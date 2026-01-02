@@ -1,21 +1,18 @@
-import './App.css'
-import { Route, Routes } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import UserContainer from './containers/UserContainer';
+import AdminContainer from './containers/AdminContainer';
 
-
-//라우팅 
-function App() {
-  
-  //UserContainer에 사용자를 구현하고 
-  //AdminContainer에 관리자를 구현하겠습니다.
-  return ( 
+export default function App() {
+  return (
     <Routes>
-      <Route element={<UserContainer/>}>
-          
-      </Route>
-      <Route element={<AdminContainer/>}>
-      </Route>
-    </Routes>
-  )
-}
+      {/* 기본 접속 시 유저로 보내기 */}
+      <Route path="/" element={<Navigate to="/user" replace />} />
 
-export default App
+      {/* User 영역 */}
+      <Route path="/user/*" element={<UserContainer />} />
+
+      {/* Admin 영역 */}
+      <Route path="/admin/*" element={<AdminContainer />} />
+    </Routes>
+  );
+}
