@@ -1,3 +1,7 @@
+import './styles/reset.css';
+import './styles/variables.css';
+import './styles/common.css';
+import './styles/theme.css';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';

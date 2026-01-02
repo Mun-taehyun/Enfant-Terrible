@@ -1,0 +1,20 @@
+/*
+  common.css
+  --------------------
+  user / admin 화면에서 공통으로 사용하는
+  레이아웃 및 기본 스타일 정의 파일
+
+  실제 화면 구조(container, 여백, 기본 색상 등)는
+  이 파일을 기준으로 구성한다.
+*/
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+}
