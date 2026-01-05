@@ -1,0 +1,74 @@
+.inputbox{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}/* 비밀번호 , 입력란 , 경고란 통째...*/
+
+.inputbox-label {
+    color: black;
+
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 140%;
+}/*상단 글자..*/
+
+
+.inputbox-container {
+    border-bottom: 1px solid gray;
+    padding: 11px 16px 11px 0px;
+
+    display: flex;
+    align-items: center;
+    
+} /*입력란 */
+
+
+.inputbox-container-error {
+    border-bottom: 1px solid red;
+    padding: 11px 16px 11px 0px;
+
+    background-color: white;
+
+    display: flex;
+    align-items: center;
+
+} /* 입력란이 오류가 났을 경우 */
+
+
+.input {
+    border: none;
+    background: none;
+    outline: none;
+
+    flex: 1;
+
+    color: black;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 140%;
+}
+/*
+border
+
+    요소 박스 모델 내부에 속하는 테두리
+
+    요소의 크기(width/height)에 영향을 줌
+
+    border는 레이아웃을 밀어냄
+
+outline "포커스 표시용"
+
+    요소 바깥쪽에 그려지는 외곽선
+
+    요소의 크기에 영향이 없음
+
+    레이아웃을 밀어내지 않음
+*/
+
+.inputbox-message {
+    color: red;
+
+    font-size: 10px;
+    font-weight: 400;
+    line-height: 140%;
+}/* 경고란 */

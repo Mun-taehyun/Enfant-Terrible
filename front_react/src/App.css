@@ -1,1 +1,280 @@
+.divider {
+    border-top: 1px solid gray;
+    width: 100%;
+}
 
+.emphasis {
+    font-weight: bolder;
+}/* 글 두께 강조.. */
+
+.word-badge{
+    border: 1px solid gray;
+    border-radius: 30px;
+    padding: 6px 20px;
+
+    color: gray;
+
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 140%;
+}/*인기검색어 버튼*/
+
+.word-badge:hover {
+    background-color: burlywood;
+    cursor: pointer;
+}
+
+
+
+.black-button {
+    border-radius: 46px;
+    width: 95px;
+    height: 30px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background-color: black;
+
+    color: white;
+
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 140%;
+    
+    cursor: pointer;
+
+}
+
+.black-button:hover {
+    background-color: gray;
+}
+
+.black-large-full-button {
+    border-radius: 46px;
+
+    width: 100%;
+    height: 48px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background-color: black;
+
+    color: white;
+
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 140%;
+
+    cursor: pointer;
+}
+
+.black-large-full-button:hover {
+    background-color: gray;
+}
+
+
+.white-button {
+    border-radius: 46px;
+    width: 93px;
+    height: 28px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background-color: white;
+
+    color: grey;
+
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 140%;
+}
+
+.white-button:hover {
+    background-color: gray;
+}
+
+
+
+.disable-button {
+    border-radius: 46px;
+    width: 95px;
+    height: 30px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background-color: gray;
+
+    color: white;
+
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 140%;
+    
+    cursor: not-allowed;
+}/**/
+
+
+.icon-box {
+    width: 24px;
+    height: 24px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-box-small {
+    width: 16px;
+    height: 16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-box-large {
+    width: 40px;
+    height: 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+/*
+justify-content 는 "주축"정렬 flex 기본값 row(가로)이므로 (가로 정렬을 의미)
+align-items 는 "교차축"정렬  flex 기본값의 교차축이므로 (세로정렬을 의미)
+
+=> flex-direction 에 따라 주축 , 교차축이 변한다는것만 알아두자. 
+*/
+
+
+
+.icon-button {
+    border-radius: 50% 50%;
+
+    width: 24px;
+    height: 24px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+}
+
+.icon-button:hover {
+    background-color: gray;
+}
+
+.icon {
+    width: 100%;
+    height: 100%;
+
+    background-position: 50% 50%;
+    background-size: 100% 100%;
+}
+
+/*          선택한 아이콘이 어디에 있는 지 찾아내고 활용함. */
+
+
+.eye-light-off-icon {
+    background-image: url(assets/image/eye-light-off.png);
+} 
+
+.eye-light-on-icon {
+    background-image: url(assets/image/eye-light-on.png);
+} 
+
+
+.expand-right-light-icon {
+    background-image: url(assets/image/expand-right-light.png);
+}/* > 방향 아이콘*/
+
+.expand-left-icon {
+    background-image: url(assets/image/expand-left.png);
+} /* < 방향 아이콘 */
+
+.expand-right-icon {
+    background-image: url(assets/image/expand-right.png);
+} /* > 방향 아이콘 */
+
+
+.logo-light-icon {
+    background-image: url(assets/image/logo-light.png);
+} /*네이버 로고 */
+
+.insta-icon {
+    background-image: url(assets/image/insta.png);
+} /* 인스타 아이콘 */
+
+.naver-blog-icon {
+    background-image: url(assets/image/naver-blog.png);
+}/* 네이버 블로그 아이콘*/
+
+.logo-dark-icon {
+    background-image: url(assets/image/logo-dark.png);
+}
+
+.search-light-icon {
+    background-image: url(assets/image/search-light.png);    
+} /* 검색표시 아이콘 */
+
+.check-round-fill-icon {
+    background-image: url(assets/image/check-round-fill.png);    
+}
+
+.check-ring-light-icon {
+    background-image: url(assets/image/check-ring-light.png);    
+}
+
+.image-box-light-icon {
+    background-image: url(assets/image/image-box-light.png);
+} /*사진표시 아이콘 */
+
+.close-icon {
+    background-image: url(assets/image/close.png);
+}/* 사진 x표시 아이콘 */
+
+.more-icon {
+    background-image: url(assets/image/more.png);
+}/* : 아이콘*/
+
+.favorite-fill-icon {
+    background-image: url(assets/image/favorite-fill.png);
+}/*꽉찬 하트*/
+
+.favorite-light-icon {
+    background-image: url(assets/image/favorite-light.png);
+}/* 빈 하트*/
+
+.up-light-icon {
+    background-image: url(assets/image/expand-up-light.png);
+}/* ^ */
+
+.down-light-icon {
+    background-image: url(assets/image/expand-down-light.png);
+}/* 아래 화살표*/
+
+.comment-icon {
+    background-image: url(assets/image/chat-light.png);
+}/*채팅 아이콘 */
+
+.edit-icon {
+    background-image: url(assets/image/edit-light.png);
+}/*연필 아이콘*/
+
+.image-box-white-icon {
+    background-image: url(assets/image/image-box-white-light.png);
+}/*이미지 없음 표시 아이콘*/
+
+.arrow-right-icon {
+    background-image: url(assets/image/arrow-right.png);
+}/*-> 이미지 표시 아이콘*/

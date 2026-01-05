@@ -1,0 +1,205 @@
+#auth-wrapper {
+    padding: 100px 0px 150px;
+    min-width: 1440px;
+    height: calc(100vh - 68px - 100px - 150px);
+    /*기본 높이 100vh , - 헤더높이 - 상단패딩 - 하단 패딩 계산*/
+    min-height: 960px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background-color: pink;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    background-size: auto;
+}
+/*
+background-image 는 이미지를 웹페이지 배경에 넣을 수 있게 해준다.
+background-repeat 는 배경이미지의 반복성을 나타낸다 (이미지크기보다 크면 여러개 나옴)
+*/
+
+.auth-container {
+    width: 1200px;
+    height: 100%;
+
+    display: grid;
+    grid-template-columns: 7fr 5fr; 
+    column-gap: 78px;
+}
+/*
+display:flex => 1차원적으로 가로 , 세로 배열이 가능하다.
+display:grid => 2차원적으로 행렬 구조로 배치가 가능하다. 
+
+grid-template-columns 는 열구조를 정의하는 속성이다.
+grid-template-columns: 7fr 5fr; 는 7 : 5 비율로 왼쪽 오른쪽을 구분한다는 의미다
+
+상태  |     columns 7비율     |  columns 5비율 |
+
+*/
+
+.auth-jumbotron-box {
+    grid-column: 1 / 2;
+
+    height: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+/* column 7비율 자리를 차치 */
+
+.auth-jumbotron-contents {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+} /* 아이콘 , 내용 , 내용  기준 => 세로 교차축 가로 중앙선 배열 */
+
+.auth-logo-icon {
+    width: 50px;
+    height: 50px;
+
+    background-color: black;
+    background-position: 50% 50%;
+    background-size: 100% 100%;
+}
+
+.auth-jumbotron-text-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.auth-jumbotron-text {
+    color: white;
+
+    font-size:40px;
+    font-weight: 400;
+    line-height: 140%;
+    letter-spacing: -1.2px;
+}
+
+.auth-card {
+    grid-column: 2 / 3;
+
+    border-radius: 10px;
+    padding: 50px 50px 30px;
+
+    background-color: white;
+    box-shadow: 0px 4px 47px 0px gray;
+}
+/* 
+column 5비율 자리를 차지
+box-shadow 박스 주변에 음영이 생긴다.. 
+*/
+
+.auth-card-box {
+    height: 100%;
+
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.auth-card-top {
+    display: flex;
+    flex-direction: column;
+    gap: 40px
+}/*세로로 요소 정렬.. gap 40px*/
+
+.auth-card-title-box {
+    display: flex;
+    justify-content: space-between;
+}
+
+.auth-card-title {
+    color: black;
+
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 140%;
+}
+
+.auth-card-page {
+    color: gray;
+
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 140%;   
+}
+
+.auth-card-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.auth-sign-in-error-box {
+    margin-bottom: -4px;
+}
+
+.auth-sign-in-error-message {
+    color: red;
+
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 140%;
+
+    white-space: pre-wrap;
+}/* 글씨가 자동으로 줄바꿈 유지 + 자동 줄바꿈을 할 수 있게.. */
+
+.auth-description-box {
+    color: gray;
+
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 140%;
+}
+
+.auth-description-link {
+    color : black;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.auth-consent-box {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.auth-check-box {
+    cursor: pointer;
+
+    width: 24px;
+    height: 24px;
+}
+
+.auth-consent-title {
+    color: black;
+
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 140%;
+}
+
+.auth-consent-title-error {
+    color: red;
+
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 140%;
+}
+
+.auth-consent-link {
+    color: black;
+
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 140%;    
+}
+
+
+
