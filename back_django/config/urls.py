@@ -16,8 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf.urls.static import static
+from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("api/v1", include("ml.urls")), # api들어올 경로 변경
+    path("api/v1/", include("ml.urls")), # api들어올 경로 변경
 ]
+
+urlpatterns += static( settings.MEDIA_URL, document_root=settings.MEDIA_ROOT )   ##미디어 추가하는 거 오류나면 settings에 있는거랑 같이 지워라

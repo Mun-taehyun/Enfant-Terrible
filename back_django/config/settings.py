@@ -37,10 +37,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'ml',
+    'corsheaders',                                              # new
+    'ml',                                                       # new
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',                     # new
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -73,10 +75,20 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
+DATABASES = {                                                           # DB를 mysql로 쓰기 위해 엔진이랑 설정 바꿈
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'enfant_terrible',
+        'USER': 'kosmo',
+        'PASSWORD': '1234',
+        'HOST': '127.0.0.1',
+        'PORT': "3306",
+        # 'OPTIONS':{
+        #     "init_command":"SET sql_mode='STRICT_TRANS_TABLES'" ,      # 이것만 명시하면 다른 것들 덮어 쓸 수 있으니 확인하고
+        #                                                                # 이미 들어가 있을 수 있음
+        #                                                                # mysql에 접속하자 마자 strict 활성한다
+        #                                                                # 경고를 에러로 명확하게 바꿔준다. ex)원치 않는 데이터 짤림등     
+        # },
     }
 }
 
@@ -99,13 +111,19 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+CORS_ALLOWED_ORIGINS = [                                ## new
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ko-kr'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Seoul'
 
 USE_I18N = True
 
@@ -116,3 +134,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+import os
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join( BASE_DIR, "media" )

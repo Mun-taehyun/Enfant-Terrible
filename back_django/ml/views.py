@@ -1,23 +1,6 @@
-from django.shortcuts import render     # 몰라 원래 있던 거
 from django.http import JsonResponse    # JSON 받는 거
 from django.views.decorators.http import require_GET        # GET만 응답하는 거
-
-def _recommend_core(product_id: int, limit: int) -> list[dict]:         # recommend_core은 추천 계산
-    """
-    나중에 진짜 모델 나오면 이 함수만 바꾸면 됩니다.
-    반환 형식은 그대로 유지하세요:
-    [{"productId": int, "score": float}, ...]
-    """
-    # 더미 추천 (임시)
-    rec_ids = []
-    cur = product_id + 1
-    while len(rec_ids) < limit:
-        if cur != product_id:
-            rec_ids.append(cur)
-        cur += 1
-    ################################## 이 윗부분을 진짜로 교체하면 됨 아래 return안에 들어 갈 것들도.
-    return [{"productId": rid, "score": 0.0} for rid in rec_ids]
-
+from ml.services.recommendations import recommend_core
 
 
 @require_GET #GET만 가능
@@ -33,7 +16,7 @@ def recommend_list(request, product_id: int):
     except ValueError:
         return JsonResponse({"message": "limit must be 1~50"}, status=400) # 이러한 것들 전부 400에러로 돌림
 
-    recommendations = _recommend_core(product_id, limit)        # recommendations = 추천
+    recommendations = recommend_core(product_id, limit)        # recommendations = 추천
 
     return JsonResponse(                                # 최종 JSON 응답 반환.  밑에 뭐 넣어야 할지 확인
         {
