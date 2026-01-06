@@ -1,9 +1,10 @@
+// pages/admin/products/Manage.tsx
+import { useState } from 'react';
+import { ProductManageItem } from './types';
+import { tableStyle } from './styles';
+
 const ProductsManage = () => {
-  const products = [
-    { id: 1, name: '강아지 사료', stock: 20 },
-    { id: 2, name: '고양이 장난감', stock: 0 },
-    { id: 3, name: '산책용 리드줄', stock: 7 },
-  ];
+  const [products] = useState<ProductManageItem[]>([]);
 
   return (
     <div>
@@ -23,26 +24,28 @@ const ProductsManage = () => {
           </tr>
         </thead>
         <tbody>
-          {products.map((product) => (
-            <tr key={product.id}>
-              <td>{product.name}</td>
-              <td>{product.stock}</td>
-              <td>
-                <button style={{ marginRight: '8px' }}>수정</button>
-                <button>삭제</button>
+          {products.length === 0 ? (
+            <tr>
+              <td colSpan={3} style={{ textAlign: 'center', padding: '16px' }}>
+                등록된 상품이 없습니다.
               </td>
             </tr>
-          ))}
+          ) : (
+            products.map((product) => (
+              <tr key={product.id}>
+                <td>{product.name}</td>
+                <td>{product.stock}</td>
+                <td>
+                  <button style={{ marginRight: '8px' }}>수정</button>
+                  <button>삭제</button>
+                </td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
     </div>
   );
-};
-
-const tableStyle: React.CSSProperties = {
-  width: '100%',
-  marginTop: '12px',
-  borderCollapse: 'collapse',
 };
 
 export default ProductsManage;

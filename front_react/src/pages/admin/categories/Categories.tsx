@@ -1,5 +1,4 @@
 import { useEffect, useState, Fragment } from 'react';
-import axios from '../../apis/core/axiosInstance';
 import type { CSSProperties } from 'react';
 
 /* =====================

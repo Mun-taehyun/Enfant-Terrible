@@ -1,21 +1,23 @@
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
-import AdminContainer from './containers/AdminContainer';
+
+// layouts
+import AdminLayout from './layouts/admin/AdminLayout';
+
+// auth
+import Login from './auth/admin/Login';
 
 // admin pages
-import Login from './pages/admin/Login';
-import Main from './pages/admin/Main';
-import Dashboard from './pages/admin/Dashboard';
-import Categories from './pages/admin/Categories';
+import Dashboard from './pages/admin/dashboard/Dashboard';
+import Categories from './pages/admin/categories/Categories';
 import ProductsDisplay from './pages/admin/products/Display';
 import ProductsManage from './pages/admin/products/Manage';
-import ChatRooms from './pages/admin/ChatRooms';
-import UserInfo from './pages/admin/UserInfo';
-import Orders from './pages/admin/Orders';
-import Reviews from './pages/admin/Reviews';
-import Popup from './pages/admin/Popup';
-import Banner from './pages/admin/Banner';
-import AdminMyPage from './pages/admin/AdminMyPage';
+import ChatRooms from './pages/admin/chat/ChatRooms';
+import Orders from './pages/admin/orders/Orders';
+import Reviews from './pages/admin/reviews/Reviews';
+import Popup from './pages/admin/popup/Popup';
+import Banner from './pages/admin/banner/Banner';
+import AdminMyPage from './pages/admin/account/AdminMyPage';
 
 /* ==============================
    Auth Utils
@@ -23,7 +25,7 @@ import AdminMyPage from './pages/admin/AdminMyPage';
 
 const isAuthenticated = () => {
   const token = localStorage.getItem('accessToken');
-  return token !== null && token !== '';
+  return !!token;
 };
 
 /* ==============================
@@ -74,38 +76,34 @@ function App() {
         path="/admin"
         element={
           <AdminRoute>
-            <AdminContainer />
+            <AdminLayout />
           </AdminRoute>
         }
       >
-        {/* ✅ 메인 (첫 랜딩 화면) */}
-        <Route index element={<Main />} />
+        {/* 첫 화면 = 대시보드 */}
+        <Route index element={<Dashboard />} />
 
-        {/* 마이페이지 */}
-        <Route path="mypage" element={<AdminMyPage />} />
+        {/* 계정 */}
+        <Route path="account" element={<AdminMyPage />} />
 
         {/* 운영 */}
-        <Route path="dashboard" element={<Dashboard />} />
         <Route path="categories" element={<Categories />} />
+        <Route path="orders" element={<Orders />} />
+        <Route path="reviews" element={<Reviews />} />
 
         {/* 상품 */}
         <Route path="products/display" element={<ProductsDisplay />} />
         <Route path="products/manage" element={<ProductsManage />} />
 
         {/* 채팅 */}
-        <Route path="chats" element={<ChatRooms />} />
-
-        {/* 회원 */}
-        <Route path="information" element={<UserInfo />} />
-        <Route path="orders" element={<Orders />} />
-        <Route path="reviews" element={<Reviews />} />
+        <Route path="chat" element={<ChatRooms />} />
 
         {/* 광고 */}
         <Route path="popup" element={<Popup />} />
         <Route path="banner" element={<Banner />} />
       </Route>
 
-      {/* 전체 fallback */}
+      {/* fallback */}
       <Route path="*" element={<Navigate to="/admin/login" replace />} />
     </Routes>
   );
