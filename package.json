@@ -1,0 +1,19 @@
+{
+  "devDependencies": {
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react-swc": "^4.2.2",
+    "vite": "^7.3.0",
+    "vite-tsconfig-paths": "^6.0.3"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.90.16",
+    "axios": "^1.13.2",
+    "dayjs": "^1.11.19",
+    "react": "^19.2.3",
+    "react-daum-postcode": "^3.2.0",
+    "react-dom": "^19.2.3",
+    "react-router-dom": "^7.11.0",
+    "zustand": "^5.0.9"
+  }
+}

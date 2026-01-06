@@ -1,48 +1,58 @@
-import type {PopupListItem} from "@/types/user/interface";
-import dayjs from "dayjs";
-import { useState } from "react";
+import type {PopupItem} from "@/types/user/interface";
+import dayjs, { Dayjs } from "dayjs";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
 
 interface Prop {
-    popupList : PopupListItem;
+    popupItem : PopupItem;
 }
 
 
 
-export default function Popup( {popupList} : Prop) {
+export default function Popup( {popupItem} : Prop) {
 
     //속성 : 인터페이스 
-    const {popupId, title, content, linkUrl , fileUrl , isActive , endAt} = popupList;
+    const {popupId, title, content, linkUrl , fileUrl , isActive , endAt} = popupItem;
 
     //상태 : 팝업창을 닫는 상태변수 (접속 시 10분정도 / 재접속 시 뜸 ) => 사용자 관리
     const [popup, setPopup] = useState<boolean>(true);
 
+    //상태 : 시간변화를 변수로 쓰인다면 마운트 시 리로드
+    const [time, setTime] = useState<Dayjs|null>();
 
 
-    //이벤트핸들러 : 팝업 닫기 시 팝업이 뜨지 않도록 .. but 10분정도 안뜨게 둔다 가정... 
-    const closePopupEventHandler = (popupId : number | string) => {
+
+    //이벤트핸들러 : 팝업 닫기 시 팝업이 뜨지 않도록 .. but 1시간정도 안뜨게 둔다 가정... 
+    const closePopupEventHandler = () => {
         if(!isActive && !popup) return; //팝업창이 뜬 것부터 이상현상 return
         
         //닫고 그 당시의 시간 체크 => 정보 저장용 localStorage 도입
         setPopup(false);
-        
+        const endTime = dayjs(endAt);
+        // => string 자료형=> Dayjs 객체로 변환 
 
-        let ddd = 600;
-        const now = dayjs().add(9, 'hour');
-        //현재(미국)시간 객체 dayjs()를 한국시간으로 보정
-        const writeTime = dayjs(now);
-        //dayjs 객체로 변환 => "현재 한국시간을 대입"
-        if ()
-        
-        setPopup(true);
-
-        
+        setTime(endTime); //종료 시간을 세팅 
     }
+    //"현재시간 생성 dayjs()"
 
+    //이벤트핸들러 : 광고 팝업 클릭 시 해당 링크로 이동하는 이벤트 처리
     const PopupLinkEventHandler = () => {
         window.open(linkUrl, "_blank")
     }//광고 사이트로 새창을 띄운다.. 
+
+    useEffect(() => {
+        if(!time) return;
+        const now = dayjs().add(9, 'hour'); 
+        const gap = time.diff(now, 'second');
+        // 10분 차이가 될 시 팝업창 재생성 => 전제조건 웹페이지 재방문
+        if(gap >= 600){
+            setPopup(true);
+        } //10분이 넘어가면 팝업을 다시 연다. 
+    }, [])
+
+
+
 
 
     if (!popup && !popupId && !isActive) return null;
@@ -52,7 +62,7 @@ export default function Popup( {popupList} : Prop) {
             <div className="popup-content-box">{content}</div>
             <div className="popup-image-box">
                 <img src={fileUrl} style={{cursor: 'pointer'}} onClick={PopupLinkEventHandler}/>
-                <button onClick={() => closePopupEventHandler(popupId)}>
+                <button onClick={() => closePopupEventHandler()}>
                     10분 동안 닫기
                 </button>
             </div>

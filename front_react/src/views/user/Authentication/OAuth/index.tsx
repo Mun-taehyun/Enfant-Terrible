@@ -20,8 +20,6 @@ export default function OAuth() {
         //날짜 객체 => 숫자화 ?? 
         const diffMs : number = expires.getTime() - now;
         if(Date.getTime())
-        
-
 
         navigate(MAIN_PATH());
     }, [accessToken])
