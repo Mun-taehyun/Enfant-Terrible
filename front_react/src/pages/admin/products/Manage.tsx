@@ -1,6 +1,6 @@
 // pages/admin/products/Manage.tsx
 import { useState } from 'react';
-import { ProductManageItem } from './types';
+import type { ProductManageItem } from './types';
 import { tableStyle } from './styles';
 
 const ProductsManage = () => {

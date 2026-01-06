@@ -1,5 +1,5 @@
 // pages/admin/products/styles.ts
-import { CSSProperties } from 'react';
+import type { CSSProperties } from 'react';
 
 export const tableStyle: CSSProperties = {
   width: '100%',

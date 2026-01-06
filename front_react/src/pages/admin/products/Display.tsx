@@ -1,7 +1,7 @@
 // pages/admin/products/Display.tsx
 import { useState } from 'react';
-import { ProductDisplayItem } from '/types';
-import { tableStyle } from '/styles';
+import type { ProductDisplayItem } from './types';
+import { tableStyle } from './styles';
 
 const ProductsDisplay = () => {
   const [products] = useState<ProductDisplayItem[]>([]);
