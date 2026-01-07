@@ -1,8 +1,11 @@
+// src/auth/admin/Login.tsx
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-// ✅ admin 전용 로그인 API
-import { login } from '../../apis/admin/adminAuth.api';
+// ✅ 실제 admin 로그인 API
+import { adminSignIn } from '../../apis/admin/adminAuth.api';
+import type AdminSignInRequestDto from '../../apis/admin/request/auth/admin-sign-in.request.dto';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -23,22 +26,22 @@ const Login = () => {
     try {
       setLoading(true);
 
-      // 2️⃣ 로그인 API 호출 (지금은 더미 / 추후 axios)
-      const response = await login({
-        loginId,
+      // 2️⃣ DTO 기준 payload 생성
+      const payload: AdminSignInRequestDto = {
+        adminId: loginId,
         password,
-      });
-      
-      /* 연결방식 : POST /admin/login 
-      🔄 axios로 바뀌는 데이터: adminId / password/ accessToken /adminName/ role  */
+      };
 
-      
-      // 3️⃣ 토큰 저장 (Auth Guard / Interceptor 대비)
+      // 3️⃣ API 호출
+      const response = await adminSignIn(payload);
+
+      // 4️⃣ 토큰 저장 (axios interceptor에서 사용)
       localStorage.setItem('accessToken', response.accessToken);
 
-      alert(`${response.adminName}님 환영합니다.`);
+      alert(`${response.adminId} 관리자님 환영합니다.`);
       navigate('/admin');
     } catch {
+      // ❗ error 미사용 → ESLint 경고 제거
       alert('아이디 또는 비밀번호가 올바르지 않습니다.');
     } finally {
       setLoading(false);
@@ -71,7 +74,7 @@ const Login = () => {
 
         <input
           type="text"
-          placeholder="ID"
+          placeholder="Admin ID"
           value={loginId}
           onChange={(e) => setLoginId(e.target.value)}
           style={{
@@ -83,7 +86,7 @@ const Login = () => {
 
         <input
           type="password"
-          placeholder="PASSWORD"
+          placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           style={{

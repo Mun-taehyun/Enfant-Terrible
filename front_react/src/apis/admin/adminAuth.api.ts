@@ -1,28 +1,20 @@
-export interface LoginRequest {
-  loginId: string;
-  password: string;
-}
+// apis/admin/adminAuth.api.ts
 
-export interface LoginResponse {
-  accessToken: string;
-  adminName: string;
-}
+import axiosInstance from '../core/api/axiosInstance';
 
-export const login = async (
-  payload: LoginRequest
-): Promise<LoginResponse> => {
-  const { loginId, password } = payload;
+import type AdminSignInRequestDto from './request/auth/admin-sign-in.request.dto';
+import type AdminSignInResponseDto from './response/auth/admin-sign-in.response.dto';
+/**
+ * 관리자 로그인
+ * POST /api/admin/auth/sign-in
+ */
+export const adminSignIn = async (
+  payload: AdminSignInRequestDto
+): Promise<AdminSignInResponseDto> => {
+  const response = await axiosInstance.post<AdminSignInResponseDto>(
+    '/admin/auth/sign-in',
+    payload
+  );
 
-  // ✅ 더미 로그인 (현재 사용)
-  if (loginId === 'admin' && password === '1234') {
-    return Promise.resolve({
-      accessToken: 'dummy-admin-token',
-      adminName: '관리자',
-    });
-  }
-
-  return Promise.reject({
-    code: 'INVALID_CREDENTIALS',
-    message: '아이디 또는 비밀번호가 올바르지 않습니다.',
-  });
+  return response.data;
 };
