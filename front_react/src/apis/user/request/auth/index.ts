@@ -1,13 +1,17 @@
 import type SignInRequestDto from "./sign-in-request.dto";
-import type SignUpRequestDto from "./sign-up-request.dto";
 import type EmailCertificationRequestDto from "./email-certification.request.dto";
-import type CheckCertificationRequestDto from "./check-certification.request.dto";
-import type PasswordSearchRequestDto from "./password-update.request.dto";
+import type EmailCodeRequestDto from "./email-code-request.dto";
+import type ResetPasswordChangeRequestDto from "./reset-password-change-response.dto";
+import type ResetPasswordCodeRequestDto from "./reset-password-code-request.dto";
+import type ResetPasswordEmailRequestDto from "./reset-password-email-request.dto";
+
+
 
 export type {
     SignInRequestDto,
-    SignUpRequestDto,
     EmailCertificationRequestDto,
-    CheckCertificationRequestDto,
-    PasswordSearchRequestDto
+    EmailCodeRequestDto,
+    ResetPasswordChangeRequestDto,
+    ResetPasswordCodeRequestDto,
+    ResetPasswordEmailRequestDto
 }

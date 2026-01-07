@@ -1,10 +1,14 @@
-import type { CheckCertificationRequestDto, EmailCertificationRequestDto, PasswordSearchRequestDto, SignInRequestDto, SignUpRequestDto } from "./request/auth";
+import type { EmailCertificationRequestDto, EmailCodeRequestDto, ResetPasswordChangeRequestDto, ResetPasswordCodeRequestDto, SignInRequestDto } from "./request/auth";
 import type { PostChatRoomIdRequestDto } from "./request/chat";
 import apiClient from "..";
 import type { GetPopupListResponseDto } from "./response/popup";
 import type { PostChatRoomIdResponseDto } from "./response/chat";
 import type { SignInResponseDto } from "./response/auth";
 import type GetCategoryListResponseDto from "./response/category/get-category-list.response.dto";
+import type { PetSelectResponseDto, SignUpResposeDto, UserSelectResponseDto } from "./response/user";
+import type { OAuthAddInformationRequestDto, PetAddInsertRequestDto, PetUpdateRequestDto, SignUpRequestDto, UserUpdateRequestDto } from "./request/user";
+import type PasswordUpdateRequestDto from "./request/user/password-update.request.dto";
+import type ResetPasswordEmailRequestDto from "./request/auth/reset-password-email-request.dto";
 
 
 // //권한 용 헤더로 보낼 엑세스토큰 사용 "제품 사용 등..."
@@ -47,6 +51,58 @@ import type GetCategoryListResponseDto from "./response/category/get-category-li
 //실패 시 error.response 반환 (NOT 2xx 상태코드) response랑 거의 유사.. 
 // error.response = {response와 거의 일치}
 
+// ============================== 사용자 ================================
+const SIGN_UP_URL = () => `/users/sign-up` //회원가입
+const USER_SELECT_URL = () => `/users/me` //내 정보 조회 
+const USER_UPDATE_URL = USER_SELECT_URL; //내 정보 수정 
+const PASSWORD_UPDATE_URL = () => `/users/me/password` //내 정보 수정 중 비밀번호 변경
+const USER_DELETE_URL = () => `/users/me` //회원탈퇴
+const OAUTH_ADD_INFORMATION_URL = () => `/users/me/profile/complete` // 소셜 회원가입 시 추가정보 요청
+const PET_ADD_INSERT_URL = () => `/users/me/pets` // 반려동물 등록 
+const PET_SELECT_URL = () => `/users/me/pets` //반려동물 목록 조회 
+const PET_UPDATE_URL = (petId : string | number)  => `/users/me/pets/${petId}` //반려동물 수정 
+const PET_DELETE_URL = (petId : string | number)  => `/users/me/pets/${petId}` //반려동물 삭제
+
+export const signupRequest = async(requestBody: SignUpRequestDto) :Promise<SignUpResposeDto> => {
+    return apiClient.post(SIGN_UP_URL(), requestBody)
+} //회원가입 
+
+export const userSelectRequest = async() :Promise<UserSelectResponseDto> => {
+    return apiClient.get(USER_SELECT_URL())
+} //내 정보 조회 
+
+export const userUpdateRequest = async(requestBody: UserUpdateRequestDto) => {
+    return apiClient.put(USER_UPDATE_URL(), requestBody)
+} //내 정보 수정 
+
+export const passwordUpdateRequest = async (requestBody: PasswordUpdateRequestDto ) => {
+    return apiClient.put(PASSWORD_UPDATE_URL(), requestBody)
+} //비밀번호 변경 요청 
+
+export const userDeleteRequest = async () => {
+    return apiClient.delete(USER_DELETE_URL())
+}//회원탈퇴
+
+export const oauthAddInformationRequest = async (requestBody: OAuthAddInformationRequestDto) => {
+    return apiClient.post(OAUTH_ADD_INFORMATION_URL(), requestBody)
+}//소셜 회원가입 시 추가 정보 입력 요청
+
+export const petAddInsertRequest = async (requestBody: PetAddInsertRequestDto) => {
+    return apiClient.post(PET_ADD_INSERT_URL(), requestBody)
+}//반려동물 등록 요청 
+
+export const petSeleteRequest = async () : Promise<PetSelectResponseDto> => {
+    return apiClient.get(PET_SELECT_URL())
+}//내 반려동물 목록 조회 
+
+export const petUpdateRequest = async (petId: string |number) => (requestBody: PetUpdateRequestDto) => {
+    return apiClient.put(PET_UPDATE_URL(petId), requestBody) //단일인자 매핑 useMutation은 data만 받는다....
+}//내 반려동물 수정 
+
+export const petDeleteRequest = async (petId: string|number) => {
+    return apiClient.delete(PET_DELETE_URL(petId))
+}//내 반려동물 정보 삭제
+
 
 
 
@@ -54,40 +110,40 @@ import type GetCategoryListResponseDto from "./response/category/get-category-li
 
 
 //================================= 인증 =================================
-//로그인/회원가입
-const SIGN_IN_URL = () => `/auth/sign-in` //로그인
-const SIGN_UP_URL = () => `/auth/sign-up` //회원가입
-//추가 요청사항 => 이메일 인증 api / 이메일 검증 api /비밀번호 변경 API
-const EMAIL_CERTIFICATION_URL = () => `/auth/email-certification`
-const CHECK_CERTIFICATION_URL = () => `/auth/check-certification`
-const PASSWORD_UPDATE = () => `/auth/password-update`
+const SIGN_IN_URL = () => `/auth/login` //로그인
+const EMAIL_CERTIFICATION_URL = () => `/auth/email/signup` //이메일 인증 메일 요청 
+const EMAIL_CODE_URL = () => `/auth/email/verify` //이메일 인증번호 검증 요청
+const RESET_PASSWORD_EMAIL_URL = () => `/auth/password/reset/request` //비밀번호 재설정 이메일요청
+const RESET_PASSWORD_CODE_URL = () => `/auth/password/reset/verify` //비밀번호 재설정 인증 검증 요청
+const RESET_PASSWORD_CHANGE_URL = () => `/auth/password/reset/verify` //비밀번호 입력 후 재설정 요청
+
 
 export const signinRequest = async(requestBody: SignInRequestDto) : Promise<SignInResponseDto> => {
     return apiClient.post(SIGN_IN_URL(), requestBody)
-} //일반 로그인
+} //일반 로그인  요청 -> 응답구조 
 
-
-export const signupRequest = async(requestBody: SignUpRequestDto) => {
-    return apiClient.post(SIGN_UP_URL(), requestBody)
-} //회원가입 
 
 export const emailCertificationRequest = async (requestBody: EmailCertificationRequestDto) => {
     return apiClient.post(EMAIL_CERTIFICATION_URL(), requestBody)
 
 } //인증번호 전송요청 
 
-export const checkCertificationRequest = async (requestBody: CheckCertificationRequestDto) => {
-    return apiClient.post(CHECK_CERTIFICATION_URL(), requestBody)
-} //인증번호 검증요청 
+export const emailCodeRequest = async (requestBody: EmailCodeRequestDto) => {
+    return apiClient.post(EMAIL_CODE_URL(), requestBody)
 
-export const passwordUpdate = async (requestBody: PasswordSearchRequestDto ) => {
-    return apiClient.patch(PASSWORD_UPDATE(), requestBody)
-} //비밀번호 변경 요청 
+} //인증번호 검증요청
 
+export const resetPasswordEmailRequest = async (requestBody: ResetPasswordEmailRequestDto) => {
+    return apiClient.post(RESET_PASSWORD_EMAIL_URL(), requestBody)
+} //비밀번호 찾기 시 이메일 인증번호 요청 
 
+export const resetPasswordCodeRequest = async (requestBody: ResetPasswordCodeRequestDto) => {
+    return apiClient.post(RESET_PASSWORD_CODE_URL(), requestBody)
+}//비번 찾기 시 이메일 인증번호 검증 요청
 
-// ================================ 소셜 ===================================
-
+export const resetPasswordChangeRequest = async (requestBody: ResetPasswordChangeRequestDto) => {
+    return apiClient.put(RESET_PASSWORD_CHANGE_URL(), requestBody)
+}//비밀번호 입력 후 재설정 요청 
 
 
 
