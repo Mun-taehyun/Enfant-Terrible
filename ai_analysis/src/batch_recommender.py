@@ -10,13 +10,14 @@ current_file_path = os.path.abspath(__file__)
 base_dir = os.path.dirname(os.path.dirname(current_file_path)) 
 PROCESSED_PATH = os.path.join(base_dir, "data", "processed")
 
-# MySQL DB 연결 설정 (ID: enfant)
-DB_URL = 'mysql+pymysql://enfant:1234@localhost:3306/enfant_db?charset=utf8mb4'
+# 1. MySQL DB 연결 설정 수정 (DB 이름: enfant_terrible)
+DB_URL = 'mysql+pymysql://enfant:1234@localhost:3306/enfant_terrible?charset=utf8mb4'
 engine = create_engine(DB_URL)
 
 def run_batch_recommendations_erd(limit_users=100):
     start_time = time.time()
-    print(f"🚀 [Enfant Terrible] ERD 기반 {limit_users}명 추천 배치 시작...")
+    # 2. 로그 메시지 수정
+    print(f"🚀 [Enfant Terrible] 신규 DB(enfant_terrible) 기반 {limit_users}명 추천 배치 시작...")
 
     try:
         score_file = os.path.join(PROCESSED_PATH, "integrated_score_v2.csv")
@@ -49,18 +50,18 @@ def run_batch_recommendations_erd(limit_users=100):
                 recommendation_data.append({
                     "u_id": int(user_id),
                     "p_id": int(p_id),
-                    "rank_val": r_idx, # ERD 컬럼 'rank'에 들어갈 값
+                    "rank_val": r_idx, 
                     "score_val": round(float(score), 4)
                 })
 
-        # 5. DB 저장 (ERD 구조에 완벽 대응)
+        # 3. DB 저장 (enfant_terrible 내 et_user_recommendation 테이블)
         print(f"🚀 {len(recommendation_data)}건의 데이터를 et_user_recommendation에 반영 중...")
         with engine.connect() as conn:
             conn.execute(text("SET FOREIGN_KEY_CHECKS = 0;"))
             conn.execute(text("TRUNCATE TABLE et_user_recommendation;"))
             conn.execute(text("SET FOREIGN_KEY_CHECKS = 1;"))
             
-            # [수정 핵심] RANK_NO 대신 `rank` 사용 및 백틱 적용
+            # `rank`는 예약어이므로 백틱(``) 필수 사용
             insert_query = text("""
                 INSERT INTO et_user_recommendation (user_id, product_id, `rank`, score)
                 VALUES (:u_id, :p_id, :rank_val, :score_val)
@@ -69,7 +70,7 @@ def run_batch_recommendations_erd(limit_users=100):
             conn.execute(insert_query, recommendation_data)
             conn.commit()
 
-        print(f"✅ ERD 최적화 추천 완료! (소요 시간: {time.time() - start_time:.2f}초)")
+        print(f"✅ enfant_terrible DB 최적화 추천 완료! (소요 시간: {time.time() - start_time:.2f}초)")
 
     except Exception as e:
         print(f"❌ 오류 발생: {e}")

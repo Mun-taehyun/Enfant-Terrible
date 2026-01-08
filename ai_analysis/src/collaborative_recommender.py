@@ -10,14 +10,14 @@ current_file_path = os.path.abspath(__file__)
 base_dir = os.path.dirname(os.path.dirname(current_file_path)) 
 PROCESSED_PATH = os.path.join(base_dir, "data", "processed")
 
-# MySQL DB 연결 설정 (사용자: enfant)
-DB_URL = 'mysql+pymysql://enfant:1234@localhost:3306/enfant_db?charset=utf8mb4'
+# 1. MySQL DB 연결 설정 (DB 이름을 enfant_terrible로 변경)
+DB_URL = 'mysql+pymysql://enfant:1234@localhost:3306/enfant_terrible?charset=utf8mb4'
 engine = create_engine(DB_URL)
 
 def run_full_batch_recommendation_erd(top_n=5):
     try:
         start_time = time.time()
-        print(f"🚀 [Enfant Terrible] ERD 기반 추천 배치 시작...")
+        print(f"🚀 [Enfant Terrible] 신규 DB(enfant_terrible) 기반 추천 배치 시작...")
 
         # 1. 데이터 로딩
         file_path = os.path.join(PROCESSED_PATH, "integrated_score_v2.csv")
@@ -46,32 +46,31 @@ def run_full_batch_recommendation_erd(top_n=5):
                 all_recommendations.append({
                     "user_id": int(target_user_id),
                     "product_id": int(p_id),
-                    "rank": int(r_idx),
+                    "rank": int(r_idx), # DB 테이블의 컬럼명과 일치해야 함
                     "score": float(round(score, 4))
                 })
 
-        # 4. DB 저장 (Pandas to_sql 방식 - 바인딩 에러 100% 해결)
+        # 4. DB 저장
         print(f"💾 MySQL 'et_user_recommendation' 테이블 업데이트 중...")
-        
-        # 리스트를 데이터프레임으로 변환
         result_df = pd.DataFrame(all_recommendations)
 
         with engine.begin() as conn:
-            # 1단계: 기존 추천 데이터 삭제 (TRUNCATE)
+            # 안전한 삭제를 위해 외래 키 체크 일시 해제
+            conn.execute(text("SET FOREIGN_KEY_CHECKS = 0;"))
             conn.execute(text("TRUNCATE TABLE et_user_recommendation;"))
+            conn.execute(text("SET FOREIGN_KEY_CHECKS = 1;"))
             
-            # 2단계: 데이터프레임을 DB 테이블에 직접 밀어넣기
-            # index=False는 행 번호를 넣지 않겠다는 뜻입니다.
+            # 데이터프레임을 DB 테이블에 직접 삽입
             result_df.to_sql(
                 name='et_user_recommendation', 
                 con=conn, 
                 if_exists='append', 
                 index=False,
-                method='multi' # 여러 행을 한 번에 삽입하여 성능 최적화
+                method='multi'
             )
             
         print(f"✨ 배치 완료! (소요 시간: {time.time() - start_time:.2f}초)")
-        print(f"✅ DB 확인: {len(all_recommendations)}개의 데이터가 'et_user_recommendation'에 저장되었습니다.")
+        print(f"✅ DB 확인: {len(all_recommendations)}개의 데이터가 'enfant_terrible' DB에 저장되었습니다.")
 
     except Exception as e:
         print(f"❌ 오류 발생 상세: {e}")

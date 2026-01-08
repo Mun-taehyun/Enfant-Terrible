@@ -9,8 +9,8 @@ def migrate_to_et_tables_erd():
     # 생성했던 ERD용 상품 마스터 로드
     CSV_PATH = os.path.join(base_dir, "data", "raw", "product_master_erd.csv")
 
-    # 2. MySQL DB 연결 (사용자: enfant)
-    DB_URL = 'mysql+pymysql://enfant:1234@localhost:3306/enfant_db?charset=utf8mb4'
+    # 2. MySQL DB 연결 설정 수정 (DB 이름: enfant_terrible)
+    DB_URL = 'mysql+pymysql://enfant:1234@localhost:3306/enfant_terrible?charset=utf8mb4'
     engine = create_engine(DB_URL)
 
     try:
@@ -33,20 +33,20 @@ def migrate_to_et_tables_erd():
         # ⚠️ 중요: 만약 DB에 아래 컬럼들을 추가하지 않았다면 주석 처리하거나 제거해야 에러가 안 납니다.
         # et_df['image_url'] = df['image_url'] 
 
-        print(f"📊 {len(et_df)}건의 데이터를 ERD 표준 형식으로 변환 완료.")
+        print(f"📊 {len(et_df)}건의 데이터를 [enfant_terrible] 표준 형식으로 변환 완료.")
 
-        # 5. 기존 데이터 초기화
-        with engine.connect() as conn:
-            print("🧹 기존 데이터를 안전하게 초기화 중...")
+        # 5. 기존 데이터 초기화 (트랜잭션 보장을 위해 engine.begin() 권장)
+        with engine.begin() as conn:
+            print(f"🧹 'enfant_terrible' 내 기존 데이터를 안전하게 초기화 중...")
             conn.execute(text("SET FOREIGN_KEY_CHECKS = 0;"))
             conn.execute(text("TRUNCATE TABLE et_product;"))
             conn.execute(text("SET FOREIGN_KEY_CHECKS = 1;"))
-            conn.commit()
+            # engine.begin()은 자동으로 commit을 수행합니다.
 
         # 6. DB 전송
         print("🚀 MySQL 'et_product' 테이블로 전송 중...")
         et_df.to_sql('et_product', con=engine, if_exists='append', index=False)
-        print("✅ ERD 기반 마이그레이션 성공!")
+        print("✅ enfant_terrible DB로 마이그레이션 성공!")
 
     except Exception as e:
         print(f"❌ 오류 발생: {e}")

@@ -17,10 +17,10 @@ def create_erd_compatible_data():
     users = np.arange(1, num_users + 1)
     products = np.arange(1, num_products + 1)
 
-    print(f"🚀 [Enfant Terrible] ERD 구조 완벽 대응 데이터 생성 시작")
+    # [수정] 로그 메시지를 프로젝트 명칭에 맞게 변경
+    print(f"🚀 [Enfant Terrible] 신규 DB 구조 대응 데이터 생성 시작...")
 
-    # 1. et_user_attribute_value 형식으로 생성 (핵심 변경 사항)
-    # ERD 구조에 맞춰 attribute_id(1:나이, 2:사이즈, 3:성별, 4:활동성)로 생성
+    # 1. et_user_attribute_value 형식으로 생성
     dog_attr_list = []
     for u_id in users:
         dog_attr_list.append({'user_id': u_id, 'attribute_id': 1, 'value_number': np.random.choice([0, 1, 2])}) # 나이
@@ -34,14 +34,13 @@ def create_erd_compatible_data():
     # 2. et_product 대응 (category_id 추가)
     df_products = pd.DataFrame({
         'product_id': products,
-        'category_id': np.random.choice([1, 2, 3], num_products), # ERD 필수 외래키
+        'category_id': np.random.choice([1, 2, 3], num_products), 
         'name': [f"프리미엄 상품 {i}" for i in products],
         'base_price': np.random.randint(10, 100, num_products) * 500
     })
     df_products.to_csv(os.path.join(RAW_PATH, "products_erd.csv"), index=False)
 
-    # 3. et_order, et_cart_item, et_product_review (기존 로직 유지하되 컬럼명 매칭)
-    # [주문]
+    # 3. 주문 및 리뷰 데이터 생성
     df_orders = pd.DataFrame({
         'user_id': np.random.choice(users, 1500),
         'product_id': np.random.choice(products, 1500),
@@ -49,7 +48,6 @@ def create_erd_compatible_data():
     }).drop_duplicates(['user_id', 'product_id'])
     df_orders.to_csv(os.path.join(RAW_PATH, "orders.csv"), index=False)
 
-    # [리뷰] - ERD의 rating 컬럼 반영
     df_reviews = pd.DataFrame({
         'user_id': np.random.choice(users, 800),
         'product_id': np.random.choice(products, 800),
@@ -57,7 +55,8 @@ def create_erd_compatible_data():
     }).drop_duplicates(['user_id', 'product_id'])
     df_reviews.to_csv(os.path.join(RAW_PATH, "reviews.csv"), index=False)
 
-    print(f"✅ ERD 호환 데이터 생성 완료! (User ID: enfant)")
+    # [수정] 로그 메시지 내 유저 ID 확인
+    print(f"✅ enfant_terrible 프로젝트용 CSV 생성 완료! (User ID: enfant)")
 
 if __name__ == "__main__":
     create_erd_compatible_data()
