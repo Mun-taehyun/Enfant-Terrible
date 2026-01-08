@@ -11,27 +11,28 @@ base_dir = os.path.dirname(os.path.dirname(current_file_path))
 RAW_PATH = os.path.join(base_dir, "data", "raw")
 PROCESSED_PATH = os.path.join(base_dir, "data", "processed")
 
-# 본인의 계정 정보로 수정 (C##ENFANT 또는 ENFANT)
-DB_URL = 'oracle+cx_oracle://ENFANT:1234@localhost:1521/?service_name=xe'
+# [수정] MySQL DB 연결 설정 (ID: enfant, PW: 1234, DB: enfant_db)
+# 만약 한글이 깨진다면 끝에 ?charset=utf8mb4 를 붙여주세요.
+DB_URL = 'mysql+pymysql://enfant:1234@localhost:3306/enfant_db?charset=utf8mb4'
 engine = create_engine(DB_URL)
 
-def run_batch_recommendations(limit_users=100):
+def run_batch_recommendations(limit_users=500):
     start_time = time.time()
-    print(f"🚀 [Enfant Terrible] {limit_users}명 대상 대량 추천 업데이트 시작...")
+    print(f"🚀 [Enfant Terrible] {limit_users}명 대상 대량 추천 업데이트 시작 (MySQL)...")
 
     try:
         # 1. 데이터 로드
         df_scores = pd.read_csv(os.path.join(PROCESSED_PATH, "integrated_score_v2.csv"))
         df_profiles = pd.read_csv(os.path.join(RAW_PATH, "dog_profiles.csv"))
         
-        # 2. 업데이트할 유저 샘플링 (활동이 있는 유저 중 상위 N명)
+        # 2. 업데이트할 유저 샘플링
         target_users = df_scores['user_id'].unique()[:limit_users]
         
         print(f"📊 총 {len(target_users)}명의 유저를 처리합니다.")
 
         with engine.connect() as conn:
             for idx, user_id in enumerate(target_users):
-                # 기존 추천 삭제
+                # [수정] 기존 추천 삭제 (MySQL 문법)
                 conn.execute(text("DELETE FROM ET_USER_RECOMMENDATION WHERE USER_ID = :u_id"), {"u_id": int(user_id)})
                 
                 # --- 추천 로직 (유사 그룹 기반) ---
@@ -49,7 +50,7 @@ def run_batch_recommendations(limit_users=100):
                 df_sub = df_scores[df_scores['user_id'].isin(sample_ids)]
                 matrix = df_sub.pivot_table(index='user_id', columns='product_id', values='total_score').fillna(0)
                 
-                # 유사도 및 가중치 계산
+                # 유사도 계산
                 user_sim = cosine_similarity(matrix)
                 user_sim_df = pd.DataFrame(user_sim, index=matrix.index, columns=matrix.index)
                 
@@ -61,17 +62,24 @@ def run_batch_recommendations(limit_users=100):
                 purchased = df_scores[df_scores['user_id'] == user_id]['product_id'].unique()
                 recommendations = weighted_scores.drop(purchased, errors='ignore').sort_values(ascending=False).head(5)
 
-                # --- DB 저장 ---
+                # --- [핵심 수정] DB 저장 (MySQL AUTO_INCREMENT 활용) ---
+                # RECOMMENDATION_ID를 쿼리에서 제외하여 MySQL이 자동으로 생성하게 함
                 for rank, (p_id, score) in enumerate(recommendations.items(), 1):
                     conn.execute(text("""
-                        INSERT INTO ET_USER_RECOMMENDATION (RECOMMENDATION_ID, USER_ID, PRODUCT_ID, RANK_NO, SCORE)
-                        VALUES (ET_RECO_SEQ.NEXTVAL, :u_id, :p_id, :rank, :score)
-                    """), {"u_id": int(user_id), "p_id": int(p_id), "rank": rank, "score": float(score)})
+                        INSERT INTO ET_USER_RECOMMENDATION (USER_ID, PRODUCT_ID, RANK_NO, SCORE)
+                        VALUES (:u_id, :p_id, :rank, :score)
+                    """), {
+                        "u_id": int(user_id), 
+                        "p_id": int(p_id), 
+                        "rank": rank, 
+                        "score": float(score)
+                    })
                 
                 if (idx + 1) % 10 == 0:
                     print(f"⏳ 진행 중... ({idx + 1}/{len(target_users)})")
             
-            conn.commit() # 최종 커밋
+            # MySQL은 commit을 명시적으로 호출해주는 것이 안전합니다.
+            conn.commit()
 
         print(f"✅ 대량 업데이트 완료! (소요 시간: {time.time() - start_time:.2f}초)")
 
@@ -79,4 +87,4 @@ def run_batch_recommendations(limit_users=100):
         print(f"❌ 오류 발생: {e}")
 
 if __name__ == "__main__":
-    run_batch_recommendations(limit_users=500) # 500명 테스트
+    run_batch_recommendations(limit_users=500)
