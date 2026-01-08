@@ -1,5 +1,5 @@
 /**
- * @description 관리자 - 계정 관리 API 세트 (이미지 7, 9번 명세 기준)
+ * @description 관리자 - 계정 관리 API 세트 
  */
 // 1. @/apis/core 대신 상대 경로로 직접 연결
 import api from '../../core/api/axiosInstance.ts';
