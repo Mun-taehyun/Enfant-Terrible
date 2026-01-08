@@ -4,9 +4,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.enfantTerrible.enfantTerrible.common.enums.EmailVerifiedStatus;
-import com.enfantTerrible.enfantTerrible.common.enums.UserRole;
-import com.enfantTerrible.enfantTerrible.common.enums.UserStatus;
 import com.enfantTerrible.enfantTerrible.dto.user.ChangePasswordRequest;
 import com.enfantTerrible.enfantTerrible.dto.user.CompleteProfileRequest;
 import com.enfantTerrible.enfantTerrible.dto.user.ResetPasswordRequest;
@@ -47,17 +44,22 @@ public class UserService {
     row.setAddressBase(req.getAddressBase());
     row.setAddressDetail(req.getAddressDetail());
 
-    row.setRole(UserRole.USER.name());
+    // 기본값
+    row.setRole("USER");
     row.setProvider("local");
-    row.setStatus(UserStatus.ACTIVE.name());
-    row.setEmailVerified(EmailVerifiedStatus.Y.name());
+    row.setStatus("ACTIVE");
+    row.setEmailVerified("Y");
 
     userMapper.insert(row);
+
     return toResponse(row);
   }
 
   public void completeProfile(Long userId, CompleteProfileRequest req) {
-    UserRow user = getUserOrThrow(userId);
+    UserRow user = userMapper.findById(userId);
+    if (user == null) {
+      throw new BusinessException("존재하지 않는 사용자입니다.");
+    }
 
     user.setTel(req.getTel());
     user.setZipCode(req.getZipCode());
@@ -67,23 +69,39 @@ public class UserService {
     userMapper.updateProfile(user);
   }
 
+  /**
+   * 내 정보 조회
+   */
   @Transactional(readOnly = true)
   public UserResponse getMyInfo(Long userId) {
-    return toResponse(getUserOrThrow(userId));
+    UserRow row = userMapper.findById(userId);
+    if (row == null) {
+      throw new BusinessException("존재하지 않는 사용자입니다.");
+    }
+    return toResponse(row);
   }
 
   /**
    * Security 전용 조회
+   * - JWT 인증 시 필요한 필드 포함
+   * - Controller 노출 금지
    */
   @Transactional(readOnly = true)
   public UserRow getUserForSecurity(Long userId) {
-    return getUserOrThrow(userId);
+    UserRow row = userMapper.findById(userId);
+    if (row == null) {
+      throw new BusinessException("존재하지 않는 사용자입니다.");
+    }
+    return row;
   }
 
+  /**
+   * 회원정보 수정
+   */
   public UserResponse updateProfile(Long userId, UpdateProfileRequest req) {
 
-    UserRow row = getUserOrThrow(userId);
-
+    UserRow row = new UserRow();
+    row.setUserId(userId);
     row.setName(req.getName());
     row.setTel(req.getTel());
     row.setZipCode(req.getZipCode());
@@ -91,12 +109,20 @@ public class UserService {
     row.setAddressDetail(req.getAddressDetail());
 
     userMapper.updateProfile(row);
-    return toResponse(getUserOrThrow(userId));
+
+    UserRow updated = userMapper.findById(userId);
+    return toResponse(updated);
   }
 
+  /**
+   * 내 정보 → 비밀번호 변경
+   */
   public void changePassword(Long userId, ChangePasswordRequest req) {
 
-    UserRow row = getUserOrThrow(userId);
+    UserRow row = userMapper.findById(userId);
+    if (row == null) {
+      throw new BusinessException("존재하지 않는 사용자입니다.");
+    }
 
     if (!passwordEncoder.matches(req.getCurrentPassword(), row.getPassword())) {
       throw new BusinessException("현재 비밀번호가 일치하지 않습니다.");
@@ -108,44 +134,44 @@ public class UserService {
     );
   }
 
+  /**
+   * 비밀번호 찾기 → 이메일 인증 후 비밀번호 재설정
+   */
   public void resetPassword(ResetPasswordRequest req) {
 
-    if (!emailVerificationService.isPasswordResetVerified(req.getEmail())) {
-      throw new BusinessException("이메일 인증이 필요합니다.");
-    }
-
-    UserRow row = userMapper.findByEmail(req.getEmail());
-    if (row == null) {
-      throw new BusinessException("존재하지 않는 사용자입니다.");
-    }
-
-    userMapper.updatePassword(
-      row.getUserId(),
-      passwordEncoder.encode(req.getNewPassword())
-    );
+  if (!emailVerificationService.isPasswordResetVerified(req.getEmail())) {
+    throw new BusinessException("이메일 인증이 필요합니다.");
   }
 
+  UserRow row = userMapper.findByEmail(req.getEmail());
+  if (row == null) {
+    throw new BusinessException("존재하지 않는 사용자입니다.");
+  }
+
+  userMapper.updatePassword(
+    row.getUserId(),
+    passwordEncoder.encode(req.getNewPassword())
+  );
+}
+
+
+  /**
+   * 마지막 로그인 시간 갱신
+   */
   public void updateLastLogin(Long userId) {
     userMapper.updateLastLogin(userId);
   }
 
+  /**
+   * 회원 탈퇴 (소프트 딜리트)
+   */
   public void delete(Long userId) {
-    getUserOrThrow(userId);
     userMapper.softDelete(userId);
   }
 
-  // =====================
-  // private helpers
-  // =====================
-
-  private UserRow getUserOrThrow(Long userId) {
-    UserRow row = userMapper.findById(userId);
-    if (row == null) {
-      throw new BusinessException("존재하지 않는 사용자입니다.");
-    }
-    return row;
-  }
-
+  /**
+   * row to response를 위한 내부 메서드
+   */
   private UserResponse toResponse(UserRow row) {
     return new UserResponse(
       row.getUserId(),

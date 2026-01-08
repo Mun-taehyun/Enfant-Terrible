@@ -1,8 +1,8 @@
 package com.enfantTerrible.enfantTerrible.controller.admin.user;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.enfantTerrible.enfantTerrible.common.response.ApiResponse;
 import com.enfantTerrible.enfantTerrible.common.response.AdminPageResponse;
 import com.enfantTerrible.enfantTerrible.dto.admin.user.AdminUserDetailResponse;
 import com.enfantTerrible.enfantTerrible.dto.admin.user.AdminUserListResponse;
@@ -22,39 +22,39 @@ public class AdminUserController {
 
   /**
    * 관리자 - 사용자 목록 조회
+   * GET /api/admin/users
+   *
+   * - 검색 조건이 모두 없으면 전체 조회
+   * - 항상 페이징 적용
    */
   @GetMapping
-  public ApiResponse<AdminPageResponse<AdminUserListResponse>> getUsers(
+  public AdminPageResponse<AdminUserListResponse> getUsers(
     AdminUserSearchRequest req
   ) {
-    return ApiResponse.success(
-      adminUserService.getUsers(req),
-      "사용자 목록 조회 성공"
-    );
+    return adminUserService.getUsers(req);
   }
 
   /**
    * 관리자 - 사용자 상세 조회
+   * GET /api/admin/users/{userId}
    */
   @GetMapping("/{userId}")
-  public ApiResponse<AdminUserDetailResponse> getUserDetail(
+  public AdminUserDetailResponse getUserDetail(
     @PathVariable Long userId
   ) {
-    return ApiResponse.success(
-      adminUserService.getUserDetail(userId),
-      "사용자 상세 조회 성공"
-    );
+    return adminUserService.getUserDetail(userId);
   }
 
   /**
    * 관리자 - 사용자 상태 변경
+   * PATCH /api/admin/users/{userId}/status
    */
   @PatchMapping("/{userId}/status")
-  public ApiResponse<Void> updateUserStatus(
+  public ResponseEntity<Void> updateUserStatus(
     @PathVariable Long userId,
     @Valid @RequestBody AdminUserStatusUpdateRequest req
   ) {
     adminUserService.updateUserStatus(userId, req.getStatus());
-    return ApiResponse.successMessage("사용자 상태 변경 완료");
+    return ResponseEntity.noContent().build();
   }
 }

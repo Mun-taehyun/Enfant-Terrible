@@ -1,13 +1,12 @@
 package com.enfantTerrible.enfantTerrible.security;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-
-import com.enfantTerrible.enfantTerrible.common.enums.UserRole;
 
 public class CustomOAuth2User implements OAuth2User {
 
@@ -31,10 +30,7 @@ public class CustomOAuth2User implements OAuth2User {
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    UserRole userRole = UserRole.from(role);
-    return AuthorityUtils.createAuthorityList(
-        userRole.getSecurityRole()
-    );
+    return List.of(new SimpleGrantedAuthority("ROLE_" + role));
   }
 
   @Override

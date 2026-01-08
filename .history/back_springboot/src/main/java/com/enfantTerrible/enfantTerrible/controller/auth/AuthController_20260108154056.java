@@ -1,6 +1,9 @@
 package com.enfantTerrible.enfantTerrible.controller.auth;
 
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.enfantTerrible.enfantTerrible.common.response.ApiResponse;
 import com.enfantTerrible.enfantTerrible.dto.auth.LoginRequest;
@@ -16,14 +19,11 @@ import lombok.RequiredArgsConstructor;
 public class AuthController {
 
   private final AuthService authService;
-
+  
   @PostMapping("/login")
   public ApiResponse<LoginResponse> login(
     @Valid @RequestBody LoginRequest req
   ) {
-    return ApiResponse.success(
-      authService.login(req),
-      "로그인 성공"
-    );
+    return ApiResponse.success(authService.login(req), "로그인 성공");
   }
 }

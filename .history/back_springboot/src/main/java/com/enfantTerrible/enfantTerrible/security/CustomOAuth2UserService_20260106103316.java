@@ -9,7 +9,6 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import com.enfantTerrible.enfantTerrible.dto.user.UserRow;
-import com.enfantTerrible.enfantTerrible.exception.BusinessException;
 import com.enfantTerrible.enfantTerrible.service.auth.AuthService;
 
 import lombok.RequiredArgsConstructor;
@@ -65,26 +64,28 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
   ) {
 
     if (PROVIDER_GOOGLE.equals(provider)) {
+      // Google: sub
       Object sub = attributes.get("sub");
       if (sub == null) {
-        throw new BusinessException("Google OAuth 사용자 식별자를 찾을 수 없습니다.");
+        throw new IllegalStateException("Google OAuth response missing sub");
       }
       return String.valueOf(sub);
     }
 
     if (PROVIDER_NAVER.equals(provider)) {
+      // Naver: response.id
       Map<String, Object> response =
         (Map<String, Object>) attributes.get("response");
 
       if (response == null || !response.containsKey("id")) {
-        throw new BusinessException("Naver OAuth 사용자 식별자를 찾을 수 없습니다.");
+        throw new IllegalStateException("Naver OAuth response missing id");
       }
 
       return String.valueOf(response.get("id"));
     }
 
-    throw new BusinessException(
-      "지원하지 않는 OAuth 제공자입니다: " + provider
+    throw new IllegalArgumentException(
+      "Unsupported OAuth provider: " + provider
     );
   }
 }

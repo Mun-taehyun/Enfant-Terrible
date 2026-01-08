@@ -1,9 +1,10 @@
 package com.enfantTerrible.enfantTerrible.security;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.enfantTerrible.enfantTerrible.common.enums.UserRole;
@@ -33,9 +34,11 @@ public class CustomUserDetails implements UserDetails {
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    UserRole userRole = UserRole.from(role);
-    return AuthorityUtils.createAuthorityList(
-        userRole.getSecurityRole()
+
+    UserRole userRole = UserRole.from(role); // 방어적 변환
+
+    return List.of(
+        new SimpleGrantedAuthority(userRole.getSecurityRole())
     );
   }
 

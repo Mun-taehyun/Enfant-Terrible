@@ -1,4 +1,4 @@
-package com.enfantTerrible.enfantTerrible.service.user;
+package com.enfantTerrible.enfantTerrible.service.admin.user;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

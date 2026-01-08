@@ -1,10 +1,12 @@
 package com.enfantTerrible.enfantTerrible.security;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import com.enfantTerrible.enfantTerrible.common.enums.UserRole;
