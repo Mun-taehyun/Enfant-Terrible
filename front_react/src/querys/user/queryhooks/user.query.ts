@@ -39,9 +39,11 @@ export const userQueries = {
 
     // ========================CUD 변경 쿼리 ===========================
 
-    // 회원가입 C(추가) 쿼리 
+    // 회원가입 C(추가) 쿼리 => 완료 
     useSignUp() {
-        return useMutation({mutationFn: signupRequest});
+        return useMutation({
+            mutationFn: signupRequest,
+        });
     },
 
     //소셜회원가입 C(추가) 쿼리 
@@ -54,7 +56,7 @@ export const userQueries = {
         });
     },
 
-    // 비밀번호 변경 U(수정) 쿼리 
+    // 비밀번호 변경 U(수정) 쿼리
     usePasswordUpdate() {
         return useMutation({mutationFn: passwordUpdateRequest}); 
         //클라이언트를 갱신할 필요성이 없는 행위 .. 

@@ -3,65 +3,107 @@ import { useQuery } from '@tanstack/react-query';
 import Popup from '@/components/user/Popup';
 import { getPopupListRequest } from './apis/user';
 import type { GetPopupListResponseDto } from './apis/user/response/popup';
-import { useEffect, useState } from 'react';
-import type { PopupItem } from './types/user/interface';
+import { useEffect } from 'react';
+import type { PopupItem, User } from './types/user/interface';
 import { Route, Routes } from 'react-router-dom';
 import UserContainer from './layouts/user/UserContainer';
-import { MAIN_PATH } from './constant/user';
+import { AUTH_PATH, MAIN_PATH } from './constant/user';
 import Main from './views/user/Main';
+import { useLoginUserStore } from './stores/user';
+import { userQueries } from './querys/user/queryhooks';
+import type { UserSelectResponseDto } from './apis/user/response/user';
+import Authentication from './views/user/Authentication/SignAll';
 //공통라우터 정리 
 
-
+const MOCK_POPUP_LIST: PopupItem[] = [
+  {
+    popupId: 1,
+    title: "신규 가입 웰컴 쿠폰팩",
+    content: "지금 가입하면 10만원 쿠폰팩 즉시 지급!",
+    linkUrl: "https://example.com/event/1",
+    fileUrl: "https://picsum.photos/id/10/400/500", // 고정 이미지
+    isActive: true,
+    endAt: "2026-12-31T23:59:59"
+  },
+  {
+    popupId: 2,
+    title: "겨울 시즌 한정 세일",
+    content: "전 품목 최대 70% 할인 혜택을 놓치지 마세요.",
+    linkUrl: "https://example.com/event/2",
+    fileUrl: "https://picsum.photos/id/20/400/500",
+    isActive: true,
+    endAt: "2026-01-31T23:59:59"
+  },
+  {
+    popupId: 3,
+    title: "주말 특가 타임세일",
+    content: null, // content가 null인 경우도 테스트
+    linkUrl: "https://example.com/event/3",
+    fileUrl: "https://picsum.photos/id/48/400/500",
+    isActive: true,
+    endAt: "2026-01-15T18:00:00"
+  }
+];
 
 
 
 function App() {
 
   //쿼리: 사용 활성화된 광고팝업 캐싱 
-  const {data , error , isLoading} = useQuery<GetPopupListResponseDto>(
+  const {data : popupData , error : popupError , isLoading : isPopupLoading } = useQuery<GetPopupListResponseDto, Error, PopupItem[]>(
     { 
       queryKey: ['popup'] , 
-      queryFn: getPopupListRequest 
+      queryFn: getPopupListRequest,
+      placeholderData: { 
+          popupList: MOCK_POPUP_LIST, 
+          code: "SU", 
+          message: "Success" 
+        } as GetPopupListResponseDto,
+      select: (popupData: GetPopupListResponseDto) =>
+            popupData.popupList.filter(item => (item.isActive === true))
     } // GetPopupListResponseDto 에 있는 isActive : true 일 경우에 받아온다. 
   );
-  if (isLoading) return <div> 팝업 업로드 중 </div>
-  if (error instanceof Error) return <div>{error.message}</div>;
 
 
-  //상태 : 활성화된 팝업
-  const [activeListPopup, setActiveListPopup] = useState<PopupItem[]>([]);
+  //서버상태 : 회원가입 한 유저정보 조회 
+  const {data : useData, error : useError } = userQueries.useMe();
 
-  //함수 : 
+  //상태보관 : 유저의 로그인/로그아웃 상태 
+  const {setLoginUser ,resetLoginUser} = useLoginUserStore();
 
-  //효과 : 팝업리스트 응답 조회를 위한 요청 
+
+  //효과 : 팝업리스트 응답 조회와 유저 로그인 상태 
   useEffect(() => {
-    if(!data) return; // data를 바로 사용 불가  
-    
-    // const dataPopup : PopupItem[] = data.popupList.map(item => item)
-    // //popupList 개수만큼 배열이 생성 
 
-    // for(let i = 0; data.popupList.length ; i++)
-    //   if(data.popupList[i].isActive === true) dataPopup.push(data.popupList[i]);
-    //   else continue;   // 아니면 반복작업 계속 시행 => isActive 검수.
+    const token = localStorage.getItem('accessToken');
+    if(!token) {
+      resetLoginUser();
+      localStorage.removeItem('accessToken');
+      return;
+    }
+    const loginUser : User = useData as UserSelectResponseDto 
+    // 로그인 데이터 사용 
+    setLoginUser(loginUser);
+  }, [useData, setLoginUser , resetLoginUser]) //처음 들어올 때 List 활용 
 
-    // => 필터를 쓰면 간단한 거였다... 
-    const filtered = data.popupList.filter(item => item.isActive === true);
-    setActiveListPopup(filtered); //활성화된 팝업만 상태를 받아온다. 
+  if (isPopupLoading) return <div> 팝업 업로드 중 </div>
+  if (popupError instanceof Error) return <div>{popupError.message}</div>;
+  if (useError instanceof Error) return <div>{'유저 데이터를 불러오는 데 실패했습니다. 서버오류'}</div>;
 
-    // return dataPopup;
-  }, []) //처음 들어올 때 List 활용 
-
-
+  
   return (
-
     //컴포넌트 렌더링 설계
-    // 
+    //메인 페이지 /
+    //Local 인증 페이지 /auth
+    <>
+    {popupData?.map((item) => (<Popup popupItem={item} />))}
     <Routes>
       <Route element={<UserContainer/>}>
         <Route path={MAIN_PATH()} element={<Main />}/>
-        {activeListPopup.map((item) => (<Popup popupItem={item} />))}
+        <Route path={AUTH_PATH()} element={<Authentication />}/>
       </Route>
     </Routes>
+    </>
   )
 }
 //광고 팝업 반환값 GetPopupListResponseDto | string | number 

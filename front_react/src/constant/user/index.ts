@@ -2,10 +2,7 @@ export const MAIN_PATH = () => '/';
 //메인페이지 
 export const AUTH_PATH = () => '/auth';
 //인증페이지 
-export const AUTH_PASSWORD_PATH = () => `/auth/password`;
-//비밀번호 찾기
-export const PASSWORD_UPDATE_PATH = () => `/auth/password-update`;
-//비밀번호 변경 
+
 
 //소셜 
 

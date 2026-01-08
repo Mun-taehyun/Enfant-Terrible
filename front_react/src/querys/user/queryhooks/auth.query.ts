@@ -22,6 +22,16 @@
 //         => 2번 파라미터 variables = mutate에 넘긴 값    
 //         => 3번 파라미터 context = onMutate 반환 값
 
+//useMutation 준비 => mutate() 호출 "수동시작 => 요청보냄" => onSuccess , onError 실행
+
+//Mutation UI 상태 처리 boolean 값 반환 
+// isIdle => 실행 o 시 true 반환 
+// isPending => 요청 시 true 반환 
+// isSuccess => 성공 시 true 반환 
+// isError => 실패 시 true 반환 
+//Mutation 에서 값을 가져올 때. await (async의 정지 처리를 기다려줌)
+// => 반환값이 있을 때 mutateAsync(값) 으로 사용하면 됩니다.
+
 import { useMutation } from '@tanstack/react-query';
 import {
     signinRequest,
@@ -31,56 +41,37 @@ import {
     resetPasswordCodeRequest,
     resetPasswordChangeRequest
 } from '@/apis/user';
-// import { authKey } from './keys';
+// import { authKey } from './keys'; => 키값이 필요한 상황이 생기면 사용. 
 
-    // ---------------------------
-    // 1) 로그인
-    // ---------------------------
-    export const useSignin = () =>
-    useMutation({
-        mutationFn: signinRequest,
-        // 필요 시 onSuccess 추가 가능
-    });
+export const authQueries = {
 
-    // ---------------------------
-    // 2) 이메일 인증 요청
-    // ---------------------------
-    export const useEmailCertification = () =>
-    useMutation({
-        mutationFn: emailCertificationRequest,
-    });
+    // ======================== C(추가) ========================
 
-    // ---------------------------
-    // 3) 이메일 인증번호 검증
-    // ---------------------------
-    export const useEmailCodeVerify = () =>
-    useMutation({
-        mutationFn: emailCodeRequest,
-    });
+    // 로그인
+    useSignin() {return useMutation({mutationFn: signinRequest,});},
 
-    // ---------------------------
-    // 4) 비밀번호 찾기 – 이메일 인증번호 요청
-    // ---------------------------
-    export const useResetPasswordEmail = () =>
-    useMutation({
-        mutationFn: resetPasswordEmailRequest,
-    });
+    // 이메일 인증번호 발송
+    useEmailCertification() {return useMutation({mutationFn: emailCertificationRequest,});},
 
-    // ---------------------------
-    // 5) 비밀번호 찾기 – 인증번호 검증
-    // ---------------------------
-    export const useResetPasswordCode = () =>
-    useMutation({
-        mutationFn: resetPasswordCodeRequest,
-    });
+    // 이메일 인증번호 검증
+    useEmailCodeVerify() {return useMutation({mutationFn: emailCodeRequest,});},
 
-    // ---------------------------
-    // 6) 비밀번호 재설정
-    // ---------------------------
-    export const useResetPasswordChange = () =>
-    useMutation({
-        mutationFn: resetPasswordChangeRequest,
-    });
+    // 비밀번호 찾기 : 이메일 인증번호 요청
+    useResetPasswordEmail() {return useMutation({mutationFn: resetPasswordEmailRequest,});},
+
+    // 비밀번호 찾기  인증번호 검증 요청
+    useResetPasswordCode() {return useMutation({mutationFn: resetPasswordCodeRequest,});},
+
+    // 비밀번호 재설정
+    useResetPasswordChange() {
+        return useMutation({
+            mutationFn: resetPasswordChangeRequest,
+            onSuccess: () => {
+                alert('비밀번호 변경이 완료되었습니다.')
+            }
+        });
+    },
+};
 
 
 

@@ -1,3 +1,4 @@
+import CategoryItemList from "@/components/user/CategoryItemList";
 import { AUTH_PATH, CART_PATH, MAIN_PATH, PRODUCT_SEARCH_PATH, USER_PATH } from "@/constant/user";
 import { useLoginUserStore } from "@/stores/user"
 import { useEffect, useRef, useState, type ChangeEvent, type KeyboardEvent } from "react";
@@ -92,12 +93,12 @@ export default function Header() {
     }
 
     //효과 : 검색어 경로 변경 될 때마다 실행될 함수 
-    useEffect(() => {
-        if(searchWord) {
-            setSearchWord(searchWord); //검색어가 남아있도록.. 
-            setSearchButton(true);//다시 검색 가능하게
-        }
-    }, [searchWord])
+    // useEffect(() => {
+    //     if(searchWord) {
+    //         setSearchWord(searchWord); //검색어가 남아있도록.. 
+    //         setSearchButton(true);//다시 검색 가능하게
+    //     }
+    // }, [])
 
 
     return (
@@ -130,10 +131,10 @@ export default function Header() {
                 </div>
                 }
             </div>
-            {categoryLargeList.length === 0 && depth === 0 &&
-            <div className="header-category-box">
-                categoryLargeList.map((item) => (<CategoryLarge item={item}/>))
-            </div> 
+            {/* <div className="header-category-box">
+                <CategoryItemList />
+            </div>  */}
+            {
             //카테고리 대분류 배열 => 서버한테 받아와야 한다. 
             //컴포넌트 크기가 중요하다 => CategoryLarge  
             //                        => CategorySmall  컴포넌트 제작 

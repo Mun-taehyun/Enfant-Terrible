@@ -1,8 +1,9 @@
-import { getCategoryListRequest, getPopupListRequest } from '@/apis/user';
+import { getCategoryListRequest } from '@/apis/user';
 import type GetCategoryListResponseDto from '@/apis/user/response/category/get-category-list.response.dto';
 import type { CategoryItem } from '@/types/user/interface';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
+import Category from '../CategoryItem';
 
 
 
@@ -17,8 +18,6 @@ export default function CategoryItemList(){
         queryFn: getCategoryListRequest
         } // GetPopupListResponseDto 에 있는 isActive : true 일 경우에 받아온다. 
     );
-    if (isLoading) return <div> 카테고리 업로드 중 </div>
-    if (error instanceof Error) return <div>{error.message}</div>;
 
     //상태 : 대분류 카테고리 클릭 상태 
     const [categoryStatus, setCategoryStatus] = useState<boolean>(false);
@@ -57,18 +56,13 @@ export default function CategoryItemList(){
 
 
 
-
+    if (isLoading) return <div> 카테고리 업로드 중 </div>
+    if (error instanceof Error) return <div>{error.message}</div>;
     return (
         <>
-        {categoryStatus ?
         <div onClick={categoryClickEventHandler}> 
-            {categoryLargeList.map((item) => <CategoryItem categoryItem={item} />) } 
+            {categoryLargeList.map((item) => <Category categoryItem={item} />) } 
         </div>
-        
-        :
-        
-        
-        }
         </>
     );
 

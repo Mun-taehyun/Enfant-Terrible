@@ -7,6 +7,6 @@ export default interface UserSelectResponseDto {
     addressBase: string;
     addressDetail: string | null;
     role: "USER";
-    status: "ACTIVE";
+    status : 'ACTIVE' | 'SUSPENDED' | 'DELETED';
 }
 //내 정보 조회
