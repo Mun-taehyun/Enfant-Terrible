@@ -2,20 +2,19 @@ import pandas as pd
 import numpy as np
 import os
 
-def generate_grand_product_master(num_products=10000):
-    # --- 경로 자동 설정 (새 프로젝트 구조 대응) ---
-    # 현재 파일(product_generator.py)의 절대 경로
+# 실행할 때마다 결과가 똑같도록 시드 고정
+np.random.seed(1)
+
+# 함수의 기본값을 10000에서 100으로 수정했습니다.
+def generate_grand_product_master(num_products=100):
+    # --- 경로 자동 설정 ---
     current_file_path = os.path.abspath(__file__) 
-    # src의 상위 폴더인 ai_analysis 폴더를 기준(base_dir)으로 설정
     base_dir = os.path.dirname(os.path.dirname(current_file_path)) 
-    
-    # 파일을 저장할 data/raw 폴더 경로 생성
     RAW_PATH = os.path.join(base_dir, "data", "raw")
     
-    # 폴더가 없으면 생성
     if not os.path.exists(RAW_PATH):
         os.makedirs(RAW_PATH)
-    # ------------------------------------------
+    # ----------------------
 
     # 1. 브랜드 및 수식어
     brands = ['앙팡', 'Enfant', '테리블', '네이처팡', '퓨어도그', '닥터테리블']
@@ -29,7 +28,7 @@ def generate_grand_product_master(num_products=10000):
         '식품/사료': ['레시피 사료', '소프트 키블', '건식 식단', '화식 식단', '동결건조 생식', '저지방 다이어트식'],
         '식품/간식': ['동결건조 트릿', '슬라이스 육포', '덴탈 치즈껌', '미트볼 스틱', '고구마 말랭이', '수제 비스킷', '락토프리 우유'],
         '건강/영양': ['관절 강화 영양제', '피부 피모 유산균', '눈가 깨끗 루테인', '종합 비타민 파우더', '심장 튼튼 코엔자임'],
-        '장난감/교육': ['노즈워크 담요', '천연고무 치발기', '실내용 자동 공놀이', '바스락 삑삑이 인형', '지능개발 퍼즐트레이', '강력 터그 로프'],
+        '장난감/교육': ['노즈워크 담요', '천연고무 치발기', '실내용 자동 공놀이', '바스락 삑 삑이 인형', '지능개발 퍼즐트레이', '강력 터그 로프'],
         '산책/외출': ['리플렉티브 하네스', '이지워크 가슴줄', '자동 리드줄 5m', '배변 봉투 파우치', '휴대용 물통', '기능성 쿨링 조끼'],
         '위생/미용': ['무자극 약용 샴푸', '실키 컨디셔너', '초강력 흡수 배변패드', '눈세정 티슈', '귀세정제', '발바닥 보습 밤'],
         '리빙/가구': ['메모리폼 마약 방석', '슬개골 보호 미끄럼방지 매트', '원목 높이조절 식기', '사계절 쿨매트', '프라이빗 켄넬'],
@@ -37,6 +36,7 @@ def generate_grand_product_master(num_products=10000):
     }
 
     products = []
+    options = ['S', 'M', 'L', '1kg', '2kg', '300g', '500ml', '박스형']
     
     for i in range(1, num_products + 1):
         cat = np.random.choice(list(category_map.keys()))
@@ -50,7 +50,7 @@ def generate_grand_product_master(num_products=10000):
         else:
             name = f"[{brand}] {quality} {item_type}"
             
-        option = np.random.choice(['S', 'M', 'L', '1kg', '2kg', '300g', '500ml', '박스형'])
+        option = np.random.choice(options)
         final_name = f"{name} ({option})"
         
         target_age = np.random.choice([0, 1, 2])
@@ -67,12 +67,12 @@ def generate_grand_product_master(num_products=10000):
 
     df = pd.DataFrame(products)
     
-    # os.path.join을 사용하여 최종 저장 경로 설정
+    # 최종 저장
     output_file = os.path.join(RAW_PATH, "product_master.csv")
     df.to_csv(output_file, index=False, encoding='utf-8-sig')
     
     print(f"✅ 위치: {output_file}")
-    print(f"✅ 총 {num_products}개의 'Enfant Terrible' 전용 상품 리스트가 생성되었습니다!")
+    print(f"✅ 총 {num_products}개의 고정된 상품 리스트가 생성되었습니다! (Seed=1)")
 
 if __name__ == "__main__":
-    generate_grand_product_master()
+    generate_grand_product_master() # 여기서 100개가 기본으로 들어갑니다.

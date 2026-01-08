@@ -1,15 +1,14 @@
 import pandas as pd
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 import os
 
 def migrate_to_et_tables():
-    # 1. 경로 자동 설정
+    # 1. 경로 설정
     current_file_path = os.path.abspath(__file__) 
     base_dir = os.path.dirname(os.path.dirname(current_file_path)) 
     CSV_PATH = os.path.join(base_dir, "data", "raw", "product_master.csv")
 
-    # 2. [수정] MySQL DB 연결 설정
-    # 형식: mysql+pymysql://사용자:비밀번호@호스트:포트/DB이름
+    # 2. MySQL DB 연결 설정
     DB_URL = 'mysql+pymysql://enfant:1234@localhost:3306/enfant_db?charset=utf8mb4'
     engine = create_engine(DB_URL)
 
@@ -18,28 +17,34 @@ def migrate_to_et_tables():
             print(f"❌ CSV 파일이 없습니다: {CSV_PATH}")
             return
 
-        # 3. 데이터 로드 및 전처리
+        # 3. 데이터 로드 및 변환
         df = pd.read_csv(CSV_PATH)
         
-        # [참고] MySQL은 관례적으로 소문자 컬럼명을 많이 사용하지만, 
-        # 백엔드 Entity 구성에 따라 대문자로 유지해도 무방합니다.
         et_df = pd.DataFrame()
         et_df['PRODUCT_ID'] = df['product_id']
         et_df['NAME'] = df['product_name']
         et_df['BASE_PRICE'] = df['price']
         et_df['DESCRIPTION'] = df['category']
-        et_df['PRODUCT_CODE'] = df['product_id'].apply(lambda x: f"ET-PROD-{x:05d}")
-        # MySQL에서 NULL을 허용한다면 None 유지
-        et_df['CATEGORY_ID'] = None 
+        # 100개 규모이므로 코드를 좀 더 짧게 포맷팅 (001~100)
+        et_df['PRODUCT_CODE'] = df['product_id'].apply(lambda x: f"ET-P-{x:03d}")
+        et_df['CATEGORY_ID'] = 1 # None 대신 기본값 1을 넣어두면 Django에서 처리하기 편합니다.
 
         print(f"📊 {len(et_df)}건의 데이터를 ET_PRODUCT 형식으로 변환 완료.")
 
-        # 4. [수정] DB 전송
+        # 4. [중요] 기존 데이터 삭제 후 새로 넣기
+        with engine.connect() as conn:
+            print("🧹 기존 테이블 데이터를 초기화합니다...")
+            # 외래 키 제약 조건 잠시 해제 후 테이블 비우기
+            conn.execute(text("SET FOREIGN_KEY_CHECKS = 0;"))
+            conn.execute(text("TRUNCATE TABLE et_product;"))
+            conn.execute(text("SET FOREIGN_KEY_CHECKS = 1;"))
+            conn.commit()
+
+        # 5. DB 전송
         print("🚀 MySQL 'et_product' 테이블로 전송 중...")
-        
-        # MySQL 테이블 이름은 소문자로 생성하셨다면 'et_product'로 맞추는 것이 안전합니다.
+        # if_exists='append'로 유지 (위에서 비웠으므로 안전합니다)
         et_df.to_sql('et_product', con=engine, if_exists='append', index=False)
-        print("✅ MySQL 마이그레이션 성공!")
+        print("✅ MySQL 마이그레이션 성공! (총 100개 상품 고정)")
 
     except Exception as e:
         print(f"❌ 오류 발생: {e}")
