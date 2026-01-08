@@ -38,3 +38,4 @@ export const getAdminAccountDetail = async (userId: number) => {
 export const patchAdminAccountStatus = async (userId: number, status: MemberStatus) => {
   await api.patch(`/admin/users/${userId}/status`, { status });
 };
+

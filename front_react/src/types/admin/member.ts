@@ -12,8 +12,8 @@ export interface Member {
 export interface AdminMemberSearchParams {
   page: number;
   size: number;
-  keyword?: string;
-  status?: MemberStatus;
+  keyword: string;
+  status: MemberStatus;
 }
 
 export interface AdminMemberListResponse {
