@@ -820,3 +820,11 @@ UNLOCK TABLES;
 SELECT DATABASE(), @@hostname, @@port, USER();
 
 SHOW TABLES LIKE 'et_user_recommendation';
+
+SELECT DATABASE();
+
+
+SHOW TABLES;
+
+
+

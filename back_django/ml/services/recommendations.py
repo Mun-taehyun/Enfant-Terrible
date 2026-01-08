@@ -40,8 +40,7 @@ def popular_products(limit:int) -> list[dict]:
                 for (pid, sold_qty) in rows
             ]
     except (OperationalError, ProgrammingError):
-        return []
-
+        pass
 
     #없으면 최신상품으로
     try:
@@ -64,18 +63,19 @@ def popular_products(limit:int) -> list[dict]:
         return []
 
 
+def recommend_for_user(user_id: int, limit: int) -> list[dict]:
+    limit = max(1, min(int(limit), 50))
 
-def recommend_for_user(user_id: int, limit:int)->list[dict]:
-    limit = max(1, min(int(limit),50))
-
-    rows = (
+    qs = (
         UserRecommendation.objects
         .filter(user_id=user_id)
         .order_by("rank_no", "-score", "recommendation_id")
-        .values("product_id", "score")[:limit]
+        .values_list("product_id", "score")[:limit]
     )
 
-    if rows :
-        return [{"productId":int(r["product_id"]), "score":float(r["score"]or 0.0)} for r in rows]
+    rows = list(qs)  # 여기서 실제 조회가 일어납니다.
+
+    if rows:
+        return [{"productId": int(pid), "score": float(score or 0.0)} for (pid, score) in rows]
 
     return popular_products(limit)

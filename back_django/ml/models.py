@@ -1,7 +1,7 @@
-from django.db import models
-from django.utils import timezone
+# ml/models.py
 
-# Create your models here.
+from django.db import models
+
 
 class UserRecommendation(models.Model):
     recommendation_id = models.BigAutoField(primary_key=True)
@@ -9,7 +9,7 @@ class UserRecommendation(models.Model):
     product_id = models.BigIntegerField()
     rank_no = models.IntegerField(null=True)
     score = models.FloatField(null=True)
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField()
 
     class Meta:
         db_table = "et_user_recommendation"

@@ -15,6 +15,12 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+#csv를 읽기 위해 쓴다
+AI_ANALYSIS_DIR = BASE_DIR.parent / "ai_analysis"
+PROCESSED_DIR = AI_ANALYSIS_DIR / "data" / "processed"
+RAW_DIR = AI_ANALYSIS_DIR / "data" / "raw"
+
+INTEGRATED_SCORE_CSV_PATH = PROCESSED_DIR / "integrated_score_v2.csv"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
@@ -39,7 +45,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',                                              # new
     'ml',                                                       # new
-    'django_apscheduler'
 ]
 
 MIDDLEWARE = [
@@ -76,21 +81,15 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {                                                           # DB를 mysql로 쓰기 위해 엔진이랑 설정 바꿈
+DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'enfant_terrible',
-        'USER': 'kosmo',
-        'PASSWORD': '1234',
-        'HOST': '127.0.0.1',
-        'PORT': "3306",
-        # 'OPTIONS':{
-        #     "init_command":"SET sql_mode='STRICT_TRANS_TABLES'" ,      # 이것만 명시하면 다른 것들 덮어 쓸 수 있으니 확인하고
-        #                                                                # 이미 들어가 있을 수 있음
-        #                                                                # mysql에 접속하자 마자 strict 활성한다
-        #                                                                # 경고를 에러로 명확하게 바꿔준다. ex)원치 않는 데이터 짤림등     
-        # },
-    }
+        'USER': 'enfant',        # <-- 위에서 확인한 유저 이름
+        'PASSWORD': '1234', # 해당 유저의 비밀번호
+        'HOST': '127.0.0.1',     # DB 서버 주소
+        'PORT': '3306',
+    },
 }
 
 
