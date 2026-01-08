@@ -21,9 +21,10 @@ public class AuthController {
   private final AuthService authService;
   
   @PostMapping("/login")
-  public ApiResponse<LoginResponse> login(
+  public LoginResponse login(
     @Valid @RequestBody LoginRequest req
   ) {
-    return ApiResponse.success(authService.login(req));
+    LoginResponse res = authService.login(req);
+    return new ApiResponse<>(true, res, "");
   }
 }

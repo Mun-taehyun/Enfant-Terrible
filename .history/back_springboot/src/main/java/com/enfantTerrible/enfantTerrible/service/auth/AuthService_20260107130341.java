@@ -6,7 +6,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.enfantTerrible.enfantTerrible.common.enums.UserStatus;
 import com.enfantTerrible.enfantTerrible.dto.auth.LoginRequest;
 import com.enfantTerrible.enfantTerrible.dto.auth.LoginResponse;
 import com.enfantTerrible.enfantTerrible.dto.user.UserRow;
@@ -38,8 +37,8 @@ public class AuthService {
     if (!passwordEncoder.matches(req.getPassword(), user.getPassword())) {
       throw new BusinessException("이메일 또는 비밀번호가 올바르지 않습니다.");
     }
-    UserStatus status = UserStatus.from(user.getStatus());
-    if (status != UserStatus.ACTIVE) {
+
+    if (!"ACTIVE".equals(user.getStatus())) {
       throw new BusinessException("사용할 수 없는 계정입니다.");
     }
 
@@ -74,8 +73,7 @@ public class AuthService {
         throw new BusinessException("연결된 사용자 정보를 찾을 수 없습니다.");
       }
 
-      UserStatus status = UserStatus.from(user.getStatus());
-      if (status != UserStatus.ACTIVE) {
+      if (!"ACTIVE".equals(user.getStatus())) {
         throw new BusinessException("사용할 수 없는 계정입니다.");
       }
 
