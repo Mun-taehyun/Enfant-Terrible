@@ -2,77 +2,55 @@ import pandas as pd
 import numpy as np
 import os
 
-# 실행할 때마다 결과가 똑같도록 시드 고정
+# 시드 고정
 np.random.seed(1)
 
-# 함수의 기본값을 10000에서 100으로 수정했습니다.
-def generate_grand_product_master(num_products=100):
-    # --- 경로 자동 설정 ---
+def generate_grand_product_master_erd(num_products=100):
     current_file_path = os.path.abspath(__file__) 
     base_dir = os.path.dirname(os.path.dirname(current_file_path)) 
     RAW_PATH = os.path.join(base_dir, "data", "raw")
-    
-    if not os.path.exists(RAW_PATH):
-        os.makedirs(RAW_PATH)
-    # ----------------------
+    if not os.path.exists(RAW_PATH): os.makedirs(RAW_PATH)
 
-    # 1. 브랜드 및 수식어
-    brands = ['앙팡', 'Enfant', '테리블', '네이처팡', '퓨어도그', '닥터테리블']
-    qualities = ['프리미엄', '유기농', '그레인프리', '가수분해', '저알러지', '고단백', '수제', '데일리', '내추럴']
-    
-    # 2. 메인 재료
-    ingredients = ['연어', '소고기', '닭가슴살', '오리', '칠면조', '양고기', '말고기', '황태', '고구마', '단호박', '곤충단백질', '사슴고기']
-    
-    # 3. 카테고리별 상세 상품군
-    category_map = {
-        '식품/사료': ['레시피 사료', '소프트 키블', '건식 식단', '화식 식단', '동결건조 생식', '저지방 다이어트식'],
-        '식품/간식': ['동결건조 트릿', '슬라이스 육포', '덴탈 치즈껌', '미트볼 스틱', '고구마 말랭이', '수제 비스킷', '락토프리 우유'],
-        '건강/영양': ['관절 강화 영양제', '피부 피모 유산균', '눈가 깨끗 루테인', '종합 비타민 파우더', '심장 튼튼 코엔자임'],
-        '장난감/교육': ['노즈워크 담요', '천연고무 치발기', '실내용 자동 공놀이', '바스락 삑 삑이 인형', '지능개발 퍼즐트레이', '강력 터그 로프'],
-        '산책/외출': ['리플렉티브 하네스', '이지워크 가슴줄', '자동 리드줄 5m', '배변 봉투 파우치', '휴대용 물통', '기능성 쿨링 조끼'],
-        '위생/미용': ['무자극 약용 샴푸', '실키 컨디셔너', '초강력 흡수 배변패드', '눈세정 티슈', '귀세정제', '발바닥 보습 밤'],
-        '리빙/가구': ['메모리폼 마약 방석', '슬개골 보호 미끄럼방지 매트', '원목 높이조절 식기', '사계절 쿨매트', '프라이빗 켄넬'],
-        '의류/액세서리': ['순면 데일리 티셔츠', '방수 올인원 레인코트', '보따리 스카프', '겨울용 패딩 조끼', '귀도리 모자']
+    # 1. ERD 기반 카테고리 ID 매핑 (실제 DB에 들어갈 ID값)
+    cat_id_map = {
+        1: '사료/간식',
+        2: '의류/리빙',
+        3: '위생/건강'
     }
 
+    # 2. 브랜드 및 재료 (데이터 풍성함을 위함)
+    brands = ['앙팡', 'Enfant', '테리블', '네이처팡', '퓨어도그']
+    qualities = ['프리미엄', '유기농', '그레인프리', '수제', '내추럴']
+    
     products = []
-    options = ['S', 'M', 'L', '1kg', '2kg', '300g', '500ml', '박스형']
     
     for i in range(1, num_products + 1):
-        cat = np.random.choice(list(category_map.keys()))
+        # ERD 구조에 맞춰 데이터 생성
+        c_id = np.random.choice([1, 2, 3])
         brand = np.random.choice(brands)
         quality = np.random.choice(qualities)
-        item_type = np.random.choice(category_map[cat])
         
-        if '식품' in cat or '건강' in cat:
-            ing = np.random.choice(ingredients)
-            name = f"[{brand}] {quality} {ing} {item_type}"
-        else:
-            name = f"[{brand}] {quality} {item_type}"
-            
-        option = np.random.choice(options)
-        final_name = f"{name} ({option})"
+        # 상품명 생성
+        p_name = f"[{brand}] {quality} 반려견 용품 {i}"
         
-        target_age = np.random.choice([0, 1, 2])
-        target_size = np.random.choice([0, 1, 2])
-
+        # --- ERD 컬럼 구조에 100% 맞춤 ---
         products.append({
             'product_id': i,
-            'product_name': final_name,
-            'category': cat,
-            'price': int(np.random.randint(5, 200)) * 500,
-            'target_age': target_age,
-            'target_size': target_size
+            'category_id': c_id,                     # ERD 외래키
+            'product_code': f"ET-P-{i:03d}",         # ERD 필수 컬럼
+            'name': p_name,                          # ERD 컬럼명 (product_name 아님)
+            'description': f"{brand} 브랜드의 {quality} 라인업 상품입니다.", # ERD 컬럼
+            'base_price': int(np.random.randint(5, 100)) * 500 # ERD 컬럼명 (price 아님)
+            
+            # 주의: target_age, image_url 등은 ERD에 없으므로 
+            # 나중에 ALTER TABLE로 컬럼을 추가하기 전까지는 DB 입력 시 제외해야 합니다.
         })
 
     df = pd.DataFrame(products)
-    
-    # 최종 저장
-    output_file = os.path.join(RAW_PATH, "product_master.csv")
+    output_file = os.path.join(RAW_PATH, "product_master_erd.csv")
     df.to_csv(output_file, index=False, encoding='utf-8-sig')
     
-    print(f"✅ 위치: {output_file}")
-    print(f"✅ 총 {num_products}개의 고정된 상품 리스트가 생성되었습니다! (Seed=1)")
+    print(f"✅ ERD 구조와 100% 일치하는 {num_products}개 상품 생성 완료!")
 
 if __name__ == "__main__":
-    generate_grand_product_master() # 여기서 100개가 기본으로 들어갑니다.
+    generate_grand_product_master_erd()

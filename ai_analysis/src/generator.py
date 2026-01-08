@@ -1,71 +1,63 @@
 import pandas as pd
 import numpy as np
 import os
-import time
 
-# [핵심] 데이터를 고정하기 위해 시드를 1로 설정합니다.
+# 시드 고정
 np.random.seed(1)
 
-# --- 경로 자동 설정 ---
+# 경로 설정
 current_file_path = os.path.abspath(__file__) 
 base_dir = os.path.dirname(os.path.dirname(current_file_path)) 
 RAW_PATH = os.path.join(base_dir, "data", "raw")
+if not os.path.exists(RAW_PATH): os.makedirs(RAW_PATH)
 
-if not os.path.exists(RAW_PATH):
-    os.makedirs(RAW_PATH)
-# ----------------------
-
-def create_dog_project_data():
-    # --- 상품 100개 기준 최적화 규모 설정 ---
-    num_users = 5000         # 유저 5,000명
-    num_products = 100       # 상품 100개
-    # 유저당 평균 20개 정도 구매 (적당한 밀도)
-    num_orders = 100000      
-    # 유저당 평균 5~10개 정도 리뷰
-    num_reviews = 30000      
-    
+def create_erd_compatible_data():
+    num_users = 100
+    num_products = 100
     users = np.arange(1, num_users + 1)
     products = np.arange(1, num_products + 1)
+
+    print(f"🚀 [Enfant Terrible] ERD 구조 완벽 대응 데이터 생성 시작")
+
+    # 1. et_user_attribute_value 형식으로 생성 (핵심 변경 사항)
+    # ERD 구조에 맞춰 attribute_id(1:나이, 2:사이즈, 3:성별, 4:활동성)로 생성
+    dog_attr_list = []
+    for u_id in users:
+        dog_attr_list.append({'user_id': u_id, 'attribute_id': 1, 'value_number': np.random.choice([0, 1, 2])}) # 나이
+        dog_attr_list.append({'user_id': u_id, 'attribute_id': 2, 'value_number': np.random.choice([0, 1, 2])}) # 사이즈
+        dog_attr_list.append({'user_id': u_id, 'attribute_id': 3, 'value_number': np.random.choice([0, 1, 2, 3])}) # 성별
+        dog_attr_list.append({'user_id': u_id, 'attribute_id': 4, 'value_number': np.random.choice([1, 2, 3])}) # 활동성
     
-    start_time = time.time()
-    print(f"🐕 [Enfant Terrible] 최적화 고정 데이터 생성 시작 (Seed: 1)")
+    df_dog_profiles = pd.DataFrame(dog_attr_list)
+    df_dog_profiles.to_csv(os.path.join(RAW_PATH, "dog_profiles_erd.csv"), index=False)
 
-    # 1. 반려견 프로필 데이터 생성
-    df_dog_profiles = pd.DataFrame({
-        'user_id': users,
-        'dog_age': np.random.choice([0, 1, 2], num_users),
-        'dog_size': np.random.choice([0, 1, 2], num_users),
-        'dog_gender_spec': np.random.choice([0, 1, 2, 3], num_users),
-        'activity_level': np.random.choice([1, 2, 3], num_users)
+    # 2. et_product 대응 (category_id 추가)
+    df_products = pd.DataFrame({
+        'product_id': products,
+        'category_id': np.random.choice([1, 2, 3], num_products), # ERD 필수 외래키
+        'name': [f"프리미엄 상품 {i}" for i in products],
+        'base_price': np.random.randint(10, 100, num_products) * 500
     })
-    df_dog_profiles.to_csv(os.path.join(RAW_PATH, "dog_profiles.csv"), index=False)
-    print("✅ 1/3: dog_profiles.csv 생성 완료")
+    df_products.to_csv(os.path.join(RAW_PATH, "products_erd.csv"), index=False)
 
-    # 2. 구매 내역 데이터 (orders.csv)
-    print("⏳ 구매 데이터 생성 중...")
+    # 3. et_order, et_cart_item, et_product_review (기존 로직 유지하되 컬럼명 매칭)
+    # [주문]
     df_orders = pd.DataFrame({
-        'user_id': np.random.choice(users, num_orders),
-        'product_id': np.random.choice(products, num_orders),
-        'quantity': np.random.randint(1, 5, num_orders)
-    })
-    # 중복 구매건 합산
-    df_orders = df_orders.groupby(['user_id', 'product_id'])['quantity'].sum().reset_index()
+        'user_id': np.random.choice(users, 1500),
+        'product_id': np.random.choice(products, 1500),
+        'quantity': np.random.randint(1, 4, 1500)
+    }).drop_duplicates(['user_id', 'product_id'])
     df_orders.to_csv(os.path.join(RAW_PATH, "orders.csv"), index=False)
-    print(f"✅ 2/3: orders.csv 생성 완료 ({len(df_orders):,})")
 
-    # 3. 별점 리뷰 데이터 (reviews.csv)
-    print("⏳ 리뷰 데이터 생성 중...")
+    # [리뷰] - ERD의 rating 컬럼 반영
     df_reviews = pd.DataFrame({
-        'user_id': np.random.choice(users, num_reviews),
-        'product_id': np.random.choice(products, num_reviews),
-        'rating': np.random.randint(1, 6, num_reviews)
-    })
-    # 중복 리뷰 제거
-    df_reviews = df_reviews.drop_duplicates(['user_id', 'product_id'])
+        'user_id': np.random.choice(users, 800),
+        'product_id': np.random.choice(products, 800),
+        'rating': np.random.randint(1, 6, 800)
+    }).drop_duplicates(['user_id', 'product_id'])
     df_reviews.to_csv(os.path.join(RAW_PATH, "reviews.csv"), index=False)
-    print(f"✅ 3/3: reviews.csv 생성 완료 ({len(df_reviews):,})")
 
-    print(f"\n🏆 상품 100개 기준 최적화 데이터 생성 완료! 소요 시간: {time.time() - start_time:.2f}초")
+    print(f"✅ ERD 호환 데이터 생성 완료! (User ID: enfant)")
 
 if __name__ == "__main__":
-    create_dog_project_data()
+    create_erd_compatible_data()
