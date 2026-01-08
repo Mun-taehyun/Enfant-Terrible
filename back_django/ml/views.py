@@ -1,6 +1,6 @@
-# ml/views.py
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
+from ml.auth import get_user_id_from_request
 
 @require_GET
 def recommendation(request):
@@ -10,9 +10,9 @@ def recommendation(request):
         limit = 5
     limit = max(1, min(limit, 50))
 
-    # JWT 붙기 전 임시 확인용 (나중에 제거 가능)
-    user_id = request.GET.get("userId")
-    user_id = int(user_id) if user_id and user_id.isdigit() else None
+    user_id = get_user_id_from_request(request)
+    if user_id is None:
+        return JsonResponse({"detail": "Unauthorized"}, status=401)
 
     return JsonResponse({
         "userId": user_id,

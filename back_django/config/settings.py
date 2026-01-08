@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',                                              # new
     'ml',                                                       # new
+    'django_apscheduler'
 ]
 
 MIDDLEWARE = [
@@ -117,6 +118,23 @@ CORS_ALLOWED_ORIGINS = [                                ## new
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
+
+
+import os
+import base64
+import binascii
+
+JWT_ALGORITHM = "HS256"
+
+JWT_SECRET_B64 = os.getenv("JWT_SECRET_B64","")
+if not JWT_SECRET_B64:
+    raise RuntimeError("JWT_SECRET_B64 환경변수가 설정되지 않았습니다")
+
+try:
+    JWT_SECRET = base64.b64decode(JWT_SECRET_B64)
+except(binascii.Error, ValueError) as e:
+    raise RuntimeError("JWT_SECRET_B64가 올바른 base64가 아닙니다.") from e
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
