@@ -1,72 +1,58 @@
 import pandas as pd
 import numpy as np
+from sqlalchemy import create_engine, text
 import os
 import time
 
-# --- 경로 설정 ---
+# --- 경로 설정 (결과 저장용) ---
 current_file_path = os.path.abspath(__file__) 
 base_dir = os.path.dirname(os.path.dirname(current_file_path)) 
-RAW_PATH = os.path.join(base_dir, "data", "raw")
 PROCESSED_PATH = os.path.join(base_dir, "data", "processed")
-
 if not os.path.exists(PROCESSED_PATH): os.makedirs(PROCESSED_PATH)
 
-def preprocess_for_erd_structure():
+# MySQL DB 연결 설정 (사용자 ID: enfant)
+DB_URL = 'mysql+pymysql://enfant:1234@localhost:3306/enfant_db?charset=utf8mb4'
+engine = create_engine(DB_URL)
+
+def preprocess_from_db():
     start_time = time.time()
-    print("🧹 [Enfant Terrible] ERD 구조 대응 전처리 시작...")
+    print("🧹 [Enfant Terrible] DB 기반 전처리 시작...")
 
-    # 1. 데이터 로드 (ERD 구조에 맞는 파일명 사용)
     try:
-        # 이전에 생성한 세로형(EAV) 프로필 데이터
-        df_attr = pd.read_csv(os.path.join(RAW_PATH, "dog_profiles_erd.csv")) 
-        df_orders = pd.read_csv(os.path.join(RAW_PATH, "orders.csv"))
-        df_reviews = pd.read_csv(os.path.join(RAW_PATH, "reviews.csv"))
-        df_carts = pd.read_csv(os.path.join(RAW_PATH, "carts.csv"))
-    except FileNotFoundError as e:
-        print(f"❌ 파일을 찾을 수 없습니다: {e}")
-        return
+        # 1. DB에서 데이터 읽기
+        print("📥 1/4: 데이터베이스에서 직접 읽어오는 중...")
+        with engine.connect() as conn:
+            # 유저 속성값 (EAV 구조)
+            df_attr = pd.read_sql("SELECT * FROM et_user_attribute_value", conn)
+            # 추천 데이터 (기본 점수용으로 사용하거나 혹은 주문/장바구니 테이블이 있다면 그것을 읽음)
+            # 현재 DB에는 추천 테이블이 가득 차 있으므로 이를 기반으로 연습해봅니다.
+            df_rec = pd.read_sql("SELECT user_id, product_id, score as total_score FROM et_user_recommendation", conn)
 
-    # 2. 프로필 데이터 전처리 (세로형 -> 가로형 변환)
-    # attribute_id 1:나이, 2:사이즈, 3:성별, 4:활동성
-    print("🔄 1/4: EAV 구조의 유저 프로필 변환 중...")
-    df_profiles = df_attr.pivot(index='user_id', columns='attribute_id', values='value_number').reset_index()
-    df_profiles.columns = ['user_id', 'dog_age', 'dog_size', 'dog_gender', 'dog_activity']
+        # 2. 프로필 데이터 변환 (세로형 -> 가로형)
+        print("🔄 2/4: 유저 프로필 구조 변환 중...")
+        if not df_attr.empty:
+            df_profiles = df_attr.pivot(index='user_id', columns='attribute_id', values='value_number').reset_index()
+            # 실제 존재하는 컬럼 개수에 맞춰 이름 할당
+            df_profiles.columns = ['user_id'] + [f'attr_{i}' for i in df_profiles.columns[1:]]
+        else:
+            print("⚠️ 속성 데이터가 비어 있습니다.")
+            return
 
-    # 3. 데이터 병합
-    print("🔗 2/4: 활동 데이터 통합 중...")
-    df_merged = pd.merge(df_orders, df_reviews, on=['user_id', 'product_id'], how='outer')
-    df_merged = pd.merge(df_merged, df_carts, on=['user_id', 'product_id'], how='outer', indicator='in_cart')
-    df_merged = pd.merge(df_merged, df_profiles, on='user_id', how='left')
+        # 3. 데이터 병합
+        print("🔗 3/4: 통합 점수 데이터 생성 중...")
+        # 이미 DB의 et_user_recommendation에 점수가 있으므로 이를 활용하거나 가공합니다.
+        final_df = df_rec.groupby(['user_id', 'product_id'])['total_score'].sum().reset_index()
 
-    # 결측치 처리
-    df_merged['rating'] = df_merged['rating'].fillna(0)
-    df_merged['quantity'] = df_merged['quantity'].fillna(0)
-    df_merged['in_cart'] = (df_merged['in_cart'] == 'both').astype(float) # 장바구니에 있으면 1, 없으면 0
+        # 4. 결과 파일 저장 (이후 추천 엔진이 이 파일을 읽음)
+        print(f"💾 4/4: 전처리 결과 저장 중...")
+        output_file = os.path.join(PROCESSED_PATH, "integrated_score_v2.csv")
+        final_df.to_csv(output_file, index=False)
 
-    # 4. 통합 점수 계산 (ERD 기반 가중치)
-    print("🔢 3/4: 행동 기반 가중치 계산 중...")
-    
-    # [가중치 정의]
-    W_ORDER = 5.0
-    W_REVIEW = 3.0
-    W_CART = 2.0
+        print(f"✨ 전처리 완료! (소요 시간: {time.time() - start_time:.2f}초)")
+        print(f"📍 저장 위치: {output_file}")
 
-    df_merged['total_score'] = (
-        (df_merged['quantity'].clip(upper=1) * W_ORDER) +  # 구매 여부
-        (df_merged['rating'] * (W_REVIEW / 5.0)) +         # 리뷰 점수 (5점 만점 환산)
-        (df_merged['in_cart'] * W_CART)                    # 장바구니 가점
-    )
-
-    # 5. 결과 저장 (ERD의 et_user_recommendation 테이블 입력용)
-    print(f"💾 4/4: 결과 저장 중...")
-    final_df = df_merged[['user_id', 'product_id', 'total_score']]
-    # 동일 유저-상품 중복 점수 합산
-    final_df = final_df.groupby(['user_id', 'product_id'])['total_score'].sum().reset_index()
-    
-    output_file = os.path.join(PROCESSED_PATH, "integrated_score_v2.csv")
-    final_df.to_csv(output_file, index=False)
-
-    print(f"✨ 전처리 완료! (소요 시간: {time.time() - start_time:.2f}초)")
+    except Exception as e:
+        print(f"❌ 전처리 중 오류 발생: {e}")
 
 if __name__ == "__main__":
-    preprocess_for_erd_structure()
+    preprocess_from_db()
