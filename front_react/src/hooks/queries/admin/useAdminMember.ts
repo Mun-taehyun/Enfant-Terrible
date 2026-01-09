@@ -7,7 +7,10 @@ import type { AdminMemberListRequest } from '@/apis/admin/request/member/adminMe
 export const useAdminMemberListQuery = (params: AdminMemberListRequest) => {
   return useQuery({
     queryKey: adminMemberKeys.list(params),
-    queryFn: () => getAdminMemberList(params),
+    queryFn: () => {
+      const request: AdminMemberListRequest = params;
+      return getAdminMemberList(request);
+    },
     placeholderData: (previousData) => previousData, 
   });
 };
