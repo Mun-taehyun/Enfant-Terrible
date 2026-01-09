@@ -1,10 +1,13 @@
-import { useState } from 'react'; // ✅ React 제거하여 경고 해결
+import { useState } from 'react'; 
 import { useNavigate } from 'react-router-dom';
-import { useAdminAccountListQuery } from '@/hooks/queries/admin/useAdminAccount';
-import type { AdminAccountListRequest } from '@/types/admin/request/account/adminAccountRequest';
-import type { MemberStatus } from '@/components/common/codes';
 
-// ✅ 1. 데이터 타입을 정의하여 any를 대체합니다.
+// ✅ 에러 해결: @/ 별칭 대신 상대 경로를 사용하여 Vite의 500 에러를 방지합니다.
+// 아래 경로는 파일 위치(src/pages/admin/accounts)를 기준으로 src/hooks까지 거슬러 올라간 경로입니다.
+import { useAdminAccountListQuery } from '../../../hooks/queries/admin/useAdminAccount';
+import type { AdminAccountListRequest } from '../../../types/admin/request/account/adminAccountRequest';
+import type { MemberStatus } from '../../../components/common/codes';
+
+// ✅ 데이터 타입 정의: any를 제거하여 안정성을 높였습니다.
 interface AdminAccount {
   id: number;
   name: string;
@@ -19,15 +22,22 @@ interface AdminAccountListResponse {
 const AdminAccountListPage = () => {
   const navigate = useNavigate();
   
+  // ✅ 타입 캐스팅 및 초기 상태 설정
   const [params] = useState<AdminAccountListRequest>({
-    page: 1, size: 20, name: '', email: '', 
+    page: 1, 
+    size: 20, 
+    name: '', 
+    email: '', 
     status: undefined as unknown as MemberStatus,
-    provider: 'LOCAL', createdFrom: '', createdTo: '',
+    provider: 'LOCAL', 
+    createdFrom: '', 
+    createdTo: '',
   });
 
+  // ✅ 데이터 호출 (Hook 연결)
   const { data, isLoading } = useAdminAccountListQuery(params);
   
-  // ✅ 2. any 대신 정의한 인터페이스로 타입 캐스팅
+  // ✅ any 대신 인터페이스 적용
   const responseData = data as AdminAccountListResponse | undefined;
   const accountList = responseData?.content || [];
 
@@ -46,7 +56,7 @@ const AdminAccountListPage = () => {
             </tr>
           </thead>
           <tbody>
-            {/* ✅ 3. account: any를 account: AdminAccount로 변경 */}
+            {/* ✅ account: AdminAccount 타입을 명시하여 안정성 확보 */}
             {accountList.map((account: AdminAccount) => (
               <tr 
                 key={account.id} 

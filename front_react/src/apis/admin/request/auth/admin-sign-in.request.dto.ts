@@ -1,3 +1,4 @@
+// ✅ export default가 있는지 확인하세요.
 export default interface AdminSignInRequestDto {
   adminId: string;
   password: string;

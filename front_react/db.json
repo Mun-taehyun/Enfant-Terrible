@@ -1,0 +1,10 @@
+{
+  "admin": {
+    "auth": {
+      "sign-in": {
+        "accessToken": "mock-token-value",
+        "adminId": "admin_user"
+      }
+    }
+  }
+}
