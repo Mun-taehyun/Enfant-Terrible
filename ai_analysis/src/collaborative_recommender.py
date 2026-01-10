@@ -1,104 +1,108 @@
-import pandas as pd
-import numpy as np
-from sklearn.metrics.pairwise import cosine_similarity
-from sqlalchemy import create_engine, text
+#collavorative_recommender.py
+# 추천 계산한다
+
 import os
 import time
-from datetime import datetime
+from pathlib import Path
 
-# --- 경로 설정 ---
-current_file_path = os.path.abspath(__file__) 
-base_dir = os.path.dirname(os.path.dirname(current_file_path)) 
-# 이전 단계에서 생성한 파일명(service_ready_data.csv)으로 맞춤
-PROCESSED_PATH = os.path.join(base_dir, "data", "processed")
+import pandas as pd
+from sklearn.metrics.pairwise import cosine_similarity
+from sqlalchemy import create_engine, text
 
-# 1. MySQL DB 연결 설정 (User: enfant)
-DB_URL = 'mysql+pymysql://enfant:1234@localhost:3306/enfant_terrible?charset=utf8mb4'
-engine = create_engine(DB_URL)
 
-def run_full_batch_recommendation_erd(top_n=5):
+def _clamp(n: int, lo: int, hi: int) -> int:
     try:
-        start_time = time.time()
-        print(f"🚀 [Enfant Terrible] 실 서비스용 추천 배치 시스템 가동...")
+        v = int(n)
+    except (TypeError, ValueError):
+        return lo
+    return max(lo, min(v, hi))
 
-        # 1. 전처리된 통합 데이터 로딩
-        # 이전 전처리 단계에서 저장한 파일명을 사용하는 것이 안전합니다.
-        file_path = os.path.join(PROCESSED_PATH, "service_ready_data.csv")
-        if not os.path.exists(file_path):
-            print(f"❌ 데이터 파일이 없습니다. 전처리 스크립트를 먼저 실행하세요: {file_path}")
-            return
-        
-        # 'final_preference' 점수를 추천의 기준으로 사용합니다.
-        df_scores = pd.read_csv(file_path)
-        
-        # 2. 유저-아이템 행렬 및 유사도 계산
-        # 실제 서비스에서는 'final_preference'가 평점 역할을 합니다.
-        user_item_matrix = df_scores.pivot_table(
-            index='user_id', 
-            columns='product_id', 
-            values='final_preference'
-        ).fillna(0)
-        
-        user_sim = cosine_similarity(user_item_matrix)
-        user_sim_df = pd.DataFrame(user_sim, index=user_item_matrix.index, columns=user_item_matrix.index)
-        
-        # 3. 추천 계산 및 리스트 생성
-        all_recommendations = []
-        current_now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-        for target_user_id in user_item_matrix.index:
-            # 자기 자신을 제외한 유사 유저 상위 10명
-            similar_users = user_sim_df[target_user_id].sort_values(ascending=False)[1:11]
-            
-            if similar_users.sum() == 0: continue # 유사도가 전혀 없는 경우 제외
+def run_full_batch_recommendation_erd(top_n=5, similar_k=10, truncate=True):
+    # 1) DB URL: 환경변수 키 통일
+    db_url = os.getenv("ENFANT_TERRIBLE_URL")
+    if not db_url:
+        raise RuntimeError("ENFANT_TERRIBLE_URL 환경변수가 없습니다.")
+    engine = create_engine(db_url, pool_pre_ping=True)
 
-            sim_user_data = user_item_matrix.loc[similar_users.index]
-            weights = similar_users.values.reshape(-1, 1)
-            
-            # 가중 평균 점수 계산
-            weighted_scores = (sim_user_data * weights).sum(axis=0) / (weights.sum() + 1e-9)
-            
-            # 이미 구매한 상품은 추천에서 제외 (df_scores 기준)
-            purchased = df_scores[df_scores['user_id'] == target_user_id]['product_id'].unique()
-            recommendations = weighted_scores.drop(purchased, errors='ignore').sort_values(ascending=False).head(top_n)
+    top_n = _clamp(top_n, 1, 50)
+    similar_k = _clamp(similar_k, 1, 50)
 
-            for r_idx, (p_id, score) in enumerate(recommendations.items(), 1):
-                all_recommendations.append({
-                    "user_id": int(target_user_id),
-                    "product_id": int(p_id),
-                    "rank": int(r_idx),
-                    "score": float(round(score, 4)),
-                    "generated_at": current_now # ERD 상의 생성 시간 기록
-                })
+    # 2) CSV 경로: SERVICE_READY_CSV로 통일 (없으면 로컬 기본)
+    out_path = os.getenv("SERVICE_READY_CSV")
+    if out_path:
+        file_path = Path(out_path).resolve()
+    else:
+        current_file_path = Path(__file__).resolve()
+        base_dir = current_file_path.parent.parent
+        file_path = base_dir / "data" / "processed" / "service_ready_data.csv"
 
-        # 4. DB 저장 (et_user_recommendation 테이블)
-        if not all_recommendations:
-            print("⚠️ 생성된 추천 데이터가 없습니다.")
-            return
+    if not file_path.exists():
+        raise RuntimeError(f"service_ready_data.csv 파일이 없습니다: {file_path}")
 
-        print(f"💾 MySQL 'et_user_recommendation' 테이블 갱신 중...")
-        result_df = pd.DataFrame(all_recommendations)
+    start_time = time.time()
+    print(f"[batch] input={file_path} top_n={top_n} similar_k={similar_k} truncate={truncate}")
 
-        with engine.begin() as conn:
-            # 1단계: 외래 키 체크 일시 해제 후 기존 추천 내역 비우기
-            conn.execute(text("SET FOREIGN_KEY_CHECKS = 0;"))
-            conn.execute(text("TRUNCATE TABLE et_user_recommendation;"))
-            conn.execute(text("SET FOREIGN_KEY_CHECKS = 1;"))
-            
-            # 2단계: 신규 추천 데이터 삽입
-            result_df.to_sql(
-                name='et_user_recommendation', 
-                con=conn, 
-                if_exists='append', 
-                index=False,
-                method='multi'
-            )
-            
-        print(f"✨ 배치 완료! (소요 시간: {time.time() - start_time:.2f}초)")
-        print(f"✅ DB 확인: {len(all_recommendations)}개의 추천 아이템이 'enfant_terrible' DB에 저장되었습니다.")
+    # 3) 읽기
+    df_scores = pd.read_csv(file_path)
 
-    except Exception as e:
-        print(f"❌ 추천 배치 오류 발생: {e}")
+    need = {"user_id", "product_id", "final_preference"}
+    if not need.issubset(df_scores.columns):
+        raise RuntimeError(f"CSV 컬럼이 부족합니다. 필요={sorted(need)} 실제={list(df_scores.columns)}")
+
+    # 4) user-item matrix / cosine
+    user_item_matrix = (
+        df_scores.pivot_table(index="user_id", columns="product_id", values="final_preference")
+        .fillna(0)
+    )
+
+    user_sim = cosine_similarity(user_item_matrix)
+    user_sim_df = pd.DataFrame(user_sim, index=user_item_matrix.index, columns=user_item_matrix.index)
+
+    # 5) 추천 생성
+    all_rows = []
+    for target_user_id in user_item_matrix.index:
+        similar_users = user_sim_df[target_user_id].sort_values(ascending=False)[1: 1 + similar_k]
+        if float(similar_users.sum()) == 0.0:
+            continue
+
+        sim_user_data = user_item_matrix.loc[similar_users.index]
+        weights = similar_users.values.reshape(-1, 1)
+        weighted_scores = (sim_user_data * weights).sum(axis=0) / (weights.sum() + 1e-9)
+
+        purchased = df_scores[df_scores["user_id"] == target_user_id]["product_id"].unique()
+        recs = weighted_scores.drop(purchased, errors="ignore").sort_values(ascending=False).head(top_n)
+
+        for r_idx, (p_id, score) in enumerate(recs.items(), 1):
+            all_rows.append({
+                "user_id": int(target_user_id),
+                "product_id": int(p_id),
+                "rank_no": int(r_idx),          # 테이블 컬럼명과 일치
+                "score": float(round(score, 4)) # 테이블 컬럼명과 일치
+                # created_at은 DEFAULT가 있으니 굳이 넣지 않음
+            })
+
+    if not all_rows:
+        print("[batch] 생성된 추천 데이터가 없습니다.")
+        return 0
+
+    # 6) DB 반영
+    with engine.begin() as conn:
+        if truncate:
+            conn.execute(text("TRUNCATE TABLE et_user_recommendation"))
+
+        # executemany insert
+        conn.execute(
+            text("""
+                INSERT INTO et_user_recommendation (user_id, product_id, rank_no, score)
+                VALUES (:user_id, :product_id, :rank_no, :score)
+            """),
+            all_rows
+        )
+
+    print(f"[batch] inserted_rows={len(all_rows)} elapsed={time.time() - start_time:.2f}s")
+    return len(all_rows)
+
 
 if __name__ == "__main__":
     run_full_batch_recommendation_erd()

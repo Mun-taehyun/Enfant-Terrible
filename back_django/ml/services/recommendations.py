@@ -1,5 +1,5 @@
 # ml/services/recommendations.py
-# 함수 계산 부분만 여기로 따로 뺌
+# 추천 읽어주는 파일. 없으면 인기 상품 보여 줌
 
 from django.db import connection
 from django.db.utils import OperationalError, ProgrammingError

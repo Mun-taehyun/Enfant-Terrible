@@ -1,3 +1,6 @@
+# db_migrator
+# et_product를 적제
+
 import pandas as pd
 from sqlalchemy import create_engine, text
 import os
@@ -9,9 +12,15 @@ def migrate_to_et_tables_erd():
     base_dir = os.path.dirname(os.path.dirname(current_file_path)) 
     CSV_PATH = os.path.join(base_dir, "data", "raw", "product_master_erd.csv")
 
-    # 2. DB 연결 (User: enfant)
-    DB_URL = 'mysql+pymysql://enfant:1234@localhost:3306/enfant_terrible?charset=utf8mb4'
-    engine = create_engine(DB_URL)
+    # 2. DB 연결 (User: kosmo)
+    DB_URL = os.getenv("ENFANT_TERRIBLE_URL")
+    if not DB_URL:
+     raise RuntimeError(
+        "ENFANT_TERRIBLE_URL 환경변수가 없습니다. "
+        '예) setx ENFANT_TERRIBLE_URL "mysql+pymysql://kosmo:1234@localhost:3306/enfant_terrible?charset=utf8mb4"'
+    )
+
+    engine = create_engine(DB_URL, pool_pre_ping=True)
 
     try:
         if not os.path.exists(CSV_PATH):

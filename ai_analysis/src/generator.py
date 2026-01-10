@@ -1,3 +1,5 @@
+# generator.py
+# 여러가지 csv todtjd. 필요 없을 가능성 1위
 import pandas as pd
 import numpy as np
 import os

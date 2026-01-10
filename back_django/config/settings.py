@@ -12,15 +12,16 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 #csv를 읽기 위해 쓴다
 AI_ANALYSIS_DIR = BASE_DIR.parent / "ai_analysis"
 PROCESSED_DIR = AI_ANALYSIS_DIR / "data" / "processed"
 RAW_DIR = AI_ANALYSIS_DIR / "data" / "raw"
+SERVICE_READY_CSV = PROCESSED_DIR / "service_ready_data.csv"
 
-INTEGRATED_SCORE_CSV_PATH = PROCESSED_DIR / "integrated_score_v2.csv"
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
@@ -85,9 +86,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'enfant_terrible',
-        'USER': 'enfant',        # <-- 위에서 확인한 유저 이름
+        'USER': 'kosmo',        # <-- 위에서 확인한 유저 이름
         'PASSWORD': '1234', # 해당 유저의 비밀번호
-        'HOST': '127.0.0.1',     # DB 서버 주소
+        'HOST': '/',     # DB 서버 주소
         'PORT': '3306',
     },
 }

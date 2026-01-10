@@ -1,3 +1,6 @@
+#product_generator.py
+#상품CSV 생성  product_geneartor에서 적재할 것이다.
+
 import pandas as pd
 import numpy as np
 import os

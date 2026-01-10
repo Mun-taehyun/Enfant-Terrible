@@ -1,3 +1,7 @@
+#ml/management/commeands/run_scheduler.py
+# 그냥 스케쥴러 파일. 배치 돌려준다. 매일 03:00 (TIME_ZONE 기준) import_integrated_scores 실행
+
+
 from __future__ import annotations
 
 import signal
@@ -16,7 +20,7 @@ class Command(BaseCommand):
       python manage.py run_scheduler
 
     기본 동작:
-      매일 03:00 (TIME_ZONE 기준) rebuild_recommendations 실행
+      매일 03:00 (TIME_ZONE 기준) import_integrated_scores 실행
     """
 
     help = "Run daily recommendation rebuild scheduler."
@@ -25,7 +29,7 @@ class Command(BaseCommand):
         parser.add_argument("--hour", type=int, default=3)
         parser.add_argument("--minute", type=int, default=0)
 
-        # rebuild_recommendations로 그대로 전달할 옵션들
+        # import_integrated_scores로 그대로 전달할 옵션들
         parser.add_argument("--limit", type=int, default=50)
         parser.add_argument("--truncate", action="store_true")
 
@@ -70,7 +74,7 @@ class Command(BaseCommand):
         scheduler.add_job(
             func=self._run_batch,
             trigger=trigger,
-            id="daily_rebuild_recommendations",
+            id="daily_import_integrated_scores",
             replace_existing=True,
             max_instances=1,
             coalesce=True,
@@ -107,7 +111,7 @@ class Command(BaseCommand):
         self.stdout.write("[scheduler] stopped")
 
     def _run_batch(self, **kwargs):
-        self.stdout.write(f"[batch] calling rebuild_recommendations with {kwargs}")
+        self.stdout.write(f"[batch] calling import_integrated_scores with {kwargs}")
         args = ["--limit", str(int(kwargs["limit"]))]
 
         if kwargs.get("truncate"):
@@ -121,5 +125,5 @@ class Command(BaseCommand):
         if kwargs.get("seed_dummy_users"):
             args.append("--seed-dummy-users")
 
-        call_command("rebuild_recommendations", *args)
-        self.stdout.write("[batch] rebuild_recommendations completed")
+        call_command("import_integrated_scores", *args)
+        self.stdout.write("[batch] import_integrated_scores completed")

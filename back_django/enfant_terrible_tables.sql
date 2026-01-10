@@ -1,5 +1,3 @@
-USE enfant_terrible;
-
 -- MySQL dump 10.13  Distrib 8.0.43, for Win64 (x86_64)
 --
 -- Host: localhost    Database: kosmo
@@ -817,14 +815,5 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2026-01-06  9:46:07
-SELECT DATABASE(), @@hostname, @@port, USER();
-
-SHOW TABLES LIKE 'et_user_recommendation';
-
-SELECT DATABASE();
-
-
-SHOW TABLES;
-
 
 
