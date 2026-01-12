@@ -12,7 +12,6 @@ export default function Main() {
     return (
         <div>
             <div className="main-banner-container">
-                
             </div>
             <div className="main-recommend-product-container"></div>
             <div className="main-chat-container"></div>

@@ -4,4 +4,4 @@ export default interface OAuthAddInformationRequestDto {
     addressBase: string;
     addressDetail: string | null;
 }
-//소셜 회원가입 시 추가정보 요청 
+//소셜 회원가입 시 추가정보 요청  => 연동완료 

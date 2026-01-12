@@ -5,10 +5,29 @@ import { ChangeEvent, KeyboardEvent, useRef, useState } from "react";
 import { Address, useDaumPostcodePopup} from "react-daum-postcode";
 import { useNavigate } from "react-router-dom";
 
+//초기화 객체: 입력값 
+const input ={email: '', verification: '', password: '', passwordCheck: '',
+              name: '', tel: '', zipCode: '', addressBase: '', addressDetail: ''} //=> 이동 시 다 비워야 좋다. 
+
 export const useAuth = () => {
-    //초기화 객체: 입력값 
-    const input ={email: '', verification: '', password: '', passwordCheck: '',
-                  name: '', tel: '', zipCode: '', addressBase: '', addressDetail: ''} //=> 이동 시 다 비워야 좋다. 
+
+    //함수: Daum 우편번호 , 주소 
+    const openDaum = useDaumPostcodePopup();
+
+    //이벤트핸들러 : 우편번호/주소 버튼 클릭 이벤트 처리
+    const onAddressButtonClickHandler = () => {
+        openDaum({onComplete: onAddressComplete});
+    }//npm i react-daum-postcode 를 하게되면 =>  인베디드 형태 , 팝업 형태를 고를 수 있음 ..
+
+    //이벤트핸들러: 우편번호, 주소 검색
+    const onAddressComplete = (data: Address) => {
+        setFormData(prev => ({ ...prev, zipCode: data.zonecode, addressBase: data.address }));
+        //FormData 순회 => zipCode , address data선택.. 
+        setErrors(prev => ({ ...prev, zipCode: { state: false, message: '' }, addressBase: { state: false, message: '' } }));
+        if(!refForms.addressDetail.current) return;
+        refForms.addressDetail.current.focus();
+        //null일 수 있으므로 필터.. 
+    };
 
     //서버상태: 메일인증
     const { mutate: emailCertification } = authQueries.useEmailCertification();
@@ -78,6 +97,7 @@ export const useAuth = () => {
         addressBase: useRef<HTMLInputElement>(null),
         addressDetail: useRef<HTMLInputElement>(null),
     };
+
     
     //함수 : 상태 초기화 "각각 가입방식에 따라 공유되지 않기위해"
     const resetForm = () => {
@@ -159,16 +179,6 @@ export const useAuth = () => {
                 onError: (error: Error) => {alert(error.message)}
             } //성공 시 검증 완료 , 유효성 / 오류 시 백엔드 알림 
         );
-    };
-
-    //이벤트핸들러: 우편번호, 주소 검색
-    const onAddressComplete = (data: Address) => {
-        setFormData(prev => ({ ...prev, zipCode: data.zonecode, addressBase: data.address }));
-        //FormData 순회 => zipCode , address data선택.. 
-        setErrors(prev => ({ ...prev, zipCode: { state: false, message: '' }, addressBase: { state: false, message: '' } }));
-        if(!refForms.addressDetail.current) return;
-        refForms.addressDetail.current.focus();
-        //null일 수 있으므로 필터.. 
     };
 
     //이벤트핸들러 : 공통 키다운 이벤트 처리 
@@ -340,28 +350,21 @@ export const useAuth = () => {
         );
     };
 
-    //이벤트핸들러 : 우편번호/주소 버튼 클릭 이벤트 처리
-    const onAddressButtonClickHandler = () => {
-        openDaum({onComplete: onAddressComplete});
-    }//npm i react-daum-postcode 를 하게되면 =>  인베디드 형태 , 팝업 형태를 고를 수 있음 ..
-    
-    //함수: Daum 우편번호 , 주소 
-    const openDaum = useDaumPostcodePopup();
 
     return {
         page, formData, formChange, errors, refForms, // 페이지변화/데이터 값/데이터변화값/오류처리값/DOM참조 값
         onInputChange, togglePasswordType, onMailButtonClick, onMailVerifyClick, resetForm,
         //기입이벤트 /비번,텍스트 타입 이벤트처리 / 메일 인증 / 메일 검증 / view이동 시 초기화 
-        onAddressComplete, onNextStepClick, onSignUpClick, 
-        //주소버튼 클릭 이벤트처리 /다음으로 이벤트처리 / 회원가입 이벤트 처리 
+        onNextStepClick, onSignUpClick, 
+        //다음으로 이벤트처리 / 회원가입 이벤트 처리 
         onKeyDown, setPage, onSignInButtonClickHandler,
         //키다운이벤트처리 / 페이지 이동 처리 / 로그인 이벤트 처리 
         onPasswordMailClick, onPasswordVerifyClick, onNextPasswordReset,
         //비번찾기메일전송 / 비번찾기인증번호검증 / 비번찾기검증 후 비번변경으로 이동 
-        onPasswordUpdateClick , onAddressButtonClickHandler,
-        //새로운비밀번호 수정 / 우편번호,주소변경 클릭 
-        onOAuthAddHandler
-        //소셜회원가입정보기입란
+        onPasswordUpdateClick,  onOAuthAddHandler , onAddressButtonClickHandler
+        //새로운비밀번호 수정  //소셜회원가입정보기입란
+       
+
 
     };
 };

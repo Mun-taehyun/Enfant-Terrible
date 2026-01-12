@@ -7,22 +7,26 @@ import { SNS_SIGN_IN_URL } from '@/apis/user';
 // 컴포넌트 : 인증화면 
 export default function Authentication() {
 
+
     // 상태 : 화면 (로그인 화면 or 회원가입 화면 외엔 안 받음)
     const [view, setView] = useState<'sign-in' | 'sign-up' |'password-search'>('sign-in');
-
 
     //========================= 로그인 카드 내부 컴포넌트 =================================
     const SignInCard = () => {
 
-        //함수: 로그인 함수 처리 
-        const {
-            formData, refForms, errors , formChange,
-            onInputChange, resetForm, onKeyDown, 
-            togglePasswordType, onSignInButtonClickHandler
-        } = useAuth();
-
 
     // ========================= 로그인 이벤트 핸들러 ===============================
+
+        //함수 : 인증 함수 처리 
+        const {
+            formData, formChange, errors, refForms, 
+            // 데이터 값/데이터변화값/오류처리값/DOM참조 값
+            onInputChange, togglePasswordType, resetForm,
+            //기입이벤트 /비번,텍스트 타입 이벤트처리 / view이동 시 초기화 
+            onKeyDown, onSignInButtonClickHandler,
+            //키다운이벤트처리 /로그인 이벤트처리 
+        } = useAuth();
+
 
         //이벤트핸들러 : 회원가입 링크 클릭 이벤트 처리
         const onSignUpLinkClickHandler = () => {
@@ -83,16 +87,17 @@ export default function Authentication() {
     // ========================= 회원가입 카드 내부 컴포넌트 ================================
     const SignUpCard = () => {
 
-        //함수 : 회원가입 함수 처리 
-        const {
-            page, formData, formChange, errors, refForms, // 페이지변화/데이터 값/데이터변화값/오류처리값/DOM참조 값
-            onInputChange, togglePasswordType, onMailButtonClick, onMailVerifyClick, resetForm,
-            //기입이벤트 /비번,텍스트 타입 이벤트처리 / 메일 인증 / 메일 검증 / view이동 시 초기화 
-            onAddressButtonClickHandler, onNextStepClick, onSignUpClick, 
-            //주소버튼 클릭 이벤트처리 /다음으로 이벤트처리 / 회원가입 이벤트 처리 
-            onKeyDown
-            //키다운이벤트처리 
-        } = useAuth();
+    //함수 : 인증 함수 처리 
+    const {
+        page, formData, formChange, errors, refForms, // 페이지변화/데이터 값/데이터변화값/오류처리값/DOM참조 값
+        onInputChange, togglePasswordType, onMailButtonClick, onMailVerifyClick, resetForm,
+        //기입이벤트 /비번,텍스트 타입 이벤트처리 / 메일 인증 / 메일 검증 / view이동 시 초기화 
+        onNextStepClick, onSignUpClick, 
+        //다음으로 이벤트처리 / 회원가입 이벤트 처리 
+        onKeyDown,
+        //키다운이벤트처리
+        onAddressButtonClickHandler
+    } = useAuth();
 
     // ========================= 회원가입 카드 이벤트핸들러 ==============================
 
@@ -102,8 +107,6 @@ export default function Authentication() {
             setView('sign-in');
             //폼에 있는 데이터 모든걸 초기화 후 로그인.. 
         }
-
-
 
     // ======================== 회원가입 이펙트 =========================================
     // 이펙트 : 페이지가 변경될 때마다 실행
@@ -130,7 +133,7 @@ export default function Authentication() {
                                       name='email' value={formData.email} onChange={onInputChange} 
                                       error={errors.email.state} message={errors.email.message} 
                                       onkeyDown={(event) => onKeyDown(event, refForms.verification, onMailButtonClick)}/>
-                            <button className='email-mail-button-click' onClick={onMailButtonClick}/>
+                            <button className='email-mail-button-click' onClick={onMailButtonClick}> {'이메일 인증'} </button>
                         </div>
                         {formChange.verificationActive && //이메일 인증번호는 true일때만 노출 
                         <div className='auth-email-box'>
@@ -138,7 +141,7 @@ export default function Authentication() {
                                       name='varification' value={formData.verification} onChange={onInputChange} 
                                       error={errors.verification.state} message={errors.verification.message} 
                                       onkeyDown={(event) => onKeyDown(event, refForms.password, onMailVerifyClick)}/>                          
-                            <button className='email-mail-button-click' onClick={onMailVerifyClick}/>
+                            <button className='email-mail-button-click' onClick={onMailVerifyClick}> {'인증번호 확인'} </button>
                         </div>
                         }                       
                         <InputBox ref={refForms.password} label='비밀번호*' type={formChange.passwordType} placeholder='비밀번호를 입력해주세요.' 
@@ -199,15 +202,16 @@ export default function Authentication() {
 // ===================================== 회원가입 내부 컴포넌트 끝 =========================================
     // ========================= 비밀번호 찾기 내부 컴포넌트 ================================
     const PasswordSearchCard = () => {
- 
-        //함수 : 비밀번호 찾기 
+        //함수 : 인증 함수 처리 
         const {
-            page, refForms, formChange, formData, errors,
-            onInputChange, togglePasswordType, onKeyDown,
+            page, formData, formChange, errors, refForms, // 페이지변화/데이터 값/데이터변화값/오류처리값/DOM참조 값
+            onInputChange, togglePasswordType,
+            //기입이벤트 /비번,텍스트 타입 이벤트처리 / view이동 시 초기화 
+            onKeyDown,
+            //키다운이벤트처리 
             onPasswordMailClick, onPasswordVerifyClick, onNextPasswordReset,
-            onPasswordUpdateClick
+            onPasswordUpdateClick 
         } = useAuth();
-
 
         // 이펙트 : 페이지가 변경될 때마다 실행
         useEffect(() => {
@@ -279,6 +283,7 @@ export default function Authentication() {
             </div>
         );
     };
+
 
     //렌더링 : 인증화면
     return (

@@ -7,4 +7,4 @@ export default interface SignUpRequestDto {
     addressBase: string;                    //주소
     addressDetail: string | null;           //상세주소
 }
-//유저 회원가입 요청사항 
+//유저 회원가입 요청사항 => 연동완료

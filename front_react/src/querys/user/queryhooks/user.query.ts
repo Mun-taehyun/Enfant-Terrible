@@ -72,7 +72,8 @@ export const userQueries = {
 
     useUserDelete() {
         return useMutation({
-            mutationFn: userDeleteRequest,onSuccess: () => {queryClient.removeQueries({queryKey: userKey.me()});}
+            mutationFn: userDeleteRequest,
+            onSuccess: () => {queryClient.removeQueries({queryKey: userKey.me()});}
         });
     },
 
@@ -97,7 +98,10 @@ export const userQueries = {
     usePetDelete() {
         return useMutation({
         mutationFn: petDeleteRequest,
-            onSuccess: () => {queryClient.invalidateQueries({queryKey: userKey.pets()});}
+            onSuccess: (_data,petId) => {
+                queryClient.removeQueries({ queryKey: userKey.petIds(petId) });
+                queryClient.invalidateQueries({queryKey: userKey.pets()});
+            }
         });
     }
 };

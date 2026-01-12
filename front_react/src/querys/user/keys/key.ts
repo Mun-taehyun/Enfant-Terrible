@@ -4,7 +4,10 @@ export const userKey = {
 
   me: () => [...userKey.all, 'me'] as const, // user , me 까지 있어야 의미 oo
 
-  pets: () => [...userKey.all, 'pets'] as const // user , pets 까지 있어야 의미 oo
+  pets: () => [...userKey.all, 'pets'] as const, // user , pets 까지 있어야 의미 oo
+
+  petIds: (petId: number| string) => [...userKey.all, 'pets', petId] as const
+  //특정id 삭제 시 필요 
 };
 
 

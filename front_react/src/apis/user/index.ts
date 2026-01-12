@@ -97,11 +97,11 @@ export const petSeleteRequest = async () : Promise<PetSelectResponseDto> => {
     return apiClient.get(PET_SELECT_URL())
 }//내 반려동물 목록 조회 
 
-export const petUpdateRequest = async (petId: string |number) => (requestBody: PetUpdateRequestDto) => {
+export const petUpdateRequest = async ({petId ,requestBody} : {petId: string | number; requestBody : PetUpdateRequestDto} ) => {
     return apiClient.put(PET_UPDATE_URL(petId), requestBody) //단일인자 매핑 useMutation은 data만 받는다....
 }//내 반려동물 수정 
 
-export const petDeleteRequest = async (petId: string|number) => {
+export const petDeleteRequest = async (petId : number | string) => {
     return apiClient.delete(PET_DELETE_URL(petId))
 }//내 반려동물 정보 삭제
 

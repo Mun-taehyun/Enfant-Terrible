@@ -5,14 +5,9 @@ import { ToggleSelect } from '@/components/user/CustomComponent/ToggleBox';
 import { ScrollBox } from '@/components/user/CustomComponent/ScrollBox';
 import { SelectBox } from '@/components/user/CustomComponent/SelectBox';
 import { usePet } from '@/hooks/user/pet/pet.hook';
-import { ACTIVITY_LEVEL_TYPES, GENDER_TYPES, NEUTERED_TYPES, PET_TYPES } from '@/constant/user/pet.index';
+import { ACTIVITY_LEVEL_TYPES, BREED_DATA, GENDER_TYPES, NEUTERED_TYPES, PET_TYPES } from '@/constant/user/pet.index';
 
 
-const BREED_DATA: Record<string, string[]> = {
-    '강아지': ['비숑', '닥트리오', '스피츠', '말티즈', '푸들', '포메라니안'],
-    '고양이': ['렉돌', '먼치킨', '샴', '러시안블루', '뱅갈'],
-    '기타': ['햄스터', '토끼', '고슴도치']
-};
 
 
 //컴포넌트 : 펫 정보 기입란

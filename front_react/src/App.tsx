@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 import type { PopupItem, User } from './types/user/interface';
 import { Route, Routes } from 'react-router-dom';
 import UserContainer from './layouts/user/UserContainer';
-import {AUTH_ADD_INFOMATION_PATH, AUTH_LOGIN_PATH, AUTH_OAUTH_PATH, AUTH_PATH, MAIN_PATH, OAUTH_PATH} from './constant/user/route.index';
+import {AUTH_ADD_INFOMATION_PATH, AUTH_LOGIN_PATH, AUTH_OAUTH_PATH, AUTH_PATH, MAIN_PATH, OAUTH_PATH, USER_PATH, USER_UPDATE_PATH} from './constant/user/route.index';
 import Main from './views/user/Main';
 import { useLoginUserStore } from './stores/user';
 import { userQueries } from './querys/user/queryhooks';
@@ -17,6 +17,8 @@ import OAuthCallBack from './views/user/Authentication/OAuth/CallBack';
 import OAuthAddPage from './views/user/Authentication/OAuth/Auth';
 import PetMessage from './components/user/PetMessage';
 import PetInfomation from './views/user/Authentication/PetInfo';
+import UserPage from './views/user/MyPage/UserPage';
+import UserUpdate from './views/user/MyPage/UserUpdate';
 //공통라우터 정리 
 
 const MOCK_POPUP_LIST: PopupItem[] = [
@@ -72,7 +74,7 @@ function App() {
   const {data : useData, error : useError } = userQueries.useMe();
 
   //상태보관 : 유저의 로그인/로그아웃 상태 
-  const {loginUser ,setLoginUser ,resetLoginUser} = useLoginUserStore();
+  const {setLoginUser ,resetLoginUser} = useLoginUserStore();
 
 
   //효과 : 팝업리스트 응답 조회와 유저 로그인 상태 
@@ -112,7 +114,9 @@ function App() {
           <Route path={AUTH_PATH() + "/" + AUTH_ADD_INFOMATION_PATH()} element={<PetInfomation />}/>
         </Route>
         <Route path={OAUTH_PATH(":accessToken")} element={<OAuthCallBack />} />
-        {/* <Route path={USER_PATH()} element={<MyPage />}/> */}
+        <Route path={USER_PATH()} element={<UserUpdate />}>
+          {/* <Route path={USER_PATH() + "/" + USER_UPDATE_PATH(":useData?.userId")} element{<UserUpdate />} /> */}
+        </Route>
       </Route>
       <Route path='*' element={<h1>404 오류</h1>} />
     </Routes>

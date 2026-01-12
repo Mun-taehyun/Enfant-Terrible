@@ -8,3 +8,5 @@ export default interface PetAddInsertRequestDto{
     activityLevel: number | null;                   //펫 활동성 수치 
     weight: number | null;                          //펫 무게 
 }
+
+//펫 등록 => 연동완료 

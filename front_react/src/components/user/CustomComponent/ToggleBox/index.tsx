@@ -23,7 +23,7 @@ export const ToggleSelect = forwardRef<HTMLDivElement, Props>((props: Props, ref
         <div className="common-form-group" ref={ref}>
             {label && <div className="common-form-label">{label}</div>}
             <div className="common-toggle-container">
-                {options.map((option: string | { label: string; value: string | number | boolean} ) => {
+                {options.map((option: string | { label: string; value: string | number | boolean}) => {
                     //option 개수 (배열 개수 , 객체 개수 에 따른 토글이 등장한다)
                     const targetValue = typeof option === 'object' ? option.value : option;
                     const targetLabel = typeof option === 'object' ? option.label : option;
