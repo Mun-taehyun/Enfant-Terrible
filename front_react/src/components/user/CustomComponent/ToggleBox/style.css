@@ -1,0 +1,43 @@
+/* 컨테이너: 옵션들을 감싸는 박스 */
+.common-toggle-container {
+    display: flex;
+    gap: 8px; /* 버튼 사이 간격 */
+    background-color: #f1f3f5; /* 연한 배경색 */
+    padding: 4px;
+    border-radius: 12px;
+    width: 100%;
+}
+
+/* 개별 토글 아이템 */
+.common-toggle-item {
+    flex: 1; /* 가로 길이를 똑같이 배분 */
+    text-align: center;
+    padding: 12px 0;
+    font-size: 15px;
+    font-weight: 500;
+    color: #868e96;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: all 0.2s ease; /* 부드러운 전환 */
+    background-color: transparent;
+}
+
+/* 작을 때 (활동성 수치 등) */
+.common-toggle-item.small {
+    padding: 8px 0;
+    font-size: 13px;
+}
+
+/* 활성화 상태 (선택됨) */
+.common-toggle-item.active {
+    background-color: #ffffff; /* 하얀색으로 튀어나오는 느낌 */
+    color: #111111;
+    font-weight: 700;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* 그림자로 입체감 */
+    transform: scale(1.02); /* 살짝 커지는 효과 */
+}
+
+/* 클릭하는 순간의 피드백 */
+.common-toggle-item:active {
+    transform: scale(0.95);
+}

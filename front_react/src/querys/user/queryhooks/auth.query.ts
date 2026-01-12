@@ -63,14 +63,7 @@ export const authQueries = {
     useResetPasswordCode() {return useMutation({mutationFn: resetPasswordCodeRequest,});},
 
     // 비밀번호 재설정
-    useResetPasswordChange() {
-        return useMutation({
-            mutationFn: resetPasswordChangeRequest,
-            onSuccess: () => {
-                alert('비밀번호 변경이 완료되었습니다.')
-            }
-        });
-    },
+    useResetPasswordChange() {return useMutation({mutationFn: resetPasswordChangeRequest,});},
 };
 
 

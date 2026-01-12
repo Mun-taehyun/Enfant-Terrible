@@ -25,7 +25,7 @@ export const userQueries = {
     useMe() {
         return useQuery({
         queryKey: userKey.me(),
-        queryFn: userSelectRequest
+        queryFn: userSelectRequest,
         });
     },
 

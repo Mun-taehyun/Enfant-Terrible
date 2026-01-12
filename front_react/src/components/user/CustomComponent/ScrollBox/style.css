@@ -1,0 +1,80 @@
+.weight-carousel-outer {
+    position: relative;
+    width: 100%;
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 20px 0;
+    overflow: hidden;
+}
+
+/* 정중앙 빨간 선 */
+.weight-center-indicator {
+    position: absolute;
+    left: 50%;
+    top: 15px;
+    bottom: 15px;
+    width: 2px;
+    background-color: #ff4d4f;
+    z-index: 10;
+    transform: translateX(-50%);
+    pointer-events: none; /* 클릭 방해 금지 */
+}
+
+.weight-scroll-box {
+    display: flex;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    /* 스크롤바 숨기기 */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.weight-scroll-box::-webkit-scrollbar {
+    display: none;
+}
+
+.weight-spacer {
+    flex: 0 0 calc(50% - 20px) !important;
+}
+
+.weight-tick-item {
+    flex: 0 0 40px !important;
+    width: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* 40px 영역 안에서 눈금 선을 가운데로 */
+}
+.tick-line {
+    width: 2px;
+    background-color: #dee2e6;
+}
+
+.tick-line.long {
+    height: 25px;
+    background-color: #495057;
+}
+
+.tick-line.medium {
+    height: 12px;
+    background-color: #adb5bd;
+}
+
+.tick-number {
+    font-size: 12px;
+    color: #868e96;
+    margin-top: 5px;
+    font-weight: 500;
+}
+
+.carousel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+}
+
+.weight-num {
+    font-size: 28px;
+    font-weight: 800;
+    color: #212529;
+}

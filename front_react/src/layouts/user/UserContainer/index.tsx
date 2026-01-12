@@ -1,7 +1,7 @@
 import {Outlet, useLocation} from 'react-router-dom';
 // import Footer from '@/layouts/user/Footer';
 import Header from '@/layouts/user/Header';
-import { AUTH_PATH }  from '@/constant/user';
+import { AUTH_PATH }  from '@/constant/user/route.index';
 
 
 // 컴포넌트 (레이아웃)

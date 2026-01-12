@@ -7,12 +7,16 @@ import { useEffect } from 'react';
 import type { PopupItem, User } from './types/user/interface';
 import { Route, Routes } from 'react-router-dom';
 import UserContainer from './layouts/user/UserContainer';
-import { AUTH_PATH, MAIN_PATH } from './constant/user';
+import {AUTH_ADD_INFOMATION_PATH, AUTH_LOGIN_PATH, AUTH_OAUTH_PATH, AUTH_PATH, MAIN_PATH, OAUTH_PATH} from './constant/user/route.index';
 import Main from './views/user/Main';
 import { useLoginUserStore } from './stores/user';
 import { userQueries } from './querys/user/queryhooks';
 import type { UserSelectResponseDto } from './apis/user/response/user';
 import Authentication from './views/user/Authentication/SignAll';
+import OAuthCallBack from './views/user/Authentication/OAuth/CallBack';
+import OAuthAddPage from './views/user/Authentication/OAuth/Auth';
+import PetMessage from './components/user/PetMessage';
+import PetInfomation from './views/user/Authentication/PetInfo';
 //공통라우터 정리 
 
 const MOCK_POPUP_LIST: PopupItem[] = [
@@ -64,17 +68,15 @@ function App() {
     } // GetPopupListResponseDto 에 있는 isActive : true 일 경우에 받아온다. 
   );
 
-
   //서버상태 : 회원가입 한 유저정보 조회 
   const {data : useData, error : useError } = userQueries.useMe();
 
   //상태보관 : 유저의 로그인/로그아웃 상태 
-  const {setLoginUser ,resetLoginUser} = useLoginUserStore();
+  const {loginUser ,setLoginUser ,resetLoginUser} = useLoginUserStore();
 
 
   //효과 : 팝업리스트 응답 조회와 유저 로그인 상태 
   useEffect(() => {
-
     const token = localStorage.getItem('accessToken');
     if(!token) {
       resetLoginUser();
@@ -88,25 +90,35 @@ function App() {
 
   if (isPopupLoading) return <div> 팝업 업로드 중 </div>
   if (popupError instanceof Error) return <div>{popupError.message}</div>;
-  if (useError instanceof Error) return <div>{'유저 데이터를 불러오는 데 실패했습니다. 서버오류'}</div>;
+  if (useError instanceof Error) return <div>{useError.message}</div>;
 
   
   return (
     //컴포넌트 렌더링 설계
     //메인 페이지 /
     //Local 인증 페이지 /auth
+    //      로그인/회원/비번바꾸기 페이지 /auth/login
+    //      소셜 회원가입 추가 페이지 /auth/oauth
+    //      펫정보 추가 페이지 /auth/add-infomation
     <>
-    {popupData?.map((item) => (<Popup popupItem={item} />))}
+    {popupData?.map((item) => (<Popup key={item.popupId} popupItem={item} />))}
+    <PetMessage name={useData?.name} />
     <Routes>
       <Route element={<UserContainer/>}>
         <Route path={MAIN_PATH()} element={<Main />}/>
-        <Route path={AUTH_PATH()} element={<Authentication />}/>
+        <Route path={AUTH_PATH()} >
+          <Route path={AUTH_PATH() + "/" + AUTH_LOGIN_PATH()} element={<Authentication />}/>
+          <Route path={AUTH_PATH() + "/" + AUTH_OAUTH_PATH()} element={<OAuthAddPage />}/>
+          <Route path={AUTH_PATH() + "/" + AUTH_ADD_INFOMATION_PATH()} element={<PetInfomation />}/>
+        </Route>
+        <Route path={OAUTH_PATH(":accessToken")} element={<OAuthCallBack />} />
+        {/* <Route path={USER_PATH()} element={<MyPage />}/> */}
       </Route>
+      <Route path='*' element={<h1>404 오류</h1>} />
     </Routes>
     </>
   )
-}
-//광고 팝업 반환값 GetPopupListResponseDto | string | number 
+} 
 export default App
 
 

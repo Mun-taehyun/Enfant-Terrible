@@ -10,7 +10,7 @@ interface Props {
 export default function Category( {categoryItem} : Props) {
 
     //속성 : 카테고리 아이템 
-    const { parentId, name , depth,} = categoryItem;
+    const { parentId, name , depth} = categoryItem;
 
 
     //렌더 : 카테고리 

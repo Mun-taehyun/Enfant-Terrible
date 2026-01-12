@@ -52,6 +52,8 @@ import type ResetPasswordEmailRequestDto from "./request/auth/reset-password-ema
 // error.response = {response와 거의 일치}
 
 // ============================== 사용자 ================================
+export const SNS_SIGN_IN_URL = (type: 'naver'| 'google') => `/auth/oauth2/${type}`; //소셜로그인 시 로그인 창 접속 
+
 const SIGN_UP_URL = () => `/users/sign-up` //회원가입
 const USER_SELECT_URL = () => `/users/me` //내 정보 조회 
 const USER_UPDATE_URL = USER_SELECT_URL; //내 정보 수정 

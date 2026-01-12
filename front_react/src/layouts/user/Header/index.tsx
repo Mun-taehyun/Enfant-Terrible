@@ -1,5 +1,5 @@
 import CategoryItemList from "@/components/user/CategoryItemList";
-import { AUTH_PATH, CART_PATH, MAIN_PATH, PRODUCT_SEARCH_PATH, USER_PATH } from "@/constant/user";
+import { AUTH_PATH, CART_PATH, MAIN_PATH, PRODUCT_SEARCH_PATH, USER_PATH } from "@/constant/user/route.index";
 import { useLoginUserStore } from "@/stores/user"
 import { useEffect, useRef, useState, type ChangeEvent, type KeyboardEvent } from "react";
 import { useNavigate } from "react-router-dom";
