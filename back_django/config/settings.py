@@ -11,9 +11,11 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
-
+import os
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR.parent / '.env')
 
 #csv를 읽기 위해 쓴다
 AI_ANALYSIS_DIR = BASE_DIR.parent / "ai_analysis"
@@ -27,7 +29,7 @@ SERVICE_READY_CSV = PROCESSED_DIR / "service_ready_data.csv"
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-88k9qx(l09$i^1_p0y+1fj6@z^=50^hot@faxzy*kz4lpwm6-1'
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-88k9qx(l09$i^1_p0y+1fj6@z^=50^hot@faxzy*kz4lpwm6-1')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -84,12 +86,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'enfant_terrible',
-        'USER': 'kosmo',        # <-- 위에서 확인한 유저 이름
-        'PASSWORD': '1234', # 해당 유저의 비밀번호
-        'HOST': '/',     # DB 서버 주소
-        'PORT': '3306',
+        'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.mysql'),
+        'NAME': os.getenv('DB_NAME', 'enfant_terrible'),
+        'USER': os.getenv('DB_USER', 'enfant'),
+        'PASSWORD': os.getenv('DB_PASSWORD', '1234'),
+        'HOST': os.getenv('DB_HOST', '/'),
+        'PORT': os.getenv('DB_PORT', '3306'),
     },
 }
 

@@ -3,10 +3,13 @@
 import os
 import time
 from pathlib import Path
+from dotenv import load_dotenv
 
 import pandas as pd
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import OperationalError, ProgrammingError
+
+load_dotenv()
 
 
 def _must_env(name: str) -> str:

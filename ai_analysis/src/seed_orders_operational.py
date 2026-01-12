@@ -7,8 +7,11 @@ import os
 import random
 from datetime import datetime, timedelta
 from uuid import uuid4
+from dotenv import load_dotenv
 
 from sqlalchemy import create_engine, text
+
+load_dotenv()
 
 
 def _must_env(name: str) -> str:
