@@ -92,7 +92,7 @@ function App() {
       >
         {/* 첫 화면 = 대시보드 */}
         <Route index element={<Dashboard />} />
-
+        <Route path="dashboard" element={<Dashboard />} />
         {/* ======================
             계정 관리
         ====================== */}
