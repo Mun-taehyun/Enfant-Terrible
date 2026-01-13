@@ -2,7 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { 
   useAdminAccountDetailQuery, 
   useAdminAccountStatusMutation 
-} from '@/hooks/queries/admin/useAdminAccount'; // ✅ 통합 훅 사용
+} from '@/hooks/admin/useAdminAccount'; // ✅ 통합 훅 사용
 import type { MemberStatus } from '@/components/common/codes';
 
 const AdminAccountDetailPage = () => {

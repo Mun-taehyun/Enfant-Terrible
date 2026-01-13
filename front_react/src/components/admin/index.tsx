@@ -1,9 +1,11 @@
+//components\admin\index.tsx
+
 import { useState } from 'react';
 
 import {
   useAdminAccountListQuery,
   useAdminAccountStatusMutation,
-} from '@/hooks/queries/admin/useAdminAccount';
+} from '@/hooks/admin/useAdminAccount';
 
 import type { AdminAccountListRequest } from '@/types/admin/request/account/adminAccountRequest';
 

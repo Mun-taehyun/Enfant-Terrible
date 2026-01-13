@@ -54,6 +54,7 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+// 토큰 있으면 자동으로 admin페이지 간다
 const LoginRoute = ({ children }: { children: React.ReactNode }) => {
   if (isAuthenticated()) {
     return <Navigate to="/admin" replace />;

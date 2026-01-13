@@ -1,9 +1,11 @@
+//pages\admin\accounts\adminaccountlistpage.tsx
+
 import { useState } from 'react'; 
 import { useNavigate } from 'react-router-dom';
 
 // ✅ 에러 해결: @/ 별칭 대신 상대 경로를 사용하여 Vite의 500 에러를 방지합니다.
 // 아래 경로는 파일 위치(src/pages/admin/accounts)를 기준으로 src/hooks까지 거슬러 올라간 경로입니다.
-import { useAdminAccountListQuery } from '../../../hooks/queries/admin/useAdminAccount';
+import { useAdminAccountListQuery } from '../../../hooks/admin/useAdminAccount';
 import type { AdminAccountListRequest } from '../../../types/admin/request/account/adminAccountRequest';
 import type { MemberStatus } from '../../../components/common/codes';
 

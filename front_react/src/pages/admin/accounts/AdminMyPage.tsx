@@ -22,7 +22,7 @@ const AdminMyPage = () => {
   };
 
   const handleSave = () => {
-    // TODO: axios PUT /api/v1/admin/me
+    // TODO: axios PUT /api/admin/me
     alert('관리자 정보가 저장되었습니다.');
   };
 

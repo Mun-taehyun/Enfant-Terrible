@@ -1,6 +1,5 @@
 // src/apis/admin/adminAuth.api.ts
 
-// apis/admin/adminAuth.api.ts
 import axiosInstance from '../core/api/axiosInstance';
 import type AdminSignInRequestDto from './request/auth/admin-sign-in.request.dto';
 import type AdminSignInResponseDto from './response/auth/admin-sign-in.response.dto';

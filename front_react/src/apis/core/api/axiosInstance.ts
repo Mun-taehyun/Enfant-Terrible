@@ -1,9 +1,12 @@
 // src/apis/core/api/axiosInstance.ts
+
+
 import axios, { AxiosHeaders } from 'axios';
 import type { AxiosError, InternalAxiosRequestConfig } from 'axios';
 
 function normalizeBaseURL(raw?: string): string {
-  const fallback = 'http://localhost:8080';
+  // 'http://localhost:8080' 실제로 할 때는 이렇게 주소 바꿔줘야 된다 지금은 목서버 주소
+  const fallback = 'https://7cb3acb1-3774-4ae0-b5ab-cb4ffd02dfc2.mock.pstmn.io';
   const v = (raw ?? '').trim();
 
   if (!v) return fallback;

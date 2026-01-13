@@ -38,7 +38,7 @@ const Categories = () => {
     const fetchCategories = async () => {
       try {
         const res = await axiosInstance.get<Category[]>(
-          '/v1/admin/categories'
+          '/admin/categories'
         );
         setCategories(res.data);
       } catch (error) {
