@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.enfantTerrible.enfantTerrible.mapper.category.CategoryMapper">
+
+  <!-- ========================= -->
+  <!-- 사용자용 조회 -->
+  <!-- ========================= -->
+
+  <!-- 전체 활성 카테고리 조회 (트리 구성용) -->
+  <select id="findAllActive" resultType="CategoryRow">
+    SELECT
+      category_id,
+      parent_id,
+      name,
+      depth,
+      sort_order,
+      is_active
+    FROM et_category
+    WHERE deleted_at IS NULL
+      AND is_active = 'Y'
+    ORDER BY depth ASC, sort_order ASC
+  </select>
+
+  <!-- 특정 부모의 활성 카테고리 조회 -->
+  <select id="findActiveByParentId" resultType="CategoryRow">
+    SELECT
+      category_id,
+      parent_id,
+      name,
+      depth,
+      sort_order,
+      is_active
+    FROM et_category
+    WHERE parent_id = #{parentId}
+      AND deleted_at IS NULL
+      AND is_active = 'Y'
+    ORDER BY sort_order ASC
+  </select>
+
+</mapper>

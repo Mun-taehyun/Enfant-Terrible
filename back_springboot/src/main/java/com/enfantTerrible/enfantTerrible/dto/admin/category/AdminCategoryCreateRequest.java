@@ -1,4 +1,4 @@
-package com.enfantTerrible.enfantTerrible.dto.category;
+package com.enfantTerrible.enfantTerrible.dto.admin.category;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -8,18 +8,14 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CategoryUpdateRequest {
+public class AdminCategoryCreateRequest {
 
-  @NotNull
-  private Long categoryId;
+  // 최상위면 null
+  private Long parentId;
 
   @NotBlank
   private String name;
 
   @NotNull
   private Integer sortOrder;
-
-  // 'Y' / 'N'
-  @NotBlank
-  private String isActive;
 }

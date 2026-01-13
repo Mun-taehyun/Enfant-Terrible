@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.enfantTerrible.enfantTerrible.mapper.admin.category.AdminCategoryMapper">
+
+  <!-- 조회 -->
+  <select id="findById" resultType="AdminCategoryRow">
+    SELECT
+      category_id,
+      parent_id,
+      name,
+      depth,
+      sort_order,
+      is_active,
+      created_at,
+      updated_at,
+      deleted_at
+    FROM et_category
+    WHERE category_id = #{categoryId}
+      AND deleted_at IS NULL
+  </select>
+
+  <select id="findAll" resultType="AdminCategoryRow">
+    SELECT
+      category_id,
+      parent_id,
+      name,
+      depth,
+      sort_order,
+      is_active,
+      created_at,
+      updated_at,
+      deleted_at
+    FROM et_category
+    WHERE deleted_at IS NULL
+    ORDER BY depth ASC, sort_order ASC
+  </select>
+
+  <!-- 생성 -->
+  <insert id="insert" parameterType="AdminCategoryRow"
+          useGeneratedKeys="true" keyProperty="categoryId">
+    INSERT INTO et_category (
+      parent_id,
+      name,
+      depth,
+      sort_order,
+      is_active
+    ) VALUES (
+      #{parentId},
+      #{name},
+      #{depth},
+      #{sortOrder},
+      #{isActive}
+    )
+  </insert>
+
+  <!-- 기본 수정 -->
+  <update id="update" parameterType="AdminCategoryRow">
+    UPDATE et_category
+    SET
+      name = #{name},
+      sort_order = #{sortOrder}
+    WHERE category_id = #{categoryId}
+      AND deleted_at IS NULL
+  </update>
+
+  <!-- 활성 / 비활성 -->
+  <update id="updateActiveStatus">
+    UPDATE et_category
+    SET is_active = #{isActive}
+    WHERE category_id = #{categoryId}
+      AND deleted_at IS NULL
+  </update>
+
+  <!-- 정렬 변경 -->
+  <update id="updateSortOrder">
+    UPDATE et_category
+    SET sort_order = #{sortOrder}
+    WHERE category_id = #{categoryId}
+      AND deleted_at IS NULL
+  </update>
+
+  <!-- 부모 변경 -->
+  <update id="updateParent">
+    UPDATE et_category
+    SET
+      parent_id = #{parentId},
+      depth = #{depth}
+    WHERE category_id = #{categoryId}
+      AND deleted_at IS NULL
+  </update>
+
+  <!-- 삭제 -->
+  <update id="softDelete">
+    UPDATE et_category
+    SET deleted_at = NOW()
+    WHERE category_id = #{categoryId}
+      AND deleted_at IS NULL
+  </update>
+
+  <!-- 중복 체크 -->
+  <select id="existsByParentAndName" resultType="boolean">
+    SELECT EXISTS (
+      SELECT 1
+      FROM et_category
+      WHERE parent_id = #{parentId}
+        AND name = #{name}
+        AND deleted_at IS NULL
+    )
+  </select>
+
+</mapper>
