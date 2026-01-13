@@ -1,0 +1,189 @@
+/* src/views/admin/categories/CategoriesView.module.css */
+.container {
+  width: 100%;
+}
+
+.title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.desc {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: #475569;
+}
+
+.messageBox {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f8fafc;
+  font-size: 13px;
+  color: #0f172a;
+}
+
+.card {
+  margin-top: 16px;
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.cardTitle {
+  font-size: 14px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 10px;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 0.8fr auto;
+  gap: 10px;
+  align-items: end;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+}
+
+.label {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.hint {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 7px 9px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 13px;
+  outline: none;
+}
+
+.input:focus {
+  border-color: #0ea5e9;
+}
+
+.actionsRight {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.button {
+  padding: 7px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.primaryButton {
+  padding: 7px 10px;
+  border: 1px solid #0ea5e9;
+  border-radius: 8px;
+  background: #ffffff;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.dangerButton {
+  padding: 7px 10px;
+  border: 1px solid #ef4444;
+  border-radius: 8px;
+  background: #ffffff;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.button:disabled,
+.primaryButton:disabled,
+.dangerButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+}
+
+.th {
+  text-align: left;
+  padding: 10px 8px;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 13px;
+  color: #0f172a;
+  background: #f8fafc;
+}
+
+.td {
+  padding: 10px 8px;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 13px;
+  color: #0f172a;
+  vertical-align: top;
+}
+
+.empty {
+  text-align: center;
+  padding: 16px;
+  color: #64748b;
+}
+
+.rowActions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.nameBlock {
+  display: grid;
+  gap: 4px;
+}
+
+.nameMain {
+  font-weight: 800;
+}
+
+.meta {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.subNameBlock {
+  padding-left: 16px;
+  display: grid;
+  gap: 4px;
+}
+
+.nameSub {
+  font-weight: 600;
+}
+
+.editSubGrid {
+  display: grid;
+  gap: 10px;
+}
+
+.editSubRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}

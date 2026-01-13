@@ -5,80 +5,185 @@
 }
 
 .title {
-  margin: 0 0 12px 0;
+  margin: 0 0 12px;
   font-size: 18px;
   font-weight: 700;
-}
-
-.summaryGrid {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin: 12px 0 16px 0;
-}
-
-.card {
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  min-width: 180px;
-}
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 12px;
-}
-
-.th,
-.td {
-  border-bottom: 1px solid #eee;
-  padding: 10px;
-  text-align: left;
-  font-size: 13px;
-}
-
-.thead {
-  background: #f8fafc;
-}
-
-.emptyCell {
-  text-align: center;
-  padding: 16px;
-  color: #64748b;
 }
 
 .loading {
   padding: 16px;
 }
 
-.errorBox {
+/* 기간 필터 바 */
+.filterBar {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
   padding: 12px;
-  border: 1px solid #ef4444;
+  margin-bottom: 12px;
+  background: #ffffff;
+}
+
+.presetGroup {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.presetButton {
+  padding: 8px 10px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
   border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.presetActive {
+  border-color: #111827;
+  font-weight: 700;
+}
+
+.dateGroup {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.dateLabel {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 13px;
+  color: #374151;
+}
+
+.dateInput {
+  padding: 7px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 13px;
+  background: #ffffff;
+}
+
+.applyButton {
+  padding: 8px 12px;
+  border: 1px solid #111827;
+  background: #111827;
+  color: #ffffff;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.resetButton {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* 요약 카드 */
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(180px, 1fr));
+  gap: 12px;
   margin: 12px 0;
 }
 
+.card {
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #ffffff;
+  font-size: 13px;
+}
+
+@media (max-width: 900px) {
+  .summaryGrid {
+    grid-template-columns: repeat(2, minmax(180px, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .summaryGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 테이블 */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.thead {
+  background: #f9fafb;
+}
+
+.th,
+.td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+  font-size: 13px;
+}
+
+.emptyCell {
+  text-align: center;
+  padding: 16px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* 에러 박스 */
+.errorBox {
+  margin: 12px 0;
+  padding: 12px;
+  border: 1px solid #ef4444;
+  border-radius: 8px;
+  background: #fff5f5;
+}
+
 .errorTitle {
-  font-weight: 700;
-  margin-bottom: 8px;
+  font-weight: 800;
+  margin-bottom: 6px;
 }
 
 .errorMessage {
+  font-size: 13px;
   margin-bottom: 8px;
 }
 
 .debug {
   font-size: 12px;
-  color: #475569;
-  line-height: 1.5;
+  color: #374151;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 8px;
+  margin-bottom: 8px;
 }
 
 .retryButton {
-  margin-top: 10px;
   padding: 8px 12px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid #111827;
+  background: #111827;
+  color: #ffffff;
   border-radius: 6px;
-  background: #fff;
+  font-size: 13px;
   cursor: pointer;
 }
