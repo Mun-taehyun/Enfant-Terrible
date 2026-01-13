@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 import type { PopupItem, User } from './types/user/interface';
 import { Route, Routes } from 'react-router-dom';
 import UserContainer from './layouts/user/UserContainer';
-import {AUTH_ADD_INFOMATION_PATH, AUTH_LOGIN_PATH, AUTH_OAUTH_PATH, AUTH_PATH, MAIN_PATH, OAUTH_PATH, USER_PATH, USER_UPDATE_PATH} from './constant/user/route.index';
+import {AUTH_ADD_INFOMATION_PATH, AUTH_LOGIN_PATH, AUTH_OAUTH_PATH, AUTH_PATH, MAIN_PATH, OAUTH_PATH, USER_PATH} from './constant/user/route.index';
 import Main from './views/user/Main';
 import { useLoginUserStore } from './stores/user';
 import { userQueries } from './querys/user/queryhooks';
@@ -18,7 +18,7 @@ import OAuthAddPage from './views/user/Authentication/OAuth/Auth';
 import PetMessage from './components/user/PetMessage';
 import PetInfomation from './views/user/Authentication/PetInfo';
 import UserPage from './views/user/MyPage/UserPage';
-import UserUpdate from './views/user/MyPage/UserUpdate';
+import {UserUpdate} from './views/user/MyPage/UserUpdate';
 //공통라우터 정리 
 
 const MOCK_POPUP_LIST: PopupItem[] = [
@@ -60,11 +60,6 @@ function App() {
     { 
       queryKey: ['popup'] , 
       queryFn: getPopupListRequest,
-      placeholderData: { 
-          popupList: MOCK_POPUP_LIST, 
-          code: "SU", 
-          message: "Success" 
-        } as GetPopupListResponseDto,
       select: (popupData: GetPopupListResponseDto) =>
             popupData.popupList.filter(item => (item.isActive === true))
     } // GetPopupListResponseDto 에 있는 isActive : true 일 경우에 받아온다. 
@@ -85,9 +80,9 @@ function App() {
       localStorage.removeItem('accessToken');
       return;
     }
-    const loginUser : User = useData as UserSelectResponseDto 
+    // const loginUser : User = useData as UserSelectResponseDto 
     // 로그인 데이터 사용 
-    setLoginUser(loginUser);
+    // setLoginUser(loginUser);
   }, [useData, setLoginUser , resetLoginUser]) //처음 들어올 때 List 활용 
 
   if (isPopupLoading) return <div> 팝업 업로드 중 </div>

@@ -1,13 +1,17 @@
 //회원가입 / 로그인 / 비밀번호 찾기 / 소셜회원가입  훅 
-import { AUTH_PATH, MAIN_PATH } from "@/constant/user/route.index";
+import { AUTH_PATH, MAIN_PATH, USER_PATH } from "@/constant/user/route.index";
+import { emailPattern, passwordPattern, telPattern, verificationPattern } from "@/constant/user/valid.intex";
 import { authQueries, userQueries } from "@/querys/user/queryhooks";
+import { useLoginUserStore } from "@/stores/user";
 import { ChangeEvent, KeyboardEvent, useRef, useState } from "react";
 import { Address, useDaumPostcodePopup} from "react-daum-postcode";
 import { useNavigate } from "react-router-dom";
 
 //초기화 객체: 입력값 
-const input ={email: '', verification: '', password: '', passwordCheck: '',
+const input ={email: '', verification: '', password: '', passwordCheck: '', newPassword: '',
               name: '', tel: '', zipCode: '', addressBase: '', addressDetail: ''} //=> 이동 시 다 비워야 좋다. 
+
+
 
 export const useAuth = () => {
 
@@ -28,6 +32,9 @@ export const useAuth = () => {
         refForms.addressDetail.current.focus();
         //null일 수 있으므로 필터.. 
     };
+
+    //보관상태: 유저정보 저장
+    const {resetLoginUser} = useLoginUserStore();
 
     //서버상태: 메일인증
     const { mutate: emailCertification } = authQueries.useEmailCertification();
@@ -53,11 +60,24 @@ export const useAuth = () => {
     //서버상태 : 소셜 로그인 추가 정보 기입
     const { mutate: addInfo } = userQueries.useOauthAddInformation();
 
+    //서버상태 : 내 정보 불러오기 
+    const {data: myInfo, error : myInfoError , isLoading : isInfoLoading } = userQueries.useMe();
+
+    //서버상태 : 내 정보 수정하기 
+    const {mutate: myInfoUpdate} = userQueries.useUserUpdate();
+
+    //서버상태 : 내 정보 삭제하기 
+    const {mutate: myInfoDelete} = userQueries.useUserDelete();
+
+    //서버상태 : 내 비밀번호 수정하기 
+    const {mutate: myPasswordUpdate} = userQueries.usePasswordUpdate();
+
     //상태: 페이지 상태 
     const [page, setPage] = useState<1 | 2>(1);
 
     //상태: 입력 데이터 
     const [formData, setFormData] = useState(input);
+
 
     //상태: 폼 상태의 변화 (비밀번호 감추기 , 아이콘 변경 , 메일발송 , 인증번호 검증.)
     const [formChange, setFormChange] = useState({
@@ -77,6 +97,7 @@ export const useAuth = () => {
         verification: { state: false, message: '' },
         password: { state: false, message: '' },
         passwordCheck: { state: false, message: '' },
+        newPassword: {state:false,message: ''},
         name: { state: false, message: '' },
         tel: { state: false, message: '' },
         zipCode: { state: false, message: '' },
@@ -91,12 +112,14 @@ export const useAuth = () => {
         verification: useRef<HTMLInputElement>(null),
         password: useRef<HTMLInputElement>(null),
         passwordCheck: useRef<HTMLInputElement>(null),
+        newPassword: useRef<HTMLInputElement>(null),
         name: useRef<HTMLInputElement>(null),
         tel: useRef<HTMLInputElement>(null),
         zipCode: useRef<HTMLInputElement>(null),
         addressBase: useRef<HTMLInputElement>(null),
         addressDetail: useRef<HTMLInputElement>(null),
     };
+
 
     
     //함수 : 상태 초기화 "각각 가입방식에 따라 공유되지 않기위해"
@@ -105,6 +128,9 @@ export const useAuth = () => {
         setErrors({}); // 에러 상태 초기화 ... 
         setFormChange(prev => ({ ...prev, verificationActive: false, codeVerify: false }));
         //FormChange에 있는 여러 매개변수 중 뒤에있는 메일발송 , 인증코드 검증 상태 초기화 
+    
+        // Object.values(refForms).forEach(ref => {
+        //     if (ref.current) ref.current.value = "";})
     };
 
     //함수: 네비게이트 
@@ -146,7 +172,6 @@ export const useAuth = () => {
     //이벤트핸들러: 이메일 인증 이벤트 처리
     const onMailButtonClick = () => {
         if (!formData.email) return; //email 데이터가 빈값 , 존재 x => return;
-        const emailPattern = /^[a-zA-Z0-9]{1,20}@([-.]?[a-zA-Z0-9]){1,8}\.[a-zA-Z]{2,4}$/; //유효성검사.. 
         if (!emailPattern.test(formData.email)) {//유효성 검사 실패 시 error , error출력 
             setErrors(p => ({ ...p, email: { state: true, message: '이메일 주소 포멧이 맞지 않다.' } }));
             return;
@@ -169,6 +194,10 @@ export const useAuth = () => {
     const onMailVerifyClick = () => {
         if (!formChange.verificationActive || !formData.email) return;
         //메일 인증 상태가 아니거나. 이메일이 존재하지 않는다면 => return
+        if (!verificationPattern) {
+            setErrors(p => ({...p, verification: {state: true, message: '인증번호가 맞지 않습니다.'}}));
+            return;
+        }
         emailCode(
             { email: formData.email, code: formData.verification }, 
             {
@@ -182,36 +211,43 @@ export const useAuth = () => {
     };
 
     //이벤트핸들러 : 공통 키다운 이벤트 처리 
-    const onKeyDown = (event: KeyboardEvent<HTMLInputElement>, nextRef?: React.RefObject<HTMLInputElement|null>, enterEvent?: () => void) => {
+    const onKeyDown = (
+        event: KeyboardEvent<HTMLInputElement>, 
+        nextField?: keyof typeof refForms, // "newPassword", "tel" 같은 키값만 받음
+        enterEvent?: () => void
+    ) => {
         if (event.key !== 'Enter') return;
-        if (enterEvent) enterEvent(); // enterEvent 함수가 존재한다면 실행
-        if (nextRef?.current) nextRef.current.focus(); //엔터 시 다음 Ref타입을 인식하기... 
+        if (enterEvent) enterEvent();
+
+        // 키를 눌렀을 때(이벤트 발생 시점) 비로소 ref를 찾으므로 안전함
+        if (nextField && refForms[nextField].current) {
+            refForms[nextField].current?.focus();
+        }
     };
     //키다운 이벤트... 함수가 존재/존재X / 다음 Ref Dom참조할 게 존재/존재X 차이.. 
 
     //이벤트핸들러: 다음 단계 버튼
     const onNextStepClick = () => {
-        const isCheckedPassword = formData.password.trim().length >= 8;
+        const isPasswordValid = passwordPattern.test(formData.password);
         const isEqualPassword = formData.password === formData.passwordCheck;
         const isNamePattern = formData.name.trim().length >= 2;
 
-        if (!isCheckedPassword) setErrors(p => ({ ...p, password: { state: true, message: '비밀번호는 8자 이상 입력해라' } }));
+        if (!isPasswordValid) setErrors(p => ({ ...p, password: { state: true, message: '비밀번호는 8자 이상 16자 이하를 입력해라' } }));
         if (!isEqualPassword) setErrors(p => ({ ...p, passwordCheck: { state: true, message: '비밀번호가 일치하지 않는다' } }));
         if (!isNamePattern) setErrors(p => ({ ...p, name: { state: true, message: '실명이름으로 입력해주세요' } }));
 
-        if (formChange.verificationActive && formChange.codeVerify && isCheckedPassword && isEqualPassword && isNamePattern) {
+        if (formChange.verificationActive && formChange.codeVerify && isPasswordValid && isEqualPassword && isNamePattern) {
             setPage(2);
         }
     };
 
     //이벤트핸들러: 회원가입 버튼 이벤트 처리 
     const onSignUpClick = () => {
-        const telPattern = /^[0-9]{11,13}$/;
         const isTelValid = telPattern.test(formData.tel);
         const hasZip = formData.zipCode.trim().length !== 0;
         const hasAddr = formData.addressBase.trim().length !== 0;
 
-        if (!isTelValid) setErrors(p => ({ ...p, tel: { state: true, message: '숫자만 입력해라' } }));
+        if (!isTelValid) setErrors(p => ({ ...p, tel: { state: true, message: '전화번호가 맞지 않습니다' } }));
         if (!hasZip) setErrors(p => ({ ...p, zipCode: { state: true, message: '우편번호를 선택해주세요' } }));
         if (!hasAddr) setErrors(p => ({ ...p, addressBase: { state: true, message: '주소를 선택해주세요' } }));
 
@@ -219,12 +255,12 @@ export const useAuth = () => {
             signUp(
                 {
                     email : formData.email, password: formData.password, 
-                    name : formData.name , tel :  formData.tel,
+                    name : formData.name , tel : formData.tel,
                     zipCode : formData.zipCode, addressBase : formData.addressBase, 
                     addressDetail : formData.addressDetail
                 },
                 {
-                    onSuccess: () => {navigate(AUTH_PATH());},
+                    onSuccess: () => {navigate(AUTH_PATH()); resetForm(); return;},
                     onError: (error:Error) => {alert(error.message)}
                 }
             );
@@ -244,26 +280,27 @@ export const useAuth = () => {
         signIn(
             { email, password }, 
             {
-            onSuccess: (data) => {
-                localStorage.setItem('accessToken', data.accessToken);
-                navigate(MAIN_PATH());
-            },
-            onError: (error : Error) => {
-                // 이미 useSignin 훅에서 AxiosError로 타입을 잡아뒀다면 
-                // 여기서 자동완성도 잘 됩니다.
-                alert(error.message || '로그인이 실패되었습니다.');
-                setErrors(p => ({...p, email: {state: true, message: '이메일을 정확히 입력해주세요.'}}));
-            }
+                onSuccess: (data) => {
+                    localStorage.setItem('accessToken', data.accessToken);
+                    navigate(MAIN_PATH());
+                    resetForm();
+                    return;
+                },
+                onError: (error : Error) => {
+                    // 이미 useSignin 훅에서 AxiosError로 타입을 잡아뒀다면 
+                    // 여기서 자동완성도 잘 됩니다.
+                    alert(error.message || '로그인이 실패되었습니다.');
+                    setErrors(p => ({...p, email: {state: true, message: '이메일을 정확히 입력해주세요.'}}));
+                }
             }
         )
     };
 
-    //이벤트핸들러 : 메일 찾기 이벤트 처리 
+    //이벤트핸들러 : 비밀번호 찾기 이벤트 처리 
     const onPasswordMailClick = () => {
         if (!formData.email) return;
-        const emailPattern = /^[a-zA-Z0-9]*@([-.]?[a-zA-Z0-9])*\.[a-zA-Z]{2,4}$/;
         if (!emailPattern.test(formData.email)) {
-            setErrors(p => ({ ...p, email: { state: true, message: '이메일 주소 포맷이 맞지 않습니다.' } }));
+            setErrors(p => ({ ...p, email: { state: true, message: '이메일이 맞지 않습니다.' } }));
             return;
         }
         sendPasswordMail({ email: formData.email }, {//email만 보냄. 
@@ -277,7 +314,9 @@ export const useAuth = () => {
     //이벤트핸들러 : 비밀번호 찾기 인증번호 검증 
     const onPasswordVerifyClick = () => {
         if (!formData.verification) return;
-        
+        if (!verificationPattern.test(formData.verification)) {
+            setErrors(p => ({...p, verification: {state:true , message:'인증번호가 일치하지 않습니다.'}}))
+        }
         verifyPasswordCode({ email: formData.email, code: formData.verification }, {
             onSuccess: () => {
                 setFormChange(p => ({ ...p, codeVerify: true }));
@@ -285,7 +324,6 @@ export const useAuth = () => {
             },
             onError: (error: Error) => {
                 alert(error.message)
-                setErrors(p => ({ ...p, verification: { state: true, message: '인증번호가 일치하지 않습니다.' } }));
             }
         });
     };
@@ -301,15 +339,14 @@ export const useAuth = () => {
 
         // 인증 성공 시 이메일만 남기고 나머지는 초기화하며 2페이지로 이동
         const savedEmail = formData.email;
-        resetForm();
         setFormData(prev => ({ ...prev, email: savedEmail })); 
         setPage(2); // pageSearch 대신 기존 page 상태 활용
     };
 
     //이벤트핸들러 : 최종 비밀번호 변경 
-    const onPasswordUpdateClick = () => {
-        if(formData.password.length < 8) {
-            return setErrors(p => ({...p, password: {state: true, message: '비밀번호는 8자 이상이어야 합니다.'}}))
+    const onResetPasswordUpdateClick = () => {
+        if(!passwordPattern.test(formData.password)) {
+            return setErrors(p => ({...p, password: {state: true, message: '비밀번호는 8자 이상 16자 이하이어야 합니다.'}}))
         }
 
         changePassword(//최종 newPassword 기입..  email은 기존에 쓰던게 올라감. 
@@ -317,6 +354,8 @@ export const useAuth = () => {
             {
             onSuccess: () => {
                 navigate(AUTH_PATH());
+                resetForm();
+                return;
             },
             onError: (error: Error) => alert(error.message || '변경 실패')
             }
@@ -326,9 +365,11 @@ export const useAuth = () => {
     //이벤트핸들러 : 소셜 회원가입 정보 기입 요청 이벤트 처리 
     const onOAuthAddHandler = () => {
         const { tel, zipCode, addressBase, addressDetail } = formData;
-        
+        const isTelValid = telPattern.test(tel);
+        const hasZip = zipCode.trim().length !== 0;
+        const hasAddr = addressBase.trim().length !== 0;
         //필수정보 입력 검증
-        if (!tel || !zipCode || !addressBase) {
+        if (!isTelValid || !hasZip || !hasAddr) {
             setErrors(p => ({...p, tel: {state: true, message: '전화번호를 정확히 기입해주세요'}}));
             setErrors(p => ({...p, zipCode:{state: true, message: '우편번호를 기입해주세요'}}));
             setErrors(p => ({...p, addressBase:{state: true, message: '주소를 기입해주세요'}}));
@@ -341,6 +382,8 @@ export const useAuth = () => {
             {
                 onSuccess: () => {
                     navigate(MAIN_PATH(), { replace: true });
+                    resetForm();
+                    return;
                     //이미 토큰을 받았으므로 처리 끝.                 
                 },
                 onError: (error: Error) => {
@@ -349,6 +392,72 @@ export const useAuth = () => {
             }
         );
     };
+
+    //이벤트핸들러 : 유저정보 수정 이벤트 처리 
+    const onUserUpdateEventHandler = () => {
+        const { name, tel, zipCode, addressBase, addressDetail} = formData;
+        const hasName = name.trim().length !== 0;
+        const isTelValid = telPattern.test(tel);
+        const hasZip = zipCode.trim().length !== 0;
+        const hasAddr = addressBase.trim().length !== 0;
+        //필수정보 입력 검증
+        if (!hasName || !isTelValid || !hasZip || !hasAddr) {
+            setErrors(p => ({...p, name: {state: true, message: '성명을 기입해주세요'}}))
+            setErrors(p => ({...p, tel: {state: true, message: '전화번호를 정확히 기입해주세요'}}));
+            setErrors(p => ({...p, zipCode:{state: true, message: '우편번호를 기입해주세요'}}));
+            setErrors(p => ({...p, addressBase:{state: true, message: '주소를 기입해주세요'}}));
+            return;
+        }
+        myInfoUpdate(
+            {name, tel, zipCode, addressBase, addressDetail},
+            {onSuccess: () => {navigate(USER_PATH()); resetForm(); return;}}
+        )
+    }
+
+
+    //이벤트핸들러 : 유저정보 삭제 이벤트 처리 
+    const onUserDeleteEventHandler = () => {
+        if (window.confirm("정말로 탈퇴하시겠습니까? 모든 정보가 삭제됩니다.")) {
+            myInfoDelete( 
+                    undefined, 
+                {
+                    onSuccess: () => {
+                        alert("탈퇴가 완료되었습니다. 그 동안 이용해 주셔서 감사합니다.");
+                        // 토큰 삭제 및 메인 페이지로 이동
+                        localStorage.removeItem("accessToken");
+                        resetForm();
+                        resetLoginUser();
+                        navigate(MAIN_PATH());
+                    },
+                    onError: (error) => alert(`${error.message}`)
+                }
+            );
+        }
+    };
+
+    //이벤트핸들러 : 유저 비밀번호 수정 이벤트 처리 
+    const onPasswordUpdateClick = () => {
+        const {password : currentPassword , newPassword} = formData;
+        if(!passwordPattern.test(newPassword)) {
+            setErrors(p => ({...p, newPassword:{state:true , message: "비밀번호는 8자이하 16자 이상이어야합니다."}}))
+        }
+
+        myPasswordUpdate(
+            {currentPassword, newPassword},
+            {
+                onSuccess: () => {
+                    navigate(USER_PATH());
+                    resetForm();
+                    return;
+                },
+                onError: (error: Error) => {
+                    alert(`${error.message}`);
+                }
+            }
+        )
+
+
+    }
 
 
     return {
@@ -361,10 +470,12 @@ export const useAuth = () => {
         //키다운이벤트처리 / 페이지 이동 처리 / 로그인 이벤트 처리 
         onPasswordMailClick, onPasswordVerifyClick, onNextPasswordReset,
         //비번찾기메일전송 / 비번찾기인증번호검증 / 비번찾기검증 후 비번변경으로 이동 
-        onPasswordUpdateClick,  onOAuthAddHandler , onAddressButtonClickHandler
-        //새로운비밀번호 수정  //소셜회원가입정보기입란
-       
+        onResetPasswordUpdateClick,  onOAuthAddHandler , onAddressButtonClickHandler,
+        //비밀번호찾기 수정  //소셜회원가입정보기입란 /주소검색 이벤트처리 
 
-
+        onUserDeleteEventHandler,onUserUpdateEventHandler,onPasswordUpdateClick,
+        //회원탈퇴                / 회원정보수정            /비밀번호 수정 
+        myInfo ,myInfoError,isInfoLoading
+        //유저정보를 뿌린다                 //수정할 데이터 주입 
     };
 };

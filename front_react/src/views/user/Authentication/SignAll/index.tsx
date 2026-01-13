@@ -60,20 +60,13 @@ export default function Authentication() {
                         </div>
                         <InputBox ref={refForms.email} label='이메일주소' type='text' placeholder='이메일 주소를 입력해주세요.' 
                                   error={errors.email.state} name='email' value={formData.email} onChange={onInputChange} 
-                                  onkeyDown={(event) => onKeyDown(event, refForms.email)}/>
+                                  onkeyDown={(event) => onKeyDown(event, 'password')}/>
                         <InputBox ref={refForms.password} label='패스워드' type={formChange.passwordType} placeholder='비밀번호를 입력해주세요.' 
                                   error={errors.password.state} name='password' value={formData.password} onChange={onInputChange} 
                                   icon={formChange.passwordIcon} onButtonClick={() => togglePasswordType('pw')} 
-                                  onkeyDown={(event) => onKeyDown(event, refForms.password, onSignInButtonClickHandler )}/>
+                                  onkeyDown={(event) => onKeyDown(event, undefined , onSignInButtonClickHandler )}/>
                     </div>
                     <div className='auth-card-bottom'>
-                        {errors.email.state || errors.password.state && //에러가 true일 때 만 뜨도록.. 
-                        <div className='auth-sign-in-error-box'>
-                            <div className='auth-sign-in-error-message'>
-                                {'이메일 주소 또는 비밀번호를 잘못 입력했습니다.\n입력하신 내용을 다시 확인해주세요.'}
-                            </div>
-                        </div>
-                        }
                         <div className='black-large-full-button' onClick={onSignInButtonClickHandler}>{'로그인'}</div>
                         <div className='auth-description-box'>
                             <div className='auth-description'>{'신규 사용자이신가요?'}<span className='auth-description-link' onClick={onSignUpLinkClickHandler}>{'회원가입'}</span></div>
@@ -132,7 +125,7 @@ export default function Authentication() {
                             <InputBox ref={refForms.email} label='이메일 주소*' type='text' placeholder='이메일 주소를 입력해주세요.' 
                                       name='email' value={formData.email} onChange={onInputChange} 
                                       error={errors.email.state} message={errors.email.message} 
-                                      onkeyDown={(event) => onKeyDown(event, refForms.verification, onMailButtonClick)}/>
+                                      onkeyDown={(event) => onKeyDown(event, "verification", onMailButtonClick)}/>
                             <button className='email-mail-button-click' onClick={onMailButtonClick}> {'이메일 인증'} </button>
                         </div>
                         {formChange.verificationActive && //이메일 인증번호는 true일때만 노출 
@@ -140,7 +133,7 @@ export default function Authentication() {
                             <InputBox ref={refForms.verification} label='이메일 인증번호*' type='text' placeholder='이메일 인증번호를 입력해주세요.' 
                                       name='varification' value={formData.verification} onChange={onInputChange} 
                                       error={errors.verification.state} message={errors.verification.message} 
-                                      onkeyDown={(event) => onKeyDown(event, refForms.password, onMailVerifyClick)}/>                          
+                                      onkeyDown={(event) => onKeyDown(event, 'password', onMailVerifyClick)}/>                          
                             <button className='email-mail-button-click' onClick={onMailVerifyClick}> {'인증번호 확인'} </button>
                         </div>
                         }                       
@@ -148,16 +141,16 @@ export default function Authentication() {
                                   name='password' value={formData.password} onChange={onInputChange} 
                                   error={errors.password.state} message={errors.password.message} 
                                   icon={formChange.passwordIcon} onButtonClick={() => togglePasswordType('pw')} 
-                                  onkeyDown={(event) => onKeyDown(event, refForms.password)}/>
+                                  onkeyDown={(event) => onKeyDown(event, 'passwordCheck')}/>
                         <InputBox ref={refForms.passwordCheck} label='비밀번호 확인*' type={formChange.passwordCheckType} placeholder='비밀번호를 다시 입력해주세요.' 
                                   name='passwordCheck' value={formData.passwordCheck} onChange={onInputChange} 
                                   error={errors.passwordCheck.state} message={errors.passwordCheck.message} 
                                   icon={formChange.passwordCheckIcon} onButtonClick={() => togglePasswordType('check')} 
-                                  onkeyDown={(event) => onKeyDown(event, refForms.name)}/>
+                                  onkeyDown={(event) => onKeyDown(event, 'name')}/>
                         <InputBox ref={refForms.name} label='이름*' type='text' placeholder='실명을 입력해주세요.' 
                                   name='name' value={formData.name} onChange={onInputChange} 
                                   error={errors.name.state} message={errors.name.message} 
-                                  onkeyDown={(event) => onKeyDown(event, refForms.tel, onNextStepClick)}/>
+                                  onkeyDown={(event) => onKeyDown(event, 'tel', onNextStepClick)}/>
                         </>
                         )}
                         {page === 2 && ( //핸드폰번호 , 우편번호 , 주소 , 상세주소  
@@ -166,7 +159,7 @@ export default function Authentication() {
                         <InputBox ref={refForms.tel} label='핸드폰 번호*' type='text' placeholder='핸드폰 번호를 입력해주세요.' 
                                   name='tel' value={formData.tel} onChange={onInputChange} 
                                   error={errors.tel.state} message={errors.tel.message} 
-                                  onkeyDown={(event) => onKeyDown(event, refForms.addressBase)} />
+                                  onkeyDown={(event) => onKeyDown(event, 'addressBase')} />
                         <InputBox ref={refForms.zipCode} label='우편 번호*' type='text' placeholder='우편 번호를 입력해주세요.' 
                                   name='zipCode' value={formData.zipCode} onChange={onInputChange} 
                                   error={errors.zipCode.state} message={errors.zipCode.message}/>
@@ -174,7 +167,7 @@ export default function Authentication() {
                                   name='addressBase' value={formData.addressBase} onChange={onInputChange} 
                                   error={errors.addressBase.state} message={errors.addressBase.message} 
                                   icon='expend-right-light-icon' onButtonClick={onAddressButtonClickHandler} 
-                                  onkeyDown={(event) => onKeyDown(event, refForms.addressDetail, onAddressButtonClickHandler)}/>
+                                  onkeyDown={(event) => onKeyDown(event, 'addressDetail', onAddressButtonClickHandler)}/>
                         <InputBox ref={refForms.addressDetail} label='상세 주소*' type='text' placeholder='상세 주소를 입력해주세요.' 
                                   name='addressDetail' value={formData.addressDetail} onChange={onInputChange} 
                                   error={false} onkeyDown={(event) => onKeyDown(event, undefined , onSignUpClick)}/>
@@ -210,7 +203,7 @@ export default function Authentication() {
             onKeyDown,
             //키다운이벤트처리 
             onPasswordMailClick, onPasswordVerifyClick, onNextPasswordReset,
-            onPasswordUpdateClick 
+            onResetPasswordUpdateClick 
         } = useAuth();
 
         // 이펙트 : 페이지가 변경될 때마다 실행
@@ -236,7 +229,7 @@ export default function Authentication() {
                             <InputBox ref={refForms.email} label='이메일 주소*' type='text' placeholder='이메일 주소를 입력해주세요.' 
                                       name='email' value={formData.email} onChange={onInputChange} 
                                       error={errors.email.state} message={errors.email.message}
-                                      onkeyDown={(event) => onKeyDown(event,refForms.email,onPasswordMailClick)}/> 
+                                      onkeyDown={(event) => onKeyDown(event,'email',onPasswordMailClick)}/> 
                             <button className='email-mail-button-click' onClick={onPasswordMailClick}>{'인증메일전송'}</button>
                         </div>
                         {formChange.verificationActive && //이메일 인증번호는 true일때만 노출 
@@ -244,7 +237,7 @@ export default function Authentication() {
                             <InputBox ref={refForms.verification} label='이메일 인증번호*' type='text' placeholder='이메일 인증번호를 입력해주세요.' 
                                       name='verification' value={formData.verification} onChange={onInputChange} 
                                       error={errors.verification.state} message={errors.varification.message} 
-                                      onkeyDown={(event) => onKeyDown(event, refForms.verification, onPasswordVerifyClick)}/>                          
+                                      onkeyDown={(event) => onKeyDown(event, 'verification', onPasswordVerifyClick)}/>                          
                             <button className='email-mail-button-click' onClick={onPasswordVerifyClick}>{'인증'}</button>
                         </div>
                         }
@@ -255,12 +248,12 @@ export default function Authentication() {
                         <InputBox ref={refForms.email} label='이메일 주소*' type='text' placeholder='이메일 주소를 입력해주세요.' 
                                   name='email' value={formData.email} onChange={onInputChange} 
                                   error={errors.email.state} message={errors.email.message} 
-                                  onkeyDown={(event) => onKeyDown(event, refForms.email)} readOnly={true}/>
+                                  onkeyDown={(event) => onKeyDown(event, 'email')} readOnly={true}/>
                         <InputBox ref={refForms.password} label='새로운 비밀번호*' type={formChange.passwordType} placeholder='새로운 비밀번호를 입력해주세요.' 
                                   name='password' value={formData.password} onChange={onInputChange} 
                                   error={errors.password.state} message={errors.password.message} 
                                   icon={formChange.passwordIcon} onButtonClick={() => togglePasswordType('pw')} 
-                                  onkeyDown={(event) => onKeyDown(event, refForms.password,onPasswordUpdateClick)}/>
+                                  onkeyDown={(event) => onKeyDown(event, 'password',onResetPasswordUpdateClick)}/>
                         </>
                         )}                                          
                     </div>
@@ -276,7 +269,7 @@ export default function Authentication() {
                         <div className='black-large-full-button' onClick={onNextPasswordReset}>{'다음으로'}</div>
                         }
                         {page === 2 && // 이메일 / 새로운비밀번호 유효성 검증 결과 체크 후 수정완료 
-                        <div className='black-large-full-button' onClick={onPasswordUpdateClick}>{'비밀번호 변경'}</div>
+                        <div className='black-large-full-button' onClick={onResetPasswordUpdateClick}>{'비밀번호 변경'}</div>
                         }
                     </div>
                 </div>
