@@ -229,7 +229,7 @@ export default function Authentication() {
                             <InputBox ref={refForms.email} label='이메일 주소*' type='text' placeholder='이메일 주소를 입력해주세요.' 
                                       name='email' value={formData.email} onChange={onInputChange} 
                                       error={errors.email.state} message={errors.email.message}
-                                      onkeyDown={(event) => onKeyDown(event,'email',onPasswordMailClick)}/> 
+                                      onkeyDown={(event) => onKeyDown(event,'verification',onPasswordMailClick)}/> 
                             <button className='email-mail-button-click' onClick={onPasswordMailClick}>{'인증메일전송'}</button>
                         </div>
                         {formChange.verificationActive && //이메일 인증번호는 true일때만 노출 
@@ -237,7 +237,7 @@ export default function Authentication() {
                             <InputBox ref={refForms.verification} label='이메일 인증번호*' type='text' placeholder='이메일 인증번호를 입력해주세요.' 
                                       name='verification' value={formData.verification} onChange={onInputChange} 
                                       error={errors.verification.state} message={errors.varification.message} 
-                                      onkeyDown={(event) => onKeyDown(event, 'verification', onPasswordVerifyClick)}/>                          
+                                      onkeyDown={(event) => onKeyDown(event, undefined, onPasswordVerifyClick)}/>                          
                             <button className='email-mail-button-click' onClick={onPasswordVerifyClick}>{'인증'}</button>
                         </div>
                         }
@@ -248,12 +248,12 @@ export default function Authentication() {
                         <InputBox ref={refForms.email} label='이메일 주소*' type='text' placeholder='이메일 주소를 입력해주세요.' 
                                   name='email' value={formData.email} onChange={onInputChange} 
                                   error={errors.email.state} message={errors.email.message} 
-                                  onkeyDown={(event) => onKeyDown(event, 'email')} readOnly={true}/>
+                                  onkeyDown={(event) => onKeyDown(event, 'password')} readOnly={true}/>
                         <InputBox ref={refForms.password} label='새로운 비밀번호*' type={formChange.passwordType} placeholder='새로운 비밀번호를 입력해주세요.' 
                                   name='password' value={formData.password} onChange={onInputChange} 
                                   error={errors.password.state} message={errors.password.message} 
                                   icon={formChange.passwordIcon} onButtonClick={() => togglePasswordType('pw')} 
-                                  onkeyDown={(event) => onKeyDown(event, 'password',onResetPasswordUpdateClick)}/>
+                                  onkeyDown={(event) => onKeyDown(event, undefined ,onResetPasswordUpdateClick)}/>
                         </>
                         )}                                          
                     </div>

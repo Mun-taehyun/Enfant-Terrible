@@ -1,12 +1,16 @@
 import PetCard from "@/components/user/PetCard";
+import { useAuth } from "@/hooks/user/auth/use-sign.hook";
 import { userQueries } from "@/querys/user/queryhooks";
 
 
 //컴포넌트 : 유저 마이페이지 
 export default function UserPage() {
 
-    //서버상태 : 유저 정보 
-    const { data: userData } = userQueries.useMe();
+    //커스텀 훅: 유저 정보 / 시스템 
+    const {
+        myInfo, onUserUpdateEventHandler,onUserDeleteEventHandler
+    } = useAuth();
+
     //서버상태 : 펫 정보 
     const {data: petData} = userQueries.usePets();
     //서버상태 : 적립금 불러오기 
@@ -15,13 +19,13 @@ export default function UserPage() {
 
     //서버상태 : 내가 쓴 리뷰 불러오기 
 
-
+    if(!myInfo) return;
     return (
         <div className="user-my-page-component">
             <div className="user-my-page-user-info-container">
                 <div className="user-my-page-user-info-box">
-                    <div className="user-my-page-user-info-welcome"></div>
-                    <div className="user-my-page-user-info-update" onClick={onUserUpdateClickEventHandler}>{'회원정보 수정'}</div>
+                    <div className="user-my-page-user-info-welcome">`${myInfo.name}님 반갑습니다`</div>
+                    <div className="user-my-page-user-info-update" onClick={onUserUpdateEventHandler}>{'회원정보 수정'}</div>
                 </div>
                 <div className="user-my-page-user-point">{'적립금 : 5000원'}</div>
             </div>
@@ -47,7 +51,7 @@ export default function UserPage() {
             </div>
             <div className="user-my-page-user-other-container">
                 <div className="user-my-page-user-control-box">
-                    <div className="user-my-page-user-delete" onClick={}>회원탈퇴</div>
+                    <div className="user-my-page-user-delete" onClick={onUserDeleteEventHandler}>회원탈퇴</div>
                 </div>
             </div>
         </div>

@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 import type { PopupItem, User } from './types/user/interface';
 import { Route, Routes } from 'react-router-dom';
 import UserContainer from './layouts/user/UserContainer';
-import {AUTH_ADD_INFOMATION_PATH, AUTH_LOGIN_PATH, AUTH_OAUTH_PATH, AUTH_PATH, MAIN_PATH, OAUTH_PATH, USER_PATH} from './constant/user/route.index';
+import {AUTH_ADD_INFOMATION_PATH, AUTH_LOGIN_PATH, AUTH_OAUTH_PATH, AUTH_PATH, MAIN_PATH, OAUTH_PATH, PRODUCT_CATEGORY_PATH, PRODUCT_PATH, USER_PATH} from './constant/user/route.index';
 import Main from './views/user/Main';
 import { useLoginUserStore } from './stores/user';
 import { userQueries } from './querys/user/queryhooks';
@@ -19,6 +19,7 @@ import PetMessage from './components/user/PetMessage';
 import PetInfomation from './views/user/Authentication/PetInfo';
 import UserPage from './views/user/MyPage/UserPage';
 import {UserUpdate} from './views/user/MyPage/UserUpdate';
+import ProductCategory from './views/user/Product/ProductCategory';
 //공통라우터 정리 
 
 const MOCK_POPUP_LIST: PopupItem[] = [
@@ -56,14 +57,14 @@ const MOCK_POPUP_LIST: PopupItem[] = [
 function App() {
 
   //쿼리: 사용 활성화된 광고팝업 캐싱 
-  const {data : popupData , error : popupError , isLoading : isPopupLoading } = useQuery<GetPopupListResponseDto, Error, PopupItem[]>(
-    { 
-      queryKey: ['popup'] , 
-      queryFn: getPopupListRequest,
-      select: (popupData: GetPopupListResponseDto) =>
-            popupData.popupList.filter(item => (item.isActive === true))
-    } // GetPopupListResponseDto 에 있는 isActive : true 일 경우에 받아온다. 
-  );
+  // const {data : popupData , error : popupError , isLoading : isPopupLoading } = useQuery<GetPopupListResponseDto, Error, PopupItem[]>(
+  //   { 
+  //     queryKey: ['popup'] , 
+  //     queryFn: getPopupListRequest,
+  //     select: (popupData: GetPopupListResponseDto) =>
+  //           popupData.popupList.filter(item => (item.isActive === true))
+  //   } // GetPopupListResponseDto 에 있는 isActive : true 일 경우에 받아온다. 
+  // );
 
   //서버상태 : 회원가입 한 유저정보 조회 
   const {data : useData, error : useError } = userQueries.useMe();
@@ -85,9 +86,9 @@ function App() {
     // setLoginUser(loginUser);
   }, [useData, setLoginUser , resetLoginUser]) //처음 들어올 때 List 활용 
 
-  if (isPopupLoading) return <div> 팝업 업로드 중 </div>
-  if (popupError instanceof Error) return <div>{popupError.message}</div>;
-  if (useError instanceof Error) return <div>{useError.message}</div>;
+  // if (isPopupLoading) return <div> 팝업 업로드 중 </div>
+  // if (popupError instanceof Error) return <div>{popupError.message}</div>;
+  // if (useError instanceof Error) return <div>{useError.message}</div>;
 
   
   return (
@@ -98,7 +99,7 @@ function App() {
     //      소셜 회원가입 추가 페이지 /auth/oauth
     //      펫정보 추가 페이지 /auth/add-infomation
     <>
-    {popupData?.map((item) => (<Popup key={item.popupId} popupItem={item} />))}
+    {/* {popupData?.map((item) => (<Popup key={item.popupId} popupItem={item} />))} */}
     <PetMessage name={useData?.name} />
     <Routes>
       <Route element={<UserContainer/>}>
@@ -111,6 +112,9 @@ function App() {
         <Route path={OAUTH_PATH(":accessToken")} element={<OAuthCallBack />} />
         <Route path={USER_PATH()} element={<UserUpdate />}>
           {/* <Route path={USER_PATH() + "/" + USER_UPDATE_PATH(":useData?.userId")} element{<UserUpdate />} /> */}
+        </Route>
+        <Route path={PRODUCT_PATH()} >
+          <Route path={PRODUCT_PATH() + "/" + PRODUCT_CATEGORY_PATH(":categoryId")} element={<ProductCategory />} />
         </Route>
       </Route>
       <Route path='*' element={<h1>404 오류</h1>} />

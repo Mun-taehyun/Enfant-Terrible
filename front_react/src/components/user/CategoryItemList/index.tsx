@@ -1,67 +1,47 @@
-import { getCategoryListRequest } from '@/apis/user';
-import type GetCategoryListResponseDto from '@/apis/user/response/category/get-category-list.response.dto';
-import type { CategoryItem } from '@/types/user/interface';
-import { useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
-import Category from '../CategoryItem';
-
-
+import './style.css';
 
 //컴포넌트 : 카테고리 리스트 
 export default function CategoryItemList(){
 
 
-    //쿼리 : API에 응답된 결과 받아오기 
-    const {data , error , isLoading} = useQuery<GetCategoryListResponseDto>(
-        { 
-        queryKey: ['category'] , 
-        queryFn: getCategoryListRequest
-        } // GetPopupListResponseDto 에 있는 isActive : true 일 경우에 받아온다. 
-    );
 
-    //상태 : 대분류 카테고리 클릭 상태 
-    const [categoryStatus, setCategoryStatus] = useState<boolean>(false);
-
-    //상태 : 대분류 카테고리 배열 상태 
-    const [categoryLargeList, setCategoryLargeList] = useState<CategoryItem[]>([]);
-
-    //상태 : 소분류 카테고리 배열 상태 
-    const [categorySmallList, setCategorySmallList] = useState<CategoryItem[]>([]); 
-
-    //이벤트핸들러 : 카테고리 클릭 이벤트 처리 
-    const categoryClickEventHandler = () => {
-        // 1. 클릭 시 소분류 카테고리 클릭 상태  => 다시 또 누르면 소분류 카테고리가 사라짐 
-        setCategoryStatus(!categoryStatus); // true => false , false => true
-    }
-
-
-    //효과 : 카테고리 데이터를 서버에서 가져온 것을 기반으로 분류처리 
-    useEffect(() => {
-        if(!data) return;
-        for(let i = 0; data.categoryListItem.length; i++ ){
-            //부모 id == 0일 경우에 => 대분류 리스트에 넣고 
-            if(data.categoryListItem[i].parentId !== null){
-                const categoryLarge = data.categoryListItem.filter(item => item.depth === 0);
-                //categoryLarge 요소가 여러개 담겨져 있음 . => sortOrder로 sort()
-                categoryLarge.sort((a, b) => b.sortOrder - a.sortOrder); // sort시 구분자가 필요 
-                setCategoryLargeList(categoryLarge);
-            }
-            const categorySmall = data.categoryListItem.filter(item => item.depth === 1);
-            //categorySmall 요소가 여러개 담겨져 있음 . => sortOrder로 sort()
-            categorySmall.sort((a, b) => b.sortOrder - a.sortOrder); // sort시 구분자가 필요 
-            setCategorySmallList(categorySmall);
-            //부모 id 가 없을 경우에 => 소분류 리스트에 넣고 
-        } 
-    }, [])
-
-
-
-    if (isLoading) return <div> 카테고리 업로드 중 </div>
-    if (error instanceof Error) return <div>{error.message}</div>;
     return (
         <>
-        <div onClick={categoryClickEventHandler}> 
-            {categoryLargeList.map((item) => <Category categoryItem={item} />) } 
+        <div className="pet-nav-container">
+            <div className="main-menu-group">
+                <div className="menu-item" data-cate="dog">강아지</div>
+                <div className="menu-item" data-cate="cat">고양이</div>
+                <div className="menu-item" data-cate="health">영양제</div>
+                <div className="menu-item" data-cate="event">이벤트/기획전</div>
+            </div>
+
+            <div className="sub-menu-panel">
+                <div className="sub-menu-content">
+                <div className="sub-column">
+                    <div className="column-title">강아지 사료</div>
+                    <div className="sub-item">건식 사료</div>
+                    <div className="sub-item">습식/캔</div>
+                    <div className="sub-item">수제 사료</div>
+                </div>
+                <div className="sub-column">
+                    <div className="column-title">고양이 간식</div>
+                    <div className="sub-item">츄르/스틱</div>
+                    <div className="sub-item">동결건조</div>
+                    <div className="sub-item">캣잎/드롭스</div>
+                </div>
+                <div className="sub-column">
+                    <div className="column-title">기능별 영양제</div>
+                    <div className="sub-item">관절/뼈</div>
+                    <div className="sub-item">피부/피모</div>
+                    <div className="sub-item">눈/눈물</div>
+                </div>
+                <div className="sub-column-promo">
+                    <div className="promo-box">
+                    🐾 이번 주 <span className="highlight">멍냥 특가</span> 보러가기
+                    </div>
+                </div>
+                </div>
+            </div>
         </div>
         </>
     );

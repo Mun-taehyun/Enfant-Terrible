@@ -1,6 +1,6 @@
 export default interface CategoryItem {
-    categoryId : number | string;
-    parentId : number | string | null;
+    categoryId : number;
+    parentId : number | null;
     name : string;
     depth : number | string;
     sortOrder : number; 

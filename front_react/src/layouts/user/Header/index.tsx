@@ -1,55 +1,25 @@
 import CategoryItemList from "@/components/user/CategoryItemList";
-import { AUTH_PATH, CART_PATH, MAIN_PATH, PRODUCT_SEARCH_PATH, USER_PATH } from "@/constant/user/route.index";
+import { AUTH_LOGIN_PATH, AUTH_PATH, CART_PATH, MAIN_PATH, PRODUCT_SEARCH_PATH, USER_PATH } from "@/constant/user/route.index";
 import { useLoginUserStore } from "@/stores/user"
 import { useEffect, useRef, useState, type ChangeEvent, type KeyboardEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import './style.css';
 
 
 //컴포넌트 : 헤더 
 export default function Header() {
 
-    //참조 : 검색입력란 
-    const searchButtonRef = useRef<HTMLDivElement | null>(null); //DOM 업데이트 이전엔 null.. 
+
 
     //상태 : 로그인 상태 여부
     const {loginUser , resetLoginUser} = useLoginUserStore();
 
-    //상태 : 검색버튼 활성화 여부 
-    const [searchButton, setSearchButton] = useState<boolean>(false);
-
-    //상태 : 검색어 변환 여부 
-    const [searchWord, setSearchWord] = useState<string>('');
-
-    //함수 : 네비게이트 함수
+    //함수 : 네비게이트 
     const navigate = useNavigate();
-
-    //이벤트핸들러 : 검색버튼 클릭 이벤트 처리 
-    const onSearchClickHandler = () => {
-        if(!searchButton) {
-            setSearchButton(!searchButton);
-            return;
-        }//on/off 기능 
-        //제품 검색 => 리스트 불러올 곳 . 
-        navigate(PRODUCT_SEARCH_PATH(searchWord));
-    }
-
-    //이벤트핸들러 : 검색어 이벤트 처리 
-    const onSearchChangeHandler = (event : ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.value;
-        setSearchWord(value);
-    }
-
-    //이벤트핸들러 : 엔터를 쳤을 경우 검색어 이벤트 처리 
-    const onSearchEventHandler = (event : KeyboardEvent<HTMLInputElement>) => {
-        if( event.key !== 'Enter') return;
-        if(!searchButtonRef.current) return; // "입력값 x "
-        searchButtonRef.current.click();
-    } //엔터를 눌렀을 때 클릭 이벤트와 동일시
-
 
     //이벤트핸들러 : 로그인 버튼 클릭 이벤트 처리 
     const onLoginButtonClickEventHandler = () => {
-        navigate(AUTH_PATH());
+        navigate(AUTH_PATH() + "/" + AUTH_LOGIN_PATH());
     }
 
     //이벤트핸들러 : 로그아웃 버튼 클릭 이벤트 처리 
@@ -92,13 +62,85 @@ export default function Header() {
         navigate(USER_PATH());
     }
 
-    //효과 : 검색어 경로 변경 될 때마다 실행될 함수 
-    // useEffect(() => {
-    //     if(searchWord) {
-    //         setSearchWord(searchWord); //검색어가 남아있도록.. 
-    //         setSearchButton(true);//다시 검색 가능하게
-    //     }
-    // }, [])
+//=====================================  검색 내부 컴포넌트 ==============================
+    // 컴포넌트 : 검색버튼
+    const SearchButton = () => {
+
+        //============================== 상태 변경 선언 모둠 ==============
+        //상태 : 검색 버튼 요소
+        const searchButtonRef = useRef<HTMLDivElement | null>(null);
+
+        //상태 : 검색버튼
+        const [status, setStatus] = useState<boolean>(false);//useState에는 boolean 자료형만 담김
+            //검색버튼에 따라 검색창이 뜰 지 말 지 결정?
+
+        //상태 : 검색어 입력값받기
+        const [keyword, setKeyword] = useState<string>('');
+
+        //상태 : 검색어 경로 변수
+        const {searchWord} = useParams();
+
+        // ==============================================================
+        //useState 는 새로고침 또는 리로딩이 되면 초기값으로 돌아간다.... 
+        //useParams 는 주소경로를 담는 함수.. 
+
+
+
+
+        //============================== 이벤트 핸들러 선언 모둠 ==============
+        //이벤트 핸들러: 검색어 변경 이벤트 처리
+        const onSearchWordChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
+            const value = event.target.value;
+            setKeyword(value);
+        };
+
+        //이벤트 핸들러: 검색어 키 이벤트 처리 함수(Enter로 넘어가게..)
+        const onSearchWordKeyDownHandler = (event: KeyboardEvent<HTMLInputElement>) => {
+            //Enter 인식 , 검색어 입력값 인식 여부
+            if(event.key !== 'Enter') return;
+            if(!searchButtonRef.current) return;
+            searchButtonRef.current.click(); //DOM에 직접 참조.. Ref 
+        };
+        //이벤트 핸들러: 검색버튼 클릭 이벤트 처리 함수
+        const onSearchButtonClickHandler = () => {
+            if(!status) {
+                setStatus(!status);
+                return;
+            } // status false 라면 => true로 상태를 바꾸고. 
+            //status true에서 누르면 
+            navigate(PRODUCT_SEARCH_PATH(keyword))
+        };
+        // ==============================================================
+
+
+        //효과 : 검색어 경로 변경 될 때마다 실행될 함수 
+        useEffect(() => {
+            if(searchWord) {
+                setKeyword(searchWord);
+                setStatus(true);
+            }
+        }, [searchWord])
+        //searchWord가 변할 때마다 실행된다
+
+
+        if (!status)
+        // 렌더링 : 검색 버튼 false 상태
+        return (
+            <div className='icon-button' onClick={onSearchButtonClickHandler}>
+                <div className='icon search-light-icon'></div>
+            </div>
+        );
+        // 렌더링 : 검색 버튼 true 상태
+        return (
+            <div className='header-search-input-box'>
+                <input className='header-search-input' type='text' placeholder='검색어를 입력해주세요' value={keyword} onChange={onSearchWordChangeHandler} onKeyDown={onSearchWordKeyDownHandler}/>
+                <div ref={searchButtonRef} className='icon-button' onClick={onSearchButtonClickHandler}>
+                    <div className='icon search-light-icon'></div>
+                </div>
+            </div>
+        );
+        //onChange (input) 
+    }
 
 
     return (
@@ -107,19 +149,7 @@ export default function Header() {
                 <div className="header-main-logo-box">
                     <div className="header-logo-content">{'앙팡테리블'}</div>
                 </div>
-                {searchButton ?
-                <div className="header-main-search-box">
-                    <input type='text' placeholder='검색어를 입력해주세요' value={searchWord} onChange={onSearchChangeHandler} onKeyDown={onSearchEventHandler} />
-                    <div ref={searchButtonRef} className="header-search-icon-box" onClick={onSearchClickHandler}>
-                        <div className="icon search-light-icon"></div>
-                    </div>
-                </div> : //입력칸 활성화 true
-                <div className="header-main-search-box">
-                    <div className="header-search-icon-box" onClick={onSearchClickHandler}>
-                        <div className="icon search-light-icon"></div>
-                    </div>
-                </div> //입력칸 비활성화 false
-                } 
+                <SearchButton />
                 {loginUser !== null ?
                 <div className="header-main-button-box">
                     <div className="header-main-button-cart" onClick={onCartButtonClickEventHandler}>{'장바구니'}</div>
@@ -131,14 +161,9 @@ export default function Header() {
                 </div>
                 }
             </div>
-            {/* <div className="header-category-box">
+            <div className="header-main-category-box">
                 <CategoryItemList />
-            </div>  */}
-            {
-            //카테고리 대분류 배열 => 서버한테 받아와야 한다. 
-            //컴포넌트 크기가 중요하다 => CategoryLarge  
-            //                        => CategorySmall  컴포넌트 제작 
-            }
+            </div>
        </div> 
     )
 

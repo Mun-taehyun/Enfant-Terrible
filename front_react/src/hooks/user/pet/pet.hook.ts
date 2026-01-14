@@ -82,7 +82,7 @@ export const usePet = () => {
             }
         ) 
     };
-    //이벤트핸들러 : 펫 정보 수정 이벤트 처리 
+    //이벤트핸들러 : 펫 정보 삭제 이벤트 처리 
     const onPetDeleteHandler = () => {
         if (!petDelete) return;
         if (!petId) return;

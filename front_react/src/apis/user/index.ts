@@ -9,6 +9,10 @@ import type { PetSelectResponseDto, SignUpResposeDto, UserSelectResponseDto } fr
 import type { OAuthAddInformationRequestDto, PetAddInsertRequestDto, PetUpdateRequestDto, SignUpRequestDto, UserUpdateRequestDto } from "./request/user";
 import type PasswordUpdateRequestDto from "./request/user/password-update.request.dto";
 import type ResetPasswordEmailRequestDto from "./request/auth/reset-password-email-request.dto";
+import { GetCategoryChildrenResponseDto } from "./response/category";
+import {GetProductListResponseDto} from "./response/product";
+import {GetProductDetailListResponseDto} from "./response/product";
+import { GetProductListRequestDto } from "./request/product";
 
 
 // //권한 용 헤더로 보낼 엑세스토큰 사용 "제품 사용 등..."
@@ -151,18 +155,27 @@ export const resetPasswordChangeRequest = async (requestBody: ResetPasswordChang
 
 
 // ================================ 카테고리 =============================
-const GET_CATEGORY_LIST_URL = () => `/category/get-List`;
+const GET_CATEGORY_LIST_URL = () => `/categories/tree`;
+const GET_CATEGORY_CHILDREN_URL = (parentId : number | string) => `/categories/children?parentId=${parentId}`;
 
 export const getCategoryListRequest = async () : Promise<GetCategoryListResponseDto> => {
-    return apiClient.post(GET_CATEGORY_LIST_URL())};
+    return apiClient.get(GET_CATEGORY_LIST_URL())};
 //카테고리 리스트를 서버에 요청 
 
-
-
+export const getCategoryChildrenRequest = async (parentId : number | string) : Promise<GetCategoryChildrenResponseDto> => {
+    return apiClient.get(GET_CATEGORY_CHILDREN_URL(parentId))};
+//소분류 카테고리 리스트를 서버에 요청 
 
 
 // ================================ 상품 =================================
+const GET_PRODUCT_LIST_URL = () => `/products`
+const GET_PRODUCT_DETAIL_URL = (productId : number) => `/products/${productId}`
 
+export const getProductListRequest = async (params : GetProductListRequestDto) : Promise<GetProductListResponseDto> => {
+    return apiClient.get(GET_PRODUCT_LIST_URL() , {params} )};
+
+export const getProductDetailRequest = async (productId : number) : Promise<GetProductDetailListResponseDto> => {
+    return apiClient.get(GET_PRODUCT_DETAIL_URL(productId))}
 
 
 
