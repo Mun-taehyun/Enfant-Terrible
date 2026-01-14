@@ -13,6 +13,7 @@
 
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .brand {
@@ -25,24 +26,11 @@
   text-decoration: none;
 }
 
-.section {
-  margin-bottom: 16px;
-}
-
-.sectionTitle {
-  background-color: #e2f0f7;
-  padding: 4px 10px;
-  font-size: 12px;
-  font-weight: 700;
-  color: #0f172a;
-  border-radius: 4px;
-  margin-bottom: 6px;
-}
-
-.sectionNav {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+.menu {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
 .menuLink {

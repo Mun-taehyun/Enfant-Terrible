@@ -1,0 +1,116 @@
+/* 파일: src/views/admin/users/users.view.module.css */
+
+.container {
+  padding: 16px;
+}
+
+.title {
+  margin: 0 0 12px 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.subTitle {
+  margin: 0 0 12px 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.message {
+  margin-bottom: 12px;
+}
+
+.layout {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.panel {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.panel:first-child {
+  width: 420px;
+}
+
+.panel:last-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.pager {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.pagerText {
+  font-size: 13px;
+}
+
+.list {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.listItem {
+  margin-bottom: 6px;
+}
+
+.userBtn {
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  padding: 0;
+  text-align: left;
+}
+
+.userBtnActive {
+  text-decoration: underline;
+  font-weight: 700;
+}
+
+.card {
+  border: 1px solid #eee;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.input {
+  padding: 6px 8px;
+  width: 220px;
+}
+
+.btn {
+  padding: 6px 10px;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.muted {
+  color: #666;
+  font-size: 13px;
+}
+
+.error {
+  color: #b42318;
+  font-size: 13px;
+}
