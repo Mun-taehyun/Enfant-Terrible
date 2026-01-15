@@ -1,9 +1,10 @@
 import CategoryItemList from "@/components/user/CategoryItemList";
-import { AUTH_LOGIN_PATH, AUTH_PATH, CART_PATH, MAIN_PATH, PRODUCT_SEARCH_PATH, USER_PATH } from "@/constant/user/route.index";
+import { AUTH_LOGIN_PATH, AUTH_PATH, CART_PATH, MAIN_PATH,USER_PATH } from "@/constant/user/route.index";
 import { useLoginUserStore } from "@/stores/user"
 import { useEffect, useRef, useState, type ChangeEvent, type KeyboardEvent } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import './style.css';
+import { useProduct } from "@/hooks/user/product/use-product.hook";
 
 
 //컴포넌트 : 헤더 
@@ -67,7 +68,13 @@ export default function Header() {
     const SearchButton = () => {
 
         //============================== 상태 변경 선언 모둠 ==============
-        //상태 : 검색 버튼 요소
+        //커스텀 훅 : 제품 검색 필터를 위한 이벤트 처리 
+        const {
+            updateSearchFilter ,
+        } = useProduct();
+
+
+        //참조 : 검색 버튼 요소
         const searchButtonRef = useRef<HTMLDivElement | null>(null);
 
         //상태 : 검색버튼
@@ -76,9 +83,6 @@ export default function Header() {
 
         //상태 : 검색어 입력값받기
         const [keyword, setKeyword] = useState<string>('');
-
-        //상태 : 검색어 경로 변수
-        const {searchWord} = useParams();
 
         // ==============================================================
         //useState 는 새로고침 또는 리로딩이 되면 초기값으로 돌아간다.... 
@@ -94,13 +98,16 @@ export default function Header() {
             setKeyword(value);
         };
 
-        //이벤트 핸들러: 검색어 키 이벤트 처리 함수(Enter로 넘어가게..)
-        const onSearchWordKeyDownHandler = (event: KeyboardEvent<HTMLInputElement>) => {
-            //Enter 인식 , 검색어 입력값 인식 여부
-            if(event.key !== 'Enter') return;
-            if(!searchButtonRef.current) return;
-            searchButtonRef.current.click(); //DOM에 직접 참조.. Ref 
+        //이벤트핸들러 : 상단 검색 엔터 시 이벤트핸들러 (기본 필터 유지x)
+        const onSearchKeyDownEventHandler = (event: KeyboardEvent<HTMLInputElement>) => {
+            if (event.key !== "Enter") return;
+            updateSearchFilter({
+                keyword: event.currentTarget.value,
+                categoryId: "",
+                page: "1"
+            })
         };
+
         //이벤트 핸들러: 검색버튼 클릭 이벤트 처리 함수
         const onSearchButtonClickHandler = () => {
             if(!status) {
@@ -108,18 +115,22 @@ export default function Header() {
                 return;
             } // status false 라면 => true로 상태를 바꾸고. 
             //status true에서 누르면 
-            navigate(PRODUCT_SEARCH_PATH(keyword))
+            updateSearchFilter({
+                keyword: "keyword",
+                categoryId: "",
+                page: "1"
+            });
         };
         // ==============================================================
 
 
         //효과 : 검색어 경로 변경 될 때마다 실행될 함수 
         useEffect(() => {
-            if(searchWord) {
-                setKeyword(searchWord);
+            if(keyword) {
+                setKeyword(keyword);
                 setStatus(true);
             }
-        }, [searchWord])
+        }, [keyword])
         //searchWord가 변할 때마다 실행된다
 
 
@@ -133,7 +144,7 @@ export default function Header() {
         // 렌더링 : 검색 버튼 true 상태
         return (
             <div className='header-search-input-box'>
-                <input className='header-search-input' type='text' placeholder='검색어를 입력해주세요' value={keyword} onChange={onSearchWordChangeHandler} onKeyDown={onSearchWordKeyDownHandler}/>
+                <input className='header-search-input' type='text' placeholder='검색어를 입력해주세요' value={keyword} onChange={onSearchWordChangeHandler} onKeyDown={(event) => onSearchKeyDownEventHandler(event)}/>
                 <div ref={searchButtonRef} className='icon-button' onClick={onSearchButtonClickHandler}>
                     <div className='icon search-light-icon'></div>
                 </div>
@@ -166,7 +177,6 @@ export default function Header() {
             </div>
        </div> 
     )
-
 }
 // 버튼 박스 
 // 비회원 상태 로그인/회원가입 

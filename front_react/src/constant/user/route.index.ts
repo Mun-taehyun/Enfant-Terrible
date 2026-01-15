@@ -16,12 +16,8 @@ export const USER_PATH = () => `/user`;
 export const USER_UPDATE_PATH = (userId: number | string) => `${userId}`;
 //마이페이지 수정
 
-export const PRODUCT_PATH = () => `/product`; //기준이 되는 리소스
-
-export const PRODUCT_CATEGORY_PATH = (categoryId: number | string) => `/product/${categoryId}`;
-//카테고리 제품페이지
-export const PRODUCT_SEARCH_PATH = (searchWord: string) => `/product/${searchWord}`;
-//제품 검색페이지 
+export const PRODUCT_PATH = () => `/product`; 
+//제품 필터된 정보 페이지 "쿼리스트링 방식은 별도로 적용"
 export const PRODUCT_DETAIL_PATH = (productId: number | string) => `/product/${productId}`;
 //제품 상세페이지 
 
