@@ -2,40 +2,304 @@
   "users": [
     {
       "id": 1,
+      "userId": 1,
       "username": "admin",
       "password": "1234",
       "name": "관리자",
       "role": "ADMIN",
+      "status": "ㅌㅌㅌㅌ",
       "email": "admin@enfant-terrible.com"
+    },
+    {
+      "id": 2,
+      "userId": 2,
+      "username": "user02",
+      "password": "1234",
+      "name": "김하늘",
+      "role": "USER",
+      "status": "ACTIVE",
+      "email": "user02@enfant-terrible.com"
+    },
+    {
+      "id": 3,
+      "userId": 3,
+      "username": "user03",
+      "password": "1234",
+      "name": "이준호",
+      "role": "USER",
+      "status": "ACTIVE",
+      "email": "user03@enfant-terrible.com"
+    },
+    {
+      "id": 4,
+      "userId": 4,
+      "username": "user04",
+      "password": "1234",
+      "name": "박지은",
+      "role": "USER",
+      "status": "SUSPENDED",
+      "email": "user04@enfant-terrible.com"
+    },
+    {
+      "id": 5,
+      "userId": 5,
+      "username": "user05",
+      "password": "1234",
+      "name": "최민수",
+      "role": "USER",
+      "status": "ACTIVE",
+      "email": "user05@enfant-terrible.com"
+    },
+    {
+      "id": 6,
+      "userId": 6,
+      "username": "user06",
+      "password": "1234",
+      "name": "정수빈",
+      "role": "USER",
+      "status": "WITHDRAWN",
+      "email": "user06@enfant-terrible.com"
+    },
+    {
+      "id": 7,
+      "userId": 7,
+      "username": "user07",
+      "password": "1234",
+      "name": "한예린",
+      "role": "USER",
+      "status": "ACTIVE",
+      "email": "user07@enfant-terrible.com"
+    },
+    {
+      "id": 8,
+      "userId": 8,
+      "username": "user08",
+      "password": "1234",
+      "name": "오지훈",
+      "role": "USER",
+      "status": "ACTIVE",
+      "email": "user08@enfant-terrible.com"
+    },
+    {
+      "id": 9,
+      "userId": 9,
+      "username": "user09",
+      "password": "1234",
+      "name": "윤서연",
+      "role": "USER",
+      "status": "SUSPENDED",
+      "email": "user09@enfant-terrible.com"
+    },
+    {
+      "id": 10,
+      "userId": 10,
+      "username": "user10",
+      "password": "1234",
+      "name": "임도현",
+      "role": "USER",
+      "status": "ACTIVE",
+      "email": "user10@enfant-terrible.com"
+    },
+    {
+      "id": 11,
+      "userId": 11,
+      "username": "user11",
+      "password": "1234",
+      "name": "서지우",
+      "role": "USER",
+      "status": "ACTIVE",
+      "email": "user11@enfant-terrible.com"
+    },
+    {
+      "id": 12,
+      "userId": 12,
+      "username": "user12",
+      "password": "1234",
+      "name": "조현우",
+      "role": "USER",
+      "status": "ACTIVE",
+      "email": "user12@enfant-terrible.com"
+    },
+    {
+      "id": 13,
+      "userId": 13,
+      "username": "user13",
+      "password": "1234",
+      "name": "문채원",
+      "role": "USER",
+      "status": "ACTIVE",
+      "email": "user13@enfant-terrible.com"
+    },
+    {
+      "id": 14,
+      "userId": 14,
+      "username": "user14",
+      "password": "1234",
+      "name": "장민재",
+      "role": "USER",
+      "status": "ACTIVE",
+      "email": "user14@enfant-terrible.com"
+    },
+    {
+      "id": 15,
+      "userId": 15,
+      "username": "user15",
+      "password": "1234",
+      "name": "백지수",
+      "role": "USER",
+      "status": "ㅌㅌㅌㅌㅌㅌ",
+      "email": "user15@enfant-terrible.com"
     }
   ],
   "amountDaily": [
-    { "date": "2026-01-01", "orderCount": 11, "refundCount": 0, "totalAmount": 540000, "completedDeliveryCount": 7 },
-    { "date": "2026-01-02", "orderCount": 14, "refundCount": 1, "totalAmount": 690000, "completedDeliveryCount": 12 },
-    { "date": "2026-01-03", "orderCount": 9,  "refundCount": 0, "totalAmount": 410000, "completedDeliveryCount": 6 },
-    { "date": "2026-01-04", "orderCount": 16, "refundCount": 0, "totalAmount": 820000, "completedDeliveryCount": 13 },
-    { "date": "2026-01-05", "orderCount": 18, "refundCount": 1, "totalAmount": 1020000, "completedDeliveryCount": 15 },
-    { "date": "2026-01-06", "orderCount": 13, "refundCount": 0, "totalAmount": 590000, "completedDeliveryCount": 10 },
-    { "date": "2026-01-07", "orderCount": 17, "refundCount": 1, "totalAmount": 980000, "completedDeliveryCount": 14 },
-    { "date": "2026-01-08", "orderCount": 21, "refundCount": 0, "totalAmount": 1320000, "completedDeliveryCount": 18 },
-    { "date": "2026-01-09", "orderCount": 19, "refundCount": 1, "totalAmount": 1210000, "completedDeliveryCount": 16 },
-    { "date": "2026-01-10", "orderCount": 22, "refundCount": 0, "totalAmount": 1410000, "completedDeliveryCount": 19 },
-    { "date": "2026-01-11", "orderCount": 15, "refundCount": 1, "totalAmount": 740000, "completedDeliveryCount": 12 },
-    { "date": "2026-01-12", "orderCount": 20, "refundCount": 0, "totalAmount": 1290000, "completedDeliveryCount": 17 },
-    { "date": "2026-01-13", "orderCount": 18, "refundCount": 1, "totalAmount": 1100000, "completedDeliveryCount": 14 },
-    { "date": "2026-01-14", "orderCount": 21, "refundCount": 1, "totalAmount": 1364000, "completedDeliveryCount": 15 }
+    {
+      "date": "2026-01-01",
+      "orderCount": 11,
+      "refundCount": 0,
+      "totalAmount": 540000,
+      "completedDeliveryCount": 7
+    },
+    {
+      "date": "2026-01-02",
+      "orderCount": 14,
+      "refundCount": 1,
+      "totalAmount": 690000,
+      "completedDeliveryCount": 12
+    },
+    {
+      "date": "2026-01-03",
+      "orderCount": 9,
+      "refundCount": 0,
+      "totalAmount": 410000,
+      "completedDeliveryCount": 6
+    },
+    {
+      "date": "2026-01-04",
+      "orderCount": 16,
+      "refundCount": 0,
+      "totalAmount": 820000,
+      "completedDeliveryCount": 13
+    },
+    {
+      "date": "2026-01-05",
+      "orderCount": 18,
+      "refundCount": 1,
+      "totalAmount": 1020000,
+      "completedDeliveryCount": 15
+    },
+    {
+      "date": "2026-01-06",
+      "orderCount": 13,
+      "refundCount": 0,
+      "totalAmount": 590000,
+      "completedDeliveryCount": 10
+    },
+    {
+      "date": "2026-01-07",
+      "orderCount": 17,
+      "refundCount": 1,
+      "totalAmount": 980000,
+      "completedDeliveryCount": 14
+    },
+    {
+      "date": "2026-01-08",
+      "orderCount": 21,
+      "refundCount": 0,
+      "totalAmount": 1320000,
+      "completedDeliveryCount": 18
+    },
+    {
+      "date": "2026-01-09",
+      "orderCount": 19,
+      "refundCount": 1,
+      "totalAmount": 1210000,
+      "completedDeliveryCount": 16
+    },
+    {
+      "date": "2026-01-10",
+      "orderCount": 22,
+      "refundCount": 0,
+      "totalAmount": 1410000,
+      "completedDeliveryCount": 19
+    },
+    {
+      "date": "2026-01-11",
+      "orderCount": 15,
+      "refundCount": 1,
+      "totalAmount": 740000,
+      "completedDeliveryCount": 12
+    },
+    {
+      "date": "2026-01-12",
+      "orderCount": 20,
+      "refundCount": 0,
+      "totalAmount": 1290000,
+      "completedDeliveryCount": 17
+    },
+    {
+      "date": "2026-01-13",
+      "orderCount": 18,
+      "refundCount": 1,
+      "totalAmount": 1100000,
+      "completedDeliveryCount": 14
+    },
+    {
+      "date": "2026-01-14",
+      "orderCount": 21,
+      "refundCount": 1,
+      "totalAmount": 1364000,
+      "completedDeliveryCount": 15
+    }
   ],
   "orders": [
-    { "id": 1001, "orderCode": "ET20260101-0001", "orderedAt": "2026-01-01T10:15:00+09:00", "status": "PAID", "totalAmount": 189000 },
-    { "id": 1002, "orderCode": "ET20260101-0002", "orderedAt": "2026-01-01T12:05:00+09:00", "status": "PAID", "totalAmount": 25000 },
-    { "id": 1003, "orderCode": "ET20260102-0001", "orderedAt": "2026-01-02T09:40:00+09:00", "status": "REFUNDED", "totalAmount": 88000 }
+    {
+      "id": 1001,
+      "orderCode": "ET20260101-0001",
+      "orderedAt": "2026-01-01T10:15:00+09:00",
+      "status": "PAID",
+      "totalAmount": 189000
+    },
+    {
+      "id": 1002,
+      "orderCode": "ET20260101-0002",
+      "orderedAt": "2026-01-01T12:05:00+09:00",
+      "status": "PAID",
+      "totalAmount": 25000
+    },
+    {
+      "id": 1003,
+      "orderCode": "ET20260102-0001",
+      "orderedAt": "2026-01-02T09:40:00+09:00",
+      "status": "REFUNDED",
+      "totalAmount": 88000
+    }
   ],
   "categories": [
-    { "id": "cat1", "name": "Outerwear", "description": "자켓, 코트, 패딩 등 겉옷" },
-    { "id": "cat2", "name": "Tops", "description": "티셔츠, 셔츠, 니트" },
-    { "id": "cat3", "name": "Bottoms", "description": "데님, 슬랙스, 스커트" },
-    { "id": "cat4", "name": "Accessories", "description": "가방, 신발, 모자" },
-    { "id": "cat5", "name": "Sale", "description": "시즌 오프 할인 상품" }
+    {
+      "id": "cat1",
+      "name": "Outerwear",
+      "description": "자켓, 코트, 패딩 등 겉옷"
+    },
+    {
+      "id": "cat2",
+      "name": "Tops",
+      "description": "티셔츠, 셔츠, 니트"
+    },
+    {
+      "id": "cat3",
+      "name": "Bottoms",
+      "description": "데님, 슬랙스, 스커트"
+    },
+    {
+      "id": "cat4",
+      "name": "Accessories",
+      "description": "가방, 신발, 모자"
+    },
+    {
+      "id": "cat5",
+      "name": "Sale",
+      "description": "시즌 오프 할인 상품"
+    }
   ],
   "products": [
     {

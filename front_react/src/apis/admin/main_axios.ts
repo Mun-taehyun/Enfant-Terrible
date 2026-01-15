@@ -1,5 +1,4 @@
 // src/apis/main_axios.ts
-
 import axios from 'axios';
 
 function getAccessToken(): string | null {
@@ -7,7 +6,7 @@ function getAccessToken(): string | null {
 }
 
 export const mainAxios = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL, // .env에 있음
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   timeout: 15000,
   headers: {
     'Content-Type': 'application/json',
@@ -16,11 +15,9 @@ export const mainAxios = axios.create({
 
 mainAxios.interceptors.request.use(config => {
   const token = getAccessToken();
-
   if (token) {
     config.headers = config.headers ?? {};
     config.headers.Authorization = `Bearer ${token}`;
   }
-
   return config;
 });

@@ -1,13 +1,14 @@
 // src/App.tsx
-import { Routes, Route, Navigate } from 'react-router-dom';
-import type { ReactNode } from 'react';
+import { Routes, Route, Navigate } from "react-router-dom";
+import type { ReactNode } from "react";
 
-// 우리가 만든 것들만 import
-import AdminLayout from './layouts/admin/AdminLayout';
-import LoginView from './views/admin/login.view';
+import AdminLayout from "./layouts/admin/AdminLayout";
+import LoginView from "./views/admin/login.view";
+import UsersView from "./views/admin/users.view";
+import SalesView from "./views/admin/sales.view";
 
 const isAuthenticated = () => {
-  const token = localStorage.getItem('accessToken');
+  const token = localStorage.getItem("accessToken");
   return !!token;
 };
 
@@ -21,12 +22,19 @@ const LoginRoute = ({ children }: { children: ReactNode }) => {
   return <>{children}</>;
 };
 
-function App() {
+const ProtectedAdminLayout = () => {
+  return (
+    <AdminRoute>
+      <AdminLayout />
+    </AdminRoute>
+  );
+};
+
+export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/admin/login" replace />} />
 
-      {/* 로그인: 우리가 만든 LoginView */}
       <Route
         path="/admin/login"
         element={
@@ -36,29 +44,15 @@ function App() {
         }
       />
 
-      {/* 관리자 레이아웃: 우리가 만든 AdminLayout(Outlet) */}
-      <Route
-        path="/admin"
-        element={
-          <AdminRoute>
-            <AdminLayout />
-          </AdminRoute>
-        }
-      >
-        {/* 지금은 대시보드 뷰가 없으니, index는 임시 문구만 */}
-        <Route
-          index
-          element={
-            <div style={{ padding: 16 }}>
-              관리자 홈(임시). 다음으로 대시보드 뷰를 만들면 여기 index를 dashboard로 리다이렉트 하시면 됩니다.
-            </div>
-          }
-        />
+      {/* 여기가 레이아웃에 뷰 넣는 곳  */}
+      <Route path="/admin" element={<ProtectedAdminLayout />}>
+        <Route index element={<SalesView />} />
+        <Route path="sales" element={<SalesView />} />
+        <Route path="users" element={<UsersView />} />
+        
       </Route>
 
       <Route path="*" element={<Navigate to="/admin/login" replace />} />
     </Routes>
   );
 }
-
-export default App;

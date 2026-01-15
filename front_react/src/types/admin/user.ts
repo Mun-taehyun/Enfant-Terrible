@@ -41,3 +41,29 @@ export type AdminUserSearchRequest = {
 export type AdminUserStatusUpdateRequest = {
   status: AdminUserStatus;
 };
+
+/* =========================
+ * ✅ request가 반환하는 "프론트에서 쓰는 결과 타입"
+ * (뷰에서 data.rows/data.page/data.message 접근이 안전해짐)
+ * ========================= */
+
+export type AdminUsersListResult = {
+  success: boolean;
+  message: string;
+  rows: AdminUserListItem[];
+  page: number;
+  size: number;
+  totalElements?: number;
+  totalPages?: number;
+};
+
+export type AdminUserDetailResult = {
+  success: boolean;
+  message: string;
+  user: AdminUserDetail;
+};
+
+export type AdminUserStatusUpdateResult = {
+  success: boolean;
+  message: string;
+};

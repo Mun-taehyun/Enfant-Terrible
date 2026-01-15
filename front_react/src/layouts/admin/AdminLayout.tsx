@@ -1,12 +1,14 @@
 import AdminSidebar from "./AdminSidebar";
-import AdminOutlet from "./AdminOutlet.tsx";
+import { Outlet } from "react-router-dom";
 import styles from "./AdminLayout.module.css";
 
 const AdminLayout = () => {
   return (
     <div className={styles.layout}>
       <AdminSidebar />
-      <AdminOutlet />
+      <main className={styles.main}>
+        <Outlet />
+      </main>
     </div>
   );
 };

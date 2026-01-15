@@ -1,4 +1,4 @@
-// 파일: src/apis/admin/response/adminUser.response.ts
+// src/apis/admin/response/adminUser.response.ts
 
 import type { AdminUserDetail, AdminUserListItem } from "@/types/admin/user";
 import type { ApiResponse, AdminPageResponse } from "@/types/admin/api";
@@ -18,7 +18,11 @@ export function unwrapAdminPage<T>(p: AdminPageResponse<T>): {
   totalElements?: number;
   totalPages?: number;
 } {
-  const rows = Array.isArray(p?.content) ? p.content : [];
+  const rows =
+    Array.isArray(p?.content) ? p.content :
+    Array.isArray(p?.rows) ? p.rows :
+    Array.isArray(p?.items) ? p.items :
+    [];
 
   const page =
     typeof p.page === "number" ? p.page :
