@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.enfantTerrible.enfantTerrible.mapper.product.ProductSkuQueryMapper">
+
+  <!--
+    옵션 조합과 정확히 일치하는 SKU 찾기
+    - option_value_id IN (...)
+    - SKU별 매칭된 옵션 개수 = 요청 옵션 개수
+  -->
+  <select id="findSkuByExactOptionMatch" resultType="ProductSkuOptionRow">
+    SELECT
+      s.sku_id,
+      s.price,
+      s.stock,
+      s.status,
+      so.option_value_id
+    FROM et_product_sku s
+    JOIN et_product_sku_option so
+      ON so.sku_id = s.sku_id
+    WHERE s.product_id = #{productId}
+      AND s.deleted_at IS NULL
+      AND so.option_value_id IN
+      <foreach collection="optionValueIds" item="id" open="(" close=")" separator=",">
+        #{id}
+      </foreach>
+    GROUP BY s.sku_id
+    HAVING COUNT(DISTINCT so.option_value_id) = #{optionCount}
+  </select>
+
+</mapper>
