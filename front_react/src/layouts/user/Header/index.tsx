@@ -138,7 +138,7 @@ export default function Header() {
         // 렌더링 : 검색 버튼 false 상태
         return (
             <div className='icon-button' onClick={onSearchButtonClickHandler}>
-                <div className='icon search-light-icon'></div>
+                <div className='icon search-light-icon'>검색x</div>
             </div>
         );
         // 렌더링 : 검색 버튼 true 상태
@@ -146,7 +146,7 @@ export default function Header() {
             <div className='header-search-input-box'>
                 <input className='header-search-input' type='text' placeholder='검색어를 입력해주세요' value={keyword} onChange={onSearchWordChangeHandler} onKeyDown={(event) => onSearchKeyDownEventHandler(event)}/>
                 <div ref={searchButtonRef} className='icon-button' onClick={onSearchButtonClickHandler}>
-                    <div className='icon search-light-icon'></div>
+                    <div className='icon search-light-icon'>검색o</div>
                 </div>
             </div>
         );

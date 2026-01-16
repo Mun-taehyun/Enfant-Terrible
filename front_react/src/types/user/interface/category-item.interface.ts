@@ -4,5 +4,5 @@ export default interface CategoryItem {
     name : string;
     depth : number | string;
     sortOrder : number; 
-    isActivated : boolean;
+    isActive : boolean;
 }

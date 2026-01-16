@@ -1,37 +1,53 @@
 import { categoryQueries} from '@/querys/user/queryhooks';
 import './style.css';
 import { useDynamicSlide } from '@/hooks/user/uiControl/use-custom.hook';
+import { CategoryItem } from '@/types/user/interface';
+
 
 
 
 //컴포넌트 : 카테고리 리스트 
 export default function CategoryItemList(){
-    const { data} = categoryQueries.useCategoryList();
 
-    // 2. UI 로직 레이어 (Custom Hook)
-    // 한 칸 이동 거리를 280px로 설정 (CSS min-width 고려)
-    const { scrollX, handleMove, containerRef } = useDynamicSlide();
+    //서버상태 : 카테고리 전체 리스트 SQL 조회 
+    const {data , isLoading} = categoryQueries.useCategoryList();
 
-    if (!data) return null;
+    //훅: 카테고리 리스트 유연한 너비 계산
+    const { scrollX, handleMove, containerRef, isStart, isEnd } = useDynamicSlide();
+
+    //data 존재여부를 일단 검증해야함.
+    if (isLoading || !data) return null;
 
     return (
-        <div className="mega-menu-viewport">
-            <button className="nav-btn left" onClick={() => handleMove('prev')}>〈</button>
-            <button className="nav-btn right" onClick={() => handleMove('next')}>〉</button>
-
-            <div 
-                className="mega-menu-rail" 
-                ref={containerRef} // 훅에서 넘겨받은 ref 연결
-                style={{ transform: `translateX(${scrollX}px)` }}
-            >
+    <div className="mega-menu-viewport">
+        {!isStart && (
+            <button className="nav-btn left" onClick={() => handleMove('prev')}>
+                <span className="arrow">❮</span>
+            </button>
+        )}
+        {!isEnd && data.menuTree.length > 5 && ( 
+            <button className="nav-btn right" onClick={() => handleMove('next')}>
+                <span className="arrow">❯</span>
+            </button>
+        )}
+        <div className="rail-window">
+            <div className="mega-menu-rail" ref={containerRef} style={{ transform: `translateX(${scrollX}px)` }}>
                 {data.menuTree.map((item) => (
                     <div key={item.categoryId} className="category-column">
                         <h3 className="main-item-name">{item.name}</h3>
-                        {/* 소분류 리스트... */}
+                        {/* 📌 소분류 판넬: 전체를 다 그리지 말고, 현재 item의 소분류만 그립니다. */}
+                        <div className="sub-menu-drop">
+                            <div className="sub-menu-inner">
+                                {item.subItems.map((sub : CategoryItem) => (
+                                    <span key={sub.categoryId} className="sub-item-text">{sub.name}</span>
+                                ))}
+                            </div>
+                        </div>
                     </div>
                 ))}
             </div>
         </div>
+    </div>
     );
 };
 

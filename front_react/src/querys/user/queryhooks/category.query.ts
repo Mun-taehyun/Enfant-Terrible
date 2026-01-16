@@ -18,14 +18,14 @@ export const categoryQueries = {
                 const mainList = activeItems.filter(item => item.depth === 0); //대분류 카테고리...
                 // 대분류에 있는 값들 중 활성화 상태를 위주로 일치 여부를 필터.. 
                 const menuTree = mainList.map(mainItem => {
-                    // 해당 대분류를 부모로 가진 소분류들을 찾음
+                    // 해당 대분류를 부모로 가진 소분류들을 찾음 => 배열로 반환
                     const subItems = activeItems.filter(subItem => subItem.parentId === mainItem.categoryId);
                     return {
                     ...mainItem,
                     // 소분류가 없으면 빈 배열 [] 이 들어감 (대분류 데이터는 그대로 유지됨)
                     subItems: subItems 
                     };
-                });
+                }); // 전체 카테고리가 나오도록 
                 return { mainList, menuTree };
             }
         });

@@ -1,143 +1,91 @@
-/* 1. 배경 어둡게 (Overlay) 효과 */
-.pet-nav-container::after {
-    content: '';
-    position: fixed;
-    top: 160px; /* 헤더 높이에 맞춰 조정 (1층+2층 높이) */
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.4); /* 너무 어둡지 않은 세련된 농도 */
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-    z-index: 500;
-    pointer-events: none; /* 클릭 방해 금지 */
-}
-
-.pet-nav-container:hover::after {
-    opacity: 1;
-    visibility: visible;
-}
-
-/* 2. 네비게이션 컨테이너 */
-.pet-nav-container {
+/* 1. 최외곽: 메인 가이드 (1200px 정중앙) */
+.mega-menu-viewport {
     position: relative;
-    width: 100%;
-    background-color: #fff;
-    font-family: 'Pretendard', sans-serif;
-    z-index: 1000; /* 어둠효과보다 위에 */
-}
-
-/* 3. 대분류 & 소분류 칼정렬 시스템 (Grid 활용) */
-.main-menu-group, .sub-menu-content {
-    display: grid;
-    /* 관리자가 넣은 개수만큼 자동으로 똑같은 너비 분할 */
-    grid-template-columns: repeat(4, 1fr); /* 현재 4개 기준, 관리자 기능 시 auto-fit 사용 가능 */
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
-    box-sizing: border-box;
+    height: 60px;
+    z-index: 2000;
 }
 
-/* 4. 대분류 스타일 */
-.main-menu-group {
-    height: 65px;
-    border-bottom: 1px solid #f0f0f0;
+/* 2. 대분류 창문 및 레일 */
+.rail-window {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
 }
 
-.menu-item {
+.mega-menu-rail {
     display: flex;
-    justify-content: center;
+    width: max-content;
+    height: 100%;
+    transition: transform 0.5s cubic-bezier(0.25, 1, 0.2, 1);
+}
+
+/* 3. 대분류 기둥: 정렬 수정 */
+.category-column {
+    flex: 0 0 140px; /* 기둥 너비 유지 */
+    display: flex;
     align-items: center;
-    font-size: 17px;
+    justify-content: center;
+    cursor: pointer;
+    position: relative; /* 📌 다시 relative를 줘서 호버 인식을 정확하게 함 */
+}
+
+.main-item-name {
+    font-size: 16px;
     font-weight: 700;
     color: #333;
-    cursor: pointer;
-    position: relative;
-    transition: color 0.2s;
+    white-space: nowrap;
 }
 
-.menu-item:hover {
-    color: #ff8e0b;
-}
-
-/* KB 스타일의 하단 오렌지 라인 */
-.menu-item:hover::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    width: 60%; /* 글자 길이에 적당히 맞춤 */
-    height: 3px;
-    background-color: #ff8e0b;
-}
-
-/* 5. 소분류 전체 판 */
-.sub-menu-panel {
-    position: absolute;
-    top: 65px;
-    left: 0;
-    width: 100%;
-    background-color: #ffffff;
-    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+/* 4. 🚨 소분류 판넬: 1200px 풀 너비 + 중앙 박제 */
+.sub-menu-drop {
+    display: none;
+    position: fixed; /* 📌 레일의 움직임을 무시하고 브라우저에 박제 */
     
-    max-height: 0;
-    opacity: 0;
-    overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    /* 📌 1200px 가이드라인에 맞추는 마법의 공식 */
+    top: 155px; /* 헤더 높이에 맞춰 미세 조정하세요 (이미지 기준 약 155px) */
+    left: 50%;
+    transform: translateX(-50%); 
+    
+    width: 1200px; /* 📌 찌부러진 너비를 1200px로 강제 복구 */
+    background: #ffffff;
+    border-top: 1px solid #eee;
+    border-bottom: 2px solid #ff8e0b; /* 오렌지 포인트 복구 */
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    z-index: 999999;
 }
 
-.pet-nav-container:hover .sub-menu-panel {
-    max-height: 450px;
-    opacity: 1;
-}
-
-/* 6. 소분류 내부 레이아웃 */
-.sub-menu-content {
-    padding: 35px 0;
-}
-
-.sub-column {
-    padding: 0 25px;
-    border-right: 1px solid #f5f5f5; /* KB식 세로 구분선 */
+/* 5. 소분류 내부: 가로 정렬 복구 */
+.sub-menu-inner {
+    width: 100%;
+    padding: 25px 0;
     display: flex;
-    flex-direction: column;
+    justify-content: center; /* 소분류들을 가로로 중앙 정렬 */
+    gap: 40px; /* 아이템 간격 시원하게 */
 }
 
-.column-title {
-    font-size: 15px;
-    font-weight: 800;
-    color: #ff8e0b; /* 펫 쇼핑몰 포인트 */
-    margin-bottom: 15px;
-}
-
-.sub-item {
+.sub-item-text {
     font-size: 14px;
     color: #666;
-    padding: 7px 0;
-    cursor: pointer;
-}
-
-.sub-item:hover {
-    color: #222;
-    font-weight: 600;
-    text-decoration: underline;
-}
-
-/* 7. 프로모션 박스 (마지막 칸) */
-.sub-column-promo {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    padding: 0 20px;
-}
-
-.promo-box {
-    background-color: #fff8f0;
-    padding: 15px 20px;
-    border-radius: 12px;
-    border: 1px dashed #ff8e0b;
-    color: #ff8e0b;
-    font-size: 14px;
-    font-weight: 700;
     white-space: nowrap;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.sub-item-text:hover {
+    color: #ff8e0b;
+    font-weight: bold;
+}
+
+/* 6. 호버 시 노출 */
+.category-column:hover .sub-menu-drop {
+    display: block !important;
+}
+
+.category-column:hover .main-item-name {
+    color: #ff8e0b;
 }

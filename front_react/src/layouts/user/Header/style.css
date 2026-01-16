@@ -1,21 +1,21 @@
-/* 1. 헤더 전체 컨테이너: 배경색과 그림자로 본문과 분리 */
+/* [Header] 전체 컨테이너 */
 #header-container {
     width: 100%;
     background-color: #ffffff;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* 은은한 그림자 */
     display: flex;
     flex-direction: column;
     align-items: center;
     position: sticky;
     top: 0;
     z-index: 9999;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 
-/* 2. 메인 박스: 로고, 검색창, 버튼 정렬 */
+/* [Header] 메인 상단바 */
 .header-main-box {
     width: 100%;
     max-width: 1200px;
-    height: 90px;
+    height: 100px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -23,49 +23,64 @@
     box-sizing: border-box;
 }
 
-/* 로고: 폰트 크기 키우고 색상 강조 */
 .header-logo-content {
-    font-size: 32px;
+    font-size: 30px;
     font-weight: 900;
-    color: #ff8e0b;
-    text-shadow: 1px 1px 0px rgba(0,0,0,0.05);
+    color: #ff8e0b; /* 펫 브랜드 메인 컬러 */
+    cursor: pointer;
 }
 
-/* 검색창: 이미지에서 안 보였던 부분! 뚜렷한 경계선 부여 */
-.header-main-search-box {
-    flex: 0 1 450px; /* 너무 퍼지지 않게 너비 고정 */
+/* [SearchButton] 둥근 입력 폼 디자인 */
+.header-search-input-box {
+    flex: 0 1 500px;
     margin: 0 40px;
-}
-
-.header-main-search-box input {
-    width: 100%;
-    height: 44px;
-    padding: 0 20px;
-    border: 2px solid #ff8e0b; /* 펫 쇼핑몰 포인트 컬러 */
-    border-radius: 22px;
-    font-size: 15px;
-    outline: none;
-    background-color: #fff;
-}
-
-/* 3. 카테고리 박스: 본문과 섞이지 않게 배경색 차이 부여 */
-.header-main-category-box {
-    width: 100%;
-    background-color: #fdfdfd;
-    border-top: 1px solid #f5f5f5;
-    position: relative; /* 소분류 판의 기준점 */
-    display: flex;
-    justify-content: center; /* 전체 메뉴를 중앙으로 */
-}
-
-.header-main-category-box > div {
-    width: 100%;
-    max-width: 1200px;
-    height: 50px;
+    position: relative;
     display: flex;
     align-items: center;
-    gap: 45px; /* 메뉴 사이 간격 대폭 확대 */
-    padding: 0 20px;
-    font-weight: 700;
-    color: #333;
+}
+
+.header-search-input {
+    width: 100%;
+    height: 50px;
+    background-color: #f8f8f8;
+    border: 2px solid transparent;
+    border-radius: 25px; /* 완벽한 타원 */
+    padding: 0 60px 0 25px;
+    font-size: 16px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.header-search-input:focus {
+    background-color: #fff;
+    border-color: #ff8e0b;
+    box-shadow: 0 4px 12px rgba(255, 142, 11, 0.1);
+}
+
+/* 검색 아이콘 버튼 (input 내부 우측 배치) */
+.header-search-input-box .icon-button {
+    position: absolute;
+    right: 15px;
+    cursor: pointer;
+    color: #ff8e0b;
+    font-weight: bold;
+}
+
+/* 우측 유저 메뉴 */
+.header-main-button-box {
+    display: flex;
+    gap: 20px;
+}
+
+.header-main-button-box div {
+    font-size: 14px;
+    font-weight: 600;
+    color: #555;
+    cursor: pointer;
+}
+
+.header-main-category-box {
+    width: 100%;
+    background-color: #fff;
+    border-top: 1px solid #f5f5f5;
 }
