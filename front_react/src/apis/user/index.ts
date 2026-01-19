@@ -13,6 +13,8 @@ import { GetCategoryChildrenResponseDto } from "./response/category";
 import {GetProductListResponseDto} from "./response/product";
 import {GetProductDetailListResponseDto} from "./response/product";
 import { GetProductListRequestDto } from "./request/product";
+import GetBannerResponseDto from "./response/banner/get-banner-list.response.dto";
+import CartItemRequestDto from "./request/cart/cart-item-request.dto";
 
 
 // //권한 용 헤더로 보낼 엑세스토큰 사용 "제품 사용 등..."
@@ -187,6 +189,20 @@ export const getProductDetailRequest = async (productId : number) : Promise<GetP
 
 
 // ================================ 장바구니 ================================
+const POST_CART_ITEM_URL = () => `/cart/items`
+//장바구니에 담는 요청 
+const GET_CART_ITEM_URL = () => `/cart/items`
+//장바구니 조회
+
+
+export const postCartItemRequest = async (requestBody : CartItemRequestDto) => {
+    return apiClient.post(POST_CART_ITEM_URL(), requestBody)}
+
+export const getCartItemResponse = async () : Promise<CartItemResponseDto> => {
+    
+}
+
+
 
 
 
@@ -215,6 +231,12 @@ export const getPopupListRequest = async () : Promise<GetPopupListResponseDto> =
 
 
 //===================================== 배너 ======================================
+//배너 리스트 불러오기 
+const GET_BANNER_LIST_URL = () => `/banners`
+
+export const getBannerListRequest = async () : Promise<GetBannerResponseDto> => {
+    return apiClient.get(GET_BANNER_LIST_URL())
+}
 
 
 

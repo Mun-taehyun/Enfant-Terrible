@@ -1,10 +1,10 @@
 import axios from "axios";
 
-// const API_DOMAIN = "http://localhost:4000/api";
-const BASE_URL = "https://4eb28f5b-12e9-4051-8cf1-74cb997b3a9f.mock.pstmn.io"
+const API_DOMAIN = "http://localhost:4000";
+// const BASE_URL = "https://4eb28f5b-12e9-4051-8cf1-74cb997b3a9f.mock.pstmn.io"
 
 const apiClient = axios.create({
-  baseURL: BASE_URL,
+  baseURL: API_DOMAIN,
   timeout: 10000,
 //baseURL , timeout 
 //baseURL : 

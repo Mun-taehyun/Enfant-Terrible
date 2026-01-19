@@ -1,52 +1,61 @@
-import { CategoryChildItem } from "@/apis/user/response/category/get-category-children.response.dto";
+import { useProduct } from "@/hooks/user/product/use-product.hook";
+import { categoryQueries } from "@/querys/user/queryhooks";
 
 
 
+export default function ProductFilterCard () {
 
-interface Props {
-    categoryName: number; //선 필터링 정보 
-    categoryList: CategoryChildItem[];
-}//자식 카테고리 리스트를 가져온다. => 필터되어 있는 것 위주로
+    //커스텀 훅 : 검색변수 , 카테고리이벤트 처리
+    const { searchParams , params , HeaderCategoryEventHandler } = useProduct();
+    
+    const keyword = searchParams.get("keyword");
 
+    const categoryId = searchParams.get("category");
 
-export default function ProductFilterCard ({ categoryList , categoryName }: Props) {
+    //서버상태 : 전체 트리 카테고리 
+    const {data: categoryList} = categoryQueries.useCategoryList();
 
-    //속성 : 소분류 카테고리 데이터 정보 
-    const {name} = categoryList;
+    //서버상태 : 소분류 카테고리 
+    const {data: categorySmallList} = categoryQueries.useCategoryChildren();
 
 
     //렌더 : 상품 필터 
     return(
-
-        <div className="filter-container">
-            <div className="category-group">
-                <div className="category-list">
-                    <div className="category-item active">{categoryName}</div>
-                    <div className="category-item">가슴줄/하네스 (2)</div>
-                    <div className="category-item">이동가방 (1)</div>
-                </div>
+        <div className="filter-sidebar">
+            <div className="filter-title">
+                {keyword ? "카테고리 종류" : "세부 카테고리"}
             </div>
-
-            {/* 검색 영역 */}
-            <div className="filter-search-group">
-                <div className="filter-label">검색옵션</div>
-                    <div className="filter-search-wrapper">
-                    <input 
-                        type="text" 
-                        className="filter-input" 
-                        placeholder="검색어 입력" 
-                        defaultValue="옐로우"
-                    />
-                    <button className="filter-clear-btn">×</button>
-                </div>
+            <div className="filter-content">
+                {keyword ? 
+                    (categoryList?.map(category => (
+                        <div key={category.categoryId} className="accordion-group">
+                        <div className="main-item" onClick={() => toggleAccordion(category.categoryId)}>
+                            {category.name} ({category.count})
+                        </div>
+                        {openId === category.categoryId && (
+                            <div className="sub-group">
+                            {category.subCategories.map(sub => (
+                                <div key={sub.id} className="sub-item" onClick={() => onCategoryClick(sub.id)}>
+                                {sub.name} ({sub.count})
+                                </div>
+                            ))}
+                            </div>
+                        )}
+                        </div>
+                    ))
+                    ) : (
+                    // [카테고리 모드] 소분류가 주르륵 나열되는 리스트 구조
+                    categorySmallList?.map(sub => (
+                        <div key={sub.categoryId} className="flat-item" onClick={() => onCategoryClick(subCat.id)}>
+                        {subCat.name}
+                        </div>
+                    ))
+                )}
             </div>
         </div>
     );
 }
 
-//대분류 CategoryName 까지만.... => parentId의 name 데이터만 가져오면 됨 
-// parentId = useSearchParams로 가져오면 됨 
-
-
-//소분류 리스트 가져와야하고 특정 부모 즉 parentId와 관련된 소분류 리스트만 가져와야함 
-// 그럼 filter((item) => item.parentId === parentId) 로 select분류  
+//설계 
+//검색할 시 카테고리는 대분류 트리로 존재 
+//클릭 시 소분류 등장 

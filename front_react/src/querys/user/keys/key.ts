@@ -40,3 +40,10 @@ export const productKeys = {
     details: () => [...productKeys.all, 'detail'] as const,
     detail: (productId: number) => [...productKeys.details(), productId] as const,
 };
+
+
+//key 관리 : banner(배너)
+export const bannerKeys = {
+    all: ['banners'] as const,
+    lists: () => [...bannerKeys.all, 'list'] as const,  
+}

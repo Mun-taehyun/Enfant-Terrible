@@ -11,7 +11,6 @@ import { useProduct } from "@/hooks/user/product/use-product.hook";
 export default function Header() {
 
 
-
     //상태 : 로그인 상태 여부
     const {loginUser , resetLoginUser} = useLoginUserStore();
 
@@ -20,7 +19,7 @@ export default function Header() {
 
     //이벤트핸들러 : 로그인 버튼 클릭 이벤트 처리 
     const onLoginButtonClickEventHandler = () => {
-        navigate(AUTH_PATH() + "/" + AUTH_LOGIN_PATH());
+        navigate(AUTH_PATH() + AUTH_LOGIN_PATH());
     }
 
     //이벤트핸들러 : 로그아웃 버튼 클릭 이벤트 처리 
@@ -116,7 +115,7 @@ export default function Header() {
             } // status false 라면 => true로 상태를 바꾸고. 
             //status true에서 누르면 
             updateSearchFilter({
-                keyword: "keyword",
+                keyword,
                 categoryId: "",
                 page: "1"
             });

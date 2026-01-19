@@ -13,7 +13,7 @@ export const OAUTH_PATH = (accessToken : string) => `/oauth/callback/${accessTok
 
 export const USER_PATH = () => `/user`;
 //마이페이지 
-export const USER_UPDATE_PATH = (userId: number | string) => `${userId}`;
+export const USER_UPDATE_PATH = (userId: number | string) => `/${userId}`;
 //마이페이지 수정
 
 export const PRODUCT_PATH = () => `/product`; 

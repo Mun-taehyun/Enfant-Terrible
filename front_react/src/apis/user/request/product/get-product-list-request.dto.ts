@@ -3,5 +3,5 @@ export default interface GetProductListRequestDto {
     size: number | string;
     categoryId: number | string | null;
     keyword: string | null;
-    sort: "RECENT" | "PRICE_ASC" | "PRICE_DESC" | "NAME";
+    sort: string;
 }

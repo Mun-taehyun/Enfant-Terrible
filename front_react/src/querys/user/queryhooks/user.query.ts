@@ -35,7 +35,8 @@ export const userQueries = {
     usePets() {
         return useQuery({
         queryKey: userKey.pets(),
-        queryFn: petSeleteRequest
+        queryFn: petSeleteRequest,
+        select: (data) => data.petList,
         });
     },
 

@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 import type { PopupItem, User } from './types/user/interface';
 import { Route, Routes } from 'react-router-dom';
 import UserContainer from './layouts/user/UserContainer';
-import {AUTH_ADD_INFOMATION_PATH, AUTH_LOGIN_PATH, AUTH_OAUTH_PATH, AUTH_PATH, MAIN_PATH, OAUTH_PATH, PRODUCT_CATEGORY_PATH, PRODUCT_DETAIL_PATH, PRODUCT_PATH, USER_PATH} from './constant/user/route.index';
+import {AUTH_ADD_INFOMATION_PATH, AUTH_LOGIN_PATH, AUTH_OAUTH_PATH, AUTH_PATH, MAIN_PATH, OAUTH_PATH, PRODUCT_CATEGORY_PATH, PRODUCT_DETAIL_PATH, PRODUCT_PATH, USER_PATH, USER_UPDATE_PATH} from './constant/user/route.index';
 import Main from './views/user/Main';
 import { useLoginUserStore } from './stores/user';
 import { userQueries } from './querys/user/queryhooks';
@@ -68,7 +68,7 @@ function App() {
   // );
 
   //서버상태 : 회원가입 한 유저정보 조회 
-  const {data : useData} = userQueries.useMe();
+  const {data : myInfo} = userQueries.useMe();
 
   //상태보관 : 유저의 로그인/로그아웃 상태 
   const {setLoginUser ,resetLoginUser} = useLoginUserStore();
@@ -82,10 +82,11 @@ function App() {
       localStorage.removeItem('accessToken');
       return;
     }
-    // const loginUser : User = useData as UserSelectResponseDto 
-    // 로그인 데이터 사용 
-    // setLoginUser(loginUser);
-  }, [useData, setLoginUser , resetLoginUser]) //처음 들어올 때 List 활용 
+    const loginUser : User = myInfo as UserSelectResponseDto 
+    //로그인 데이터 사용 
+    setLoginUser(loginUser);
+    localStorage.setItem('userId', String(myInfo?.userId))
+  }, [myInfo, setLoginUser , resetLoginUser]) //처음 들어올 때 List 활용 
 
   // if (isPopupLoading) return <div> 팝업 업로드 중 </div>
   // if (popupError instanceof Error) return <div>{popupError.message}</div>;
@@ -107,7 +108,7 @@ function App() {
     //      제품 상세페이지 /product/:productId
     <>
     {/* {popupData?.map((item) => (<Popup key={item.popupId} popupItem={item} />))} */}
-    <PetMessage name={useData?.name} />
+    <PetMessage name={myInfo?.name} />
     <Routes>
       <Route element={<UserContainer/>}>
         <Route path={MAIN_PATH()} element={<Main />}/>
@@ -117,9 +118,9 @@ function App() {
           <Route path={AUTH_PATH() + "/" + AUTH_ADD_INFOMATION_PATH()} element={<PetInfomation />}/>
         </Route>
         <Route path={OAUTH_PATH(":accessToken")} element={<OAuthCallBack />} />
-        <Route path={USER_PATH()} element={<UserUpdate />}>
-          {/* <Route path={USER_PATH() + "/" + USER_UPDATE_PATH(":useData?.userId")} element{<UserUpdate />} /> */}
-        </Route>
+        
+        <Route path={USER_PATH()} element={<UserPage />}/>
+        <Route path={USER_PATH() + USER_UPDATE_PATH(':userId')} element={<UserUpdate />} />
         <Route path={PRODUCT_PATH()} element={<ProductFilter />} >
           <Route path={PRODUCT_PATH() + "/" + PRODUCT_DETAIL_PATH(":productId")} element={<ProductDetail />} />
         </Route>

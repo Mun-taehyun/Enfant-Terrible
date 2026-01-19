@@ -1,11 +1,40 @@
 import { USER_PATH } from "@/constant/user/route.index";
 import { userQueries } from "@/querys/user/queryhooks";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 
 export const usePet = () => {
 
+    //url상태 : petId 인식
     const {petId} = useParams();
+
+    //참조 : 펫 카드 스크롤을 위한 DOM 참조 
+    const scrollRef = useRef<HTMLDivElement>(null);
+
+    //상태 : 
+    const [showLeftBtn, setShowLeftBtn] = useState(false);
+
+    const handleScroll = () => {
+        if (scrollRef.current) {
+            const { scrollLeft } = scrollRef.current;
+            setShowLeftBtn(scrollLeft > 10);
+        }
+    };
+
+    const onPetScrollHandler = (direction: 'left' | 'right') => {
+        if (scrollRef.current) {
+            const moveAmount = 340;
+            const currentScroll = scrollRef.current.scrollLeft;
+            const targetScroll = direction === 'left' 
+                ? currentScroll - moveAmount 
+                : currentScroll + moveAmount;
+
+            scrollRef.current.scrollTo({
+                left: targetScroll,
+                behavior: 'smooth'
+            });
+        }
+    };
 
     //상태: 펫 초기 데이터 
     const [formData, setFormData] = useState({
@@ -98,6 +127,9 @@ export const usePet = () => {
     // 객체 형태로 리턴해야 부모에서 { formData, updateField } 식으로 꺼내 씁니다.
     return { 
         formData, updateField, handleInputChange, onPetRegisterHandler,
-        onPetUpdateHandler, onPetDeleteHandler
+        onPetUpdateHandler, onPetDeleteHandler,
+
+        //펫카드 스크롤 ui
+        scrollRef, showLeftBtn, handleScroll, onPetScrollHandler
     };
 };

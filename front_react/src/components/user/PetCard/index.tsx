@@ -1,5 +1,6 @@
 import { usePet } from "@/hooks/user/pet/pet.hook";
 import { Pet } from "@/types/user/interface";
+import './style.css';
 
 interface Props {
   pet: Pet;

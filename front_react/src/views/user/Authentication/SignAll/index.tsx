@@ -19,7 +19,7 @@ export default function Authentication() {
 
         //함수 : 인증 함수 처리 
         const {
-            formData, formChange, errors, refForms, 
+            formData, formChange, refForms, 
             // 데이터 값/데이터변화값/오류처리값/DOM참조 값
             onInputChange, togglePasswordType, resetForm,
             //기입이벤트 /비번,텍스트 타입 이벤트처리 / view이동 시 초기화 
@@ -59,10 +59,10 @@ export default function Authentication() {
                             </div>
                         </div>
                         <InputBox ref={refForms.email} label='이메일주소' type='text' placeholder='이메일 주소를 입력해주세요.' 
-                                  error={errors.email.state} name='email' value={formData.email} onChange={onInputChange} 
+                                  error={false} name='email' value={formData.email} onChange={onInputChange} 
                                   onkeyDown={(event) => onKeyDown(event, 'password')}/>
                         <InputBox ref={refForms.password} label='패스워드' type={formChange.passwordType} placeholder='비밀번호를 입력해주세요.' 
-                                  error={errors.password.state} name='password' value={formData.password} onChange={onInputChange} 
+                                  error={false} name='password' value={formData.password} onChange={onInputChange} 
                                   icon={formChange.passwordIcon} onButtonClick={() => togglePasswordType('pw')} 
                                   onkeyDown={(event) => onKeyDown(event, undefined , onSignInButtonClickHandler )}/>
                     </div>

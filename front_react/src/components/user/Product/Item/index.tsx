@@ -2,14 +2,14 @@ import Product from "@/types/user/interface/product.interface";
 
 
 interface Props {
-    props : Product;
+    product : Product;
 }
 
 //컴포넌트 : 제품
-export default function ProductCard({ props }: Props) {
+export default function ProductCard({ product }: Props) {
 
     //속성 : 제품
-    const { categoryName, name, description, price, thumbnailUrl} = props;
+    const { categoryName, name, description, price, thumbnailUrl} = product;
 
 
     //렌더 : 제품

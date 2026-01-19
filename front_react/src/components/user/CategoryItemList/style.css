@@ -1,91 +1,131 @@
-/* 1. 최외곽: 메인 가이드 (1200px 정중앙) */
-.mega-menu-viewport {
+
+
+/* 1. 최외곽 뷰포트: 전체 카테고리의 기준점 */
+.category-view-box {
     position: relative;
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
     height: 60px;
-    z-index: 2000;
+    background: #fff;
+    z-index: 5000; 
 }
 
-/* 2. 대분류 창문 및 레일 */
-.rail-window {
+/* 2. 대분류 슬라이드 레일 통로 */
+.category-large-control-box {
     width: 100%;
     height: 100%;
-    overflow: hidden;
+    /* 📌 세로로 소분류가 나와야 하므로 hidden을 풀고 보이게 설정 */
+    overflow: visible !important; 
     position: relative;
 }
 
-.mega-menu-rail {
+.category-main-box {
     display: flex;
     width: max-content;
     height: 100%;
     transition: transform 0.5s cubic-bezier(0.25, 1, 0.2, 1);
+    position: relative;
 }
 
-/* 3. 대분류 기둥: 정렬 수정 */
-.category-column {
-    flex: 0 0 140px; /* 기둥 너비 유지 */
+/* 3. 대분류 기둥: 소분류가 세로로 정렬될 기준점 */
+.category-large-input-box {
+    flex: 0 0 140px; 
     display: flex;
+    flex-direction: column; /* 📌 세로 정렬 구조로 변경 */
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    position: relative; /* 📌 다시 relative를 줘서 호버 인식을 정확하게 함 */
+    /* 📌 소분류가 해당 대분류 바로 아래에 뜨려면 relative여야 함 */
+    position: relative !important; 
 }
 
-.main-item-name {
+.category-large-name {
     font-size: 16px;
     font-weight: 700;
     color: #333;
     white-space: nowrap;
+    transition: color 0.2s;
 }
 
-/* 4. 🚨 소분류 판넬: 1200px 풀 너비 + 중앙 박제 */
-.sub-menu-drop {
-    display: none;
-    position: fixed; /* 📌 레일의 움직임을 무시하고 브라우저에 박제 */
+/* 4. 소분류 판넬: 세로형 리스트 디자인 */
+.category-small-box {
+    display: none; /* 호버 전까지 숨김 */
+    position: absolute !important; 
     
-    /* 📌 1200px 가이드라인에 맞추는 마법의 공식 */
-    top: 155px; /* 헤더 높이에 맞춰 미세 조정하세요 (이미지 기준 약 155px) */
-    left: 50%;
-    transform: translateX(-50%); 
+    /* 📌 대분류 바로 아래 중앙 정렬 */
+    top: 60px !important; 
+    left: 50% !important;
+    transform: translateX(-50%) !important; 
     
-    width: 1200px; /* 📌 찌부러진 너비를 1200px로 강제 복구 */
-    background: #ffffff;
-    border-top: 1px solid #eee;
-    border-bottom: 2px solid #ff8e0b; /* 오렌지 포인트 복구 */
-    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
-    z-index: 999999;
+    min-width: 160px; /* 세로형일 때 글자가 안 겹치도록 너비 확보 */
+    background: #ffffff !important;
+    border: 1px solid #f0f0f0 !important;
+    border-bottom: 3px solid #ff8e0b !important; /* 시그니처 오렌지 */
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+    
+    z-index: 9999 !important;
+    padding: 10px 0 !important;
 }
 
-/* 5. 소분류 내부: 가로 정렬 복구 */
-.sub-menu-inner {
-    width: 100%;
-    padding: 25px 0;
+/* 5. 소분류 내부 아이템: 세로 리스트 정렬 */
+.category-small-input-box {
     display: flex;
-    justify-content: center; /* 소분류들을 가로로 중앙 정렬 */
-    gap: 40px; /* 아이템 간격 시원하게 */
+    flex-direction: column; /* 📌 가로 gap 대신 세로 나열 */
+    width: 100%;
+    margin: 0 auto;
+    padding: 0;
 }
 
-.sub-item-text {
+.category-small-name {
+    padding: 12px 20px; /* 클릭 영역 확보 */
     font-size: 14px;
     color: #666;
     white-space: nowrap;
-    cursor: pointer;
     font-weight: 500;
+    cursor: pointer;
+    text-align: center;
     transition: all 0.2s;
 }
 
-.sub-item-text:hover {
+.category-small-name:hover {
+    background-color: #fff9f2; /* 연한 오렌지 배경 */
     color: #ff8e0b;
-    font-weight: bold;
+    font-weight: 700;
 }
 
-/* 6. 호버 시 노출 */
-.category-column:hover .sub-menu-drop {
+/* 6. 호버 및 액션 로직 */
+.category-large-input-box:hover .category-small-box {
     display: block !important;
 }
 
-.category-column:hover .main-item-name {
+.category-large-input-box:hover .category-large-name {
     color: #ff8e0b;
+}
+
+/* 7. 네비게이션 버튼: 글자 가리지 않게 영역 밖으로 밀기 */
+.category-large-left-box,
+.category-large-right-box {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 32px;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 50%;
+    z-index: 6000;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.category-large-left-box { left: -45px; }
+.category-large-right-box { right: -45px; }
+
+.arrow {
+    color: #ff8e0b;
+    font-weight: bold;
 }

@@ -10,6 +10,7 @@ export const productQueries = {
         return useQuery({
             queryKey: productKeys.list(params),
             queryFn: () => getProductListRequest(params),
+            select: (data) => data.productList,
         });
     },
 
