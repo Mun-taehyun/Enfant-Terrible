@@ -5,6 +5,9 @@ public enum OrderStatus {
   ORDERED,
   PAYMENT_PENDING,
   PAID,
+  PARTIALLY_CANCELLED,
+  SHIPPING,
+  DELIVERED,
   CANCELLED;
 
   public static OrderStatus from(String value) {

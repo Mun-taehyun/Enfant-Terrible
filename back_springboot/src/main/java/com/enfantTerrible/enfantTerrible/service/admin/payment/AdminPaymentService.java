@@ -84,8 +84,9 @@ public class AdminPaymentService {
       throw new BusinessException("주문을 찾을 수 없습니다.");
     }
 
-    if (order.getOrderStatus() != OrderStatus.PAID) {
-      throw new BusinessException("환불할 수 없는 주문 상태입니다.");
+    // 환불은 배송완료 후에만 가능
+    if (order.getOrderStatus() != OrderStatus.DELIVERED) {
+      throw new BusinessException("배송완료 후에만 환불할 수 있습니다.");
     }
 
     // PortOne 결제 취소

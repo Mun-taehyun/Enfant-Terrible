@@ -31,6 +31,46 @@ public class PointService {
     return res;
   }
 
+  public void revokeEarnForOrderPartially(Long userId, Long orderId, Long cancelledAmount) {
+    if (userId == null || orderId == null || cancelledAmount == null) {
+      return;
+    }
+
+    Integer earned = pointHistoryMapper.sumEarnForOrder(userId, orderId);
+    if (earned == null || earned <= 0) {
+      return;
+    }
+
+    Integer revoked = pointHistoryMapper.sumRevokedForOrder(userId, orderId);
+    int alreadyRevoked = revoked == null ? 0 : revoked;
+
+    int shouldRevokeTotal = (int) (cancelledAmount / 10);
+    if (shouldRevokeTotal <= 0) {
+      return;
+    }
+
+    int cappedShouldRevokeTotal = Math.min(shouldRevokeTotal, earned);
+    int delta = cappedShouldRevokeTotal - alreadyRevoked;
+    if (delta <= 0) {
+      return;
+    }
+
+    // 사용자 포인트 잔액 부족 시 회수 불가
+    int balance = pointHistoryMapper.sumBalanceForUpdate(userId);
+    if (balance < delta) {
+      throw new BusinessException("포인트가 부족하여 회수할 수 없습니다.");
+    }
+
+    pointHistoryMapper.insert(
+        userId,
+        -delta,
+        PointType.ADJUST.name(),
+        "주문 부분취소 회수",
+        "ORDER",
+        orderId
+    );
+  }
+
   @Transactional(readOnly = true)
   public List<PointHistoryResponse> getMyHistory(Long userId, Integer pageParam, Integer sizeParam) {
 

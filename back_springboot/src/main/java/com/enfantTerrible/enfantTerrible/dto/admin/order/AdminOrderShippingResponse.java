@@ -7,18 +7,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class AdminOrderListResponse {
+public class AdminOrderShippingResponse {
 
   private Long orderId;
-  private Long userId;
-  private String orderCode;
   private String status;
-  private Long totalAmount;
-
-  private String receiverName;
-  private String receiverPhone;
 
   private String trackingNumber;
   private LocalDateTime shippedAt;
-  private LocalDateTime deliveredAt;
 }

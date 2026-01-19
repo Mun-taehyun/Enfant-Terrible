@@ -1,5 +1,7 @@
 package com.enfantTerrible.enfantTerrible.mapper.order;
 
+import java.time.LocalDateTime;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -29,5 +31,24 @@ public interface OrderMapper {
   int updateOrderStatus(
       @Param("orderId") Long orderId,
       @Param("orderStatus") String orderStatus
+  );
+
+  int updateStatusAndTotalAmount(
+      @Param("orderId") Long orderId,
+      @Param("orderStatus") String orderStatus,
+      @Param("totalAmount") Long totalAmount
+  );
+
+  int startShipping(
+      @Param("orderId") Long orderId,
+      @Param("trackingNumber") String trackingNumber,
+      @Param("shippedAt") LocalDateTime shippedAt,
+      @Param("orderStatus") String orderStatus
+  );
+
+  int markDeliveredIfShippedBefore(
+      @Param("cutoff") LocalDateTime cutoff,
+      @Param("orderStatus") String orderStatus,
+      @Param("deliveredAt") LocalDateTime deliveredAt
   );
 }

@@ -14,6 +14,8 @@ public interface PaymentMapper {
 
   PaymentRow findLatestByOrderId(@Param("orderId") Long orderId);
 
+  PaymentRow findLatestSuccessByOrderId(@Param("orderId") Long orderId);
+
   int updateStatus(
       @Param("paymentId") Long paymentId,
       @Param("paymentStatus") String paymentStatus,

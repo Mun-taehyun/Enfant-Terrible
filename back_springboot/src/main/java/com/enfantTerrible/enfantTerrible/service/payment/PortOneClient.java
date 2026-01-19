@@ -15,7 +15,7 @@ public class PortOneClient {
   private final RestClient restClient;
 
   public PortOneClient(
-      @Value("${portone.api-secret}") String apiSecret
+      @Value("${portone.api-secret:}") String apiSecret
   ) {
     this.restClient = RestClient.builder()
         .baseUrl("https://api.portone.io")

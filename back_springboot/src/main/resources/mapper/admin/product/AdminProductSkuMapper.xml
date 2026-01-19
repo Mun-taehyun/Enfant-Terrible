@@ -48,6 +48,14 @@
       AND s.deleted_at IS NULL
   </select>
 
+  <select id="findSkuIdsByProductId" resultType="long">
+    SELECT s.sku_id
+    FROM et_product_sku s
+    WHERE s.product_id = #{productId}
+      AND s.deleted_at IS NULL
+    ORDER BY s.sku_id ASC
+  </select>
+
   <!-- ⭐ generatedKeys로 skuId 받기 -->
   <insert id="insertInternal" useGeneratedKeys="true" keyProperty="skuId">
     INSERT INTO et_product_sku (

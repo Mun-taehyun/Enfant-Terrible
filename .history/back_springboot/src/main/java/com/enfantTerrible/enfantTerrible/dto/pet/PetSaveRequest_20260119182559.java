@@ -3,6 +3,7 @@ package com.enfantTerrible.enfantTerrible.dto.pet;
 import com.enfantTerrible.enfantTerrible.common.enums.PetGender;
 import com.enfantTerrible.enfantTerrible.common.enums.PetSpecies;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

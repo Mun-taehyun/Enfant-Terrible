@@ -2,6 +2,7 @@ package com.enfantTerrible.enfantTerrible.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -44,19 +45,25 @@ public class SecurityConfig {
 
       // URL 권한 설정
       .authorizeHttpRequests(auth -> auth
-        // 인증 없이 접근
+        // 인증 없이 접근 (로그인/이메일 인증/비밀번호 재설정 등)
         .requestMatchers(
           "/api/auth/**",
-          "/api/users/signup",
-          "/api/users/password/reset",
           "/oauth2/**",
           "/login/oauth2/**",
-          "/api/categories/**",
-          "/api/posts/**",
-          "/api/banners/**",
-          "/api/popups/**",
           "/ws/**"
         ).permitAll()
+
+        // 인증 없이 접근 (쇼핑몰 공개 조회)
+        .requestMatchers(HttpMethod.GET,
+          "/api/categories/**",
+          "/api/products/**",
+          "/api/posts/**",
+          "/api/banners/**",
+          "/api/popups/**"
+        ).permitAll()
+
+        // 회원가입은 인증 없이 허용
+        .requestMatchers(HttpMethod.POST, "/api/users/signup").permitAll()
 
         // 관리자
         .requestMatchers("/api/admin/**").hasRole("ADMIN")

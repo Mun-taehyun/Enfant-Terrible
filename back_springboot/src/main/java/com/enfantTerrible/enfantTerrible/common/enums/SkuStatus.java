@@ -21,6 +21,9 @@ public enum SkuStatus {
   }
 
   public static SkuStatus from(String value) {
+    if (value != null && "OFF_SALE".equalsIgnoreCase(value.trim())) {
+      return STOPPED;
+    }
     return Arrays.stream(values())
         .filter(v -> v.name().equals(value))
         .findFirst()

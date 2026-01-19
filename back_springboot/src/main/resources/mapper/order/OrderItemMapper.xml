@@ -21,4 +21,37 @@
     )
   </insert>
 
+  <select id="findByOrderId" resultType="com.enfantTerrible.enfantTerrible.dto.order.OrderItemRow">
+    SELECT
+      order_id,
+      sku_id,
+      product_name,
+      price,
+      quantity,
+      cancelled_quantity
+    FROM et_order_item
+    WHERE order_id = #{orderId}
+    ORDER BY sku_id ASC
+  </select>
+
+  <update id="increaseCancelledQuantity">
+    UPDATE et_order_item
+    SET cancelled_quantity = cancelled_quantity + #{cancelQty}
+    WHERE order_id = #{orderId}
+      AND sku_id = #{skuId}
+      AND cancelled_quantity + #{cancelQty} &lt;= quantity
+  </update>
+
+  <select id="sumRemainingAmount" resultType="long">
+    SELECT COALESCE(SUM(price * (quantity - cancelled_quantity)), 0)
+    FROM et_order_item
+    WHERE order_id = #{orderId}
+  </select>
+
+  <select id="sumCancelledAmount" resultType="long">
+    SELECT COALESCE(SUM(price * cancelled_quantity), 0)
+    FROM et_order_item
+    WHERE order_id = #{orderId}
+  </select>
+
 </mapper>

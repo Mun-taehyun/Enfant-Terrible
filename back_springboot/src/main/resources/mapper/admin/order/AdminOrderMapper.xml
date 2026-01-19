@@ -29,7 +29,10 @@
       o.status,
       o.total_amount,
       o.receiver_name,
-      o.receiver_phone
+      o.receiver_phone,
+      o.tracking_number,
+      o.shipped_at,
+      o.delivered_at
     FROM et_order o
     <include refid="adminOrderWhere" />
     ORDER BY o.order_id DESC
@@ -53,7 +56,10 @@
       o.receiver_phone,
       o.zip_code,
       o.address_base,
-      o.address_detail
+      o.address_detail,
+      o.tracking_number,
+      o.shipped_at,
+      o.delivered_at
     FROM et_order o
     WHERE o.order_id = #{orderId}
   </select>
@@ -63,7 +69,9 @@
       oi.sku_id,
       oi.product_name,
       oi.price,
-      oi.quantity
+      oi.quantity,
+      oi.cancelled_quantity,
+      (oi.quantity - oi.cancelled_quantity) AS remaining_quantity
     FROM et_order_item oi
     WHERE oi.order_id = #{orderId}
     ORDER BY oi.sku_id ASC

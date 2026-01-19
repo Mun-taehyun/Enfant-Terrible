@@ -13,4 +13,11 @@
       AND stock >= #{quantity}
   </update>
 
+  <update id="increaseStock">
+    UPDATE et_product_sku
+    SET stock = stock + #{quantity}
+    WHERE sku_id = #{skuId}
+      AND deleted_at IS NULL
+  </update>
+
 </mapper>

@@ -40,6 +40,24 @@
     LIMIT 1
   </select>
 
+  <select id="findLatestSuccessByOrderId" resultType="com.enfantTerrible.enfantTerrible.dto.payment.PaymentRow">
+    SELECT
+      payment_id,
+      order_id,
+      payment_method,
+      payment_amount,
+      payment_status,
+      pg_tid,
+      paid_at,
+      created_at,
+      updated_at
+    FROM et_payment
+    WHERE order_id = #{orderId}
+      AND payment_status = 'SUCCESS'
+    ORDER BY payment_id DESC
+    LIMIT 1
+  </select>
+
   <update id="updateStatus">
     UPDATE et_payment
     SET

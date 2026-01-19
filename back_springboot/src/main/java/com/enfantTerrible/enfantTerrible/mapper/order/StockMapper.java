@@ -10,4 +10,9 @@ public interface StockMapper {
       @Param("skuId") Long skuId,
       @Param("quantity") Integer quantity
   );
+
+  int increaseStock(
+      @Param("skuId") Long skuId,
+      @Param("quantity") Integer quantity
+  );
 }

@@ -4,7 +4,9 @@ import org.springframework.web.bind.annotation.*;
 
 import com.enfantTerrible.enfantTerrible.common.response.ApiResponse;
 import com.enfantTerrible.enfantTerrible.common.response.AdminPageResponse;
-import com.enfantTerrible.enfantTerrible.dto.admin.product.*;
+import com.enfantTerrible.enfantTerrible.dto.admin.product.AdminSkuListRequest;
+import com.enfantTerrible.enfantTerrible.dto.admin.product.AdminSkuResponse;
+import com.enfantTerrible.enfantTerrible.dto.admin.product.AdminSkuSaveRequest;
 import com.enfantTerrible.enfantTerrible.service.admin.product.AdminProductSkuService;
 
 import jakarta.validation.Valid;
@@ -37,14 +39,6 @@ public class AdminProductSkuController {
     );
   }
 
-  @PostMapping
-  public ApiResponse<Void> create(
-      @Valid @RequestBody AdminSkuSaveRequest req
-  ) {
-    skuService.create(req);
-    return ApiResponse.successMessage("SKU 등록 성공");
-  }
-
   @PutMapping("/{skuId}")
   public ApiResponse<Void> update(
       @PathVariable Long skuId,
@@ -52,13 +46,5 @@ public class AdminProductSkuController {
   ) {
     skuService.update(skuId, req);
     return ApiResponse.successMessage("SKU 수정 성공");
-  }
-
-  @DeleteMapping("/{skuId}")
-  public ApiResponse<Void> delete(
-      @PathVariable Long skuId
-  ) {
-    skuService.delete(skuId);
-    return ApiResponse.successMessage("SKU 삭제 성공");
   }
 }

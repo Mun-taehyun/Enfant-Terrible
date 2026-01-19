@@ -33,6 +33,16 @@ public interface PointHistoryMapper {
       @Param("orderId") Long orderId
   );
 
+  Integer sumEarnForOrder(
+      @Param("userId") Long userId,
+      @Param("orderId") Long orderId
+  );
+
+  Integer sumRevokedForOrder(
+      @Param("userId") Long userId,
+      @Param("orderId") Long orderId
+  );
+
   List<PointHistoryRow> findByUserId(
       @Param("userId") Long userId,
       @Param("size") int size,

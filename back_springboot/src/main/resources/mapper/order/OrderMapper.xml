@@ -61,4 +61,31 @@
     WHERE order_id = #{orderId}
   </update>
 
+  <update id="updateStatusAndTotalAmount">
+    UPDATE et_order
+    SET
+      status = #{orderStatus},
+      total_amount = #{totalAmount}
+    WHERE order_id = #{orderId}
+  </update>
+
+  <update id="startShipping">
+    UPDATE et_order
+    SET
+      status = #{orderStatus},
+      tracking_number = #{trackingNumber},
+      shipped_at = #{shippedAt}
+    WHERE order_id = #{orderId}
+  </update>
+
+  <update id="markDeliveredIfShippedBefore">
+    UPDATE et_order
+    SET
+      status = #{orderStatus},
+      delivered_at = #{deliveredAt}
+    WHERE status = 'SHIPPING'
+      AND shipped_at IS NOT NULL
+      AND shipped_at &lt;= #{cutoff}
+  </update>
+
 </mapper>

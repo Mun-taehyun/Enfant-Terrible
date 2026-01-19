@@ -59,6 +59,25 @@
     )
   </select>
 
+  <select id="sumEarnForOrder" resultType="int">
+    SELECT COALESCE(SUM(point_amount), 0)
+    FROM et_point_history
+    WHERE user_id = #{userId}
+      AND ref_type = 'ORDER'
+      AND ref_id = #{orderId}
+      AND point_type = 'EARN'
+  </select>
+
+  <select id="sumRevokedForOrder" resultType="int">
+    SELECT COALESCE(SUM(-point_amount), 0)
+    FROM et_point_history
+    WHERE user_id = #{userId}
+      AND ref_type = 'ORDER'
+      AND ref_id = #{orderId}
+      AND point_type = 'ADJUST'
+      AND point_amount &lt; 0
+  </select>
+
   <select id="findByUserId" resultType="com.enfantTerrible.enfantTerrible.dto.point.PointHistoryRow">
     SELECT
       point_history_id,
