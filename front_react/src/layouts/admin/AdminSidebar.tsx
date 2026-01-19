@@ -17,7 +17,6 @@ const ADMIN_NAV: AdminNavSection[] = [
   {
     title: "상품 제어",
     items: [
-      { label: "상품 진열", to: "/admin/products/display" },
       { label: "상품 관리", to: "/admin/products/manage" },
     ],
   },

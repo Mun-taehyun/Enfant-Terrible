@@ -3,7 +3,11 @@ import { useMemo, useState } from "react";
 import styles from "./sales.view.module.css";
 
 import { useAdminAmount, useAdminAmountDaily } from "@/hooks/admin/adminSales.hook";
-import type { AdminSalesRange } from "@/types/admin/sales";
+import type {
+  AdminSalesRange,
+  AdminAmountDailyItem,
+  AdminAmountSummary,
+} from "@/types/admin/sales";
 
 function pad2(n: number) {
   return String(n).padStart(2, "0");
@@ -37,8 +41,10 @@ export default function SalesView() {
   const amountQuery = useAdminAmount(range);
   const dailyQuery = useAdminAmountDaily(range);
 
-  const summary = amountQuery.data;
-  const daily = dailyQuery.data ?? [];
+  const summary = amountQuery.data as AdminAmountSummary | undefined;
+
+  // ✅ any 금지: 공용 타입 사용
+  const daily = (dailyQuery.data ?? []) as AdminAmountDailyItem[];
 
   // 백엔드 필드명이 totalAmount/amount 중 뭐가 와도 표시되게 처리
   const totalAmount =
@@ -54,6 +60,12 @@ export default function SalesView() {
       : typeof summary?.count === "number"
         ? summary.count
         : undefined;
+
+  // ✅ 오늘 버튼 (오늘 하루)
+  const onClickToday = () => {
+    const d = toYmdLocal(new Date());
+    setRange({ from: d, to: d });
+  };
 
   const onClick7days = () => {
     const to = toYmdLocal(new Date());
@@ -79,9 +91,14 @@ export default function SalesView() {
         <h1 className={styles.title}>쇼핑몰 매출 확인</h1>
 
         <div className={styles.controls}>
+          <button type="button" className={styles.btn} onClick={onClickToday}>
+            오늘
+          </button>
+
           <button type="button" className={styles.btn} onClick={onClick7days}>
             최근 7일
           </button>
+
           <button type="button" className={styles.btn} onClick={onClick30days}>
             최근 30일
           </button>

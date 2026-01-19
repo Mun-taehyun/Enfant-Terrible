@@ -7,8 +7,13 @@
       "password": "1234",
       "name": "관리자",
       "role": "ADMIN",
-      "status": "ㅌㅌㅌㅌ",
-      "email": "admin@enfant-terrible.com"
+      "status": "ACTIVE",
+      "email": "admin@enfant-terrible.com",
+      "tel": "010-1000-0001",
+      "zipCode": "08500",
+      "addressBase": "서울특별시 금천구 가산디지털1로",
+      "addressDetail": "101동 1001호",
+      "lastLoginAt": "2026-01-18T10:00:00+09:00"
     },
     {
       "id": 2,
@@ -17,8 +22,13 @@
       "password": "1234",
       "name": "김하늘",
       "role": "USER",
-      "status": "ACTIVE",
-      "email": "user02@enfant-terrible.com"
+      "status": "SUSPENDED",
+      "email": "user02@enfant-terrible.com",
+      "tel": "010-1000-0002",
+      "zipCode": "08501",
+      "addressBase": "서울특별시 금천구 시흥대로",
+      "addressDetail": "202동 202호",
+      "lastLoginAt": "2026-01-17T14:20:00+09:00"
     },
     {
       "id": 3,
@@ -27,8 +37,13 @@
       "password": "1234",
       "name": "이준호",
       "role": "USER",
-      "status": "ACTIVE",
-      "email": "user03@enfant-terrible.com"
+      "status": "SUSPENDED",
+      "email": "user03@enfant-terrible.com",
+      "tel": "010-1000-0003",
+      "zipCode": "08502",
+      "addressBase": "서울특별시 금천구 디지털로",
+      "addressDetail": "303동 303호",
+      "lastLoginAt": "2026-01-10T09:10:00+09:00"
     },
     {
       "id": 4,
@@ -37,8 +52,13 @@
       "password": "1234",
       "name": "박지은",
       "role": "USER",
-      "status": "SUSPENDED",
-      "email": "user04@enfant-terrible.com"
+      "status": "ACTIVE",
+      "email": "user04@enfant-terrible.com",
+      "tel": "010-1000-0004",
+      "zipCode": "08503",
+      "addressBase": "서울특별시 금천구 독산로",
+      "addressDetail": "404동 404호",
+      "lastLoginAt": null
     },
     {
       "id": 5,
@@ -47,8 +67,13 @@
       "password": "1234",
       "name": "최민수",
       "role": "USER",
-      "status": "ACTIVE",
-      "email": "user05@enfant-terrible.com"
+      "status": "SUSPENDED",
+      "email": "user05@enfant-terrible.com",
+      "tel": "010-1000-0005",
+      "zipCode": "08504",
+      "addressBase": "서울특별시 금천구 벚꽃로",
+      "addressDetail": "505동 505호",
+      "lastLoginAt": "2026-01-18T20:30:00+09:00"
     },
     {
       "id": 6,
@@ -57,164 +82,16 @@
       "password": "1234",
       "name": "정수빈",
       "role": "USER",
-      "status": "WITHDRAWN",
-      "email": "user06@enfant-terrible.com"
-    },
-    {
-      "id": 7,
-      "userId": 7,
-      "username": "user07",
-      "password": "1234",
-      "name": "한예린",
-      "role": "USER",
       "status": "ACTIVE",
-      "email": "user07@enfant-terrible.com"
-    },
-    {
-      "id": 8,
-      "userId": 8,
-      "username": "user08",
-      "password": "1234",
-      "name": "오지훈",
-      "role": "USER",
-      "status": "ACTIVE",
-      "email": "user08@enfant-terrible.com"
-    },
-    {
-      "id": 9,
-      "userId": 9,
-      "username": "user09",
-      "password": "1234",
-      "name": "윤서연",
-      "role": "USER",
-      "status": "SUSPENDED",
-      "email": "user09@enfant-terrible.com"
-    },
-    {
-      "id": 10,
-      "userId": 10,
-      "username": "user10",
-      "password": "1234",
-      "name": "임도현",
-      "role": "USER",
-      "status": "ACTIVE",
-      "email": "user10@enfant-terrible.com"
-    },
-    {
-      "id": 11,
-      "userId": 11,
-      "username": "user11",
-      "password": "1234",
-      "name": "서지우",
-      "role": "USER",
-      "status": "ACTIVE",
-      "email": "user11@enfant-terrible.com"
-    },
-    {
-      "id": 12,
-      "userId": 12,
-      "username": "user12",
-      "password": "1234",
-      "name": "조현우",
-      "role": "USER",
-      "status": "ACTIVE",
-      "email": "user12@enfant-terrible.com"
-    },
-    {
-      "id": 13,
-      "userId": 13,
-      "username": "user13",
-      "password": "1234",
-      "name": "문채원",
-      "role": "USER",
-      "status": "ACTIVE",
-      "email": "user13@enfant-terrible.com"
-    },
-    {
-      "id": 14,
-      "userId": 14,
-      "username": "user14",
-      "password": "1234",
-      "name": "장민재",
-      "role": "USER",
-      "status": "ACTIVE",
-      "email": "user14@enfant-terrible.com"
-    },
-    {
-      "id": 15,
-      "userId": 15,
-      "username": "user15",
-      "password": "1234",
-      "name": "백지수",
-      "role": "USER",
-      "status": "ㅌㅌㅌㅌㅌㅌ",
-      "email": "user15@enfant-terrible.com"
+      "email": "user06@enfant-terrible.com",
+      "tel": "010-1000-0006",
+      "zipCode": "08505",
+      "addressBase": "서울특별시 금천구 금하로",
+      "addressDetail": "606동 606호",
+      "lastLoginAt": "2026-01-16T08:45:00+09:00"
     }
   ],
   "amountDaily": [
-    {
-      "date": "2026-01-01",
-      "orderCount": 11,
-      "refundCount": 0,
-      "totalAmount": 540000,
-      "completedDeliveryCount": 7
-    },
-    {
-      "date": "2026-01-02",
-      "orderCount": 14,
-      "refundCount": 1,
-      "totalAmount": 690000,
-      "completedDeliveryCount": 12
-    },
-    {
-      "date": "2026-01-03",
-      "orderCount": 9,
-      "refundCount": 0,
-      "totalAmount": 410000,
-      "completedDeliveryCount": 6
-    },
-    {
-      "date": "2026-01-04",
-      "orderCount": 16,
-      "refundCount": 0,
-      "totalAmount": 820000,
-      "completedDeliveryCount": 13
-    },
-    {
-      "date": "2026-01-05",
-      "orderCount": 18,
-      "refundCount": 1,
-      "totalAmount": 1020000,
-      "completedDeliveryCount": 15
-    },
-    {
-      "date": "2026-01-06",
-      "orderCount": 13,
-      "refundCount": 0,
-      "totalAmount": 590000,
-      "completedDeliveryCount": 10
-    },
-    {
-      "date": "2026-01-07",
-      "orderCount": 17,
-      "refundCount": 1,
-      "totalAmount": 980000,
-      "completedDeliveryCount": 14
-    },
-    {
-      "date": "2026-01-08",
-      "orderCount": 21,
-      "refundCount": 0,
-      "totalAmount": 1320000,
-      "completedDeliveryCount": 18
-    },
-    {
-      "date": "2026-01-09",
-      "orderCount": 19,
-      "refundCount": 1,
-      "totalAmount": 1210000,
-      "completedDeliveryCount": 16
-    },
     {
       "date": "2026-01-10",
       "orderCount": 22,
@@ -235,70 +112,79 @@
       "refundCount": 0,
       "totalAmount": 1290000,
       "completedDeliveryCount": 17
-    },
-    {
-      "date": "2026-01-13",
-      "orderCount": 18,
-      "refundCount": 1,
-      "totalAmount": 1100000,
-      "completedDeliveryCount": 14
-    },
-    {
-      "date": "2026-01-14",
-      "orderCount": 21,
-      "refundCount": 1,
-      "totalAmount": 1364000,
-      "completedDeliveryCount": 15
     }
   ],
   "orders": [
     {
       "id": 1001,
-      "orderCode": "ET20260101-0001",
-      "orderedAt": "2026-01-01T10:15:00+09:00",
+      "orderCode": "ET20260110-0001",
+      "orderedAt": "2026-01-10T10:15:00+09:00",
       "status": "PAID",
       "totalAmount": 189000
     },
     {
       "id": 1002,
-      "orderCode": "ET20260101-0002",
-      "orderedAt": "2026-01-01T12:05:00+09:00",
+      "orderCode": "ET20260111-0001",
+      "orderedAt": "2026-01-11T12:05:00+09:00",
       "status": "PAID",
       "totalAmount": 25000
-    },
-    {
-      "id": 1003,
-      "orderCode": "ET20260102-0001",
-      "orderedAt": "2026-01-02T09:40:00+09:00",
-      "status": "REFUNDED",
-      "totalAmount": 88000
     }
   ],
   "categories": [
     {
-      "id": "cat1",
-      "name": "Outerwear",
-      "description": "자켓, 코트, 패딩 등 겉옷"
+      "category_id": 1,
+      "parent_id": null,
+      "name": "상의ㄴ",
+      "depth": 1,
+      "sort_order": 1,
+      "is_active": 1,
+      "created_at": "2026-01-06 09:46:07",
+      "updated_at": "2026-01-19T09:22:52.979Z",
+      "deleted_at": null
     },
     {
-      "id": "cat2",
-      "name": "Tops",
-      "description": "티셔츠, 셔츠, 니트"
+      "category_id": 2,
+      "parent_id": 3,
+      "name": "티셔츠",
+      "depth": 3,
+      "sort_order": 1,
+      "is_active": 1,
+      "created_at": "2026-01-06 09:46:07",
+      "updated_at": "2026-01-19T09:03:06.143Z",
+      "deleted_at": "2026-01-19T09:03:06.143Z"
     },
     {
-      "id": "cat3",
-      "name": "Bottoms",
-      "description": "데님, 슬랙스, 스커트"
+      "category_id": 3,
+      "parent_id": 1,
+      "name": "셔츠",
+      "depth": 2,
+      "sort_order": 2,
+      "is_active": 1,
+      "created_at": "2026-01-06 09:46:07",
+      "updated_at": "2026-01-06 09:46:07",
+      "deleted_at": null
     },
     {
-      "id": "cat4",
-      "name": "Accessories",
-      "description": "가방, 신발, 모자"
+      "category_id": 4,
+      "parent_id": null,
+      "name": "하의",
+      "depth": 1,
+      "sort_order": 3,
+      "is_active": 0,
+      "created_at": "2026-01-06 09:46:07",
+      "updated_at": "2026-01-19T09:00:00.429Z",
+      "deleted_at": null
     },
     {
-      "id": "cat5",
-      "name": "Sale",
-      "description": "시즌 오프 할인 상품"
+      "category_id": 5,
+      "parent_id": 1,
+      "name": "바지",
+      "depth": 2,
+      "sort_order": 3,
+      "is_active": 1,
+      "created_at": "2026-01-19T09:03:00.915Z",
+      "updated_at": "2026-01-19T09:27:22.926Z",
+      "deleted_at": "2026-01-19T09:27:22.926Z"
     }
   ],
   "products": [
@@ -319,24 +205,6 @@
       "stock": 100,
       "img": "https://via.placeholder.com/150",
       "description": "부드러운 촉감의 데일리 면 티셔츠."
-    },
-    {
-      "id": 3,
-      "categoryId": "cat3",
-      "name": "와이드 핏 데님 팬츠",
-      "price": 54000,
-      "stock": 42,
-      "img": "https://via.placeholder.com/150",
-      "description": "트렌디한 실루엣의 와이드 데님입니다."
-    },
-    {
-      "id": 4,
-      "categoryId": "cat4",
-      "name": "레더 크로스백",
-      "price": 88000,
-      "stock": 8,
-      "img": "https://via.placeholder.com/150",
-      "description": "어떤 코디에도 잘 어울리는 가죽 가방입니다."
     }
   ],
   "notices": [
@@ -344,13 +212,7 @@
       "id": 1,
       "title": "신규 회원 가입 이벤트 안내",
       "content": "신규 가입 시 10% 할인 쿠폰을 드립니다.",
-      "date": "2024-05-20"
-    },
-    {
-      "id": 2,
-      "title": "배송 지연 공지",
-      "content": "폭설로 인해 일부 지역 배송이 지연될 수 있습니다.",
-      "date": "2024-05-21"
+      "date": "2026-01-10"
     }
   ]
 }

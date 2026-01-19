@@ -6,6 +6,7 @@ import AdminLayout from "./layouts/admin/AdminLayout";
 import LoginView from "./views/admin/login.view";
 import UsersView from "./views/admin/users.view";
 import SalesView from "./views/admin/sales.view";
+import CategoriesView from "./views/admin/categories.view.tsx"; // ✅ 추가
 
 const isAuthenticated = () => {
   const token = localStorage.getItem("accessToken");
@@ -44,12 +45,11 @@ export default function App() {
         }
       />
 
-      {/* 여기가 레이아웃에 뷰 넣는 곳  */}
       <Route path="/admin" element={<ProtectedAdminLayout />}>
         <Route index element={<SalesView />} />
         <Route path="sales" element={<SalesView />} />
         <Route path="users" element={<UsersView />} />
-        
+        <Route path="categories" element={<CategoriesView />} /> {/* ✅ 추가 */}
       </Route>
 
       <Route path="*" element={<Navigate to="/admin/login" replace />} />

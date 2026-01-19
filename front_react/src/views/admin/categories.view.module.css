@@ -1,0 +1,275 @@
+/* src/views/admin/categories.view.module.css */
+
+.wrap {
+  padding: 16px;
+}
+
+/* 전체 레이아웃: 좌 트리 / 우 상세 */
+.layout {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 12px;
+  padding: 16px;
+  min-height: 560px;
+}
+
+/* 패널 공통 */
+.left,
+.right {
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 좌측 헤더 */
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.subTitle {
+  font-size: 12px;
+  color: #666;
+}
+
+.title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* 좌측 검색 */
+.search {
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  padding: 0 10px;
+  width: 180px;
+  outline: none;
+}
+
+.search:focus {
+  border-color: #999;
+}
+
+/* 버튼 공통 */
+.refresh,
+.retry,
+.btn,
+.btnDanger {
+  height: 34px;
+  border-radius: 8px;
+  padding: 0 10px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  background: #f7f7f7;
+  color: #111;
+  font-size: 13px;
+}
+
+.refresh:hover,
+.retry:hover,
+.btn:hover {
+  background: #f1f1f1;
+}
+
+.btnDanger {
+  border: 1px solid #ccc;
+  background: #fff;
+  width: 100%; /* 삭제 버튼은 한 줄 꽉 차게 */
+}
+
+.btnDanger:hover {
+  background: #f7f7f7;
+}
+
+/* 트리 영역 */
+.treeRoot {
+  list-style: none;
+  margin: 0;
+  padding: 10px;
+  overflow: auto;
+}
+
+.treeEmpty {
+  padding: 12px;
+  border: 1px dashed #ddd;
+  border-radius: 8px;
+  background: #fafafa;
+  color: #666;
+}
+
+/* 노드 */
+.nodeItem {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nodeBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border: 1px solid #e6e6e6;
+  background: #fff;
+  border-radius: 8px;
+  padding: 9px 10px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.nodeBtn:hover {
+  background: #fafafa;
+}
+
+.nodeBtnActive {
+  border-color: #111;
+  background: #fcfcfc;
+}
+
+.nodeName {
+  font-weight: 600;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.nodeMeta {
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
+}
+
+/* 트리 내부 배지 */
+.badgeActive,
+.badgeInactive {
+  font-size: 11px;
+  border-radius: 4px;
+  padding: 2px 6px;
+  border: 1px solid #ddd;
+  background: #fff;
+  color: #111;
+}
+
+.badgeInactive {
+  color: #999;
+}
+
+/* 자식 */
+.nodeChildren {
+  list-style: none;
+  margin: 6px 0 10px 18px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* 우측 */
+.empty {
+  margin: 12px;
+  padding: 12px;
+  border: 1px dashed #ddd;
+  border-radius: 8px;
+  background: #fafafa;
+  color: #666;
+}
+
+.panel {
+  padding: 12px;
+  overflow: auto;
+}
+
+/* 블록들 */
+.block {
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 12px;
+  background: #fff;
+  margin-bottom: 12px;
+}
+
+.blockTitle {
+  font-weight: 700;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ✅ 활성/비활성 버튼 그룹 (간격 조정됨) */
+.btnGroup {
+  display: flex;
+  align-items: center;
+  gap: 24px; /* 버튼과 상태 뱃지 사이를 넉넉히 벌림 */
+}
+
+/* ✅ 상태 표시 뱃지 상세 디자인 */
+.statusBadge {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  min-width: 50px;
+}
+
+.active {
+  background-color: #e6f7ed;
+  color: #1f8b4d;
+  border: 1px solid #b7ebc6;
+}
+
+.inactive {
+  background-color: #fff1f0;
+  color: #f5222d;
+  border: 1px solid #ffa39e;
+}
+
+.input,
+.select {
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  padding: 0 10px;
+  outline: none;
+  flex: 1;
+  font-size: 13px;
+}
+
+.input:focus,
+.select:focus {
+  border-color: #999;
+}
+
+.blockDanger {
+  margin-top: 16px;
+  border-top: 1px solid #eee;
+  padding-top: 16px;
+}
+

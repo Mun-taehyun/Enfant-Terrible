@@ -1,136 +1,237 @@
 // src/views/admin/users.view.tsx
-import { useState } from 'react';
 
-import styles from './users.view.module.css';
+import { useState } from "react";
+import styles from "./users.view.module.css";
 
-import { useAdminUsers, useAdminUserDetail, useAdminUserStatusUpdate } from '../../hooks/admin/adminUsers.hook';
-import type { AdminUserId } from '../../types/admin/user';
+import {
+  useAdminUsers,
+  useAdminUserDetail,
+  useAdminUserStatusUpdate,
+} from "../../hooks/admin/adminUsers.hook";
+
+import type { AdminUserId, AdminUserListItem } from "../../types/admin/user";
+import {
+  ADMIN_USER_STATUS_LABEL,
+  ADMIN_USER_STATUS_OPTIONS,
+  type AdminUserStatus,
+} from "../../types/admin/user";
+
+/**
+ * 상세 정보의 각 행을 렌더링하는 컴포넌트
+ */
+function InfoRow({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | null | undefined;
+}) {
+  return (
+    <div className={styles.infoRow}>
+      <div className={styles.labelCell}>{label}</div>
+      <div className={styles.valueCell}>
+        <span className={styles.displayText}>{value ? value : "-"}</span>
+      </div>
+      <div className={styles.actionCell} />
+    </div>
+  );
+}
+
+/**
+ * 유저 상태 타입 가드
+ */
+function isAdminUserStatus(v: unknown): v is AdminUserStatus {
+  return v === "ACTIVE" || v === "SUSPENDED" || v === "WITHDRAWN";
+}
+
+/**
+ * 계정 상태 변경 행을 렌더링하는 컴포넌트
+ */
+function StatusRow({
+  status,
+  disabled,
+  onChange,
+}: {
+  status: AdminUserStatus;
+  disabled: boolean;
+  onChange: (next: AdminUserStatus) => void;
+}) {
+  return (
+    <div className={styles.infoRow}>
+      <div className={styles.labelCell}>계정상태</div>
+
+      <div className={styles.valueCell}>
+        <select
+          className={styles.statusSelect}
+          value={status}
+          disabled={disabled}
+          onChange={(e) => {
+            const next = e.target.value;
+            if (isAdminUserStatus(next)) onChange(next);
+          }}
+        >
+          {ADMIN_USER_STATUS_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+
+        <div className={styles.statusHint}>
+          현재: {ADMIN_USER_STATUS_LABEL[status]} ({status})
+        </div>
+      </div>
+
+      <div className={styles.actionCell} />
+    </div>
+  );
+}
 
 export default function UsersView() {
-  const [page, setPage] = useState<number>(0);
+  const [page, setPage] = useState(1);
   const [selectedUserId, setSelectedUserId] = useState<AdminUserId | null>(null);
-  const [status, setStatus] = useState<string>('');
 
-  // 1) 목록 조회
-  const usersQuery = useAdminUsers({ page, size: 20 });
+  const PAGE_SIZE = 10;
 
-  // 2) 상세 조회(선택된 경우만 로드: NaN 방식 유지)
-  const detailUserId = (selectedUserId ?? Number.NaN) as unknown as AdminUserId;
-  const userDetailQuery = useAdminUserDetail(detailUserId);
+  // 1) 리스트 데이터 조회
+  const usersQuery = useAdminUsers({ page, size: PAGE_SIZE });
+  const rows: AdminUserListItem[] = usersQuery.data?.rows ?? [];
 
-  // 3) 상태 변경
-  const statusMutation = useAdminUserStatusUpdate();
+  // 2) 상세 정보 조회
+  const detailQuery = useAdminUserDetail(selectedUserId);
+  const user = detailQuery.data?.user;
 
-  const rows = usersQuery.data?.rows ?? [];
-  const listMessage = usersQuery.data?.message ?? '';
+  // 3) 상태 변경 뮤테이션
+  const updateMutation = useAdminUserStatusUpdate();
 
-  const user = userDetailQuery.data?.user;
-  const detailMessage = userDetailQuery.data?.message ?? '';
+  // 변경 중 UI에 즉시 반영하기 위한 상태
+  const [optimisticStatus, setOptimisticStatus] = useState<AdminUserStatus | null>(
+    null
+  );
 
-  const onClickPrev = () => setPage((p) => Math.max(0, p - 1));
-  const onClickNext = () => setPage((p) => p + 1);
+  const serverStatus: AdminUserStatus = isAdminUserStatus(user?.status)
+    ? user.status
+    : "ACTIVE";
 
-  const onSelectUser = (userId: AdminUserId) => {
-    setSelectedUserId(userId);
-    setStatus('');
-  };
+  const currentStatus: AdminUserStatus = optimisticStatus ?? serverStatus;
 
-  const onSubmitStatus = async () => {
-    if (selectedUserId === null) return;
-    const next = status.trim();
-    if (!next) return;
+  // 페이징 관련 계산
+  const totalPages =
+    typeof usersQuery.data?.totalPages === "number" && usersQuery.data.totalPages >= 1
+      ? usersQuery.data.totalPages
+      : null;
 
-    await statusMutation.mutateAsync({
-      userId: selectedUserId,
-      body: { status: next },
-    });
+  const disablePrev = page <= 1;
+  const disableNext = totalPages !== null ? page >= totalPages : rows.length < PAGE_SIZE;
 
-    await userDetailQuery.refetch();
+  // 상태 변경 핸들러
+  const handleStatusChange = async (next: AdminUserStatus) => {
+    if (!selectedUserId) return;
+
+    setOptimisticStatus(next);
+
+    try {
+      await updateMutation.mutateAsync({
+        userId: selectedUserId,
+        body: { status: next },
+      });
+
+      await detailQuery.refetch();
+      await usersQuery.refetch();
+
+      setOptimisticStatus(null);
+    } catch (e) {
+      console.error(e);
+      alert("상태 변경 실패");
+      setOptimisticStatus(null);
+    }
   };
 
   return (
     <div className={styles.container}>
-      <h2 className={styles.title}>사용자 관리</h2>
-
-      {listMessage ? <div className={styles.message}>{listMessage}</div> : null}
+      <h2 className={styles.title}>사용자 계정 관리</h2>
 
       <div className={styles.layout}>
+        {/* 왼쪽: 사용자 리스트 패널 */}
         <section className={styles.panel}>
+          <div className={styles.panelHeader}>사용자 리스트</div>
+
+          <div className={styles.listContainer}>
+            {usersQuery.isError ? (
+              <div className={styles.emptyState}>목록 조회 실패</div>
+            ) : rows.length === 0 ? (
+              <div className={styles.emptyState}>사용자가 없습니다.</div>
+            ) : (
+              rows.map((u) => (
+                <div
+                  key={u.userId}
+                  className={`${styles.userItem} ${
+                    selectedUserId === u.userId ? styles.activeItem : ""
+                  }`}
+                  onClick={() => {
+                    setSelectedUserId(u.userId);
+                    setOptimisticStatus(null);
+                  }}
+                >
+                  <span className={styles.idNo}>#{u.userId}</span>
+
+                  <div className={styles.userMainInfo}>
+                    <span className={styles.nameText}>{u.name}</span>
+                    <span className={styles.emailText}>{u.email}</span>
+                  </div>
+                  
+                  {/* ✅ 리스트 내 상태 태그(statusTag)가 삭제되었습니다. */}
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* ✅ 페이징 버튼이 리스트 하단으로 이동되었습니다. */}
           <div className={styles.pager}>
-            <button type="button" className={styles.btn} onClick={onClickPrev} disabled={page <= 0}>
+            <button
+              className={styles.pageBtn}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={disablePrev}
+            >
               이전
             </button>
-
-            <span className={styles.pagerText}>page: {usersQuery.data?.page ?? page}</span>
-
-            <button type="button" className={styles.btn} onClick={onClickNext}>
+            <span className={styles.pageInfo}>PAGE {page}</span>
+            <button
+              className={styles.pageBtn}
+              onClick={() => setPage((p) => p + 1)}
+              disabled={disableNext}
+            >
               다음
             </button>
           </div>
-
-          {usersQuery.isLoading ? <div className={styles.muted}>로딩 중...</div> : null}
-          {usersQuery.error ? <div className={styles.error}>목록 조회 에러가 발생했습니다.</div> : null}
-
-          {!usersQuery.isLoading && !usersQuery.error ? (
-            <ul className={styles.list}>
-              {rows.map((u) => {
-                const active = selectedUserId === u.userId;
-                return (
-                  <li key={u.userId} className={styles.listItem}>
-                    <button
-                      type="button"
-                      onClick={() => onSelectUser(u.userId)}
-                      className={`${styles.userBtn} ${active ? styles.userBtnActive : ''}`}
-                    >
-                      userId: {u.userId}
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          ) : null}
         </section>
 
+        {/* 오른쪽: 사용자 상세 정보 패널 */}
         <section className={styles.panel}>
-          <h3 className={styles.subTitle}>사용자 상세</h3>
+          <div className={styles.panelHeader}>사용자 상세 정보</div>
 
-          {selectedUserId === null ? (
-            <div className={styles.muted}>왼쪽 목록에서 사용자를 선택하세요.</div>
+          {!user ? (
+            <div className={styles.emptyState}>
+              사용자를 선택하면 상세 정보가 표시됩니다.
+            </div>
           ) : (
-            <>
-              {detailMessage ? <div className={styles.message}>{detailMessage}</div> : null}
+            <div className={styles.detailWrapper}>
+              <div className={styles.detailBodyBox}>
+                <div className={styles.infoTable}>
+                  <InfoRow label="이름" value={user.name} />
+                  <InfoRow label="회원번호" value={`${user.userId}`} />
+                  <InfoRow label="이메일" value={user.email} />
+                  <InfoRow label="전화번호" value={user.tel} />
+                  <InfoRow label="주소" value={user.address} />
 
-              {userDetailQuery.isLoading ? <div className={styles.muted}>로딩 중...</div> : null}
-              {userDetailQuery.error ? <div className={styles.error}>상세 조회 에러가 발생했습니다.</div> : null}
-
-              {!userDetailQuery.isLoading && !userDetailQuery.error ? (
-                <>
-                  <div className={styles.card}>
-                    <div>userId: {user?.userId}</div>
-                  </div>
-
-                  <div className={styles.row}>
-                    <input
-                      className={styles.input}
-                      value={status}
-                      onChange={(e) => setStatus(e.target.value)}
-                      placeholder="변경할 status"
-                    />
-
-                    <button
-                      type="button"
-                      className={styles.btn}
-                      disabled={statusMutation.isPending || !status.trim()}
-                      onClick={onSubmitStatus}
-                    >
-                      상태 변경
-                    </button>
-
-                    {statusMutation.isPending ? <span className={styles.muted}>처리 중...</span> : null}
-                  </div>
-                </>
-              ) : null}
-            </>
+                  <StatusRow
+                    status={currentStatus}
+                    disabled={updateMutation.isPending}
+                    onChange={handleStatusChange}
+                  />
+                </div>
+              </div>
+            </div>
           )}
         </section>
       </div>

@@ -1,53 +1,46 @@
-// 파일: src/types/admin/user.ts
+// src/types/admin/user.ts
 
 export type AdminUserId = number;
 
-/**
- * 사용자 상태 (백엔드 enum/코드 확정되면 string -> union으로 잠그세요)
- * 예: "ACTIVE" | "SUSPENDED" | "WITHDRAWN"
- */
-export type AdminUserStatus = string;
+/** 상태 코드(서버로 보내는 값) */
+export type AdminUserStatus = "ACTIVE" | "SUSPENDED" | "WITHDRAWN";
 
-/**
- * 관리자 - 사용자 목록 아이템
- * (AdminUserListResponse DTO 필드 확정되면 여기에 추가)
- */
-export type AdminUserListItem = {
-  userId: AdminUserId;
-  // TODO: email, name, status, createdAt ... 등 실제 DTO 필드로 확정
-};
-
-/**
- * 관리자 - 사용자 상세
- * (AdminUserDetailResponse DTO 필드 확정되면 여기에 추가)
- */
-export type AdminUserDetail = {
-  userId: AdminUserId;
-  // TODO: 실제 DTO 필드로 확정
-};
-
-/**
- * 관리자 - 사용자 목록 조회 QueryString
- * (백엔드 AdminUserSearchRequest DTO 필드 확정되면 여기 타입을 정확히 잠그세요)
- */
-export type AdminUserSearchRequest = {
+/** 검색 요청 */
+export interface AdminUserSearchRequest {
   page?: number;
   size?: number;
-  keyword?: string;
-  status?: string;
-};
+  email?: string;
+  name?: string;
+  status?: AdminUserStatus;
+}
 
-/** 관리자 - 사용자 상태 변경 Body */
-export type AdminUserStatusUpdateRequest = {
+/** 상태 변경 요청(PATCH /status) */
+export interface AdminUserStatusUpdateRequest {
   status: AdminUserStatus;
-};
+}
 
-/* =========================
- * ✅ request가 반환하는 "프론트에서 쓰는 결과 타입"
- * (뷰에서 data.rows/data.page/data.message 접근이 안전해짐)
- * ========================= */
+/** 리스트용 아이템 */
+export interface AdminUserListItem {
+  userId: AdminUserId;
+  email: string;
+  name: string;
+  status: AdminUserStatus;
+  role: string;
+}
 
-export type AdminUsersListResult = {
+/** 상세 정보용 */
+export interface AdminUserDetail {
+  userId: AdminUserId;
+  email: string;
+  name: string;
+  tel: string;
+  address: string;
+  role: string;
+  status: AdminUserStatus;
+  lastLoginAt: string | null;
+}
+
+export interface AdminUsersListResult {
   success: boolean;
   message: string;
   rows: AdminUserListItem[];
@@ -55,15 +48,23 @@ export type AdminUsersListResult = {
   size: number;
   totalElements?: number;
   totalPages?: number;
-};
+}
 
-export type AdminUserDetailResult = {
+export interface AdminUserDetailResult {
   success: boolean;
   message: string;
   user: AdminUserDetail;
+}
+
+/** 화면 표시용(선택: status 표시/드롭다운에 쓰면 유지) */
+export const ADMIN_USER_STATUS_LABEL: Record<AdminUserStatus, string> = {
+  ACTIVE: "정지 해제",
+  SUSPENDED: "정지",
+  WITHDRAWN: "탈퇴",
 };
 
-export type AdminUserStatusUpdateResult = {
-  success: boolean;
-  message: string;
-};
+export const ADMIN_USER_STATUS_OPTIONS: { value: AdminUserStatus; label: string }[] = [
+  { value: "ACTIVE", label: "정지 해제" },
+  { value: "SUSPENDED", label: "정지" },
+  { value: "WITHDRAWN", label: "탈퇴" },
+];
