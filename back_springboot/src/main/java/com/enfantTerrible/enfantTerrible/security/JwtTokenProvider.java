@@ -6,6 +6,8 @@ import java.util.Date;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.enfantTerrible.enfantTerrible.common.enums.UserRole;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -31,11 +33,11 @@ public class JwtTokenProvider {
     this.refreshTokenValidityMs = refreshSec * 1000;
   }
 
-  public String createAccessToken(Long userId, String role) {
+  public String createAccessToken(Long userId, UserRole role) {
     long now = System.currentTimeMillis();
     return Jwts.builder()
       .setSubject(String.valueOf(userId))
-      .claim("role", role)       // USER / ADMIN
+      .claim("role", role.name())       // USER / ADMIN
       .claim("typ", "ACCESS")
       .setIssuedAt(new Date(now))
       .setExpiration(new Date(now + accessTokenValidityMs))

@@ -17,5 +17,12 @@ public class ProductResponse {
   // ⭐ 최저 SKU 가격
   private Long price;
 
+  private String discountType;
+  private Integer discountValue;
+  private Long discountedPrice;
+
+  private Float averageRating;
+  private Integer reviewCount;
+
   private String thumbnailUrl;
 }

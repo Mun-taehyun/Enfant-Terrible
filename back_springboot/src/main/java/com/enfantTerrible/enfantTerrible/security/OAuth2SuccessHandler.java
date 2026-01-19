@@ -9,6 +9,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
+import com.enfantTerrible.enfantTerrible.common.enums.UserRole;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -44,7 +46,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     // 2️⃣ 사용자 정보 추출
     Long userId = oAuth2User.getUserId();
-    String role = oAuth2User.getRole();
+    UserRole role = oAuth2User.getRole();
 
     // 3️⃣ Access Token 발급 (refresh token 미사용)
     String accessToken =

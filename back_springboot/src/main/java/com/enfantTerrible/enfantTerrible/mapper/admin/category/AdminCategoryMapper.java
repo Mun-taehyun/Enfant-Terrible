@@ -74,6 +74,12 @@ public interface AdminCategoryMapper {
       @Param("name") String name
   );
 
+  boolean existsByParentAndNameExcludeId(
+      @Param("parentId") Long parentId,
+      @Param("name") String name,
+      @Param("excludeId") Long excludeId
+  );
+
   List<AdminCategoryRow> findSubtree(@Param("rootId") Long rootId);
 
   int updateDepth(

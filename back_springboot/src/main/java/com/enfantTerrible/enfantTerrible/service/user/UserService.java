@@ -15,6 +15,7 @@ import com.enfantTerrible.enfantTerrible.dto.user.UpdateProfileRequest;
 import com.enfantTerrible.enfantTerrible.dto.user.UserResponse;
 import com.enfantTerrible.enfantTerrible.dto.user.UserRow;
 import com.enfantTerrible.enfantTerrible.exception.BusinessException;
+import com.enfantTerrible.enfantTerrible.mapper.qna.QnaRoomMapper;
 import com.enfantTerrible.enfantTerrible.mapper.user.UserMapper;
 import com.enfantTerrible.enfantTerrible.service.auth.EmailVerificationService;
 
@@ -28,6 +29,7 @@ public class UserService {
   private final UserMapper userMapper;
   private final PasswordEncoder passwordEncoder;
   private final EmailVerificationService emailVerificationService;
+  private final QnaRoomMapper qnaRoomMapper;
 
   /**
    * 회원가입 (LOCAL)
@@ -47,12 +49,17 @@ public class UserService {
     row.setAddressBase(req.getAddressBase());
     row.setAddressDetail(req.getAddressDetail());
 
-    row.setRole(UserRole.USER.name());
+    row.setRole(UserRole.USER);
     row.setProvider("local");
-    row.setStatus(UserStatus.ACTIVE.name());
-    row.setEmailVerified(EmailVerifiedStatus.Y.name());
+    row.setStatus(UserStatus.ACTIVE);
+    row.setEmailVerified(EmailVerifiedStatus.Y);
 
     userMapper.insert(row);
+
+    if (qnaRoomMapper.findByUserId(row.getUserId()) == null) {
+      qnaRoomMapper.insert(row.getUserId());
+    }
+
     return toResponse(row);
   }
 
@@ -102,9 +109,9 @@ public class UserService {
       throw new BusinessException("현재 비밀번호가 일치하지 않습니다.");
     }
 
-    userMapper.updatePassword(
-      userId,
-      passwordEncoder.encode(req.getNewPassword())
+    userMapper.updatePasswordWithTimestamp(
+        userId,
+        passwordEncoder.encode(req.getNewPassword())
     );
   }
 

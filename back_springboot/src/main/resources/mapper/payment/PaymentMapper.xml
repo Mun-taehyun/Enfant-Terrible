@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.enfantTerrible.enfantTerrible.mapper.payment.PaymentMapper">
+
+  <insert id="insert" useGeneratedKeys="true" keyProperty="paymentId">
+    INSERT INTO et_payment (
+      order_id,
+      payment_method,
+      payment_amount,
+      payment_status,
+      pg_tid,
+      paid_at
+    ) VALUES (
+      #{orderId},
+      #{paymentMethod},
+      #{paymentAmount},
+      #{paymentStatus},
+      #{pgTid},
+      #{paidAt}
+    )
+  </insert>
+
+  <select id="findLatestByOrderId" resultType="com.enfantTerrible.enfantTerrible.dto.payment.PaymentRow">
+    SELECT
+      payment_id,
+      order_id,
+      payment_method,
+      payment_amount,
+      payment_status,
+      pg_tid,
+      paid_at,
+      created_at,
+      updated_at
+    FROM et_payment
+    WHERE order_id = #{orderId}
+    ORDER BY payment_id DESC
+    LIMIT 1
+  </select>
+
+  <update id="updateStatus">
+    UPDATE et_payment
+    SET
+      payment_status = #{paymentStatus},
+      pg_tid = #{pgTid},
+      paid_at = #{paidAt}
+    WHERE payment_id = #{paymentId}
+  </update>
+
+</mapper>

@@ -51,6 +51,14 @@ public interface UserMapper {
   );
 
   /**
+   * 비밀번호 변경일시 업데이트
+   */
+  int updatePasswordWithTimestamp(
+    @Param("userId") Long userId,
+    @Param("password") String password
+  );
+
+  /**
    * 마지막 로그인 시간 갱신
    */
   int updateLastLogin(@Param("userId") Long userId);

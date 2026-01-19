@@ -79,7 +79,7 @@ public class PetService {
     row.setBreed(req.getBreed());
     row.setAge(req.getAge());
     row.setGender(req.getGender());
-    row.setIsNeutered(req.getIsNeutered() == null ? null : (req.getIsNeutered() ? 1 : 0));
+    row.setIsNeutered(req.getIsNeutered());
     row.setActivityLevel(req.getActivityLevel());
     row.setWeight(req.getWeight());
   }
@@ -92,7 +92,7 @@ public class PetService {
     res.setBreed(row.getBreed());
     res.setAge(row.getAge());
     res.setGender(row.getGender());
-    res.setIsNeutered(row.getIsNeutered() == null ? null : row.getIsNeutered() == 1);
+    res.setIsNeutered(row.getIsNeutered());
     res.setActivityLevel(row.getActivityLevel());
     res.setWeight(row.getWeight());
     return res;

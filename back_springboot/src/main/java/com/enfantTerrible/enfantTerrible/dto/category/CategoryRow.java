@@ -2,6 +2,8 @@ package com.enfantTerrible.enfantTerrible.dto.category;
 
 import java.time.LocalDateTime;
 
+import com.enfantTerrible.enfantTerrible.common.enums.CategoryStatus;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,8 +19,7 @@ public class CategoryRow {
   private Integer depth;
   private Integer sortOrder;
 
-  // 'Y' / 'N'
-  private String isActive;
+  private CategoryStatus status;
 
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;

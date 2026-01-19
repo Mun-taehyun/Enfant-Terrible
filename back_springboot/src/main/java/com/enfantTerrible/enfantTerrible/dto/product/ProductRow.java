@@ -2,6 +2,8 @@ package com.enfantTerrible.enfantTerrible.dto.product;
 
 import java.time.LocalDateTime;
 
+import com.enfantTerrible.enfantTerrible.common.enums.ProductStatus;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,6 +21,9 @@ public class ProductRow {
   // ⭐ 최저 SKU 가격
   private Long minSkuPrice;
 
-  private String status;
+  private Float averageRating;
+  private Integer reviewCount;
+
+  private ProductStatus status;
   private LocalDateTime createdAt; // 정렬용
 }

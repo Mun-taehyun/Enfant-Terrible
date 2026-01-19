@@ -41,7 +41,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     String providerUserId = extractProviderUserId(provider, attributes);
 
     // 5️⃣ 로그인 처리 (조회 or 신규 생성)
-    UserRow user = authService.oauthLogin(
+    UserRow user = authService.processOAuth2Login(
       provider,
       providerUserId,
       attributes

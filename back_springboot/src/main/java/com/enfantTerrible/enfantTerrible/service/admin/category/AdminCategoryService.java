@@ -241,35 +241,19 @@ public class AdminCategoryService {
       throw new BusinessException("카테고리 이름은 필수입니다.");
     }
 
-    // 단순 exists는 exclude를 못하니, exclude 필요하면 서비스에서 보정:
-    // - 중복이 존재하면, 실제로 같은게 자기 자신인지 확인해야 함
-    // 여기서는 안전하게: "중복 가능성" 발견 시 트리에서 검증(혹은 쿼리 추가)
-    // → 꼼꼼하게 하려면 Mapper에 exclude 포함한 exists를 추가하는 걸 추천.
-    boolean exists = adminCategoryMapper.existsByParentAndName(parentId, name.trim());
-    if (!exists) {
+    // excludeId가 없으면 기본 중복 체크
+    if (excludeId == null) {
+      boolean exists = adminCategoryMapper.existsByParentAndName(parentId, name.trim());
+      if (exists) {
+        throw new BusinessException("같은 상위 카테고리 아래에 동일한 이름의 카테고리가 이미 존재합니다.");
+      }
       return;
     }
 
-    // excludeId가 없으면 바로 중복 처리
-    if (excludeId == null) {
+    // excludeId가 있으면 제외하고 중복 체크
+    boolean exists = adminCategoryMapper.existsByParentAndNameExcludeId(parentId, name.trim(), excludeId);
+    if (exists) {
       throw new BusinessException("같은 상위 카테고리 아래에 동일한 이름의 카테고리가 이미 존재합니다.");
-    }
-
-    // excludeId가 있는 경우: 정확히 하려면 Mapper에 exclude 조건이 있는 exists가 필요함.
-    // (현재는 꼼꼼함을 위해, findAll로 필터링해서 동일 이름/parent 찾아 비교)
-    List<AdminCategoryRow> all = adminCategoryMapper.findAll();
-    for (AdminCategoryRow r : all) {
-      if (r.getParentId() == null) {
-        if (parentId != null) continue;
-      } else {
-        if (parentId == null) continue;
-        if (!r.getParentId().equals(parentId)) continue;
-      }
-      if (r.getName() != null && r.getName().equals(name.trim())) {
-        if (!r.getCategoryId().equals(excludeId)) {
-          throw new BusinessException("같은 상위 카테고리 아래에 동일한 이름의 카테고리가 이미 존재합니다.");
-        }
-      }
     }
   }
 

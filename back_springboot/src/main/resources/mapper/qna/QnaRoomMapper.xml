@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.enfantTerrible.enfantTerrible.mapper.qna.QnaRoomMapper">
+
+  <select id="findById" resultType="com.enfantTerrible.enfantTerrible.dto.qna.QnaRoomRow">
+    SELECT
+      room_id,
+      user_id,
+      status,
+      user_last_read_message_id,
+      admin_last_read_message_id,
+      last_message_at,
+      created_at
+    FROM et_qna_room
+    WHERE room_id = #{roomId}
+  </select>
+
+  <select id="findByUserId" resultType="com.enfantTerrible.enfantTerrible.dto.qna.QnaRoomRow">
+    SELECT
+      room_id,
+      user_id,
+      status,
+      user_last_read_message_id,
+      admin_last_read_message_id,
+      last_message_at,
+      created_at
+    FROM et_qna_room
+    WHERE user_id = #{userId}
+    ORDER BY room_id DESC
+    LIMIT 1
+  </select>
+
+  <insert id="insert">
+    INSERT INTO et_qna_room (
+      user_id,
+      status,
+      user_last_read_message_id,
+      admin_last_read_message_id
+    ) VALUES (
+      #{userId},
+      'OPEN',
+      0,
+      0
+    )
+  </insert>
+
+  <select id="findLastInsertId" resultType="long">
+    SELECT LAST_INSERT_ID()
+  </select>
+
+  <update id="touchLastMessage">
+    UPDATE et_qna_room
+    SET last_message_at = NOW()
+    WHERE room_id = #{roomId}
+  </update>
+
+  <update id="updateUserLastRead">
+    UPDATE et_qna_room
+    SET user_last_read_message_id = GREATEST(user_last_read_message_id, #{messageId})
+    WHERE room_id = #{roomId}
+  </update>
+
+  <update id="updateAdminLastRead">
+    UPDATE et_qna_room
+    SET admin_last_read_message_id = GREATEST(admin_last_read_message_id, #{messageId})
+    WHERE room_id = #{roomId}
+  </update>
+
+  <select id="countUnreadForUser" resultType="int">
+    SELECT COUNT(*)
+    FROM et_qna_message m
+    JOIN et_qna_room r ON r.room_id = m.room_id
+    WHERE m.room_id = #{roomId}
+      AND m.sender = 'ADMIN'
+      AND m.message_id &gt; r.user_last_read_message_id
+  </select>
+
+  <select id="countUnreadForAdmin" resultType="int">
+    SELECT COUNT(*)
+    FROM et_qna_message m
+    JOIN et_qna_room r ON r.room_id = m.room_id
+    WHERE m.room_id = #{roomId}
+      AND m.sender = 'USER'
+      AND m.message_id &gt; r.admin_last_read_message_id
+  </select>
+
+</mapper>

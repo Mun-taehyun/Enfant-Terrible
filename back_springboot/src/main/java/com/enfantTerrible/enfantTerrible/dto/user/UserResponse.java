@@ -1,5 +1,8 @@
 package com.enfantTerrible.enfantTerrible.dto.user;
 
+import com.enfantTerrible.enfantTerrible.common.enums.UserRole;
+import com.enfantTerrible.enfantTerrible.common.enums.UserStatus;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,7 +20,7 @@ public class UserResponse {
   private String zipCode;
   private String addressBase;
   private String addressDetail;
-  private String role;
-  private String status;
+  private UserRole role;
+  private UserStatus status;
 }
 

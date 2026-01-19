@@ -1,13 +1,11 @@
 package com.enfantTerrible.enfantTerrible.service.category;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.enfantTerrible.enfantTerrible.common.util.CategoryTreeUtils;
 import com.enfantTerrible.enfantTerrible.dto.category.CategoryResponse;
 import com.enfantTerrible.enfantTerrible.dto.category.CategoryRow;
 import com.enfantTerrible.enfantTerrible.mapper.category.CategoryMapper;
@@ -25,43 +23,31 @@ public class CategoryService {
    * 사용자용 - 전체 카테고리 트리 조회
    */
   public List<CategoryResponse> getCategoryTree() {
-
     List<CategoryRow> rows = categoryMapper.findAllActive();
 
-    // parentId 기준으로 그룹핑
-    Map<Long, List<CategoryResponse>> childrenMap = new HashMap<>();
+    // 먼저 Row를 Response로 변환
+    List<CategoryResponse> responses = rows.stream()
+        .map(this::toResponse)
+        .toList();
 
-    for (CategoryRow row : rows) {
-      CategoryResponse res = toResponse(row);
-      childrenMap
-          .computeIfAbsent(row.getParentId(), k -> new ArrayList<>())
-          .add(res);
-    }
-
-    // 루트 카테고리 (parentId == null)
-    List<CategoryResponse> roots = childrenMap.getOrDefault(null, new ArrayList<>());
-
-    // 재귀적으로 children 세팅
-    for (CategoryResponse root : roots) {
-      attachChildren(root, childrenMap);
-    }
-
-    return roots;
+    // 유틸리티를 사용한 트리 구조 조립
+    return CategoryTreeUtils.buildTree(
+        responses,
+        CategoryResponse::getCategoryId,
+        CategoryResponse::getParentId,
+        CategoryResponse::setChildren
+    );
   }
 
   /**
    * 사용자용 - 특정 부모의 하위 카테고리 조회
    */
   public List<CategoryResponse> getChildren(Long parentId) {
-
     List<CategoryRow> rows = categoryMapper.findActiveByParentId(parentId);
 
-    List<CategoryResponse> result = new ArrayList<>();
-    for (CategoryRow row : rows) {
-      result.add(toResponse(row));
-    }
-
-    return result;
+    return rows.stream()
+        .map(this::toResponse)
+        .toList();
   }
 
   /**
@@ -74,25 +60,7 @@ public class CategoryService {
     res.setName(row.getName());
     res.setDepth(row.getDepth());
     res.setSortOrder(row.getSortOrder());
-    res.setIsActive(row.getIsActive());
+    res.setStatus(row.getStatus());
     return res;
-  }
-
-  /**
-   * 트리 구조 재귀 조립
-   */
-  private void attachChildren(
-      CategoryResponse parent,
-      Map<Long, List<CategoryResponse>> childrenMap
-  ) {
-
-    List<CategoryResponse> children =
-        childrenMap.getOrDefault(parent.getCategoryId(), new ArrayList<>());
-
-    parent.setChildren(children);
-
-    for (CategoryResponse child : children) {
-      attachChildren(child, childrenMap);
-    }
   }
 }

@@ -6,6 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.enfantTerrible.enfantTerrible.common.enums.UserRole;
 import com.enfantTerrible.enfantTerrible.common.enums.UserStatus;
 import com.enfantTerrible.enfantTerrible.dto.auth.LoginRequest;
 import com.enfantTerrible.enfantTerrible.dto.auth.LoginResponse;
@@ -38,8 +39,8 @@ public class AuthService {
     if (!passwordEncoder.matches(req.getPassword(), user.getPassword())) {
       throw new BusinessException("이메일 또는 비밀번호가 올바르지 않습니다.");
     }
-    UserStatus status = UserStatus.from(user.getStatus());
-    if (status != UserStatus.ACTIVE) {
+    
+    if (user.getStatus() != UserStatus.ACTIVE) {
       throw new BusinessException("사용할 수 없는 계정입니다.");
     }
 
@@ -49,22 +50,18 @@ public class AuthService {
         user.getUserId(),
         user.getRole()
     );
+    String refreshToken = jwtTokenProvider.createRefreshToken(user.getUserId());
 
-    return new LoginResponse(accessToken);
+    return new LoginResponse(accessToken, refreshToken);
   }
 
   /**
-   * OAuth 로그인
+   * OAuth2 로그인 (신규 사용자 생성 또는 기존 사용자 조회)
    */
-  @Transactional
-  public UserRow oauthLogin(
-      String provider,
-      String providerUserId,
-      Map<String, Object> attributes
-  ) {
+  public UserRow processOAuth2Login(String provider, String providerUserId, Map<String, Object> attributes) {
 
-    Map<String, Object> social =
-        userMapper.findSocialAccount(provider, providerUserId);
+    // 기존 소셜 계정 조회
+    Map<String, Object> social = userMapper.findSocialAccount(provider, providerUserId);
 
     if (social != null) {
       Long userId = ((Number) social.get("user_id")).longValue();
@@ -74,8 +71,7 @@ public class AuthService {
         throw new BusinessException("연결된 사용자 정보를 찾을 수 없습니다.");
       }
 
-      UserStatus status = UserStatus.from(user.getStatus());
-      if (status != UserStatus.ACTIVE) {
+      if (user.getStatus() != UserStatus.ACTIVE) {
         throw new BusinessException("사용할 수 없는 계정입니다.");
       }
 
@@ -95,10 +91,10 @@ public class AuthService {
     user.setEmail(email);
     user.setName(name);
     user.setTel(tel);
-    user.setRole("USER");
+    user.setRole(UserRole.USER);
     user.setProvider(provider);
-    user.setStatus("ACTIVE");
-    user.setEmailVerified("Y");
+    user.setStatus(UserStatus.ACTIVE);
+    user.setEmailVerified(com.enfantTerrible.enfantTerrible.common.enums.EmailVerifiedStatus.Y);
 
     userMapper.insertOAuthUser(user);
 
@@ -113,41 +109,69 @@ public class AuthService {
     return user;
   }
 
-  // ===== provider별 attribute 추출 =====
+  /**
+   * Refresh Token으로 Access Token 재발급
+   */
+  public LoginResponse refresh(String refreshToken) {
+    if (!jwtTokenProvider.validate(refreshToken)) {
+      throw new BusinessException("유효하지 않은 리프레시 토큰입니다.");
+    }
 
-  @SuppressWarnings("unchecked")
+    String tokenType = jwtTokenProvider.getTokenType(refreshToken);
+    if (!"REFRESH".equals(tokenType)) {
+      throw new BusinessException("리프레시 토큰이 아닙니다.");
+    }
+
+    Long userId = jwtTokenProvider.getUserId(refreshToken);
+    UserRow user = userMapper.findById(userId);
+    if (user == null || user.getStatus() != UserStatus.ACTIVE) {
+      throw new BusinessException("사용할 수 없는 계정입니다.");
+    }
+
+    String newAccessToken = jwtTokenProvider.createAccessToken(userId, user.getRole());
+    String newRefreshToken = jwtTokenProvider.createRefreshToken(userId);
+
+    return new LoginResponse(newAccessToken, newRefreshToken);
+  }
+
+  // =====================
+  // private helpers
+  // =====================
+
   private String extractEmail(String provider, Map<String, Object> attributes) {
-    if ("google".equals(provider)) {
-      return String.valueOf(attributes.get("email"));
+    // 각 OAuth2 제공사별 이메일 추출 로직
+    switch (provider.toLowerCase()) {
+      case "google":
+        return (String) attributes.get("email");
+      case "naver":
+        Map<String, Object> response = (Map<String, Object>) attributes.get("response");
+        return (String) response.get("email");
+      default:
+        return null;
     }
-    if ("naver".equals(provider)) {
-      Map<String, Object> response =
-          (Map<String, Object>) attributes.get("response");
-      return response == null ? null : String.valueOf(response.get("email"));
-    }
-    return null;
   }
 
-  @SuppressWarnings("unchecked")
   private String extractName(String provider, Map<String, Object> attributes) {
-    if ("google".equals(provider)) {
-      return String.valueOf(attributes.get("name"));
+    switch (provider.toLowerCase()) {
+      case "google":
+        return (String) attributes.get("name");
+      case "naver":
+        Map<String, Object> response = (Map<String, Object>) attributes.get("response");
+        return (String) response.get("name");
+      default:
+        return null;
     }
-    if ("naver".equals(provider)) {
-      Map<String, Object> response =
-          (Map<String, Object>) attributes.get("response");
-      return response == null ? null : String.valueOf(response.get("name"));
-    }
-    return null;
   }
 
-  @SuppressWarnings("unchecked")
   private String extractTel(String provider, Map<String, Object> attributes) {
-    if ("naver".equals(provider)) {
-      Map<String, Object> response =
-          (Map<String, Object>) attributes.get("response");
-      return response == null ? null : String.valueOf(response.get("mobile"));
+    switch (provider.toLowerCase()) {
+      case "google":
+        return (String) attributes.get("phone_number");
+      case "naver":
+        Map<String, Object> response = (Map<String, Object>) attributes.get("response");
+        return (String) response.get("mobile");
+      default:
+        return null;
     }
-    return null;
   }
 }

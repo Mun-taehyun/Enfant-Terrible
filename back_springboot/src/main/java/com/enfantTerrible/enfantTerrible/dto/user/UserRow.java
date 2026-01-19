@@ -2,6 +2,10 @@ package com.enfantTerrible.enfantTerrible.dto.user;
 
 import java.time.LocalDateTime;
 
+import com.enfantTerrible.enfantTerrible.common.enums.EmailVerifiedStatus;
+import com.enfantTerrible.enfantTerrible.common.enums.UserRole;
+import com.enfantTerrible.enfantTerrible.common.enums.UserStatus;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,11 +24,11 @@ public class UserRow {
   private String zipCode;
   private String addressBase;
   private String addressDetail;
-  private String emailVerified;
+  private EmailVerifiedStatus emailVerified;
 
-  private String role;       // ADMIN, USER
+  private UserRole role;
   private String provider;   // local, google, naver
-  private String status;
+  private UserStatus status;
 
   private LocalDateTime lastLoginAt;
   private LocalDateTime createdAt;

@@ -111,4 +111,15 @@
     )
   </select>
 
+  <select id="existsByParentAndNameExcludeId" resultType="boolean">
+    SELECT EXISTS (
+      SELECT 1
+      FROM et_category
+      WHERE parent_id = #{parentId}
+        AND name = #{name}
+        AND category_id != #{excludeId}
+        AND deleted_at IS NULL
+    )
+  </select>
+
 </mapper>

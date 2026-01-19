@@ -23,4 +23,6 @@ public interface ProductMapper {
   ProductRow findByIdForUser(@Param("productId") Long productId);
 
   List<ProductSkuOptionRow> findSkusWithOptions(@Param("productId") Long productId);
+
+  int refreshReviewCache(@Param("productId") Long productId);
 }

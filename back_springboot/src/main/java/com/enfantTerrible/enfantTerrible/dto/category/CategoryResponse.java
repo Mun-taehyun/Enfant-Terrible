@@ -3,6 +3,8 @@ package com.enfantTerrible.enfantTerrible.dto.category;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.enfantTerrible.enfantTerrible.common.enums.CategoryStatus;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,7 +20,7 @@ public class CategoryResponse {
   private Integer depth;
   private Integer sortOrder;
 
-  private String isActive;
+  private CategoryStatus status;
 
   private List<CategoryResponse> children = new ArrayList<>();
 }

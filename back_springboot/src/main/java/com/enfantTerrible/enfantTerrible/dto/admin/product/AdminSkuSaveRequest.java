@@ -2,6 +2,8 @@ package com.enfantTerrible.enfantTerrible.dto.admin.product;
 
 import java.util.List;
 
+import com.enfantTerrible.enfantTerrible.common.validation.NonNegativeStock;
+import com.enfantTerrible.enfantTerrible.common.validation.PositivePrice;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -14,10 +16,10 @@ public class AdminSkuSaveRequest {
   @NotNull
   private Long productId;
 
-  @NotNull
+  @PositivePrice
   private Long price;
 
-  @NotNull
+  @NonNegativeStock
   private Long stock;
 
   @NotBlank

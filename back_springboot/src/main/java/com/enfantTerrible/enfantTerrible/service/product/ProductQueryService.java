@@ -1,12 +1,15 @@
 package com.enfantTerrible.enfantTerrible.service.product;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.enfantTerrible.enfantTerrible.common.enums.ProductSortType;
+import com.enfantTerrible.enfantTerrible.dto.product.ProductDiscountRow;
 import com.enfantTerrible.enfantTerrible.dto.product.ProductDetailResponse;
 import com.enfantTerrible.enfantTerrible.dto.product.ProductOptionGroupResponse;
 import com.enfantTerrible.enfantTerrible.dto.product.ProductOptionGroupRow;
@@ -18,6 +21,7 @@ import com.enfantTerrible.enfantTerrible.dto.product.ProductSkuOptionRow;
 import com.enfantTerrible.enfantTerrible.dto.product.ProductSkuResponse;
 import com.enfantTerrible.enfantTerrible.event.ProductViewedEvent;
 import com.enfantTerrible.enfantTerrible.exception.BusinessException;
+import com.enfantTerrible.enfantTerrible.mapper.product.ProductDiscountMapper;
 import com.enfantTerrible.enfantTerrible.mapper.product.ProductMapper;
 import com.enfantTerrible.enfantTerrible.mapper.product.ProductOptionQueryMapper;
 import com.enfantTerrible.enfantTerrible.service.file.FileQueryService;
@@ -35,6 +39,8 @@ public class ProductQueryService {
 
   private final ProductMapper productMapper;
   private final ProductOptionQueryMapper productOptionQueryMapper;
+  private final ProductDiscountMapper productDiscountMapper;
+  private final ProductDiscountService productDiscountService;
   private final FileQueryService fileQueryService;
   private final ApplicationEventPublisher eventPublisher;
 
@@ -69,6 +75,15 @@ public class ProductQueryService {
         offset
     );
 
+    Map<Long, ProductDiscountRow> discountMap = new HashMap<>();
+    if (!rows.isEmpty()) {
+      List<Long> productIds = rows.stream().map(ProductRow::getProductId).toList();
+      List<ProductDiscountRow> discounts = productDiscountMapper.findActiveByProductIds(productIds);
+      for (ProductDiscountRow d : discounts) {
+        discountMap.put(d.getProductId(), d);
+      }
+    }
+
     return rows.stream().map(row -> {
       ProductResponse res = new ProductResponse();
       res.setProductId(row.getProductId());
@@ -79,6 +94,24 @@ public class ProductQueryService {
 
       // ⭐ 1안: base_price = 최저 SKU 가격 캐시
       res.setPrice(row.getMinSkuPrice());
+
+      ProductDiscountRow discount = discountMap.get(row.getProductId());
+      if (discount != null) {
+        res.setDiscountType(discount.getDiscountType());
+        res.setDiscountValue(discount.getDiscountValue());
+        res.setDiscountedPrice(
+            productDiscountService.applyDiscount(
+                row.getMinSkuPrice() == null ? 0L : row.getMinSkuPrice(),
+                discount.getDiscountType(),
+                discount.getDiscountValue()
+            )
+        );
+      } else {
+        res.setDiscountedPrice(row.getMinSkuPrice());
+      }
+
+      res.setAverageRating(row.getAverageRating());
+      res.setReviewCount(row.getReviewCount());
 
       res.setThumbnailUrl(
           fileQueryService.findFirstFileUrl(
@@ -110,6 +143,15 @@ public class ProductQueryService {
     res.setCategoryName(row.getCategoryName());
     res.setName(row.getName());
     res.setDescription(row.getDescription());
+
+    ProductDiscountRow discount = productDiscountMapper.findActiveByProductId(productId);
+    if (discount != null) {
+      res.setDiscountType(discount.getDiscountType());
+      res.setDiscountValue(discount.getDiscountValue());
+    }
+
+    res.setAverageRating(row.getAverageRating());
+    res.setReviewCount(row.getReviewCount());
 
     res.setThumbnailUrl(
         fileQueryService.findFirstFileUrl(
@@ -164,6 +206,17 @@ public class ProductQueryService {
         ProductSkuResponse s = new ProductSkuResponse();
         s.setSkuId(r.getSkuId());
         s.setPrice(r.getPrice());
+        if (discount != null) {
+          s.setDiscountedPrice(
+              productDiscountService.applyDiscount(
+                  r.getPrice() == null ? 0L : r.getPrice(),
+                  discount.getDiscountType(),
+                  discount.getDiscountValue()
+              )
+          );
+        } else {
+          s.setDiscountedPrice(r.getPrice());
+        }
         s.setStock(r.getStock());
         s.setStatus(r.getStatus());
         s.setOptionValueIds(new java.util.ArrayList<>());

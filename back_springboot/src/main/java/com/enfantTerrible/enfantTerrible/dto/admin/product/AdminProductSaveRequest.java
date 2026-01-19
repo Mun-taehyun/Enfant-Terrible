@@ -1,5 +1,7 @@
 package com.enfantTerrible.enfantTerrible.dto.admin.product;
 
+import com.enfantTerrible.enfantTerrible.common.validation.PositivePrice;
+import com.enfantTerrible.enfantTerrible.common.validation.ProductName;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -15,10 +17,10 @@ public class AdminProductSaveRequest {
   @NotNull
   private Long categoryId;
 
-  @NotBlank
+  @ProductName
   private String name;
 
-  @NotNull
+  @PositivePrice
   private Long basePrice;
 
   @NotBlank

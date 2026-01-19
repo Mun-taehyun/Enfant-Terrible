@@ -7,19 +7,20 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.enfantTerrible.enfantTerrible.common.enums.UserRole;
+import com.enfantTerrible.enfantTerrible.common.enums.UserStatus;
 
 public class CustomUserDetails implements UserDetails {
 
   private final Long userId;
   private final String email;
-  private final String role;
-  private final String status;        // ACTIVE / SUSPENDED
+  private final UserRole role;
+  private final UserStatus status;
 
   public CustomUserDetails(
     Long userId,
     String email,
-    String role,
-    String status
+    UserRole role,
+    UserStatus status
   ) {
     this.userId = userId;
     this.email = email;
@@ -33,9 +34,8 @@ public class CustomUserDetails implements UserDetails {
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    UserRole userRole = UserRole.from(role);
     return AuthorityUtils.createAuthorityList(
-        userRole.getSecurityRole()
+        role.getSecurityRole()
     );
   }
 
@@ -51,7 +51,7 @@ public class CustomUserDetails implements UserDetails {
 
   @Override
   public boolean isAccountNonLocked() {
-    return "ACTIVE".equals(status);
+    return status == UserStatus.ACTIVE;
   }
 
   @Override

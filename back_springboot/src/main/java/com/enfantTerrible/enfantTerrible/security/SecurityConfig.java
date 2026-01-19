@@ -7,6 +7,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.enfantTerrible.enfantTerrible.service.user.UserService;
 
@@ -30,6 +33,9 @@ public class SecurityConfig {
       new JwtAuthenticationFilter(jwtTokenProvider, userService);
 
     http
+      // CORS 설정
+      .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+      
       // CSRF / 세션 비활성화 (JWT 필수)
       .csrf(csrf -> csrf.disable())
       .sessionManagement(sm ->
@@ -45,7 +51,11 @@ public class SecurityConfig {
           "/api/users/password/reset",
           "/oauth2/**",
           "/login/oauth2/**",
-          "/api/categories/**"
+          "/api/categories/**",
+          "/api/posts/**",
+          "/api/banners/**",
+          "/api/popups/**",
+          "/ws/**"
         ).permitAll()
 
         // 관리자
@@ -78,9 +88,41 @@ public class SecurityConfig {
               "data": null,
               "message": "유효하지 않거나 만료된 토큰입니다."
             }
-          """);
+            """);
         })
+        .accessDeniedHandler((request, response, accessDeniedException) -> {
+          response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+          response.setContentType("application/json;charset=UTF-8");
+          response.getWriter().write("""
+            {
+              "success": false,
+              "data": null,
+              "message": "접근 권한이 없습니다."
+            }
+            """);
+        })
+      )
+
+      // 보안 헤더 설정
+      .headers(headers -> headers
+        .frameOptions(frame -> frame.deny())
+        .httpStrictTransportSecurity(hsts -> hsts
+          .maxAgeInSeconds(31536000)
+        )
       );
     return http.build();
+  }
+
+  @Bean
+  public CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration configuration = new CorsConfiguration();
+    configuration.setAllowCredentials(true);
+    configuration.addAllowedOriginPattern("*");
+    configuration.addAllowedHeader("*");
+    configuration.addAllowedMethod("*");
+    
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", configuration);
+    return source;
   }
 }

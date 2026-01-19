@@ -16,6 +16,12 @@ public class ProductDetailResponse {
   private String name;
   private String description;
 
+  private String discountType;
+  private Integer discountValue;
+
+  private Float averageRating;
+  private Integer reviewCount;
+
   private String thumbnailUrl;
   private List<String> contentImageUrls;
 

@@ -11,6 +11,7 @@ public class ProductSkuResponse {
 
   private Long skuId;
   private Long price;
+  private Long discountedPrice;
   private Long stock;
   private String status;
 
