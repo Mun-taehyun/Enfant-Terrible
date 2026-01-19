@@ -1,4 +1,4 @@
-// src/apis/main_axios.ts
+// src/apis/admin/main_axios.ts
 import axios from 'axios';
 
 function getAccessToken(): string | null {

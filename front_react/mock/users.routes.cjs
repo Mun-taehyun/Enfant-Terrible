@@ -25,6 +25,7 @@ module.exports = function registerUsersRoutes(server, router, common) {
     };
   }
 
+  // 사용자 목록 조회
   server.get("/api/admin/users", (req, res) => {
     const page = Number(req.query.page ?? 1);
     const size = Number(req.query.size ?? 10);
@@ -63,6 +64,7 @@ module.exports = function registerUsersRoutes(server, router, common) {
     return res.json(ok(pageData, "사용자 목록 조회 성공"));
   });
 
+  // 사용자 상세 조회
   server.get("/api/admin/users/:userId", (req, res) => {
     const userId = Number(req.params.userId);
     if (Number.isNaN(userId)) return res.status(400).json(fail("userId는 숫자여야 합니다."));
@@ -81,6 +83,7 @@ module.exports = function registerUsersRoutes(server, router, common) {
     return res.json(ok(toDetail(user), "사용자 상세 조회 성공"));
   });
 
+  // 사용자 상태 변경
   server.patch("/api/admin/users/:userId/status", (req, res) => {
     const userId = Number(req.params.userId);
     if (Number.isNaN(userId)) return res.status(400).json(fail("userId는 숫자여야 합니다."));
@@ -91,11 +94,6 @@ module.exports = function registerUsersRoutes(server, router, common) {
     }
 
     const db = router.db;
-    const usersArr = db.get("users").value();
-    if (!Array.isArray(usersArr)) {
-      return res.status(500).json(fail("db.json에 users 배열이 없습니다."));
-    }
-
     const found =
       db.get("users").find({ userId }).value() ||
       db.get("users").find({ id: userId }).value();
@@ -108,4 +106,24 @@ module.exports = function registerUsersRoutes(server, router, common) {
 
     return res.json(ok(null, "사용자 상태 변경 완료"));
   });
-};
+
+  /* ==========================================================
+   * 추가된 로그인 로직 (반드시 이 중괄호 안에 있어야 함)
+   * 호출 주소: POST http://localhost:8080/api/admin/auth/sign-in
+   * ========================================================== */
+  server.post("/api/admin/auth/sign-in", (req, res) => {
+    const { adminId, password } = req.body;
+
+    // ID: admin / PW: 1234 일 때만 성공하는 테스트용 로직
+    if (adminId === "admin" && password === "1234") {
+      return res.json(ok({
+        accessToken: "mock-access-token-12345",
+        adminId: "admin",
+        name: "관리자"
+      }, "로그인 성공"));
+    } else {
+      return res.status(401).json(fail("아이디 또는 비밀번호가 올바르지 않습니다."));
+    }
+  });
+
+}; // 파일의 끝

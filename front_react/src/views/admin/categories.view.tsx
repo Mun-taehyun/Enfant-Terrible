@@ -1,9 +1,9 @@
-// categories.view.tsx
+// src/views/admin/categories/categories.view.tsx
 
 import { useMemo, useState } from "react";
 import styles from "./categories.view.module.css";
 
-import type { AdminCategory, AdminCategoryActive } from "@/types/admin/category";
+import type { AdminCategory } from "@/types/admin/category";
 import { useAdminCategoriesPage } from "@/hooks/admin/adminCategories.hook";
 
 type CodeMap = Map<number, string>;
@@ -23,6 +23,11 @@ function buildCodeMap(tree: AdminCategory[]): CodeMap {
   return map;
 }
 
+// ✅ enum 확정에 따른 고정 규칙
+type ActiveCode = "Y" | "N";
+const isActiveStatus = (status: AdminCategory["status"]) => status === "ACTIVE";
+const nextActiveCode = (status: AdminCategory["status"]): ActiveCode => (isActiveStatus(status) ? "N" : "Y");
+
 export default function CategoriesView() {
   const {
     selectedId,
@@ -40,7 +45,12 @@ export default function CategoriesView() {
     deleteMut,
   } = useAdminCategoriesPage();
 
+  // ✅ 루트 생성
+  const [newRootName, setNewRootName] = useState("");
+
+  // ✅ 하위 생성
   const [newChildName, setNewChildName] = useState("");
+
   const [editName, setEditName] = useState("");
   const [editSortOrder, setEditSortOrder] = useState<number>(0);
   const [moveParentId, setMoveParentId] = useState<number | "null">("null");
@@ -55,7 +65,7 @@ export default function CategoriesView() {
   };
 
   const renderNode = (node: AdminCategory) => {
-    const active = node.isActive === "Y";
+    const active = isActiveStatus(node.status);
     const isSelected = selectedId === node.categoryId;
     const code = codeMap.get(node.categoryId) ?? "";
 
@@ -72,13 +82,17 @@ export default function CategoriesView() {
           <span className={active ? styles.badgeActive : styles.badgeInactive}>{active ? "Y" : "N"}</span>
         </button>
 
-        {node.children?.length ? (
-          <ul className={styles.nodeChildren}>
-            {node.children.map((c) => renderNode(c))}
-          </ul>
-        ) : null}
+        {node.children?.length ? <ul className={styles.nodeChildren}>{node.children.map(renderNode)}</ul> : null}
       </li>
     );
+  };
+
+  const handleCreateRoot = async () => {
+    const name = newRootName.trim();
+    if (!name) return;
+
+    await createMut.mutateAsync({ parentId: null, name });
+    setNewRootName("");
   };
 
   const handleCreateChild = async () => {
@@ -103,7 +117,9 @@ export default function CategoriesView() {
 
   const handleToggleActive = async () => {
     if (!selectedId || !selected) return;
-    const next: AdminCategoryActive = selected.isActive === "Y" ? "N" : "Y";
+
+    // ✅ status(ACTIVE/INACTIVE)로 판단 → 요청은 Y/N(code)
+    const next: ActiveCode = nextActiveCode(selected.status);
     await toggleMut.mutateAsync({ categoryId: selectedId, isActive: next });
   };
 
@@ -145,6 +161,8 @@ export default function CategoriesView() {
       </div>
     );
 
+  const selectedActive = selected ? isActiveStatus(selected.status) : false;
+
   return (
     <div className={styles.layout}>
       <section className={styles.left}>
@@ -155,106 +173,120 @@ export default function CategoriesView() {
           </button>
         </div>
 
-        <ul className={styles.treeRoot}>{tree.map((n) => renderNode(n))}</ul>
+        <ul className={styles.treeRoot}>{tree.map(renderNode)}</ul>
       </section>
 
       <section className={styles.right}>
         <h2 className={styles.title}>관리</h2>
 
-        {!selectedId || !selected ? (
-          <div className={styles.empty}>왼쪽 트리에서 카테고리를 선택하세요.</div>
-        ) : (
-          <div className={styles.panel}>
-            {/* ✅ 성일님 요청: ID/부모/Depth/Sort/활성 “표시 영역” 삭제 완료 */}
-
-            <div className={styles.block}>
-              <div className={styles.blockTitle}>이름 변경</div>
-              <div className={styles.inline}>
-                <input className={styles.input} value={editName} onChange={(e) => setEditName(e.target.value)} />
-                <button type="button" className={styles.btn} onClick={handleRename}>
-                  저장
-                </button>
-              </div>
-            </div>
-
-            <div className={styles.block}>
-              <div className={styles.blockTitle}>활성/비활성</div>
-
-              <div className={styles.inlineRight}>
-                <button type="button" className={styles.btn} onClick={handleToggleActive}>
-                  변경
-                </button>
-
-                <span className={styles.statusText}>
-                  {selected.isActive === "Y" ? "활성" : "비활성"}
-                </span>
-
-                <span className={selected.isActive === "Y" ? styles.badgeActive : styles.badgeInactive}>
-                  {selected.isActive}
-                </span>
-              </div>
-            </div>
-
-            <div className={styles.block}>
-              <div className={styles.blockTitle}>정렬 순서 변경</div>
-              <div className={styles.inline}>
-                <input
-                  className={styles.input}
-                  type="number"
-                  value={editSortOrder}
-                  onChange={(e) => setEditSortOrder(Number(e.target.value))}
-                />
-                <button type="button" className={styles.btn} onClick={handleSortOrder}>
-                  적용
-                </button>
-              </div>
-            </div>
-
-            <div className={styles.block}>
-              <div className={styles.blockTitle}>부모 변경(이동)</div>
-              <div className={styles.inline}>
-                <select
-                  className={styles.select}
-                  value={moveParentId}
-                  onChange={(e) => setMoveParentId(e.target.value === "null" ? "null" : Number(e.target.value))}
-                >
-                  <option value="null">루트(null)</option>
-                  {flat
-                    .filter((c) => c.categoryId !== selectedId)
-                    .map((c) => (
-                      <option key={c.categoryId} value={c.categoryId}>
-                        {codeMap.get(c.categoryId) ?? ""} {c.name}
-                      </option>
-                    ))}
-                </select>
-                <button type="button" className={styles.btn} onClick={handleMoveParent}>
-                  이동
-                </button>
-              </div>
-            </div>
-
-            <div className={styles.block}>
-              <div className={styles.blockTitle}>하위 카테고리 생성</div>
-              <div className={styles.inline}>
-                <input
-                  className={styles.input}
-                  placeholder="새 하위 카테고리 이름"
-                  value={newChildName}
-                  onChange={(e) => setNewChildName(e.target.value)}
-                />
-                <button type="button" className={styles.btn} onClick={handleCreateChild}>
-                  생성
-                </button>
-              </div>
-            </div>
-
-            <div className={styles.blockDanger}>
-              <button type="button" className={styles.btnDanger} onClick={handleDelete}>
-                삭제(soft delete)
+        <div className={styles.panel}>
+          {/* ✅ 메인(루트) 생성 */}
+          <div className={styles.block}>
+            <div className={styles.blockTitle}>메인(루트) 카테고리 생성</div>
+            <div className={styles.inline}>
+              <input
+                className={styles.input}
+                placeholder="새 메인 카테고리 이름"
+                value={newRootName}
+                onChange={(e) => setNewRootName(e.target.value)}
+              />
+              <button type="button" className={styles.btn} onClick={handleCreateRoot}>
+                생성
               </button>
             </div>
           </div>
-        )}
+
+          {!selectedId || !selected ? (
+            <div className={styles.empty}>왼쪽 트리에서 카테고리를 선택하세요.</div>
+          ) : (
+            <>
+              <div className={styles.block}>
+                <div className={styles.blockTitle}>이름 변경</div>
+                <div className={styles.inline}>
+                  <input className={styles.input} value={editName} onChange={(e) => setEditName(e.target.value)} />
+                  <button type="button" className={styles.btn} onClick={handleRename}>
+                    저장
+                  </button>
+                </div>
+              </div>
+
+              <div className={styles.block}>
+                <div className={styles.blockTitle}>활성/비활성</div>
+
+                <div className={styles.inlineRight}>
+                  <button type="button" className={styles.btn} onClick={handleToggleActive}>
+                    변경
+                  </button>
+
+                  <span className={styles.statusText}>{selectedActive ? "활성" : "비활성"}</span>
+
+                  <span className={selectedActive ? styles.badgeActive : styles.badgeInactive}>
+                    {selectedActive ? "Y" : "N"}
+                  </span>
+                </div>
+              </div>
+
+              <div className={styles.block}>
+                <div className={styles.blockTitle}>정렬 순서 변경</div>
+                <div className={styles.inline}>
+                  <input
+                    className={styles.input}
+                    type="number"
+                    value={editSortOrder}
+                    onChange={(e) => setEditSortOrder(Number(e.target.value))}
+                  />
+                  <button type="button" className={styles.btn} onClick={handleSortOrder}>
+                    적용
+                  </button>
+                </div>
+              </div>
+
+              <div className={styles.block}>
+                <div className={styles.blockTitle}>부모 변경(이동)</div>
+                <div className={styles.inline}>
+                  <select
+                    className={styles.select}
+                    value={moveParentId}
+                    onChange={(e) => setMoveParentId(e.target.value === "null" ? "null" : Number(e.target.value))}
+                  >
+                    <option value="null">루트(null)</option>
+                    {flat
+                      .filter((c) => c.categoryId !== selectedId)
+                      .map((c) => (
+                        <option key={c.categoryId} value={c.categoryId}>
+                          {codeMap.get(c.categoryId) ?? ""} {c.name}
+                        </option>
+                      ))}
+                  </select>
+                  <button type="button" className={styles.btn} onClick={handleMoveParent}>
+                    이동
+                  </button>
+                </div>
+              </div>
+
+              <div className={styles.block}>
+                <div className={styles.blockTitle}>하위 카테고리 생성</div>
+                <div className={styles.inline}>
+                  <input
+                    className={styles.input}
+                    placeholder="새 하위 카테고리 이름"
+                    value={newChildName}
+                    onChange={(e) => setNewChildName(e.target.value)}
+                  />
+                  <button type="button" className={styles.btn} onClick={handleCreateChild}>
+                    생성
+                  </button>
+                </div>
+              </div>
+
+              <div className={styles.blockDanger}>
+                <button type="button" className={styles.btnDanger} onClick={handleDelete}>
+                  삭제(soft delete)
+                </button>
+              </div>
+            </>
+          )}
+        </div>
       </section>
     </div>
   );

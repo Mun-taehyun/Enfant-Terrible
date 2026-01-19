@@ -1,6 +1,7 @@
 // server.cjs
 const path = require("path");
 const jsonServer = require("json-server");
+const bodyParser = require("body-parser");
 
 const common = require("./mock/common.cjs");
 const registerSalesRoutes = require("./mock/sales.routes.cjs");
@@ -12,7 +13,11 @@ const router = jsonServer.router(path.join(__dirname, "db.json"));
 const middlewares = jsonServer.defaults();
 
 server.use(middlewares);
-server.use(jsonServer.bodyParser);
+
+// ✅ 핵심: JSON strict 모드 해제
+// - PATCH에서 body가 null(또는 원시값)이어도 파싱 에러가 나지 않게 함
+server.use(bodyParser.json({ strict: false }));
+server.use(bodyParser.urlencoded({ extended: true }));
 
 // 304 방지
 server.disable("etag");

@@ -1,6 +1,6 @@
 // src/apis/admin/request/adminCategory.request.ts
 
-import { mainAxios } from "@/apis/admin/main_axios";
+import { mainAxios } from "@/apis/admin/main_axios"; // ✅ 통일
 import type {
   AdminCategory,
   AdminCategoryActive,
@@ -22,30 +22,28 @@ export async function getAdminCategoryTree(): Promise<AdminCategory[]> {
 }
 
 export async function createAdminCategory(payload: AdminCategoryCreatePayload): Promise<void> {
-  // ✅ 운영 백: POST /api/admin/categories, ApiResponse<Void>
+  // ✅ 운영 백: POST /api/admin/categories
   await mainAxios.post<ApiResponse<null>>(BASE, payload);
 }
 
 export async function updateAdminCategory(categoryId: number, payload: AdminCategoryUpdatePayload): Promise<void> {
-  // ✅ 운영 백: PATCH /api/admin/categories/{categoryId}, ApiResponse<Void>
+  // ✅ 운영 백: PATCH /api/admin/categories/{categoryId}
   await mainAxios.patch<ApiResponse<null>>(`${BASE}/${categoryId}`, payload);
 }
 
 export async function updateAdminCategoryActive(categoryId: number, isActive: AdminCategoryActive): Promise<void> {
   // ✅ 운영 백: PATCH /{id}/active?isActive=Y|N (RequestParam)
-  // 🚫 body에 null 보내면(mock express/body-parser)에서 "null is not valid JSON" 터질 수 있음
-  // ✅ 빈 객체 {}로 고정
   await mainAxios.patch<ApiResponse<null>>(`${BASE}/${categoryId}/active`, {}, { params: { isActive } });
 }
 
 export async function updateAdminCategorySortOrder(categoryId: number, sortOrder: number): Promise<void> {
-  // ✅ 운영 백: PATCH /{id}/sort-order?sortOrder=... (RequestParam)
+  // ✅ 운영 백: PATCH /{id}/sort-order?sortOrder=...
   await mainAxios.patch<ApiResponse<null>>(`${BASE}/${categoryId}/sort-order`, {}, { params: { sortOrder } });
 }
 
 export async function moveAdminCategory(categoryId: number, parentId: number | null): Promise<void> {
-  // ✅ 운영 백: PATCH /{id}/move?parentId=... (nullable RequestParam)
-  // parentId가 null이면 RequestParam 자체를 보내지 않는 형태로 맞춤
+  // ✅ 운영 백: PATCH /{id}/move?parentId=... (nullable)
+  // parentId=null이면 RequestParam 자체를 보내지 않음 (= Spring @RequestParam(required=false) Long parentId)
   const params: { parentId?: number } = {};
   if (parentId !== null) params.parentId = parentId;
 
@@ -54,6 +52,5 @@ export async function moveAdminCategory(categoryId: number, parentId: number | n
 
 export async function softDeleteAdminCategory(categoryId: number): Promise<void> {
   // ✅ 운영 백: DELETE /{id}
-  // DELETE도 body 보내지 않음 (data:null 같은 거 금지)
   await mainAxios.delete<ApiResponse<null>>(`${BASE}/${categoryId}`);
 }
