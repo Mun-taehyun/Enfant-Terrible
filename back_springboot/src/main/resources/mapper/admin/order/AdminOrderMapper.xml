@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.enfantTerrible.enfantTerrible.mapper.admin.order.AdminOrderMapper">
+
+  <sql id="adminOrderWhere">
+    WHERE 1=1
+
+    <if test="req.userId != null">
+      AND o.user_id = #{req.userId}
+    </if>
+
+    <if test="req.orderCode != null and req.orderCode != ''">
+      AND o.order_code LIKE CONCAT('%', #{req.orderCode}, '%')
+    </if>
+
+    <if test="req.status != null and req.status != ''">
+      AND o.status = #{req.status}
+    </if>
+  </sql>
+
+  <select id="findOrders" resultType="com.enfantTerrible.enfantTerrible.dto.admin.order.AdminOrderListResponse">
+    SELECT
+      o.order_id,
+      o.user_id,
+      o.order_code,
+      o.status,
+      o.total_amount,
+      o.receiver_name,
+      o.receiver_phone,
+      o.tracking_number,
+      o.shipped_at,
+      o.delivered_at
+    FROM et_order o
+    <include refid="adminOrderWhere" />
+    ORDER BY o.order_id DESC
+    LIMIT #{req.size} OFFSET #{req.offset}
+  </select>
+
+  <select id="countOrders" resultType="int">
+    SELECT COUNT(*)
+    FROM et_order o
+    <include refid="adminOrderWhere" />
+  </select>
+
+  <select id="findOrderDetail" resultType="com.enfantTerrible.enfantTerrible.dto.admin.order.AdminOrderDetailResponse">
+    SELECT
+      o.order_id,
+      o.user_id,
+      o.order_code,
+      o.status,
+      o.total_amount,
+      o.receiver_name,
+      o.receiver_phone,
+      o.zip_code,
+      o.address_base,
+      o.address_detail,
+      o.tracking_number,
+      o.shipped_at,
+      o.delivered_at
+    FROM et_order o
+    WHERE o.order_id = #{orderId}
+  </select>
+
+  <select id="findOrderItems" resultType="com.enfantTerrible.enfantTerrible.dto.admin.order.AdminOrderItemResponse">
+    SELECT
+      oi.sku_id,
+      oi.product_name,
+      oi.price,
+      oi.quantity,
+      oi.cancelled_quantity,
+      (oi.quantity - oi.cancelled_quantity) AS remaining_quantity
+    FROM et_order_item oi
+    WHERE oi.order_id = #{orderId}
+    ORDER BY oi.sku_id ASC
+  </select>
+
+  <update id="updateOrderStatus">
+    UPDATE et_order
+    SET status = #{status}
+    WHERE order_id = #{orderId}
+  </update>
+
+</mapper>

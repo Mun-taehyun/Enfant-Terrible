@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.enfantTerrible.enfantTerrible.mapper.admin.product.AdminProductMapper">
+
+  <!-- ===========================
+       공통 SELECT 컬럼
+       =========================== -->
+  <sql id="adminProductSelectColumns">
+    p.product_id,
+    p.product_code,
+    p.name,
+    p.base_price,
+    p.status,
+    p.category_id,
+    c.name AS category_name,
+    p.created_at
+  </sql>
+
+  <!-- ===========================
+       공통 WHERE (삭제 상품 제외)
+       =========================== -->
+  <sql id="adminProductWhere">
+    WHERE p.deleted_at IS NULL
+
+    <if test="req.status != null and req.status != ''">
+      AND p.status = #{req.status}
+    </if>
+
+    <if test="req.keyword != null and req.keyword != ''">
+      AND p.name LIKE CONCAT('%', #{req.keyword}, '%')
+    </if>
+
+    <if test="req.productCode != null and req.productCode != ''">
+      AND p.product_code LIKE CONCAT('%', #{req.productCode}, '%')
+    </if>
+  </sql>
+
+  <!-- ===========================
+       관리자 상품 목록 조회
+       =========================== -->
+  <select id="findProducts" resultType="AdminProductRow">
+    SELECT
+      <include refid="adminProductSelectColumns" />
+    FROM et_product p
+    JOIN et_category c ON c.category_id = p.category_id
+    <include refid="adminProductWhere" />
+    ORDER BY p.product_id DESC
+    LIMIT #{size} OFFSET #{offset}
+  </select>
+
+  <!-- ===========================
+       관리자 상품 개수 조회
+       =========================== -->
+  <select id="countProducts" resultType="int">
+    SELECT COUNT(*)
+    FROM et_product p
+    <include refid="adminProductWhere" />
+  </select>
+
+</mapper>

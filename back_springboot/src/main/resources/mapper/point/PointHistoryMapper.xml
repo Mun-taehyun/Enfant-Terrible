@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.enfantTerrible.enfantTerrible.mapper.point.PointHistoryMapper">
+
+  <insert id="insert">
+    INSERT INTO et_point_history (
+      user_id,
+      point_amount,
+      point_type,
+      reason,
+      ref_type,
+      ref_id
+    ) VALUES (
+      #{userId},
+      #{pointAmount},
+      #{pointType},
+      #{reason},
+      #{refType},
+      #{refId}
+    )
+  </insert>
+
+  <select id="sumBalance" resultType="int">
+    SELECT COALESCE(SUM(point_amount), 0)
+    FROM et_point_history
+    WHERE user_id = #{userId}
+  </select>
+
+  <select id="sumBalanceForUpdate" resultType="int">
+    SELECT COALESCE(SUM(point_amount), 0)
+    FROM et_point_history
+    WHERE user_id = #{userId}
+    FOR UPDATE
+  </select>
+
+  <select id="existsEarnForOrder" resultType="int">
+    SELECT EXISTS(
+      SELECT 1
+      FROM et_point_history
+      WHERE user_id = #{userId}
+        AND ref_type = 'ORDER'
+        AND ref_id = #{orderId}
+        AND point_type = 'EARN'
+    )
+  </select>
+
+  <select id="existsRevokeForOrder" resultType="int">
+    SELECT EXISTS(
+      SELECT 1
+      FROM et_point_history
+      WHERE user_id = #{userId}
+        AND ref_type = 'ORDER'
+        AND ref_id = #{orderId}
+        AND point_type = 'ADJUST'
+        AND point_amount &lt; 0
+    )
+  </select>
+
+  <select id="sumEarnForOrder" resultType="int">
+    SELECT COALESCE(SUM(point_amount), 0)
+    FROM et_point_history
+    WHERE user_id = #{userId}
+      AND ref_type = 'ORDER'
+      AND ref_id = #{orderId}
+      AND point_type = 'EARN'
+  </select>
+
+  <select id="sumRevokedForOrder" resultType="int">
+    SELECT COALESCE(SUM(-point_amount), 0)
+    FROM et_point_history
+    WHERE user_id = #{userId}
+      AND ref_type = 'ORDER'
+      AND ref_id = #{orderId}
+      AND point_type = 'ADJUST'
+      AND point_amount &lt; 0
+  </select>
+
+  <select id="findByUserId" resultType="com.enfantTerrible.enfantTerrible.dto.point.PointHistoryRow">
+    SELECT
+      point_history_id,
+      user_id,
+      point_amount,
+      point_type,
+      reason,
+      ref_type,
+      ref_id,
+      created_at
+    FROM et_point_history
+    WHERE user_id = #{userId}
+    ORDER BY point_history_id DESC
+    LIMIT #{size} OFFSET #{offset}
+  </select>
+
+</mapper>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.enfantTerrible.enfantTerrible.mapper.order.OrderMapper">
+
+  <insert id="insertOrder">
+    INSERT INTO et_order (
+      user_id,
+      order_code,
+      status,
+      total_amount,
+      receiver_name,
+      receiver_phone,
+      zip_code,
+      address_base,
+      address_detail
+    ) VALUES (
+      #{userId},
+      #{orderCode},
+      #{orderStatus},
+      #{totalAmount},
+      #{receiverName},
+      #{receiverPhone},
+      #{zipCode},
+      #{addressBase},
+      #{addressDetail}
+    )
+  </insert>
+
+  <select id="findLastInsertId" resultType="long">
+    SELECT LAST_INSERT_ID()
+  </select>
+
+  <select id="findByIdForPayment" resultType="com.enfantTerrible.enfantTerrible.dto.order.OrderRow">
+    SELECT
+      order_id,
+      user_id,
+      order_code,
+      status AS order_status,
+      total_amount
+    FROM et_order
+    WHERE order_id = #{orderId}
+  </select>
+
+  <select id="findByCodeForPayment" resultType="com.enfantTerrible.enfantTerrible.dto.order.OrderRow">
+    SELECT
+      order_id,
+      user_id,
+      order_code,
+      status AS order_status,
+      total_amount
+    FROM et_order
+    WHERE order_code = #{orderCode}
+  </select>
+
+  <update id="updateOrderStatus">
+    UPDATE et_order
+    SET status = #{orderStatus}
+    WHERE order_id = #{orderId}
+  </update>
+
+  <update id="updateStatusAndTotalAmount">
+    UPDATE et_order
+    SET
+      status = #{orderStatus},
+      total_amount = #{totalAmount}
+    WHERE order_id = #{orderId}
+  </update>
+
+  <update id="startShipping">
+    UPDATE et_order
+    SET
+      status = #{orderStatus},
+      tracking_number = #{trackingNumber},
+      shipped_at = #{shippedAt}
+    WHERE order_id = #{orderId}
+  </update>
+
+  <update id="markDeliveredIfShippedBefore">
+    UPDATE et_order
+    SET
+      status = #{orderStatus},
+      delivered_at = #{deliveredAt}
+    WHERE status = 'SHIPPING'
+      AND shipped_at IS NOT NULL
+      AND shipped_at &lt;= #{cutoff}
+  </update>
+
+</mapper>
