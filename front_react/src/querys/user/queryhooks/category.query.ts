@@ -14,7 +14,7 @@ export const categoryQueries = {
             select: (allCategories) => {
                 //빈값을 전달 받으면 => 빈 배열을 준다.
                 if (!Array.isArray(allCategories)) return { mainList: [], menuTree: [] };
-                const activeItems = allCategories.filter(item => item.isActive); //비활성화 카테고리 거름망
+                const activeItems = allCategories.filter(item => item.status === "ACTIVE"); //비활성화 카테고리 거름망
                 const mainList = activeItems.filter(item => item.depth === 0); //대분류 카테고리...
                 // 대분류에 있는 값들 중 활성화 상태를 위주로 일치 여부를 필터.. 
                 const menuTree = mainList.map(mainItem => {

@@ -131,10 +131,12 @@ export default function Authentication() {
                         {formChange.verificationActive && //이메일 인증번호는 true일때만 노출 
                         <div className='auth-email-box'>
                             <InputBox ref={refForms.verification} label='이메일 인증번호*' type='text' placeholder='이메일 인증번호를 입력해주세요.' 
-                                      name='varification' value={formData.verification} onChange={onInputChange} 
+                                      name='verification' value={formData.verification} onChange={onInputChange} 
                                       error={errors.verification.state} message={errors.verification.message} 
-                                      onkeyDown={(event) => onKeyDown(event, 'password', onMailVerifyClick)}/>                          
-                            <button className='email-mail-button-click' onClick={onMailVerifyClick}> {'인증번호 확인'} </button>
+                                      onkeyDown={(event) => onKeyDown(event, 'password', onMailVerifyClick)}/> 
+                            {!formChange.codeVerify && //인증번호 검증이 되었을 경우 버튼 비활성화
+                                <button className='email-mail-button-click' onClick={onMailVerifyClick}> {'인증번호 확인'} </button>
+                            }
                         </div>
                         }                       
                         <InputBox ref={refForms.password} label='비밀번호*' type={formChange.passwordType} placeholder='비밀번호를 입력해주세요.' 

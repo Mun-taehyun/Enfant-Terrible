@@ -1,8 +1,6 @@
 import type { EmailCertificationRequestDto, EmailCodeRequestDto, ResetPasswordChangeRequestDto, ResetPasswordCodeRequestDto, SignInRequestDto } from "./request/auth";
-import type { PostChatRoomIdRequestDto } from "./request/chat";
 import apiClient from "..";
 import type { GetPopupListResponseDto } from "./response/popup";
-import type { PostChatRoomIdResponseDto } from "./response/chat";
 import type { SignInResponseDto } from "./response/auth";
 import type GetCategoryListResponseDto from "./response/category/get-category-list.response.dto";
 import type { PetSelectResponseDto, SignUpResposeDto, UserSelectResponseDto } from "./response/user";
@@ -15,6 +13,22 @@ import {GetProductDetailListResponseDto} from "./response/product";
 import { GetProductListRequestDto } from "./request/product";
 import GetBannerResponseDto from "./response/banner/get-banner-list.response.dto";
 import CartItemRequestDto from "./request/cart/cart-item-request.dto";
+import CartItemResponseDto from "./response/cart/cart-item-response.dto";
+import PutCartItemRequestDto from "./request/cart/put-cart-item-request.dto";
+import OrderFromCartRequestDto from "./request/order/order-from-cart-request.dto";
+import OrderCreateResponseDto from "./response/order/order-create-response.dto";
+import { DirectOrderRequestDto } from "./request/order";
+import { PaymentCancelRequestDto, PaymentConfirmRequestDto } from "./request/payment";
+import { PaymentCancelResponseDto, PaymentConfirmResponseDto } from "./response/payment";
+import { PointBalanceResponseDto, PointHistoryResponseDto } from "./response/point";
+import { PointChangeRequestDto } from "./request/point";
+import PostListRequestDto from "./request/post/post-list-request.dto";
+import PostResponseDto from "./response/post/post-response.dto";
+import ProductSkuResolveResponse from "./response/product/product-sku-resolve-response.dto";
+import { QnaMessageResponseDto, QnaRoomResponseDto } from "./response/chat";
+import ProductReviewResponseDto from "./response/review/product-review-response.dto";
+import { ProductReviewCreateRequestDto, ProductReviewUpdateRequestDto } from "./request/review";
+
 
 
 // //권한 용 헤더로 보낼 엑세스토큰 사용 "제품 사용 등..."
@@ -111,19 +125,19 @@ export const petDeleteRequest = async (petId : number | string) => {
     return apiClient.delete(PET_DELETE_URL(petId))
 }//내 반려동물 정보 삭제
 
-
-
-
-
-
-
 //================================= 인증 =================================
-const SIGN_IN_URL = () => `/auth/login` //로그인
-const EMAIL_CERTIFICATION_URL = () => `/auth/email/signup` //이메일 인증 메일 요청 
-const EMAIL_CODE_URL = () => `/auth/email/verify` //이메일 인증번호 검증 요청
-const RESET_PASSWORD_EMAIL_URL = () => `/auth/password/reset/request` //비밀번호 재설정 이메일요청
-const RESET_PASSWORD_CODE_URL = () => `/auth/password/reset/verify` //비밀번호 재설정 인증 검증 요청
-const RESET_PASSWORD_CHANGE_URL = () => `/auth/password/reset/verify` //비밀번호 입력 후 재설정 요청
+const SIGN_IN_URL = () => `/auth/login` 
+//로그인
+const EMAIL_CERTIFICATION_URL = () => `/auth/email/signup` 
+//이메일 인증 메일 요청 
+const EMAIL_CODE_URL = () => `/auth/email/verify` 
+//이메일 인증번호 검증 요청
+const RESET_PASSWORD_EMAIL_URL = () => `/auth/password/reset/request` 
+//비밀번호 재설정 이메일요청
+const RESET_PASSWORD_CODE_URL = () => `/auth/password/reset/verify` 
+//비밀번호 재설정 인증 검증 요청
+const RESET_PASSWORD_CHANGE_URL = () => `/auth/password/reset/verify` 
+//비밀번호 입력 후 재설정 요청
 
 
 export const signinRequest = async(requestBody: SignInRequestDto) : Promise<SignInResponseDto> => {
@@ -132,29 +146,22 @@ export const signinRequest = async(requestBody: SignInRequestDto) : Promise<Sign
 
 
 export const emailCertificationRequest = async (requestBody: EmailCertificationRequestDto) => {
-    return apiClient.post(EMAIL_CERTIFICATION_URL(), requestBody)
-
-} //인증번호 전송요청 
+    return apiClient.post(EMAIL_CERTIFICATION_URL(), requestBody)} //인증번호 전송요청 
 
 export const emailCodeRequest = async (requestBody: EmailCodeRequestDto) => {
-    return apiClient.post(EMAIL_CODE_URL(), requestBody)
-
-} //인증번호 검증요청
+    return apiClient.post(EMAIL_CODE_URL(), requestBody)} //인증번호 검증요청
 
 export const resetPasswordEmailRequest = async (requestBody: ResetPasswordEmailRequestDto) => {
-    return apiClient.post(RESET_PASSWORD_EMAIL_URL(), requestBody)
-} //비밀번호 찾기 시 이메일 인증번호 요청 
+    return apiClient.post(RESET_PASSWORD_EMAIL_URL(), requestBody)} 
+    //비밀번호 찾기 시 이메일 인증번호 요청 
 
 export const resetPasswordCodeRequest = async (requestBody: ResetPasswordCodeRequestDto) => {
-    return apiClient.post(RESET_PASSWORD_CODE_URL(), requestBody)
-}//비번 찾기 시 이메일 인증번호 검증 요청
+    return apiClient.post(RESET_PASSWORD_CODE_URL(), requestBody)}
+    //비번 찾기 시 이메일 인증번호 검증 요청
 
 export const resetPasswordChangeRequest = async (requestBody: ResetPasswordChangeRequestDto) => {
-    return apiClient.put(RESET_PASSWORD_CHANGE_URL(), requestBody)
-}//비밀번호 입력 후 재설정 요청 
-
-
-
+    return apiClient.put(RESET_PASSWORD_CHANGE_URL(), requestBody)}
+    //비밀번호 입력 후 재설정 요청 
 
 // ================================ 카테고리 =============================
 const GET_CATEGORY_LIST_URL = () => `/categories/tree`;
@@ -170,61 +177,155 @@ export const getCategoryChildrenRequest = async (parentId : number | string) : P
 
 
 // ================================ 상품 =================================
-const GET_PRODUCT_LIST_URL = () => `/products`
-const GET_PRODUCT_DETAIL_URL = (productId : number) => `/products/${productId}`
+const GET_PRODUCT_LIST_URL = () => `/products`;
+//상품 리스트 조회
+const GET_PRODUCT_DETAIL_URL = (productId : number) => `/products/${productId}`;
+//상품 상세 조회
+const GET_PRODUCT_SKU_RESOLVE_URL = (productId : number) => `/products/${productId}/skus/resolve`;
+//상품 sku 확정
 
 export const getProductListRequest = async (params : GetProductListRequestDto) : Promise<GetProductListResponseDto> => {
     return apiClient.get(GET_PRODUCT_LIST_URL() , {params} )};
 
 export const getProductDetailRequest = async (productId : number) : Promise<GetProductDetailListResponseDto> => {
-    return apiClient.get(GET_PRODUCT_DETAIL_URL(productId))}
+    return apiClient.get(GET_PRODUCT_DETAIL_URL(productId))};
+
+export const getProductSkuResolveRequest = async (productId :number , optionValueIds : number[]) : Promise<ProductSkuResolveResponse> => {
+    return apiClient.get(GET_PRODUCT_SKU_RESOLVE_URL(productId) , {params: {optionValueIds: optionValueIds.join(',')}});}
+
+// ================================ 주문 ============================
+const POST_ORDER_FROM_CART_URL = () => `/order/from-cart`;
+//장바구니에서 주문하기 시.. 
+const POST_ORDER_DIRECT_URL = () => `/order/direct`;
+//즉시 구매 주문하기 시..
+
+export const postOrderFromCartRequest = async(requestBody : OrderFromCartRequestDto) : Promise<OrderCreateResponseDto> => {
+    return apiClient.post(POST_ORDER_FROM_CART_URL(), requestBody);}
+
+export const postOrderDirectRequest = async(requestBody: DirectOrderRequestDto) : Promise<OrderCreateResponseDto> => {
+    return apiClient.post(POST_ORDER_DIRECT_URL(), requestBody);}
 
 
+//================================= 결제 ============================
+const POST_PAYMENTS_CONFIRM_URL = () => `/payments/confirm`;
+//결제 승인
+const POST_PAYMENTS_CANCEL_URL = () => `/payments/cancel`;
+//결제 취소 
+
+export const postPaymentsConfirmRequest = async(requestBody : PaymentConfirmRequestDto) : Promise<PaymentConfirmResponseDto> => {
+    return apiClient.post(POST_PAYMENTS_CONFIRM_URL(), requestBody);}
+
+export const postPaymentsCancelRequest = async(requestBody : PaymentCancelRequestDto) : Promise<PaymentCancelResponseDto> => {
+    return apiClient.post(POST_PAYMENTS_CANCEL_URL(), requestBody);}
 
 
-// ================================ 주문/결제 ============================
+//================================ 포인트 ============================
+const GET_POINTS_ME_URL = () => `/points/me`;
+//포인트 조회하기 
+const GET_POINTS_ME_HISTORY_URL = (page : number|null , size : number|null) => `/points/me/history?page=${page}&size=${size}`;
+//포인트 히스토리 조회하기  
+const POST_POINTS_ME_EARN_URL = () => `/points/me/earn`;
+//포인트 적립 하기 
+const POST_POINTS_ME_USE_URL = () => `/points/me/use`;
+//포인트 사용하기 
 
+export const getPointsMeRequest = () : Promise<PointBalanceResponseDto> => {
+    return apiClient.get(GET_POINTS_ME_URL());}
+    
+export const getPointsMeHistoryRequest = (page: number|null , size : number | null) : Promise<PointHistoryResponseDto[]> => {
+    return apiClient.get(GET_POINTS_ME_HISTORY_URL(page,size));}
 
+export const postPointsMeEarnRequest = (requestBody : PointChangeRequestDto) => {
+    return apiClient.post(POST_POINTS_ME_EARN_URL(), requestBody);}
+
+export const postPointMeUseRequest = (requestBody : PointChangeRequestDto) => {
+    return apiClient.post(POST_POINTS_ME_USE_URL(), requestBody);}
 
 
 
 // ================================ 장바구니 ================================
-const POST_CART_ITEM_URL = () => `/cart/items`
+const POST_CART_ITEM_URL = () => `/cart/items`;
 //장바구니에 담는 요청 
-const GET_CART_ITEM_URL = () => `/cart/items`
+const GET_CART_ITEM_URL = () => `/cart/items`;
 //장바구니 조회
-
+const PUT_CART_ITEM_URL = (cartItemId : number) => `/cart/items/${cartItemId}`;
+//장바구니 수량 수정 
+const DELETE_CART_ITEM_URL = (cartItemId : number) => `/cart/item/${cartItemId}`;
+//장바구니 특정부분 삭제 
+const DELETE_CLEAR_CART_ITEM_URL = () => `/cart/items`;
+//장바구니 전체삭제 
 
 export const postCartItemRequest = async (requestBody : CartItemRequestDto) => {
     return apiClient.post(POST_CART_ITEM_URL(), requestBody)}
 
-export const getCartItemResponse = async () : Promise<CartItemResponseDto> => {
-    
-}
+export const getCartItemRequest = async () : Promise<CartItemResponseDto> => {
+    return apiClient.get(GET_CART_ITEM_URL());}
+
+export const putCartItemRequest = async ({cartItemId , requestBody} : {cartItemId : number , requestBody : PutCartItemRequestDto }) => {
+    return apiClient.put(PUT_CART_ITEM_URL(cartItemId), requestBody);}  
+
+export const deleteCartItemRequest = async(cartItemId : number) => {
+    return apiClient.delete(DELETE_CART_ITEM_URL(cartItemId));}
+
+export const deleteClearCartItemRequest = async() => {
+    return apiClient.delete(DELETE_CLEAR_CART_ITEM_URL());}
 
 
 
+// ===============================   게시물 ===================================
+const GET_POSTS_URL = () => `/posts`;
+//게시물 목록 조회 
+const GET_POSTS_DETAIL_URL = (postId : number) => `/posts/${postId}`;
+//게시물 상세 조회
+
+export const getPostRequest = (params : PostListRequestDto) : Promise<PostResponseDto> => {
+    return apiClient.get(GET_POSTS_URL(), {params});}
+
+export const getPostDetailRequest = (postId : number) : Promise<PostResponseDto> => {
+    return apiClient.get(GET_POSTS_DETAIL_URL(postId))};
+
+// ================================ 리뷰 =======================================
+const GET_PRODUCTS_REVIEWS_URL = (productId : number , page : number , size : number) => `/products/${productId}/reviews?page=${page}&size=${size}`
+//상품 리뷰 조회 
+const POST_PRODUCTS_REVIEWS_URL = (productId : number) => `/products/${productId}/reviews`;
+//상품 리뷰 생성 
+const PUT_PRODUCTS_REVIEWS_URL = (reviewId : number) => `/reviews/${reviewId}`;
+//상품 리뷰 수정
+const DELETE_PRODUCTS_REVIEWS_URL = (reviewId : number) => `/reviews/${reviewId}`;
+//상품 리뷰 삭제
+
+
+export const getProductReviewRequest = (productId : number , page : number , size : number) : Promise<ProductReviewResponseDto> => {
+    return apiClient.get(GET_PRODUCTS_REVIEWS_URL(productId,page,size));}
+
+export const postProductReviewRequest = (productId : number, requestBody : ProductReviewCreateRequestDto) : Promise<ProductReviewResponseDto> => {
+    return apiClient.post(POST_PRODUCTS_REVIEWS_URL(productId), requestBody);}
+
+export const putProductReviewRequest = (reviewId : number, requestBody : ProductReviewUpdateRequestDto ) : Promise<ProductReviewResponseDto> => {
+    return apiClient.put(PUT_PRODUCTS_REVIEWS_URL(reviewId), requestBody);}
+
+export const deleteProductReviewRequest = (reviewId : number) => {
+    return apiClient.delete(DELETE_PRODUCTS_REVIEWS_URL(reviewId));}
 
 
 
+// ================================ QNA채팅 ================================
+const GET_QNA_ROOM_URL = () => `/qna/room`;
+//채팅방 조회 
+const GET_QNA_MESSAGES_URL = (roomId : number , limit : number) => `/qna/messages?roomId=${roomId}&limit=${limit}`;
+//제한된 메세지 조회 
 
-// ================================   채팅 ================================
-const POST_CHATROOM_ID_URL = () => `/chat/room`;
-// => jwt 토큰 여부도 있어야 한다 . "회원 한정이므로"
+export const getQnaRoomRequest = () : Promise<QnaRoomResponseDto> => {
+    return apiClient.get(GET_QNA_ROOM_URL())}
 
-
-export const postChatRoomIdRequest = async (requestBody : PostChatRoomIdRequestDto ) : Promise<PostChatRoomIdResponseDto> => {
-    return apiClient.post(POST_CHATROOM_ID_URL(), requestBody )}; 
-    //roomId 발급과정 
-
-
-
+export const getQnaMessageRequest = (roomId : number , limit : number) : Promise<QnaMessageResponseDto> => {
+    return apiClient.get(GET_QNA_MESSAGES_URL(roomId,limit))}
 
 
 
 //==================================  광고 ===============================
 //광고 팝업 리스트 불러오기
-const GET_POPUP_LIST_URL = () => `/popup/popup-list`;
+const GET_POPUP_LIST_URL = () => `/popups`;
 
 export const getPopupListRequest = async () : Promise<GetPopupListResponseDto> => {
     return apiClient.get(GET_POPUP_LIST_URL());};
@@ -237,12 +338,6 @@ const GET_BANNER_LIST_URL = () => `/banners`
 export const getBannerListRequest = async () : Promise<GetBannerResponseDto> => {
     return apiClient.get(GET_BANNER_LIST_URL())
 }
-
-
-
-// =================================== 마이페이지 ==========================
-
-
 
 
 

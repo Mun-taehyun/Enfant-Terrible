@@ -11,11 +11,12 @@ import { QueryClient } from "@tanstack/react-query";
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 1,
+      // 10분 동안 데이터를 "신선한(fresh)" 상태로 간주
+      staleTime: 1000 * 60 * 10,
     }, //서버 통신이 안될 때 1번은 재시도를 한다 . 
-    mutations: {
-      retry: 1
-    } //서버에 업로드 , 수정 , 삭제 요청이 실패했을 때 1번씩은 재시도를 한다.
+    // mutations: {
+
+    // } //서버에 업로드 , 수정 , 삭제 요청이 실패했을 때 1번씩은 재시도를 한다.
   }
 });
 //전역으로 사용할 queryClient => useQuery , useMutation 에 공통 설정으로 들어간다. 

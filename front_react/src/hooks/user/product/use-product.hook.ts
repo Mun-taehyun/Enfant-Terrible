@@ -1,5 +1,6 @@
 import { GetProductListRequestDto } from "@/apis/user/request/product";
 import { PRODUCT_PATH } from "@/constant/user/route.index";
+import { categoryQueries } from "@/querys/user/queryhooks";
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
@@ -9,6 +10,9 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 
 //커스텀 훅 : 상품 관련
 export const useProduct = () => {
+
+    //서버상태 : 카테고리 트리 
+    const {data : categoryTree } = categoryQueries.useCategoryList();
 
     //상태: 쿼리스트링 훅 사용
     const [searchParams, setSearchParams] = useSearchParams();
@@ -80,8 +84,13 @@ export const useProduct = () => {
   
     
     return { 
-        params,         updateSearchFilter,         searchParams,              currentSort,
-        //초기화 변수   / URL 검색누적 필터         / 쿼리스트링 key=value 형식  /정렬 방식 
+        params,                 searchParams,              currentSort,
+        //초기화 변수           / 쿼리스트링 key=value 형식  /정렬 방식 
+
+        categoryTree,
+        //카테고리 변수를 활용.. 
+        updateSearchFilter, 
+        // URL 검색누적 필터 
 
         HeaderCategoryEventHandler,
         //상단 카테고리

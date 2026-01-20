@@ -1,5 +1,7 @@
-import type PostChatRoomIdResponseDto from "./post-chatroom-id-response.dto";
+import QnaRoomResponseDto from "./qna-room-response.dto"
+import QnaMessageResponseDto from "./qna-message-response.dto"
 
 export type {
-    PostChatRoomIdResponseDto
+    QnaMessageResponseDto,
+    QnaRoomResponseDto
 }

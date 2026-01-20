@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_DOMAIN = "http://localhost:4000";
+const API_DOMAIN = "http://localhost:8080/api";
 // const BASE_URL = "https://4eb28f5b-12e9-4051-8cf1-74cb997b3a9f.mock.pstmn.io"
 
 const apiClient = axios.create({

@@ -4,5 +4,9 @@ export default interface CategoryItem {
     name : string;
     depth : number | string;
     sortOrder : number; 
-    isActive : boolean;
+    status : string;
 }
+
+//   카테고리 상태 
+//   ACTIVE("Y"),
+//   INACTIVE("N"); 활성화 비활성화 여부 
