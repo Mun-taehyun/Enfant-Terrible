@@ -6,7 +6,8 @@ import AdminLayout from "./layouts/admin/AdminLayout";
 import LoginView from "./views/admin/login.view";
 import UsersView from "./views/admin/users.view";
 import SalesView from "./views/admin/sales.view";
-import CategoriesView from "./views/admin/categories.view.tsx"; // ✅ 추가
+import CategoriesView from "./views/admin/categories.view.tsx";
+import ProductsView from "./views/admin/productsView.tsx";
 
 const isAuthenticated = () => {
   const token = localStorage.getItem("accessToken");
@@ -49,7 +50,15 @@ export default function App() {
         <Route index element={<SalesView />} />
         <Route path="sales" element={<SalesView />} />
         <Route path="users" element={<UsersView />} />
-        <Route path="categories" element={<CategoriesView />} /> {/* ✅ 추가 */}
+        <Route path="categories" element={<CategoriesView />} />
+        <Route path="products" element={<ProductsView />} />
+
+        {/* ❗ 아직 화면 없는 라우트들은 만들기 전까지 들어오면 index로 보냄 */}
+        <Route path="chat" element={<Navigate to="/admin" replace />} />
+        <Route path="orders" element={<Navigate to="/admin" replace />} />
+        <Route path="reviews" element={<Navigate to="/admin" replace />} />
+        <Route path="popup" element={<Navigate to="/admin" replace />} />
+        <Route path="banner" element={<Navigate to="/admin" replace />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/admin/login" replace />} />

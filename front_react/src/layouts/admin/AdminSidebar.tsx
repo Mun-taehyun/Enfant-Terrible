@@ -10,33 +10,39 @@ const ADMIN_NAV: AdminNavSection[] = [
   {
     title: "운영",
     items: [
-      { label: "쇼핑몰 매출확인", to: "/admin" }, 
+      { label: "쇼핑몰 매출확인", to: "/admin" },
       { label: "카테고리 관리", to: "/admin/categories" },
     ],
   },
   {
     title: "상품 제어",
     items: [
-      { label: "상품 관리", to: "/admin/products/manage" },
+      // ✅ 우리가 만든 상품 관리 경로로 변경
+      { label: "상품 관리", to: "/admin/products" },
     ],
   },
   {
     title: "고객 소통",
-    items: [{ label: "사용자 채팅방 관리", to: "/admin/chat" }],
+    items: [
+      // ❗ 아직 라우트/화면 없으면 깨지므로 일단 /admin으로
+      { label: "사용자 채팅방 관리", to: "/admin" },
+    ],
   },
   {
     title: "회원 관리",
     items: [
-      { label: "사용자 정보 조회", to: "/admin/users" }, 
-      { label: "주문 목록 조회", to: "/admin/orders" },
-      { label: "리뷰 삭제 관리", to: "/admin/reviews" },
+      { label: "사용자 정보 조회", to: "/admin/users" },
+      // ❗ 아직 라우트/화면 없으면 깨지므로 일단 /admin으로
+      { label: "주문 목록 조회", to: "/admin" },
+      { label: "리뷰 삭제 관리", to: "/admin" },
     ],
   },
   {
     title: "광고 및 홍보",
     items: [
-      { label: "광고 팝업 설정", to: "/admin/popup" },
-      { label: "광고 배너 설정", to: "/admin/banner" },
+      // ❗ 아직 라우트/화면 없으면 깨지므로 일단 /admin으로
+      { label: "광고 팝업 설정", to: "/admin" },
+      { label: "광고 배너 설정", to: "/admin" },
     ],
   },
 ];
@@ -66,10 +72,10 @@ const AdminSidebar = () => {
           <SidebarSection key={section.title} title={section.title}>
             {section.items.map((item) => (
               <NavLink
-                key={item.to}
+                key={item.to + item.label}
                 to={item.to}
                 className={linkClassName}
-                end={item.to === "/admin"}  // ✅ /admin만 정확히 매칭
+                end={item.to === "/admin"} // ✅ /admin만 정확히 매칭
               >
                 {item.label}
               </NavLink>

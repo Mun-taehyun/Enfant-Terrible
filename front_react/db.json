@@ -239,7 +239,12 @@
       "price": 189000,
       "stock": 15,
       "img": "https://via.placeholder.com/150",
-      "description": "겨울철 따뜻하게 입을 수 있는 프리미엄 울 코트입니다."
+      "description": "겨울철 따뜻하게 입을 수 있는 프리미엄 울 코트입니다.",
+      "productCode": "P-0001",
+      "basePrice": 189000,
+      "status": "ACTIVE",
+      "createdAt": "2026-01-10T00:00:00.000Z",
+      "deleted_at": null
     },
     {
       "id": 2,
@@ -248,7 +253,12 @@
       "price": 25000,
       "stock": 100,
       "img": "https://via.placeholder.com/150",
-      "description": "부드러운 촉감의 데일리 면 티셔츠."
+      "description": "부드러운 촉감의 데일리 면 티셔츠.",
+      "productCode": "P-0002",
+      "basePrice": 25000,
+      "status": "ACTIVE",
+      "createdAt": "2026-01-11T00:00:00.000Z",
+      "deleted_at": null
     }
   ],
   "notices": [
@@ -257,6 +267,56 @@
       "title": "신규 회원 가입 이벤트 안내",
       "content": "신규 가입 시 10% 할인 쿠폰을 드립니다.",
       "date": "2026-01-10"
+    }
+  ],
+
+
+  "productOptionGroups": [
+    {
+      "groupId": 1,
+      "productId": 1,
+      "name": "사이즈",
+      "sortOrder": 1,
+      "createdAt": "2026-01-10T00:00:00.000Z",
+      "deleted_at": null
+    },
+    {
+      "groupId": 2,
+      "productId": 1,
+      "name": "색상",
+      "sortOrder": 2,
+      "createdAt": "2026-01-10T00:00:00.000Z",
+      "deleted_at": null
+    }
+  ],
+  "productOptionValues": [
+    { "valueId": 1, "groupId": 1, "value": "S", "sortOrder": 1, "deleted_at": null },
+    { "valueId": 2, "groupId": 1, "value": "M", "sortOrder": 2, "deleted_at": null },
+    { "valueId": 3, "groupId": 1, "value": "L", "sortOrder": 3, "deleted_at": null },
+
+    { "valueId": 4, "groupId": 2, "value": "BLACK", "sortOrder": 1, "deleted_at": null },
+    { "valueId": 5, "groupId": 2, "value": "GRAY", "sortOrder": 2, "deleted_at": null }
+  ],
+  "productSkus": [
+    {
+      "skuId": 1,
+      "productId": 1,
+      "skuCode": "SKU-0001",
+      "price": 189000,
+      "stock": 5,
+      "status": "ON_SALE",
+      "createdAt": "2026-01-10T00:00:00.000Z",
+      "deleted_at": null
+    },
+    {
+      "skuId": 2,
+      "productId": 1,
+      "skuCode": "SKU-0002",
+      "price": 199000,
+      "stock": 10,
+      "status": "SOLD_OUT",
+      "createdAt": "2026-01-10T00:00:00.000Z",
+      "deleted_at": null
     }
   ]
 }
