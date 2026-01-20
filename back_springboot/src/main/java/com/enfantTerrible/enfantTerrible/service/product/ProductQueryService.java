@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +46,7 @@ public class ProductQueryService {
   private final ProductDiscountService productDiscountService;
   private final FileQueryService fileQueryService;
   private final ApplicationEventPublisher eventPublisher;
+  private final ObjectProvider<HttpServletRequest> requestProvider;
 
   /* =========================
      목록 (Product 중심)
@@ -231,8 +235,28 @@ public class ProductQueryService {
 
     res.setSkus(new java.util.ArrayList<>(skuMap.values()));
 
-    eventPublisher.publishEvent(new ProductViewedEvent(userId, productId));
+    HttpServletRequest request = requestProvider.getIfAvailable();
+    String sessionId = request != null && request.getSession(false) != null
+        ? request.getSession(false).getId()
+        : "";
+    String clientIp = getClientIp(request);
+    String userAgent = request != null ? request.getHeader("User-Agent") : "";
+
+    eventPublisher.publishEvent(
+        new ProductViewedEvent(userId, productId, sessionId, clientIp, userAgent)
+    );
 
     return res;
+  }
+
+  private String getClientIp(HttpServletRequest request) {
+    if (request == null) {
+      return "";
+    }
+    String forwarded = request.getHeader("X-Forwarded-For");
+    if (forwarded != null && !forwarded.isBlank()) {
+      return forwarded.split(",")[0];
+    }
+    return request.getRemoteAddr();
   }
 }

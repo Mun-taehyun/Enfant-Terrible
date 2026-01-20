@@ -45,6 +45,9 @@ public class SecurityConfig {
 
       // URL 권한 설정
       .authorizeHttpRequests(auth -> auth
+        // CORS preflight
+        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
         // 인증 없이 접근 (로그인/이메일 인증/비밀번호 재설정 등)
         .requestMatchers(
           "/api/auth/**",
@@ -56,10 +59,19 @@ public class SecurityConfig {
         // 인증 없이 접근 (쇼핑몰 공개 조회)
         .requestMatchers(HttpMethod.GET,
           "/api/categories/**",
-          "/api/products/**",
           "/api/posts/**",
           "/api/banners/**",
           "/api/popups/**"
+        ).permitAll()
+
+        // 인증 없이 접근 (상품/리뷰 공개 조회)
+        // - 상품 목록/상세는 비회원 허용
+        // - 리뷰 목록은 비회원 허용
+        // - SKU resolve 등 기타 하위 기능은 기본적으로 인증 필요
+        .requestMatchers(HttpMethod.GET,
+          "/api/products",
+          "/api/products/*",
+          "/api/products/*/reviews"
         ).permitAll()
 
         // 회원가입은 인증 없이 허용
