@@ -24,6 +24,20 @@
       p.created_at
     FROM et_product p
     JOIN et_category c ON c.category_id = p.category_id
+
+    <if test="orderBy == 'BEST_SELLING'">
+      LEFT JOIN (
+        SELECT
+          s.product_id,
+          COALESCE(SUM(oi.quantity - oi.cancelled_quantity), 0) AS sold_qty
+        FROM et_order_item oi
+        JOIN et_order o ON o.order_id = oi.order_id
+        JOIN et_product_sku s ON s.sku_id = oi.sku_id
+        WHERE o.order_status IN ('PAID', 'PARTIALLY_CANCELLED', 'SHIPPING', 'DELIVERED')
+        GROUP BY s.product_id
+      ) sales ON sales.product_id = p.product_id
+    </if>
+
     WHERE p.deleted_at IS NULL
       AND p.status IN ('ON_SALE', 'SOLD_OUT')
 
@@ -35,10 +49,36 @@
       AND p.name LIKE CONCAT('%', #{keyword}, '%')
     </if>
 
+    <if test="minPrice != null">
+      AND p.base_price &gt;= #{minPrice}
+    </if>
+
+    <if test="maxPrice != null">
+      AND p.base_price &lt;= #{maxPrice}
+    </if>
+
+    <if test="minRating != null">
+      AND p.average_rating &gt;= #{minRating}
+    </if>
+
+    <if test="hasDiscount != null and hasDiscount">
+      AND EXISTS (
+        SELECT 1
+        FROM et_product_discount d
+        WHERE d.product_id = p.product_id
+          AND (d.start_at IS NULL OR d.start_at &lt;= NOW())
+          AND (d.end_at IS NULL OR d.end_at &gt;= NOW())
+      )
+    </if>
+
     ORDER BY
     <choose>
+      <when test="orderBy == 'RECENT'">p.created_at DESC, p.product_id DESC</when>
+      <when test="orderBy == 'BEST_SELLING'">COALESCE(sales.sold_qty, 0) DESC, p.product_id DESC</when>
       <when test="orderBy == 'PRICE_ASC'">p.base_price ASC</when>
       <when test="orderBy == 'PRICE_DESC'">p.base_price DESC</when>
+      <when test="orderBy == 'RATING_DESC'">p.average_rating DESC, p.product_id DESC</when>
+      <when test="orderBy == 'REVIEW_COUNT_DESC'">p.review_count DESC, p.product_id DESC</when>
       <when test="orderBy == 'NAME'">p.name ASC</when>
       <when test="orderBy == 'CREATED_AT'">p.created_at DESC</when>
       <otherwise>p.product_id DESC</otherwise>
@@ -67,6 +107,33 @@
     WHERE p.product_id = #{productId}
       AND p.deleted_at IS NULL
       AND p.status IN ('ON_SALE', 'SOLD_OUT')
+  </select>
+
+  <select id="findProductsByIds" resultType="ProductRow">
+    SELECT
+      p.product_id,
+      p.category_id,
+      c.name AS category_name,
+      p.name,
+      p.description,
+      p.base_price AS min_sku_price,
+      p.average_rating,
+      p.review_count,
+      p.status,
+      p.created_at
+    FROM et_product p
+    JOIN et_category c ON c.category_id = p.category_id
+    WHERE p.product_id IN
+    <foreach item="id" collection="productIds" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+      AND p.deleted_at IS NULL
+      AND p.status IN ('ON_SALE', 'SOLD_OUT')
+    ORDER BY FIELD(p.product_id,
+    <foreach item="id" collection="productIds" separator=",">
+      #{id}
+    </foreach>
+    )
   </select>
 
   <update id="refreshReviewCache">

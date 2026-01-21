@@ -17,8 +17,16 @@
       created_at
     FROM et_point_history
     WHERE user_id = #{userId}
-    ORDER BY point_history_id DESC
-    LIMIT #{size} OFFSET #{offset}
+    ORDER BY
+    <choose>
+      <when test="req.sortBy == 'CREATED_AT'">created_at</when>
+      <otherwise>point_history_id</otherwise>
+    </choose>
+    <choose>
+      <when test="req.direction == 'ASC'">ASC</when>
+      <otherwise>DESC</otherwise>
+    </choose>
+    LIMIT #{req.size} OFFSET #{req.offset}
   </select>
 
   <select id="countHistory" resultType="int">

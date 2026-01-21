@@ -51,7 +51,16 @@
       u.last_login_at
     FROM et_user u
     <include refid="adminUserSearchWhere" />
-    ORDER BY u.user_id DESC
+    ORDER BY
+    <choose>
+      <when test="req.sortBy == 'CREATED_AT'">u.created_at</when>
+      <when test="req.sortBy == 'LAST_LOGIN_AT'">u.last_login_at</when>
+      <otherwise>u.user_id</otherwise>
+    </choose>
+    <choose>
+      <when test="req.direction == 'ASC'">ASC</when>
+      <otherwise>DESC</otherwise>
+    </choose>
     LIMIT #{req.size} OFFSET #{req.offset}
   </select>
 

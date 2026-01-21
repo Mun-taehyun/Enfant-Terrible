@@ -57,6 +57,10 @@ public class ProductQueryService {
       Integer sizeParam,
       Long categoryId,
       String keyword,
+      Long minPrice,
+      Long maxPrice,
+      Float minRating,
+      Boolean hasDiscount,
       String sort
   ) {
 
@@ -74,6 +78,10 @@ public class ProductQueryService {
     List<ProductRow> rows = productMapper.findProducts(
         categoryId,
         keyword,
+        minPrice,
+        maxPrice,
+        minRating,
+        hasDiscount,
         sortType.name(),
         size,
         offset

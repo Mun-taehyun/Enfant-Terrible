@@ -25,13 +25,39 @@
     <if test="req.status != null and req.status != ''">
       AND s.status = #{req.status}
     </if>
+
+    <if test="req.minPrice != null">
+      AND s.price &gt;= #{req.minPrice}
+    </if>
+
+    <if test="req.maxPrice != null">
+      AND s.price &lt;= #{req.maxPrice}
+    </if>
+
+    <if test="req.minStock != null">
+      AND s.stock &gt;= #{req.minStock}
+    </if>
+
+    <if test="req.maxStock != null">
+      AND s.stock &lt;= #{req.maxStock}
+    </if>
   </sql>
 
   <select id="findSkus" resultType="AdminSkuRow">
     SELECT <include refid="selectColumns" />
     FROM et_product_sku s
     <include refid="where" />
-    ORDER BY s.sku_id DESC
+    ORDER BY
+    <choose>
+      <when test="req.sortBy == 'CREATED_AT'">s.created_at</when>
+      <when test="req.sortBy == 'PRICE'">s.price</when>
+      <when test="req.sortBy == 'STOCK'">s.stock</when>
+      <otherwise>s.sku_id</otherwise>
+    </choose>
+    <choose>
+      <when test="req.direction == 'ASC'">ASC</when>
+      <otherwise>DESC</otherwise>
+    </choose>
     LIMIT #{size} OFFSET #{offset}
   </select>
 

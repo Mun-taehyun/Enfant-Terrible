@@ -16,6 +16,18 @@
       AND p.user_id = #{req.userId}
     </if>
 
+    <if test="req.keyword != null and req.keyword != ''">
+      AND p.title LIKE CONCAT('%', #{req.keyword}, '%')
+    </if>
+
+    <if test="req.createdFrom != null">
+      AND p.created_at &gt;= #{req.createdFrom}
+    </if>
+
+    <if test="req.createdTo != null">
+      AND p.created_at &lt;= #{req.createdTo}
+    </if>
+
     AND p.deleted_at IS NULL
   </sql>
 
@@ -29,7 +41,16 @@
       p.updated_at
     FROM et_post p
     <include refid="adminPostWhere" />
-    ORDER BY p.post_id DESC
+    ORDER BY
+    <choose>
+      <when test="req.sortBy == 'CREATED_AT'">p.created_at</when>
+      <when test="req.sortBy == 'UPDATED_AT'">p.updated_at</when>
+      <otherwise>p.post_id</otherwise>
+    </choose>
+    <choose>
+      <when test="req.direction == 'ASC'">ASC</when>
+      <otherwise>DESC</otherwise>
+    </choose>
     LIMIT #{req.size} OFFSET #{req.offset}
   </select>
 

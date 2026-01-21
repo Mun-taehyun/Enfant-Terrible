@@ -30,6 +30,26 @@
     <if test="req.productCode != null and req.productCode != ''">
       AND p.product_code LIKE CONCAT('%', #{req.productCode}, '%')
     </if>
+
+    <if test="req.categoryId != null">
+      AND p.category_id = #{req.categoryId}
+    </if>
+
+    <if test="req.minPrice != null">
+      AND p.base_price &gt;= #{req.minPrice}
+    </if>
+
+    <if test="req.maxPrice != null">
+      AND p.base_price &lt;= #{req.maxPrice}
+    </if>
+
+    <if test="req.createdFrom != null">
+      AND p.created_at &gt;= #{req.createdFrom}
+    </if>
+
+    <if test="req.createdTo != null">
+      AND p.created_at &lt;= #{req.createdTo}
+    </if>
   </sql>
 
   <select id="findProducts" resultType="AdminProductRow">
@@ -37,7 +57,25 @@
     FROM et_product p
     JOIN et_category c ON c.category_id = p.category_id
     <include refid="where" />
-    ORDER BY p.product_id DESC
+    ORDER BY
+    <choose>
+      <when test="req.sortBy == 'CREATED_AT'">
+        p.created_at
+      </when>
+      <when test="req.sortBy == 'BASE_PRICE'">
+        p.base_price
+      </when>
+      <when test="req.sortBy == 'NAME'">
+        p.name
+      </when>
+      <otherwise>
+        p.product_id
+      </otherwise>
+    </choose>
+    <choose>
+      <when test="req.direction == 'ASC'">ASC</when>
+      <otherwise>DESC</otherwise>
+    </choose>
     LIMIT #{size} OFFSET #{offset}
   </select>
 

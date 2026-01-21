@@ -28,7 +28,17 @@
       ) AS unread
     FROM et_qna_room r
     <include refid="adminQnaRoomWhere" />
-    ORDER BY COALESCE(r.last_message_at, r.created_at) DESC, r.room_id DESC
+    ORDER BY
+    <choose>
+      <when test="req.sortBy == 'CREATED_AT'">r.created_at</when>
+      <when test="req.sortBy == 'ROOM_ID'">r.room_id</when>
+      <otherwise>COALESCE(r.last_message_at, r.created_at)</otherwise>
+    </choose>
+    <choose>
+      <when test="req.direction == 'ASC'">ASC</when>
+      <otherwise>DESC</otherwise>
+    </choose>
+    , r.room_id DESC
     LIMIT #{req.size} OFFSET #{req.offset}
   </select>
 

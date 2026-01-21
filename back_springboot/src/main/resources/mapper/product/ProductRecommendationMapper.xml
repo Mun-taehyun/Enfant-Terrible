@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.enfantTerrible.enfantTerrible.mapper.product.ProductRecommendationMapper">
+
+  <select id="findRecommendedProductIdsByUserId" resultType="long">
+    SELECT
+      ur.product_id
+    FROM et_user_recommendation ur
+    JOIN et_product p ON p.product_id = ur.product_id
+    WHERE ur.user_id = #{userId}
+      AND p.deleted_at IS NULL
+      AND p.status IN ('ON_SALE', 'SOLD_OUT')
+    ORDER BY
+      ur.rank_no ASC,
+      ur.score DESC,
+      ur.recommendation_id DESC
+    LIMIT #{limit}
+  </select>
+
+  <select id="findBestSellingProductIds" resultType="long">
+    SELECT
+      s.product_id
+    FROM et_order_item oi
+    JOIN et_order o ON o.order_id = oi.order_id
+    JOIN et_product_sku s ON s.sku_id = oi.sku_id
+    JOIN et_product p ON p.product_id = s.product_id
+    WHERE p.deleted_at IS NULL
+      AND p.status IN ('ON_SALE', 'SOLD_OUT')
+      AND o.order_status IN ('PAID', 'PARTIALLY_CANCELLED', 'SHIPPING', 'DELIVERED')
+    GROUP BY s.product_id
+    ORDER BY SUM(oi.quantity - oi.cancelled_quantity) DESC,
+             s.product_id DESC
+    LIMIT #{limit}
+  </select>
+
+</mapper>

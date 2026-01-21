@@ -29,7 +29,17 @@
       b.created_at
     FROM et_banner b
     <include refid="adminBannerWhere" />
-    ORDER BY b.sort_order ASC, b.banner_id DESC
+    ORDER BY
+    <choose>
+      <when test="req.sortBy == 'BANNER_ID'">b.banner_id</when>
+      <when test="req.sortBy == 'CREATED_AT'">b.created_at</when>
+      <otherwise>b.sort_order</otherwise>
+    </choose>
+    <choose>
+      <when test="req.direction == 'DESC'">DESC</when>
+      <otherwise>ASC</otherwise>
+    </choose>
+    , b.banner_id DESC
     LIMIT #{req.size} OFFSET #{req.offset}
   </select>
 

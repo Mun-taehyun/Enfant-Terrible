@@ -81,7 +81,7 @@
       JOIN et_product_sku ps ON ps.sku_id = oi.sku_id
       WHERE o.order_id = #{orderId}
         AND o.user_id = #{userId}
-        AND o.status = 'PAID'
+        AND o.order_status = 'PAID'
         AND ps.product_id = #{productId}
     )
   </select>

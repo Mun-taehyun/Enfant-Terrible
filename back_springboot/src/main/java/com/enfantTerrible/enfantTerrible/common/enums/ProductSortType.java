@@ -5,8 +5,11 @@ import com.enfantTerrible.enfantTerrible.exception.BusinessException;
 public enum ProductSortType {
 
   RECENT("최신순"),
+  BEST_SELLING("판매량순"),
   PRICE_ASC("가격 낮은 순"),
   PRICE_DESC("가격 높은 순"),
+  RATING_DESC("평점 높은 순"),
+  REVIEW_COUNT_DESC("리뷰 많은 순"),
   NAME("이름순");
 
   private final String description;

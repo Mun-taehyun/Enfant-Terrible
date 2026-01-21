@@ -325,9 +325,9 @@
 - Auth: 없음
 - 제목: 상품 목록 조회
 - Query
-  - page, size, categoryId, keyword, sort (모두 선택)
+  - page, size, categoryId, keyword, minPrice, maxPrice, minRating, hasDiscount, sort (모두 선택)
 - Request 예시
-  /api/products?page=1&size=20&categoryId=1&keyword=사료&sort=latest
+  /api/products?page=1&size=20&categoryId=1&keyword=사료&minPrice=5000&maxPrice=30000&minRating=4.0&hasDiscount=true&sort=BEST_SELLING
 - Response 예시 (필드 일부)
   {
     "success": true,
@@ -704,7 +704,7 @@
 - Auth: ADMIN
 - 제목: 사용자 목록 조회
 - Query 예시
-  /api/admin/users?page=1&size=20&email=user1@example.com&status=ACTIVE
+  /api/admin/users?page=1&size=20&email=user1@example.com&status=ACTIVE&sortBy=LAST_LOGIN_AT&direction=DESC
 - Response 예시(형태)
   {
     "success": true,
@@ -797,7 +797,7 @@
 - Method/Path: GET /api/admin/products
 - 제목: 관리자 상품 목록 조회
 - Query 예시
-  /api/admin/products?page=1&size=20&keyword=사료&status=ON_SALE
+  /api/admin/products?page=1&size=20&keyword=사료&status=ON_SALE&categoryId=1&minPrice=5000&maxPrice=30000&sortBy=CREATED_AT&direction=DESC
 - Response 예시(형태)
   { "success": true, "data": { "items": [], "page": 1, "size": 20, "total": 0 }, "message": "관리자 상품 목록 조회 성공" }
 
@@ -903,7 +903,7 @@
 - Method/Path: GET /api/admin/products/skus
 - 제목: 관리자 SKU 목록 조회
 - Query 예시
-  /api/admin/products/skus?productId=1&status=ON_SALE
+  /api/admin/products/skus?productId=1&status=ON_SALE&minPrice=5000&maxPrice=30000&minStock=1&sortBy=PRICE&direction=ASC
 - Response 예시(형태)
   { "success": true, "data": { "items": [], "page": 1, "size": 20, "total": 0 }, "message": "관리자 SKU 목록 조회 성공" }
 
@@ -963,7 +963,6 @@
 - 제목: 상품 할인 삭제
 - Response 예시
   { "success": true, "data": null, "message": "상품 할인 삭제 성공" }
-
 ------------------------------------------------------------
 [ADMIN-ORDER] 주문 관리
 ------------------------------------------------------------
@@ -972,7 +971,7 @@
 - Method/Path: GET /api/admin/orders
 - 제목: 관리자 주문 목록 조회
 - Query 예시
-  /api/admin/orders?page=1&size=20&status=PAID&orderCode=ORD-20260101-0001
+  /api/admin/orders?page=1&size=20&status=PAID&orderCode=ORD-20260101-0001&minTotalAmount=10000&shippedFrom=2026-01-01T00:00:00&shippedTo=2026-01-31T23:59:59&deliveredFrom=2026-01-01T00:00:00&deliveredTo=2026-01-31T23:59:59&sortBy=DELIVERED_AT&direction=DESC
 - Response 예시(형태)
   { "success": true, "data": { "items": [], "page": 1, "size": 20, "total": 0 }, "message": "관리자 주문 목록 조회 성공" }
 
@@ -980,7 +979,7 @@
 - Method/Path: GET /api/admin/orders/{orderId}
 - 제목: 관리자 주문 상세 조회
 - Response 예시
-  { "success": true, "data": { "orderId": 1, "orderCode": "ORD-..." }, "message": "관리자 주문 상세 조회 성공" }
+  { "success": true, "data": { "orderId": 1, "orderCode": "ORD-...", "status": "PAID", "trackingNumber": "1234-5678", "shippedAt": "2026-01-01T10:00:00", "deliveredAt": "2026-01-03T10:00:00", "items": [ { "skuId": 123, "quantity": 2, "cancelledQuantity": 1, "remainingQuantity": 1 } ] }, "message": "관리자 주문 상세 조회 성공" }
 
 3) 주문 상태 변경
 - Method/Path: PATCH /api/admin/orders/{orderId}/status
@@ -1009,7 +1008,7 @@
     "reason": "재고 문제"
   }
 - Response 예시
-  { "success": true, "data": { "canceled": true }, "message": "부분취소 처리 완료" }
+  { "success": true, "data": { "orderId": 1, "orderStatus": "PARTIALLY_CANCELLED", "refundAmount": 10000, "remainingAmount": 20000 }, "message": "부분취소 처리 완료" }
 
 ------------------------------------------------------------
 [ADMIN-PAYMENT] 결제 관리
@@ -1019,7 +1018,7 @@
 - Method/Path: GET /api/admin/payments
 - 제목: 관리자 결제 목록 조회
 - Query 예시
-  /api/admin/payments?page=1&size=20&orderCode=ORD-20260101-0001&paymentStatus=PAID
+  /api/admin/payments?page=1&size=20&orderCode=ORD-20260101-0001&paymentStatus=PAID&minPaymentAmount=10000&sortBy=PAID_AT&direction=DESC
 - Response 예시(형태)
   { "success": true, "data": { "items": [], "page": 1, "size": 20, "total": 0 }, "message": "관리자 결제 목록 조회 성공" }
 
@@ -1051,7 +1050,7 @@
 - Method/Path: GET /api/admin/points/users/{userId}/history
 - 제목: 관리자 포인트 히스토리 조회
 - Query 예시
-  /api/admin/points/users/1/history?page=1&size=20
+  /api/admin/points/users/1/history?page=1&size=20&sortBy=CREATED_AT&direction=DESC
 - Response 예시
   { "success": true, "data": { "items": [], "page": 1, "size": 20, "total": 0 }, "message": "관리자 포인트 히스토리 조회 성공" }
 
@@ -1071,7 +1070,7 @@
 - Method/Path: GET /api/admin/posts
 - 제목: 관리자 게시글 목록 조회
 - Query 예시
-  /api/admin/posts?page=1&size=20&postType=NOTICE
+  /api/admin/posts?page=1&size=20&postType=NOTICE&keyword=공지&sortBy=UPDATED_AT&direction=DESC
 - Response 예시
   { "success": true, "data": { "items": [], "page": 1, "size": 20, "total": 0 }, "message": "관리자 게시글 목록 조회 성공" }
 
@@ -1111,7 +1110,7 @@
 - Method/Path: GET /api/admin/banners
 - 제목: 관리자 배너 목록 조회
 - Query 예시
-  /api/admin/banners?page=1&size=20&title=메인
+  /api/admin/banners?page=1&size=20&title=메인&sortBy=SORT_ORDER&direction=ASC
 - Response 예시
   { "success": true, "data": { "items": [], "page": 1, "size": 20, "total": 0 }, "message": "관리자 배너 목록 조회 성공" }
 
@@ -1151,7 +1150,7 @@
 - Method/Path: GET /api/admin/popups
 - 제목: 관리자 팝업 목록 조회
 - Query 예시
-  /api/admin/popups?page=1&size=20&title=쿠폰
+  /api/admin/popups?page=1&size=20&title=쿠폰&sortBy=CREATED_AT&direction=DESC
 - Response 예시
   { "success": true, "data": { "items": [], "page": 1, "size": 20, "total": 0 }, "message": "관리자 팝업 목록 조회 성공" }
 
@@ -1191,7 +1190,7 @@
 - Method/Path: GET /api/admin/qna/rooms
 - 제목: 관리자 QnA 방 목록 조회
 - Query 예시
-  /api/admin/qna/rooms?page=1&size=20&userId=1
+  /api/admin/qna/rooms?page=1&size=20&userId=1&sortBy=LAST_MESSAGE_AT&direction=DESC
 - Response 예시
   { "success": true, "data": { "items": [], "page": 1, "size": 20, "total": 0 }, "message": "관리자 QnA 방 목록 조회 성공" }
 
