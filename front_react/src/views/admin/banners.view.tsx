@@ -217,7 +217,7 @@ export default function BannersView() {
         </div>
 
         <div className={styles.filterItem}>
-          <label className={styles.label}>Size</label>
+          <label className={styles.label}>건수 정렬</label>
           <select
             className={styles.select}
             value={String(size)}
@@ -241,7 +241,7 @@ export default function BannersView() {
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>bannerId</th>
+              <th>배너ID</th>
               <th>제목</th>
               <th>링크</th>
               <th>정렬</th>

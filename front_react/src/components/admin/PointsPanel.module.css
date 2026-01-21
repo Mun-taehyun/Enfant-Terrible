@@ -1,0 +1,197 @@
+/* src/components/admin/PointsPanel.module.css */
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.balanceBox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.balanceLabel {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.balanceValue {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 12px;
+  align-items: start;
+  min-width: 0; /* ✅ 중요: grid 자식 overflow 계산 정상화 */
+}
+
+.card {
+  min-width: 0;
+}
+
+.cardTitle {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.label {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.input {
+  height: 34px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 0 10px;
+}
+
+.primaryBtn {
+  height: 38px;
+  border: none;
+  border-radius: 10px;
+  background: #111;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 6px;
+}
+
+.smallBtn {
+  height: 30px;
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 8px;
+  padding: 0 10px;
+  cursor: pointer;
+}
+
+.errorBox {
+  margin-top: 10px;
+  padding: 10px;
+  background: #fff3f3;
+  border: 1px solid #ffd2d2;
+  border-radius: 8px;
+  color: #a40000;
+  font-size: 12px;
+}
+
+.loading {
+  padding: 12px 0;
+  font-size: 13px;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.toolItem {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.toolLabel {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.select {
+  height: 30px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 0 8px;
+  background: #fff;
+}
+
+.meta {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-bottom: 8px;
+}
+
+.tableWrap {
+  overflow: auto;
+  min-width: 0;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 760px;
+}
+
+.table th,
+.table td {
+  border-bottom: 1px solid #eee;
+  padding: 8px;
+  font-size: 12px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.empty {
+  text-align: center;
+  padding: 16px;
+  opacity: 0.7;
+}
+
+.positive {
+  font-weight: 700;
+}
+
+.negative {
+  font-weight: 700;
+}
+
+.pager {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.pageText {
+  font-size: 12px;
+  opacity: 0.8;
+  min-width: 80px;
+  text-align: center;
+}
+
+@media (max-width: 1100px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

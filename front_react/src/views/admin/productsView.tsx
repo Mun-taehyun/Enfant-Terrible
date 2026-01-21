@@ -4,7 +4,7 @@ import styles from "./productsView.module.css";
 
 import type { AdminProductListParams } from "@/types/admin/product";
 import { useAdminProducts } from "@/hooks/admin/adminProduct.hook";
-import ProductDetailView from "@/views/admin/productDetailView";
+import ProductDetailView from "@/views/admin/productsDetailView";
 
 export default function ProductsView() {
   const [page, setPage] = useState<number>(1);

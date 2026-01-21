@@ -309,36 +309,36 @@
     }
   ],
   "payments": [
-  {
-    "paymentId": 5001,
-    "orderId": 1001,
-    "userId": 2,
-    "orderCode": "ET20260110-0001",
-    "paymentMethod": "CARD",
-    "paymentAmount": 189000,
-    "paymentStatus": "PAID",
-    "pgTid": "MOCK-TID-5001",
-    "paidAt": "2026-01-10T10:16:00+09:00",
-    "createdAt": "2026-01-10T10:16:05+09:00",
-    "updatedAt": "2026-01-10T10:16:05+09:00"
-  },
-  {
-    "paymentId": 5002,
-    "orderId": 1002,
-    "userId": 3,
-    "orderCode": "ET20260111-0001",
-    "paymentMethod": "VBANK",
-    "paymentAmount": 25000,
-    "paymentStatus": "PAID",
-    "pgTid": "MOCK-TID-5002",
-    "paidAt": "2026-01-11T12:06:00+09:00",
-    "createdAt": "2026-01-11T12:06:10+09:00",
-    "updatedAt": "2026-01-11T12:06:10+09:00"
-  }
-],
-"productDiscounts": [],
-
- "posts": [
+    {
+      "paymentId": 5001,
+      "orderId": 1001,
+      "userId": 2,
+      "orderCode": "ET20260110-0001",
+      "paymentMethod": "CARD",
+      "paymentAmount": 189000,
+      "paymentStatus": "PAID",
+      "pgTid": "MOCK-TID-5001",
+      "paidAt": "2026-01-10T10:16:00+09:00",
+      "createdAt": "2026-01-10T10:16:05+09:00",
+      "updatedAt": "2026-01-10T10:16:05+09:00"
+    },
+    {
+      "paymentId": 5002,
+      "orderId": 1002,
+      "userId": 3,
+      "orderCode": "ET20260111-0001",
+      "paymentMethod": "VBANK",
+      "paymentAmount": 25000,
+      "paymentStatus": "CANCELED",
+      "pgTid": "MOCK-TID-5002",
+      "paidAt": "2026-01-11T12:06:00+09:00",
+      "createdAt": "2026-01-11T12:06:10+09:00",
+      "updatedAt": "2026-01-21T08:41:06.474Z",
+      "cancelReason": "ahffk"
+    }
+  ],
+  "productDiscounts": [],
+  "posts": [
     {
       "postId": 1,
       "userId": 1,
@@ -353,69 +353,111 @@
     }
   ],
   "popups": [
+    {
+      "popupId": 1,
+      "title": "신년 세일 안내",
+      "content": "신년 한정 10% 쿠폰 지급",
+      "linkUrl": "https://example.com/event/newyear",
+      "position": "TOP_RIGHT",
+      "width": 420,
+      "height": 320,
+      "isActive": true,
+      "startAt": "2026-01-20T00:00",
+      "endAt": "2026-02-01T23:59",
+      "imageUrl": "https://via.placeholder.com/600x400",
+      "createdAt": "2026-01-20T01:00:00.000Z",
+      "updatedAt": "2026-01-20T01:00:00.000Z",
+      "deletedAt": null
+    },
+    {
+      "popupId": 2,
+      "title": "배송 지연 공지",
+      "content": "설 연휴로 배송이 지연될 수 있습니다.",
+      "linkUrl": null,
+      "position": "BOTTOM_LEFT",
+      "width": 480,
+      "height": 260,
+      "isActive": false,
+      "startAt": null,
+      "endAt": null,
+      "imageUrl": null,
+      "createdAt": "2026-01-18T10:00:00.000Z",
+      "updatedAt": "2026-01-18T10:00:00.000Z",
+      "deletedAt": null
+    }
+  ],
+  "banners": [
+    {
+      "bannerId": 1,
+      "title": "겨울 시즌 메인",
+      "linkUrl": "https://example.com/season/",
+      "sortOrder": 1,
+      "isActive": true,
+      "startAt": "2025-12-11T00:00",
+      "endAt": "2026-02-10T23:59",
+      "imageUrl": null,
+      "createdAt": "2026-01-20T01:00:00.000Z",
+      "updatedAt": "2026-01-21T07:51:12.108Z",
+      "deletedAt": null
+    },
+    {
+      "bannerId": 2,
+      "title": "신규 가입 이벤트",
+      "linkUrl": "https://example.com/event/join",
+      "sortOrder": 2,
+      "isActive": false,
+      "startAt": null,
+      "endAt": null,
+      "imageUrl": "https://via.placeholder.com/1200x400?text=JOIN",
+      "createdAt": "2026-01-18T10:00:00.000Z",
+      "updatedAt": "2026-01-18T10:00:00.000Z",
+      "deletedAt": null
+    },
+    {
+      "bannerId": 3,
+      "title": "나도 몰라",
+      "linkUrl": "www.sdflafds;lj.com",
+      "sortOrder": 2,
+      "isActive": true,
+      "startAt": "2026-01-06T16:52",
+      "endAt": "2026-01-29T16:52",
+      "imageUrl": null,
+      "createdAt": "2026-01-21T07:52:23.796Z",
+      "updatedAt": "2026-01-21T07:52:23.796Z",
+      "deletedAt": null
+    }
+  ],
+  "pointHistory": [
   {
-    "popupId": 1,
-    "title": "신년 세일 안내",
-    "content": "신년 한정 10% 쿠폰 지급",
-    "linkUrl": "https://example.com/event/newyear",
-    "position": "TOP_RIGHT",
-    "width": 420,
-    "height": 320,
-    "isActive": true,
-    "startAt": "2026-01-20T00:00",
-    "endAt": "2026-02-01T23:59",
-    "imageUrl": "https://via.placeholder.com/600x400",
-    "createdAt": "2026-01-20T01:00:00.000Z",
-    "updatedAt": "2026-01-20T01:00:00.000Z",
-    "deletedAt": null
+    "pointHistoryId": 1,
+    "userId": 2,
+    "pointAmount": 1000,
+    "pointType": "EARN",
+    "reason": "가입 보너스",
+    "refType": "SIGNUP",
+    "refId": null,
+    "createdAt": "2026-01-18T10:10:00+09:00"
   },
   {
-    "popupId": 2,
-    "title": "배송 지연 공지",
-    "content": "설 연휴로 배송이 지연될 수 있습니다.",
-    "linkUrl": null,
-    "position": "BOTTOM_LEFT",
-    "width": 480,
-    "height": 260,
-    "isActive": false,
-    "startAt": null,
-    "endAt": null,
-    "imageUrl": null,
-    "createdAt": "2026-01-18T10:00:00.000Z",
-    "updatedAt": "2026-01-18T10:00:00.000Z",
-    "deletedAt": null
-  }
-],
-"banners": [
-  {
-    "bannerId": 1,
-    "title": "겨울 시즌 메인 배너",
-    "linkUrl": "https://example.com/season/winter",
-    "sortOrder": 1,
-    "isActive": true,
-    "startAt": "2026-01-20T00:00",
-    "endAt": "2026-02-10T23:59",
-    "imageUrl": "https://via.placeholder.com/1200x400",
-    "createdAt": "2026-01-20T01:00:00.000Z",
-    "updatedAt": "2026-01-20T01:00:00.000Z",
-    "deletedAt": null
+    "pointHistoryId": 2,
+    "userId": 2,
+    "pointAmount": -200,
+    "pointType": "USE",
+    "reason": "주문 사용",
+    "refType": "ORDER",
+    "refId": 1001,
+    "createdAt": "2026-01-19T11:20:00+09:00"
   },
   {
-    "bannerId": 2,
-    "title": "신규 가입 이벤트",
-    "linkUrl": "https://example.com/event/join",
-    "sortOrder": 2,
-    "isActive": false,
-    "startAt": null,
-    "endAt": null,
-    "imageUrl": "https://via.placeholder.com/1200x400?text=JOIN",
-    "createdAt": "2026-01-18T10:00:00.000Z",
-    "updatedAt": "2026-01-18T10:00:00.000Z",
-    "deletedAt": null
+    "pointHistoryId": 3,
+    "userId": 3,
+    "pointAmount": 500,
+    "pointType": "EARN",
+    "reason": "이벤트",
+    "refType": "EVENT",
+    "refId": null,
+    "createdAt": "2026-01-20T09:00:00+09:00"
   }
 ]
-
-
-
 
 }

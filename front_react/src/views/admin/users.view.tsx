@@ -1,5 +1,4 @@
 // src/views/admin/users.view.tsx
-
 import { useState } from "react";
 import styles from "./users.view.module.css";
 
@@ -15,6 +14,9 @@ import {
   ADMIN_USER_STATUS_OPTIONS,
   type AdminUserStatus,
 } from "../../types/admin/user";
+
+// ✅ 포인트 패널(이 파일은 제가 이전에 준 컴포넌트 그대로 쓰시면 됩니다)
+import PointsPanel from "@/components/admin/PointsPanel";
 
 /** 상세 정보 한 행 */
 function InfoRow({
@@ -81,6 +83,21 @@ function StatusRow({
   );
 }
 
+/**
+ * usersQuery.data가 {} / unknown 으로 잡혀도,
+ * totalCount/list 접근에서 TS 에러 안 나게 하는 안전 파서
+ */
+function parseAdminPageResponse(data: unknown): { list: AdminUserListItem[]; totalCount: number } {
+  if (!data || typeof data !== "object") return { list: [], totalCount: 0 };
+
+  const d = data as Record<string, unknown>;
+
+  const list = Array.isArray(d.list) ? (d.list as AdminUserListItem[]) : [];
+  const totalCount = typeof d.totalCount === "number" ? d.totalCount : 0;
+
+  return { list, totalCount };
+}
+
 export default function UsersView() {
   const [page, setPage] = useState(1);
   const [selectedUserId, setSelectedUserId] = useState<AdminUserId | null>(null);
@@ -89,16 +106,15 @@ export default function UsersView() {
 
   const usersQuery = useAdminUsers({ page, size: PAGE_SIZE });
 
-  const rows = usersQuery.data?.list ?? [];
+  // ✅ 여기서 타입 추론이 {}여도 안전하게 처리
+  const { list: rows, totalCount } = parseAdminPageResponse(usersQuery.data);
 
-  const totalCount =
-  typeof usersQuery.data?.totalCount === "number" ? usersQuery.data.totalCount : 0;
   const totalPages = totalCount > 0 ? Math.ceil(totalCount / PAGE_SIZE) : 1;
 
   const disablePrev = page <= 1;
   const disableNext = page >= totalPages;
 
-  // ✅ 백엔드: GET /api/admin/users/{userId} -> ApiResponse<AdminUserDetailResponse>
+  // ✅ 백엔드: GET /api/admin/users/{userId}
   const detailQuery = useAdminUserDetail(selectedUserId);
   const user = detailQuery.data;
 
@@ -122,7 +138,7 @@ export default function UsersView() {
     try {
       await updateMutation.mutateAsync({
         userId: selectedUserId,
-        body: { status: next }, // ✅ 백엔드 AdminUserStatusUpdateRequest
+        body: { status: next },
       });
 
       await detailQuery.refetch();
@@ -231,7 +247,7 @@ export default function UsersView() {
                     onChange={handleStatusChange}
                   />
 
-                  {/* pets 표시(DTO에 존재) - UI 필요 없으면 이 블록 통째로 제거하셔도 됩니다 */}
+                  {/* pets 표시(DTO에 존재) - UI 필요 없으면 이 블록 제거 가능 */}
                   {Array.isArray(user.pets) && user.pets.length > 0 ? (
                     <div className={styles.petsBox}>
                       <div className={styles.petsTitle}>반려동물 정보</div>
@@ -253,6 +269,11 @@ export default function UsersView() {
                       ))}
                     </div>
                   ) : null}
+                </div>
+
+                {/* ✅ 포인트 패널: 사용자 상세 하단 */}
+                <div style={{ marginTop: 16 }}>
+                  <PointsPanel userId={Number(user.userId)} />
                 </div>
               </div>
             </div>

@@ -1,10 +1,16 @@
 /* src/views/admin/popups.view.module.css */
 
+/* 전체 요소에 박스 모델 규격 적용 (패딩이 너비를 잡아먹지 않게 함) */
+.wrap, .wrap * {
+  box-sizing: border-box;
+}
+
 .wrap {
   display: flex;
   flex-direction: column;
   gap: 12px;
   padding: 16px;
+  width: 100%;
 }
 
 .header {
@@ -24,6 +30,7 @@
   gap: 8px;
 }
 
+/* 필터 영역 */
 .filters {
   display: grid;
   grid-template-columns: 1fr 180px 120px auto;
@@ -35,6 +42,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-width: 0;
 }
 
 .label {
@@ -46,15 +54,19 @@
 .select,
 .textarea {
   width: 100%;
+  max-width: 100%;
   border: 1px solid rgba(0,0,0,0.15);
   border-radius: 8px;
   padding: 10px 12px;
   outline: none;
   background: #fff;
+  font-family: inherit;
+  font-size: 14px;
 }
 
 .textarea {
   resize: vertical;
+  min-height: 100px;
 }
 
 .meta {
@@ -65,25 +77,29 @@
   opacity: 0.85;
 }
 
+/* 테이블 영역 수정 */
 .tableWrap {
   border: 1px solid rgba(0,0,0,0.12);
   border-radius: 10px;
-  overflow: hidden;
+  overflow-x: auto; /* 테이블이 너무 길어지면 내부 스크롤 발생시켜 잘림 방지 */
   background: #fff;
+  width: 100%;
 }
 
 .table {
   width: 100%;
   border-collapse: collapse;
+  /* fixed를 제거하거나 비율을 조정하여 버튼이 안 잘리게 함 */
+  min-width: 800px; 
 }
 
 .table th,
 .table td {
   border-bottom: 1px solid rgba(0,0,0,0.08);
-  padding: 10px 12px;
+  padding: 12px;
   font-size: 13px;
   text-align: left;
-  vertical-align: top;
+  vertical-align: middle; /* 상단 정렬보다 중앙 정렬이 깔끔함 */
 }
 
 .table th {
@@ -91,31 +107,38 @@
   font-weight: 700;
 }
 
+/* 특정 열의 너비 및 텍스트 처리 */
 .tdTitle {
   font-weight: 600;
+  /* 제목 열은 남는 공간을 다 쓰도록 설정 */
 }
 
 .tdLink {
-  max-width: 260px;
   word-break: break-all;
+  max-width: 200px;
 }
 
 .tdPeriod {
   white-space: nowrap;
+  width: 180px;
 }
 
+/* 버튼 열: 절대 잘리지 않도록 너비를 충분히 확보 */
 .tdActions {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   white-space: nowrap;
+  width: 140px; /* 버튼 2개가 들어갈 충분한 고정 너비 */
+  justify-content: flex-start;
 }
 
 .empty {
   text-align: center;
-  padding: 20px 12px;
+  padding: 40px 12px;
   opacity: 0.7;
 }
 
+/* 페이지네이션 */
 .pager {
   display: flex;
   gap: 10px;
@@ -131,84 +154,90 @@
   opacity: 0.85;
 }
 
+/* 버튼 스타일 */
 .primaryBtn,
 .grayBtn,
 .dangerBtn {
-  border-radius: 8px;
-  padding: 10px 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  padding: 8px 12px;
   border: 1px solid rgba(0,0,0,0.12);
   background: #fff;
   cursor: pointer;
+  font-size: 13px;
+  white-space: nowrap;
 }
 
 .primaryBtn {
-  border-color: rgba(0,0,0,0.2);
-  font-weight: 700;
+  background: #222;
+  color: #fff;
+  font-weight: 600;
 }
 
 .grayBtn {
-  opacity: 0.9;
+  background: #f8f8f8;
 }
 
 .dangerBtn {
-  border-color: rgba(255,0,0,0.25);
+  color: #d32f2f;
+  border-color: rgba(211, 47, 47, 0.2);
 }
 
 .primaryBtn:disabled,
 .grayBtn:disabled,
 .dangerBtn:disabled {
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: 0.4;
 }
 
-/* modal */
+/* 모달 섹션 */
 .modalBackdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.35);
+  background: rgba(0,0,0,0.4);
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 24px;
-  z-index: 50;
+  z-index: 1000;
 }
 
 .modal {
   width: 860px;
   max-width: 100%;
+  max-height: 90vh;
   background: #fff;
   border-radius: 12px;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
-  border: 1px solid rgba(0,0,0,0.15);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
 }
 
 .modalHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 14px;
+  padding: 16px 20px;
   border-bottom: 1px solid rgba(0,0,0,0.08);
-  background: rgba(0,0,0,0.02);
 }
 
 .modalTitle {
   font-weight: 800;
-}
-
-.loadingBox {
-  padding: 12px 14px;
-  font-size: 13px;
-  opacity: 0.85;
+  font-size: 16px;
 }
 
 .formGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  padding: 14px;
+  gap: 16px;
+  padding: 20px;
+  overflow-y: auto;
 }
 
-.formItem {
+.formItem, .formItemWide {
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -216,16 +245,13 @@
 
 .formItemWide {
   grid-column: 1 / -1;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
 }
 
 .modalFooter {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  padding: 12px 14px;
+  padding: 16px 20px;
   border-top: 1px solid rgba(0,0,0,0.08);
   background: rgba(0,0,0,0.02);
 }

@@ -69,10 +69,8 @@ export default function App() {
 
         <Route path="qna" element={<QnaRoomsView />} />
         <Route path="qna/:roomId" element={<QnaMessagesView />} />
-
-        {/* ❌ 현재 백엔드 관리자 목록 컨트롤러가 없으니 막아둠(메뉴에서도 제거 권장) */}
+        
         <Route path="orders" element={<Navigate to="/admin" replace />} />
-        <Route path="reviews" element={<Navigate to="/admin" replace />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/admin/login" replace />} />
