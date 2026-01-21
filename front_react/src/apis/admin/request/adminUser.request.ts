@@ -1,52 +1,43 @@
-// src/apis/admin/request/adminUser.request.ts
-
-import { mainAxios } from '@/apis/admin/main_axios';
-
+// src/apis/admin/request/adminUsers.request.ts
+import { mainAxios } from "@/apis/admin/main_axios";
+import type { ApiResponse, AdminPageResponse } from "@/types/admin/api";
 import type {
   AdminUserId,
+  AdminUserListItem,
+  AdminUserDetail,
   AdminUserSearchRequest,
   AdminUserStatusUpdateRequest,
-} from '@/types/admin/user';
+} from "@/types/admin/user";
 
-import type {
-  GetUsersResponse,
-  GetUserDetailResponse,
-  PatchUserStatusResponse,
-} from '../response/adminUser.response';
-
-import { unwrapApi, unwrapAdminPage } from '../response/adminUser.response';
-
-const API = {
-  list: '/api/admin/users',
-  detail: (userId: AdminUserId) => `/api/admin/users/${userId}`,
-  status: (userId: AdminUserId) => `/api/admin/users/${userId}/status`,
-};
-
-/** GET /api/admin/users */
-export async function requestAdminUsers(req: AdminUserSearchRequest) {
-  const res = await mainAxios.get<GetUsersResponse>(API.list, { params: req });
-
-  const { success, data: pageData, message } = unwrapApi(res.data);
-  const page = unwrapAdminPage(pageData);
-
-  return { success, message, ...page };
+function unwrapOrThrow<T>(res: ApiResponse<T>): T {
+  if (!res || res.success !== true) {
+    throw new Error(res?.message || "요청에 실패했습니다.");
+  }
+  return res.data;
 }
 
-/** GET /api/admin/users/{userId} */
-export async function requestAdminUserDetail(userId: AdminUserId) {
-  const res = await mainAxios.get<GetUserDetailResponse>(API.detail(userId));
-  const { success, data, message } = unwrapApi(res.data);
-
-  return { success, message, user: data };
+export async function getAdminUsers(params: AdminUserSearchRequest) {
+  const { data } = await mainAxios.get<ApiResponse<AdminPageResponse<AdminUserListItem>>>(
+    "/api/admin/users",
+    { params }
+  );
+  return unwrapOrThrow(data);
 }
 
-/** PATCH /api/admin/users/{userId}/status */
-export async function requestUpdateAdminUserStatus(
+export async function getAdminUserDetail(userId: AdminUserId) {
+  const { data } = await mainAxios.get<ApiResponse<AdminUserDetail>>(
+    `/api/admin/users/${userId}`
+  );
+  return unwrapOrThrow(data);
+}
+
+export async function patchAdminUserStatus(
   userId: AdminUserId,
   body: AdminUserStatusUpdateRequest
 ) {
-  const res = await mainAxios.patch<PatchUserStatusResponse>(API.status(userId), body);
-  const { success, message } = unwrapApi(res.data);
-
-  return { success, message };
+  const { data } = await mainAxios.patch<ApiResponse<null>>(
+    `/api/admin/users/${userId}/status`,
+    body
+  );
+  unwrapOrThrow(data);
 }

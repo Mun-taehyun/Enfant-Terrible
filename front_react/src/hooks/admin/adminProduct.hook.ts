@@ -1,5 +1,4 @@
-// src/hooks/admin/product.hook.ts
-
+// src/hooks/admin/adminProduct.hook.ts
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import type {
@@ -15,7 +14,6 @@ import {
   adminProductsListOptions,
   adminProductDetailOptions,
   adminSkusListOptions,
-  adminSkuDetailOptions,
   adminOptionGroupsOptions,
   adminOptionValuesOptions,
   adminProductKeys,
@@ -34,8 +32,7 @@ import {
   deleteAdminOptionValue,
 } from "@/apis/admin/request/adminProduct.request";
 
-/* ========================= Products ========================= */
-
+/* Products */
 export function useAdminProducts(params: AdminProductListParams) {
   return useQuery(adminProductsListOptions(params));
 }
@@ -75,28 +72,23 @@ export function useAdminProductDelete() {
   });
 }
 
-/* ========================= SKUs ========================= */
-
+/* SKUs */
 export function useAdminSkus(params: AdminSkuListParams) {
   return useQuery(adminSkusListOptions(params));
-}
-
-export function useAdminSkuDetail(skuId: number) {
-  return useQuery(adminSkuDetailOptions(skuId));
 }
 
 export function useAdminSkuUpdate() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (vars: { skuId: number; payload: AdminSkuSavePayload }) => updateAdminSku(vars.skuId, vars.payload),
+    mutationFn: (vars: { skuId: number; payload: AdminSkuSavePayload }) =>
+      updateAdminSku(vars.skuId, vars.payload),
     onSuccess: async () => {
       await qc.invalidateQueries({ queryKey: adminProductKeys.root });
     },
   });
 }
 
-/* ========================= Options ========================= */
-
+/* Options */
 export function useAdminOptionGroups(productId: number) {
   return useQuery(adminOptionGroupsOptions(productId));
 }

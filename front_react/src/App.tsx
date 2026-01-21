@@ -8,6 +8,14 @@ import UsersView from "./views/admin/users.view";
 import SalesView from "./views/admin/sales.view";
 import CategoriesView from "./views/admin/categories.view.tsx";
 import ProductsView from "./views/admin/productsView.tsx";
+import QnaMessagesView from "./views/admin/QnaMessagesView.tsx";
+import QnaRoomsView from "./views/admin/QnaRoomsView.tsx";
+
+// ✅ 추가: 관리자 신규 메뉴(백엔드 컨트롤러 존재)
+import PaymentsView from "@/views/admin/payments.view";
+import PostsView from "@/views/admin/posts.view";
+import PopupsView from "@/views/admin/popups.view";
+import BannersView from "@/views/admin/banners.view";
 
 const isAuthenticated = () => {
   const token = localStorage.getItem("accessToken");
@@ -49,16 +57,22 @@ export default function App() {
       <Route path="/admin" element={<ProtectedAdminLayout />}>
         <Route index element={<SalesView />} />
         <Route path="sales" element={<SalesView />} />
+
         <Route path="users" element={<UsersView />} />
         <Route path="categories" element={<CategoriesView />} />
         <Route path="products" element={<ProductsView />} />
 
-        {/* ❗ 아직 화면 없는 라우트들은 만들기 전까지 들어오면 index로 보냄 */}
-        <Route path="chat" element={<Navigate to="/admin" replace />} />
+        <Route path="payments" element={<PaymentsView />} />
+        <Route path="posts" element={<PostsView />} />
+        <Route path="popups" element={<PopupsView />} />
+        <Route path="banners" element={<BannersView />} />
+
+        <Route path="qna" element={<QnaRoomsView />} />
+        <Route path="qna/:roomId" element={<QnaMessagesView />} />
+
+        {/* ❌ 현재 백엔드 관리자 목록 컨트롤러가 없으니 막아둠(메뉴에서도 제거 권장) */}
         <Route path="orders" element={<Navigate to="/admin" replace />} />
         <Route path="reviews" element={<Navigate to="/admin" replace />} />
-        <Route path="popup" element={<Navigate to="/admin" replace />} />
-        <Route path="banner" element={<Navigate to="/admin" replace />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/admin/login" replace />} />

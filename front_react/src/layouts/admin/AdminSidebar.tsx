@@ -6,6 +6,7 @@ import styles from "./AdminSidebar.module.css";
 import SidebarSection from "../../components/admin/SidebarComp";
 import type { AdminNavSection } from "../../types/admin/navigation";
 
+
 const ADMIN_NAV: AdminNavSection[] = [
   {
     title: "운영",
@@ -17,32 +18,41 @@ const ADMIN_NAV: AdminNavSection[] = [
   {
     title: "상품 제어",
     items: [
-      // ✅ 우리가 만든 상품 관리 경로로 변경
       { label: "상품 관리", to: "/admin/products" },
+      // 상품 옵션/sku/할인은 "상품 상세 패널 내부"에서 처리
     ],
   },
   {
-    title: "고객 소통",
+    title: "결제·정산",
     items: [
-      // ❗ 아직 라우트/화면 없으면 깨지므로 일단 /admin으로
-      { label: "사용자 채팅방 관리", to: "/admin" },
+      // AdminPaymentController: /api/admin/payments
+      { label: "결제 관리", to: "/admin/payments" },
+    ],
+  },
+  {
+    title: "콘텐츠",
+    items: [
+      // AdminPostController: /api/admin/posts
+      { label: "게시글 관리", to: "/admin/posts" },
+      // QnA(채팅방) 확정 라우트
+      { label: "사용자 채팅방 관리", to: "/admin/qna" },
     ],
   },
   {
     title: "회원 관리",
     items: [
+      // AdminUserController: /api/admin/users
       { label: "사용자 정보 조회", to: "/admin/users" },
-      // ❗ 아직 라우트/화면 없으면 깨지므로 일단 /admin으로
-      { label: "주문 목록 조회", to: "/admin" },
-      { label: "리뷰 삭제 관리", to: "/admin" },
+      // 포인트는 사용자 상세 안에서 처리(/api/admin/points/users/{userId}/...)
     ],
   },
   {
     title: "광고 및 홍보",
     items: [
-      // ❗ 아직 라우트/화면 없으면 깨지므로 일단 /admin으로
-      { label: "광고 팝업 설정", to: "/admin" },
-      { label: "광고 배너 설정", to: "/admin" },
+      // AdminPopupController: /api/admin/popups
+      { label: "광고 팝업 설정", to: "/admin/popups" },
+      // AdminBannerController: /api/admin/banners
+      { label: "광고 배너 설정", to: "/admin/banners" },
     ],
   },
 ];
@@ -75,7 +85,7 @@ const AdminSidebar = () => {
                 key={item.to + item.label}
                 to={item.to}
                 className={linkClassName}
-                end={item.to === "/admin"} // ✅ /admin만 정확히 매칭
+                end={item.to === "/admin"}
               >
                 {item.label}
               </NavLink>
@@ -85,7 +95,11 @@ const AdminSidebar = () => {
       </div>
 
       <div className={styles.logoutArea}>
-        <button type="button" className={styles.logoutButton} onClick={handleLogout}>
+        <button
+          type="button"
+          className={styles.logoutButton}
+          onClick={handleLogout}
+        >
           로그아웃
         </button>
       </div>

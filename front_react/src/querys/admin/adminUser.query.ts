@@ -1,35 +1,42 @@
 // src/querys/admin/adminUser.query.ts
+import type { QueryKey } from "@tanstack/react-query";
 import type {
   AdminUserId,
   AdminUserSearchRequest,
   AdminUserStatusUpdateRequest,
-} from '@/types/admin/user';
+} from "@/types/admin/user";
 
 import {
-  requestAdminUsers,
-  requestAdminUserDetail,
-  requestUpdateAdminUserStatus,
-} from '@/apis/admin/request/adminUser.request';
+  getAdminUsers,
+  getAdminUserDetail,
+  patchAdminUserStatus,
+} from "@/apis/admin/request/adminUser.request.ts";
 
 export const adminUserKeys = {
-  all: ['adminUsers'] as const,
-  list: (params: AdminUserSearchRequest) => ['adminUsers', 'list', params] as const,
-  detail: (userId: AdminUserId) => ['adminUsers', 'detail', userId] as const,
+  root: ["admin", "users"] as const,
+  list: (params: AdminUserSearchRequest) => [...adminUserKeys.root, "list", params] as const,
+  detail: (userId: AdminUserId) => [...adminUserKeys.root, "detail", userId] as const,
 };
 
-export const adminUsersListQuery = (params: AdminUserSearchRequest) => ({
-  queryKey: adminUserKeys.list(params),
-  queryFn: () => requestAdminUsers(params),
-});
+export function adminUsersListQuery(params: AdminUserSearchRequest) {
+  return {
+    queryKey: adminUserKeys.list(params) as QueryKey,
+    queryFn: () => getAdminUsers(params),
+    keepPreviousData: true,
+  };
+}
 
-export const adminUserDetailQuery = (userId: AdminUserId) => ({
-  queryKey: adminUserKeys.detail(userId),
-  queryFn: () => requestAdminUserDetail(userId),
+export function adminUserDetailQuery(userId: AdminUserId) {
+  return {
+    queryKey: adminUserKeys.detail(userId) as QueryKey,
+    queryFn: () => getAdminUserDetail(userId),
+    enabled: userId > 0,
+  };
+}
 
-  enabled: Number.isFinite(userId as unknown as number),
-});
-
-export const adminUserStatusMutation = () => ({
-  mutationFn: (v: { userId: AdminUserId; body: AdminUserStatusUpdateRequest }) =>
-    requestUpdateAdminUserStatus(v.userId, v.body),
-});
+export function adminUserStatusMutation() {
+  return {
+    mutationFn: (vars: { userId: AdminUserId; body: AdminUserStatusUpdateRequest }) =>
+      patchAdminUserStatus(vars.userId, vars.body),
+  };
+}

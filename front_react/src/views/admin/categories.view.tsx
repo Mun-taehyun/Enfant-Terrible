@@ -26,7 +26,20 @@ function buildCodeMap(tree: AdminCategory[]): CodeMap {
 // ✅ enum 확정에 따른 고정 규칙
 type ActiveCode = "Y" | "N";
 const isActiveStatus = (status: AdminCategory["status"]) => status === "ACTIVE";
-const nextActiveCode = (status: AdminCategory["status"]): ActiveCode => (isActiveStatus(status) ? "N" : "Y");
+const nextActiveCode = (status: AdminCategory["status"]): ActiveCode =>
+  isActiveStatus(status) ? "N" : "Y";
+
+// ✅ 백/훅에서 throw된 Error.message(=백 message) 우선 표시
+function errorText(err: unknown, fallback: string) {
+  if (err instanceof Error && err.message) return err.message;
+  if (typeof err === "string" && err) return err;
+  try {
+    const s = JSON.stringify(err);
+    return s && s !== "{}" ? s : fallback;
+  } catch {
+    return fallback;
+  }
+}
 
 export default function CategoriesView() {
   const {
@@ -79,10 +92,15 @@ export default function CategoriesView() {
           <span className={styles.nodeName}>
             <span className={styles.nodeMeta}>{code}</span> {node.name}
           </span>
-          <span className={active ? styles.badgeActive : styles.badgeInactive}>{active ? "Y" : "N"}</span>
+          {/* ✅ 표기는 Y/N 유지 */}
+          <span className={active ? styles.badgeActive : styles.badgeInactive}>
+            {active ? "Y" : "N"}
+          </span>
         </button>
 
-        {node.children?.length ? <ul className={styles.nodeChildren}>{node.children.map(renderNode)}</ul> : null}
+        {node.children?.length ? (
+          <ul className={styles.nodeChildren}>{node.children.map(renderNode)}</ul>
+        ) : null}
       </li>
     );
   };
@@ -91,20 +109,28 @@ export default function CategoriesView() {
     const name = newRootName.trim();
     if (!name) return;
 
-    await createMut.mutateAsync({ parentId: null, name });
-    setNewRootName("");
+    try {
+      await createMut.mutateAsync({ parentId: null, name });
+      setNewRootName("");
+    } catch (e) {
+      alert(errorText(e, "메인 카테고리 생성에 실패했습니다."));
+    }
   };
 
   const handleCreateChild = async () => {
     if (!selectedId) {
-      alert("부모(상위) 카테고리를 먼저 선택하세요.");
+      alert("상위(부모) 카테고리를 먼저 선택하세요.");
       return;
     }
     const name = newChildName.trim();
     if (!name) return;
 
-    await createMut.mutateAsync({ parentId: selectedId, name });
-    setNewChildName("");
+    try {
+      await createMut.mutateAsync({ parentId: selectedId, name });
+      setNewChildName("");
+    } catch (e) {
+      alert(errorText(e, "하위 카테고리 생성에 실패했습니다."));
+    }
   };
 
   const handleRename = async () => {
@@ -112,20 +138,33 @@ export default function CategoriesView() {
     const name = editName.trim();
     if (!name) return;
 
-    await updateMut.mutateAsync({ categoryId: selectedId, payload: { name } });
+    try {
+      await updateMut.mutateAsync({ categoryId: selectedId, payload: { name } });
+    } catch (e) {
+      alert(errorText(e, "이름 변경에 실패했습니다."));
+    }
   };
 
   const handleToggleActive = async () => {
     if (!selectedId || !selected) return;
 
-    // ✅ status(ACTIVE/INACTIVE)로 판단 → 요청은 Y/N(code)
-    const next: ActiveCode = nextActiveCode(selected.status);
-    await toggleMut.mutateAsync({ categoryId: selectedId, isActive: next });
+    try {
+      // ✅ status(ACTIVE/INACTIVE)로 판단 → 요청은 Y/N(code)
+      const next: ActiveCode = nextActiveCode(selected.status);
+      await toggleMut.mutateAsync({ categoryId: selectedId, isActive: next });
+    } catch (e) {
+      alert(errorText(e, "활성/비활성 변경에 실패했습니다."));
+    }
   };
 
   const handleSortOrder = async () => {
     if (!selectedId) return;
-    await sortMut.mutateAsync({ categoryId: selectedId, sortOrder: Number(editSortOrder) });
+
+    try {
+      await sortMut.mutateAsync({ categoryId: selectedId, sortOrder: Number(editSortOrder) });
+    } catch (e) {
+      alert(errorText(e, "정렬 순서 변경에 실패했습니다."));
+    }
   };
 
   const handleMoveParent = async () => {
@@ -134,11 +173,15 @@ export default function CategoriesView() {
     const pid = moveParentId === "null" ? null : Number(moveParentId);
 
     if (pid !== null && pid === selectedId) {
-      alert("자기 자신을 부모로 지정할 수 없습니다.");
+      alert("자기 자신을 상위(부모)로 지정할 수 없습니다.");
       return;
     }
 
-    await moveMut.mutateAsync({ categoryId: selectedId, parentId: pid });
+    try {
+      await moveMut.mutateAsync({ categoryId: selectedId, parentId: pid });
+    } catch (e) {
+      alert(errorText(e, "상위 카테고리 변경에 실패했습니다."));
+    }
   };
 
   const handleDelete = async () => {
@@ -146,20 +189,27 @@ export default function CategoriesView() {
     const ok = window.confirm("해당 카테고리를 삭제(soft delete)하시겠습니까?");
     if (!ok) return;
 
-    await deleteMut.mutateAsync(selectedId);
-    setSelectedId(null);
+    try {
+      await deleteMut.mutateAsync(selectedId);
+      setSelectedId(null);
+    } catch (e) {
+      alert(errorText(e, "카테고리 삭제에 실패했습니다."));
+    }
   };
 
   if (treeQuery.isLoading) return <div className={styles.wrap}>로딩 중...</div>;
-  if (treeQuery.isError)
+
+  if (treeQuery.isError) {
     return (
       <div className={styles.wrap}>
-        카테고리 트리 조회에 실패했습니다.
+        {/* ✅ 백 메시지 우선 */}
+        {errorText(treeQuery.error, "카테고리 트리 조회에 실패했습니다.")}
         <button type="button" className={styles.retry} onClick={() => treeQuery.refetch()}>
           다시 시도
         </button>
       </div>
     );
+  }
 
   const selectedActive = selected ? isActiveStatus(selected.status) : false;
 
@@ -182,7 +232,7 @@ export default function CategoriesView() {
         <div className={styles.panel}>
           {/* ✅ 메인(루트) 생성 */}
           <div className={styles.block}>
-            <div className={styles.blockTitle}>메인(루트) 카테고리 생성</div>
+            <div className={styles.blockTitle}>메인 카테고리 생성</div>
             <div className={styles.inline}>
               <input
                 className={styles.input}
@@ -203,7 +253,11 @@ export default function CategoriesView() {
               <div className={styles.block}>
                 <div className={styles.blockTitle}>이름 변경</div>
                 <div className={styles.inline}>
-                  <input className={styles.input} value={editName} onChange={(e) => setEditName(e.target.value)} />
+                  <input
+                    className={styles.input}
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                  />
                   <button type="button" className={styles.btn} onClick={handleRename}>
                     저장
                   </button>
@@ -242,13 +296,16 @@ export default function CategoriesView() {
               </div>
 
               <div className={styles.block}>
-                <div className={styles.blockTitle}>부모 변경(이동)</div>
+                <div className={styles.blockTitle}>상위 카테고리 변경</div>
                 <div className={styles.inline}>
                   <select
                     className={styles.select}
                     value={moveParentId}
-                    onChange={(e) => setMoveParentId(e.target.value === "null" ? "null" : Number(e.target.value))}
+                    onChange={(e) =>
+                      setMoveParentId(e.target.value === "null" ? "null" : Number(e.target.value))
+                    }
                   >
+                    {/* ✅ 표기만 한글화 */}
                     <option value="null">루트(null)</option>
                     {flat
                       .filter((c) => c.categoryId !== selectedId)
@@ -281,7 +338,7 @@ export default function CategoriesView() {
 
               <div className={styles.blockDanger}>
                 <button type="button" className={styles.btnDanger} onClick={handleDelete}>
-                  삭제(soft delete)
+                  삭제
                 </button>
               </div>
             </>

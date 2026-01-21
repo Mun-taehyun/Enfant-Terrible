@@ -2,7 +2,8 @@
 module.exports = function registerProductsRoutes(server, router, common) {
   const ok = common?.ok ?? ((data, message) => ({ success: true, data, message }));
   const fail = common?.fail ?? ((message) => ({ success: false, data: null, message }));
-  const successMessage = common?.successMessage ?? ((message) => ({ success: true, data: null, message }));
+  const successMessage =
+    common?.successMessage ?? ((message) => ({ success: true, data: null, message }));
 
   const db = router.db;
 
@@ -15,15 +16,21 @@ module.exports = function registerProductsRoutes(server, router, common) {
     return Number.isFinite(n) ? n : fallback;
   }
 
+  // 프론트는 page=1부터 넘김 -> 내부는 0-based로 slice
   function normalizePage(pageRaw) {
-    const p = toInt(pageRaw, 0);
+    const p = toInt(pageRaw, 1);
     if (p >= 1) return p - 1;
     return 0;
   }
 
-  function makeAdminPage({ content, totalElements, page, size }) {
-    const totalPages = size > 0 ? Math.ceil(totalElements / size) : 1;
-    return { content, totalElements, totalPages, page, number: page, size, pageSize: size };
+  // ✅ 고정 규격: AdminPageResponse<T> { page,size,totalCount,list }
+  function makeAdminPageFixed({ list, totalCount, page0, size }) {
+    return {
+      page: page0 + 1,        // ✅ 응답은 1-based로 돌려줌
+      size,
+      totalCount,
+      list,
+    };
   }
 
   function getList(key) {
@@ -99,6 +106,10 @@ module.exports = function registerProductsRoutes(server, router, common) {
   }
 
   function skuToAdminResponse(s) {
+    const optionValueIds = Array.isArray(s.optionValueIds)
+      ? s.optionValueIds.map((n) => Number(n)).filter((n) => Number.isFinite(n))
+      : undefined;
+
     return {
       skuId: Number(s.skuId ?? s.sku_id ?? s.id),
       productId: Number(s.productId ?? s.product_id),
@@ -107,6 +118,7 @@ module.exports = function registerProductsRoutes(server, router, common) {
       stock: Number(s.stock ?? 0),
       status: s.status ?? "ON_SALE",
       createdAt: s.createdAt ?? s.created_at ?? nowIso(),
+      ...(optionValueIds ? { optionValueIds } : {}),
     };
   }
 
@@ -117,6 +129,14 @@ module.exports = function registerProductsRoutes(server, router, common) {
     if (v.toUpperCase() === "OFF_SALE") return "STOPPED";
     if (v === "ON_SALE" || v === "SOLD_OUT" || v === "STOPPED") return v;
     return "__INVALID__";
+  }
+
+  function normalizeNumberArray(arr) {
+    if (arr == null) return undefined;
+    if (!Array.isArray(arr)) return "__INVALID__";
+    const nums = arr.map((x) => Number(x));
+    if (nums.some((n) => !Number.isFinite(n))) return "__INVALID__";
+    return nums;
   }
 
   function refreshProductBasePrice(productId) {
@@ -142,17 +162,59 @@ module.exports = function registerProductsRoutes(server, router, common) {
     }
   }
 
-  /* =======================
-     (중요) SKUS / OPTIONS 같은 "고정 경로"를 먼저 등록
-     ======================= */
-
+  // ====== 준비 ======
   ensureArray("productSkus");
   ensureArray("productOptionGroups");
   ensureArray("productOptionValues");
 
-  // GET /api/admin/products/skus?productId=&status=&page=&size=
+  // ====== OPTIONS 변환(프론트 호환) ======
+  function normalizeGroupId(x) {
+    const n = Number(x?.optionGroupId ?? x?.groupId ?? x?.id);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  function normalizeValueId(x) {
+    const n = Number(x?.optionValueId ?? x?.valueId ?? x?.id);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  function groupToResponse(g) {
+    const gid = normalizeGroupId(g);
+    return {
+      optionGroupId: gid ?? 0,
+      groupId: gid ?? 0,
+      productId: Number(g.productId ?? 0),
+      name: g.name ?? "",
+      sortOrder: Number(g.sortOrder ?? 0),
+      createdAt: g.createdAt ?? g.created_at ?? nowIso(),
+      deleted_at: g.deleted_at ?? null,
+      updated_at: g.updated_at ?? null,
+    };
+  }
+
+  function valueToResponse(v) {
+    const vid = normalizeValueId(v);
+    const gid = Number(v.optionGroupId ?? v.groupId ?? 0);
+    return {
+      optionValueId: vid ?? 0,
+      valueId: vid ?? 0,
+      optionGroupId: Number.isFinite(gid) ? gid : 0,
+      groupId: Number.isFinite(gid) ? gid : 0,
+      value: v.value ?? "",
+      sortOrder: Number(v.sortOrder ?? 0),
+      createdAt: v.createdAt ?? v.created_at ?? nowIso(),
+      deleted_at: v.deleted_at ?? null,
+      updated_at: v.updated_at ?? null,
+    };
+  }
+
+  /* =======================
+     SKU
+     ======================= */
+
+  // ✅ GET /api/admin/products/skus -> ApiResponse<AdminPageResponse<...>>
   server.get("/api/admin/products/skus", (req, res) => {
-    const page = normalizePage(req.query.page);
+    const page0 = normalizePage(req.query.page);
     const size = toInt(req.query.size, 10);
 
     const productIdRaw = req.query.productId;
@@ -162,31 +224,38 @@ module.exports = function registerProductsRoutes(server, router, common) {
 
     if (productIdRaw != null && String(productIdRaw).trim() !== "") {
       const pid = Number(productIdRaw);
-      if (Number.isFinite(pid)) rows = rows.filter((s) => Number(s.productId ?? s.product_id) === pid);
+      if (Number.isFinite(pid)) {
+        rows = rows.filter((s) => Number(s.productId ?? s.product_id) === pid);
+      }
     }
 
     if (statusRaw) rows = rows.filter((s) => String(s.status ?? "") === statusRaw);
 
-    rows.sort((a, b) => Number((b.skuId ?? b.id)) - Number((a.skuId ?? a.id)));
+    rows.sort((a, b) => Number(b.skuId ?? b.id) - Number(a.skuId ?? a.id));
 
-    const totalElements = rows.length;
-    const start = page * size;
-    const content = rows.slice(start, start + size).map(skuToAdminResponse);
+    const totalCount = rows.length;
+    const start = page0 * size;
+    const list = rows.slice(start, start + size).map(skuToAdminResponse);
 
-    return res.json(ok(makeAdminPage({ content, totalElements, page, size }), "관리자 SKU 목록 조회 성공"));
+    return res.json(
+      ok(
+        makeAdminPageFixed({ list, totalCount, page0, size }),
+        "관리자 SKU 목록 조회 성공"
+      )
+    );
   });
 
-  // GET /api/admin/products/skus/{skuId}
   server.get("/api/admin/products/skus/:skuId(\\d+)", (req, res) => {
     const skuId = Number(req.params.skuId);
 
-    const s = getList("productSkus").find((x) => !isDeleted(x) && Number(x.skuId ?? x.id) === skuId);
+    const s = getList("productSkus").find(
+      (x) => !isDeleted(x) && Number(x.skuId ?? x.id) === skuId
+    );
     if (!s) return res.status(404).json(fail("SKU를 찾을 수 없습니다."));
 
     return res.json(ok(skuToAdminResponse(s), "관리자 SKU 상세 조회 성공"));
   });
 
-  // PUT /api/admin/products/skus/{skuId}
   server.put("/api/admin/products/skus/:skuId(\\d+)", (req, res) => {
     const skuId = Number(req.params.skuId);
     const body = req.body || {};
@@ -199,8 +268,14 @@ module.exports = function registerProductsRoutes(server, router, common) {
     const stock = Number(body.stock);
     const normalizedStatus = normalizeSkuStatus(body.status);
 
+    // optionValueIds는 선택
+    const optionValueIds = normalizeNumberArray(body.optionValueIds);
+
     if (!Number.isFinite(price) || !Number.isFinite(stock) || !normalizedStatus || normalizedStatus === "__INVALID__") {
       return res.status(400).json(fail("SKU 수정 요청 값이 올바르지 않습니다."));
+    }
+    if (optionValueIds === "__INVALID__") {
+      return res.status(400).json(fail("optionValueIds는 숫자 배열이어야 합니다."));
     }
 
     skus[idx] = {
@@ -209,6 +284,7 @@ module.exports = function registerProductsRoutes(server, router, common) {
       price,
       stock,
       status: normalizedStatus,
+      ...(Array.isArray(optionValueIds) ? { optionValueIds } : {}),
       updated_at: nowIso(),
     };
 
@@ -220,37 +296,211 @@ module.exports = function registerProductsRoutes(server, router, common) {
     return res.json(successMessage("SKU 수정 성공"));
   });
 
-  // GET /api/admin/products/options/groups?productId=
+  /* =======================
+     OPTIONS (그룹/값)
+     ======================= */
+
   server.get("/api/admin/products/options/groups", (req, res) => {
     const productId = Number(req.query.productId);
     if (!Number.isFinite(productId)) return res.status(400).json(fail("productId가 필요합니다."));
 
     const rows = getList("productOptionGroups")
       .filter((g) => !isDeleted(g) && Number(g.productId) === productId)
-      .sort((a, b) => Number(a.sortOrder ?? 0) - Number(b.sortOrder ?? 0));
+      .sort((a, b) => Number(a.sortOrder ?? 0) - Number(b.sortOrder ?? 0))
+      .map(groupToResponse);
 
     return res.json(ok(rows, "옵션 그룹 조회 성공"));
   });
 
-  // GET /api/admin/products/options/values?groupId=
+  server.post("/api/admin/products/options/groups", (req, res) => {
+    const body = req.body || {};
+
+    const productId = Number(body.productId);
+    const name = body.name != null ? String(body.name).trim() : "";
+    const sortOrder = Number(body.sortOrder);
+
+    if (!Number.isFinite(productId) || productId <= 0) return res.status(400).json(fail("productId가 올바르지 않습니다."));
+    if (!name) return res.status(400).json(fail("name은 필수입니다."));
+    if (!Number.isFinite(sortOrder)) return res.status(400).json(fail("sortOrder는 숫자여야 합니다."));
+
+    const groups = getList("productOptionGroups");
+    const groupId = nextId(groups, "groupId");
+
+    groups.push({
+      groupId,
+      optionGroupId: groupId,
+      productId,
+      name,
+      sortOrder,
+      createdAt: nowIso(),
+      deleted_at: null,
+    });
+
+    saveList("productOptionGroups", groups);
+    return res.json(successMessage("옵션 그룹 생성 성공"));
+  });
+
+  server.put("/api/admin/products/options/groups/:groupId(\\d+)", (req, res) => {
+    const groupIdParam = Number(req.params.groupId);
+    if (!Number.isFinite(groupIdParam)) return res.status(400).json(fail("groupId가 올바르지 않습니다."));
+
+    const body = req.body || {};
+    const productId = Number(body.productId);
+    const name = body.name != null ? String(body.name).trim() : "";
+    const sortOrder = Number(body.sortOrder);
+
+    if (!Number.isFinite(productId) || productId <= 0) return res.status(400).json(fail("productId가 올바르지 않습니다."));
+    if (!name) return res.status(400).json(fail("name은 필수입니다."));
+    if (!Number.isFinite(sortOrder)) return res.status(400).json(fail("sortOrder는 숫자여야 합니다."));
+
+    const groups = getList("productOptionGroups");
+    const idx = groups.findIndex((g) => !isDeleted(g) && (normalizeGroupId(g) === groupIdParam));
+    if (idx < 0) return res.status(404).json(fail("옵션 그룹을 찾을 수 없습니다."));
+
+    const gid = normalizeGroupId(groups[idx]) ?? groupIdParam;
+
+    groups[idx] = {
+      ...groups[idx],
+      groupId: gid,
+      optionGroupId: gid,
+      productId,
+      name,
+      sortOrder,
+      updated_at: nowIso(),
+    };
+
+    saveList("productOptionGroups", groups);
+    return res.json(successMessage("옵션 그룹 수정 성공"));
+  });
+
+  server.delete("/api/admin/products/options/groups/:groupId(\\d+)", (req, res) => {
+    const groupIdParam = Number(req.params.groupId);
+    if (!Number.isFinite(groupIdParam)) return res.status(400).json(fail("groupId가 올바르지 않습니다."));
+
+    const groups = getList("productOptionGroups");
+    const idx = groups.findIndex((g) => !isDeleted(g) && (normalizeGroupId(g) === groupIdParam));
+    if (idx < 0) return res.status(404).json(fail("옵션 그룹을 찾을 수 없습니다."));
+
+    groups[idx] = { ...groups[idx], deleted_at: nowIso() };
+    saveList("productOptionGroups", groups);
+
+    const values = getList("productOptionValues");
+    for (let i = 0; i < values.length; i++) {
+      if (isDeleted(values[i])) continue;
+      const gid = Number(values[i].optionGroupId ?? values[i].groupId);
+      if (Number.isFinite(gid) && gid === groupIdParam) {
+        values[i] = { ...values[i], deleted_at: nowIso() };
+      }
+    }
+    saveList("productOptionValues", values);
+
+    return res.json(successMessage("옵션 그룹 삭제 성공"));
+  });
+
   server.get("/api/admin/products/options/values", (req, res) => {
     const groupId = Number(req.query.groupId);
     if (!Number.isFinite(groupId)) return res.status(400).json(fail("groupId가 필요합니다."));
 
     const rows = getList("productOptionValues")
-      .filter((v) => !isDeleted(v) && Number(v.groupId ?? v.optionGroupId) === groupId)
-      .sort((a, b) => Number(a.sortOrder ?? 0) - Number(b.sortOrder ?? 0));
+      .filter((v) => !isDeleted(v) && Number(v.optionGroupId ?? v.groupId) === groupId)
+      .sort((a, b) => Number(a.sortOrder ?? 0) - Number(b.sortOrder ?? 0))
+      .map(valueToResponse);
 
     return res.json(ok(rows, "옵션 값 조회 성공"));
   });
 
+  server.post("/api/admin/products/options/values", (req, res) => {
+    const body = req.body || {};
+
+    const groupId = Number(body.optionGroupId ?? body.groupId);
+    const value = body.value != null ? String(body.value).trim() : "";
+    const sortOrder = Number(body.sortOrder);
+
+    if (!Number.isFinite(groupId) || groupId <= 0) return res.status(400).json(fail("optionGroupId(groupId)가 올바르지 않습니다."));
+    if (!value) return res.status(400).json(fail("value는 필수입니다."));
+    if (!Number.isFinite(sortOrder)) return res.status(400).json(fail("sortOrder는 숫자여야 합니다."));
+
+    const groups = getList("productOptionGroups");
+    const g = groups.find((x) => !isDeleted(x) && (normalizeGroupId(x) === groupId));
+    if (!g) return res.status(404).json(fail("옵션 그룹을 찾을 수 없습니다."));
+
+    const values = getList("productOptionValues");
+    const valueId = nextId(values, "valueId");
+
+    values.push({
+      valueId,
+      optionValueId: valueId,
+      groupId,
+      optionGroupId: groupId,
+      value,
+      sortOrder,
+      createdAt: nowIso(),
+      deleted_at: null,
+    });
+
+    saveList("productOptionValues", values);
+    return res.json(successMessage("옵션 값 생성 성공"));
+  });
+
+  server.put("/api/admin/products/options/values/:valueId(\\d+)", (req, res) => {
+    const valueIdParam = Number(req.params.valueId);
+    if (!Number.isFinite(valueIdParam)) return res.status(400).json(fail("valueId가 올바르지 않습니다."));
+
+    const body = req.body || {};
+    const groupId = Number(body.optionGroupId ?? body.groupId);
+    const value = body.value != null ? String(body.value).trim() : "";
+    const sortOrder = Number(body.sortOrder);
+
+    if (!Number.isFinite(groupId) || groupId <= 0) return res.status(400).json(fail("optionGroupId(groupId)가 올바르지 않습니다."));
+    if (!value) return res.status(400).json(fail("value는 필수입니다."));
+    if (!Number.isFinite(sortOrder)) return res.status(400).json(fail("sortOrder는 숫자여야 합니다."));
+
+    const groups = getList("productOptionGroups");
+    const g = groups.find((x) => !isDeleted(x) && (normalizeGroupId(x) === groupId));
+    if (!g) return res.status(404).json(fail("옵션 그룹을 찾을 수 없습니다."));
+
+    const values = getList("productOptionValues");
+    const idx = values.findIndex((v) => !isDeleted(v) && (normalizeValueId(v) === valueIdParam));
+    if (idx < 0) return res.status(404).json(fail("옵션 값을 찾을 수 없습니다."));
+
+    const vid = normalizeValueId(values[idx]) ?? valueIdParam;
+
+    values[idx] = {
+      ...values[idx],
+      valueId: vid,
+      optionValueId: vid,
+      groupId,
+      optionGroupId: groupId,
+      value,
+      sortOrder,
+      updated_at: nowIso(),
+    };
+
+    saveList("productOptionValues", values);
+    return res.json(successMessage("옵션 값 수정 성공"));
+  });
+
+  server.delete("/api/admin/products/options/values/:valueId(\\d+)", (req, res) => {
+    const valueIdParam = Number(req.params.valueId);
+    if (!Number.isFinite(valueIdParam)) return res.status(400).json(fail("valueId가 올바르지 않습니다."));
+
+    const values = getList("productOptionValues");
+    const idx = values.findIndex((v) => !isDeleted(v) && (normalizeValueId(v) === valueIdParam));
+    if (idx < 0) return res.status(404).json(fail("옵션 값을 찾을 수 없습니다."));
+
+    values[idx] = { ...values[idx], deleted_at: nowIso() };
+    saveList("productOptionValues", values);
+
+    return res.json(successMessage("옵션 값 삭제 성공"));
+  });
+
   /* =======================
-     PRODUCTS (숫자 productId만 매칭되게!)
+     PRODUCTS
      ======================= */
 
-  // GET /api/admin/products?status=&keyword=&productCode=&page=&size=
+  // ✅ GET /api/admin/products -> ApiResponse<AdminPageResponse<...>>
   server.get("/api/admin/products", (req, res) => {
-    const page = normalizePage(req.query.page);
+    const page0 = normalizePage(req.query.page);
     const size = toInt(req.query.size, 10);
 
     const status = req.query.status ? String(req.query.status).trim() : "";
@@ -276,14 +526,18 @@ module.exports = function registerProductsRoutes(server, router, common) {
 
     rows.sort((a, b) => Number(b.id) - Number(a.id));
 
-    const totalElements = rows.length;
-    const start = page * size;
-    const content = rows.slice(start, start + size).map(productToAdminResponse);
+    const totalCount = rows.length;
+    const start = page0 * size;
+    const list = rows.slice(start, start + size).map(productToAdminResponse);
 
-    return res.json(ok(makeAdminPage({ content, totalElements, page, size }), "관리자 상품 목록 조회 성공"));
+    return res.json(
+      ok(
+        makeAdminPageFixed({ list, totalCount, page0, size }),
+        "관리자 상품 목록 조회 성공"
+      )
+    );
   });
 
-  // GET /api/admin/products/{productId}  (숫자만!)
   server.get("/api/admin/products/:productId(\\d+)", (req, res) => {
     const productId = Number(req.params.productId);
     const p = getList("products").find((x) => !isDeleted(x) && Number(x.id) === productId);
@@ -292,7 +546,6 @@ module.exports = function registerProductsRoutes(server, router, common) {
     return res.json(ok(productToAdminResponse(p), "관리자 상품 상세 조회 성공"));
   });
 
-  // POST /api/admin/products
   server.post("/api/admin/products", (req, res) => {
     const body = req.body || {};
 
@@ -328,7 +581,6 @@ module.exports = function registerProductsRoutes(server, router, common) {
     return res.json(successMessage("상품 등록 성공"));
   });
 
-  // PUT /api/admin/products/{productId}
   server.put("/api/admin/products/:productId(\\d+)", (req, res) => {
     const productId = Number(req.params.productId);
     const body = req.body || {};
@@ -362,7 +614,6 @@ module.exports = function registerProductsRoutes(server, router, common) {
     return res.json(successMessage("상품 수정 성공"));
   });
 
-  // DELETE /api/admin/products/{productId}
   server.delete("/api/admin/products/:productId(\\d+)", (req, res) => {
     const productId = Number(req.params.productId);
 

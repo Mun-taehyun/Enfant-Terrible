@@ -1,0 +1,159 @@
+/* src/views/admin/qna/QnaView.module.css */
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.input {
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  min-width: 140px;
+}
+
+.button {
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.buttonPrimary {
+  border-color: #222;
+}
+
+.grid {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.grid th,
+.grid td {
+  border-bottom: 1px solid #eee;
+  padding: 10px;
+  text-align: left;
+  vertical-align: top;
+  font-size: 14px;
+}
+
+.muted {
+  color: #666;
+  font-size: 13px;
+}
+
+.kv {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 6px 10px;
+}
+
+.k {
+  color: #555;
+  font-size: 13px;
+}
+
+.v {
+  word-break: break-word;
+  font-size: 13px;
+}
+
+.cardList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card {
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.title {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.error {
+  color: #b00020;
+}
+/* ===== QnA form layout hotfix ===== */
+
+.formRow {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: 10px;
+  align-items: center;
+}
+
+.formLabel {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.formValue {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* ✅ form 안에서는 input이 폭을 줄일 수 있어야 겹침이 사라짐 */
+.formValue .input {
+  min-width: 0;
+  width: 100%;
+  max-width: 260px;
+}
+
+.formActions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* ===== rooms: one-line control bar ===== */
+
+.ctrlBar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap; /* 화면 좁으면 자연스럽게 줄바꿈 */
+}
+
+.ctrlItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ctrlLabel {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.ctrlInput {
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  width: 90px;      /* ✅ 짧게 고정해서 밑으로 내려가는 문제 방지 */
+}

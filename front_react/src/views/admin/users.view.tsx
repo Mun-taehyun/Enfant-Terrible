@@ -16,9 +16,7 @@ import {
   type AdminUserStatus,
 } from "../../types/admin/user";
 
-/**
- * 상세 정보의 각 행을 렌더링하는 컴포넌트
- */
+/** 상세 정보 한 행 */
 function InfoRow({
   label,
   value,
@@ -37,16 +35,12 @@ function InfoRow({
   );
 }
 
-/**
- * 유저 상태 타입 가드
- */
+/** 백엔드 enum(UserStatus)와 1:1 */
 function isAdminUserStatus(v: unknown): v is AdminUserStatus {
-  return v === "ACTIVE" || v === "SUSPENDED" || v === "WITHDRAWN";
+  return v === "ACTIVE" || v === "SUSPENDED" || v === "DELETED";
 }
 
-/**
- * 계정 상태 변경 행을 렌더링하는 컴포넌트
- */
+/** 계정 상태 변경 행 */
 function StatusRow({
   status,
   disabled,
@@ -93,21 +87,26 @@ export default function UsersView() {
 
   const PAGE_SIZE = 10;
 
-  // 1) 리스트 데이터 조회
   const usersQuery = useAdminUsers({ page, size: PAGE_SIZE });
-  const rows: AdminUserListItem[] = usersQuery.data?.rows ?? [];
 
-  // 2) 상세 정보 조회
+  const rows = usersQuery.data?.list ?? [];
+
+  const totalCount =
+  typeof usersQuery.data?.totalCount === "number" ? usersQuery.data.totalCount : 0;
+  const totalPages = totalCount > 0 ? Math.ceil(totalCount / PAGE_SIZE) : 1;
+
+  const disablePrev = page <= 1;
+  const disableNext = page >= totalPages;
+
+  // ✅ 백엔드: GET /api/admin/users/{userId} -> ApiResponse<AdminUserDetailResponse>
   const detailQuery = useAdminUserDetail(selectedUserId);
-  const user = detailQuery.data?.user;
+  const user = detailQuery.data;
 
-  // 3) 상태 변경 뮤테이션
+  // ✅ 상태 변경
   const updateMutation = useAdminUserStatusUpdate();
 
-  // 변경 중 UI에 즉시 반영하기 위한 상태
-  const [optimisticStatus, setOptimisticStatus] = useState<AdminUserStatus | null>(
-    null
-  );
+  // optimistic 적용
+  const [optimisticStatus, setOptimisticStatus] = useState<AdminUserStatus | null>(null);
 
   const serverStatus: AdminUserStatus = isAdminUserStatus(user?.status)
     ? user.status
@@ -115,16 +114,6 @@ export default function UsersView() {
 
   const currentStatus: AdminUserStatus = optimisticStatus ?? serverStatus;
 
-  // 페이징 관련 계산
-  const totalPages =
-    typeof usersQuery.data?.totalPages === "number" && usersQuery.data.totalPages >= 1
-      ? usersQuery.data.totalPages
-      : null;
-
-  const disablePrev = page <= 1;
-  const disableNext = totalPages !== null ? page >= totalPages : rows.length < PAGE_SIZE;
-
-  // 상태 변경 핸들러
   const handleStatusChange = async (next: AdminUserStatus) => {
     if (!selectedUserId) return;
 
@@ -133,7 +122,7 @@ export default function UsersView() {
     try {
       await updateMutation.mutateAsync({
         userId: selectedUserId,
-        body: { status: next },
+        body: { status: next }, // ✅ 백엔드 AdminUserStatusUpdateRequest
       });
 
       await detailQuery.refetch();
@@ -176,17 +165,14 @@ export default function UsersView() {
                   <span className={styles.idNo}>#{u.userId}</span>
 
                   <div className={styles.userMainInfo}>
-                    <span className={styles.nameText}>{u.name}</span>
+                    <span className={styles.nameText}>{u.name ?? "-"}</span>
                     <span className={styles.emailText}>{u.email}</span>
                   </div>
-                  
-                  {/* ✅ 리스트 내 상태 태그(statusTag)가 삭제되었습니다. */}
                 </div>
               ))
             )}
           </div>
 
-          {/* ✅ 페이징 버튼이 리스트 하단으로 이동되었습니다. */}
           <div className={styles.pager}>
             <button
               className={styles.pageBtn}
@@ -195,7 +181,9 @@ export default function UsersView() {
             >
               이전
             </button>
-            <span className={styles.pageInfo}>PAGE {page}</span>
+            <span className={styles.pageInfo}>
+              PAGE {page} / {totalPages} (총 {totalCount}명)
+            </span>
             <button
               className={styles.pageBtn}
               onClick={() => setPage((p) => p + 1)}
@@ -218,17 +206,53 @@ export default function UsersView() {
             <div className={styles.detailWrapper}>
               <div className={styles.detailBodyBox}>
                 <div className={styles.infoTable}>
-                  <InfoRow label="이름" value={user.name} />
-                  <InfoRow label="회원번호" value={`${user.userId}`} />
+                  <InfoRow label="회원번호" value={String(user.userId)} />
                   <InfoRow label="이메일" value={user.email} />
+                  <InfoRow label="이름" value={user.name} />
                   <InfoRow label="전화번호" value={user.tel} />
-                  <InfoRow label="주소" value={user.address} />
+                  <InfoRow label="권한" value={user.role} />
+                  <InfoRow label="가입경로" value={user.provider} />
+                  <InfoRow
+                    label="이메일 인증"
+                    value={
+                      typeof user.emailVerified === "boolean"
+                        ? user.emailVerified
+                          ? "인증"
+                          : "미인증"
+                        : null
+                    }
+                  />
+                  <InfoRow label="가입일" value={user.createdAt} />
+                  <InfoRow label="마지막 로그인" value={user.lastLoginAt} />
 
                   <StatusRow
                     status={currentStatus}
                     disabled={updateMutation.isPending}
                     onChange={handleStatusChange}
                   />
+
+                  {/* pets 표시(DTO에 존재) - UI 필요 없으면 이 블록 통째로 제거하셔도 됩니다 */}
+                  {Array.isArray(user.pets) && user.pets.length > 0 ? (
+                    <div className={styles.petsBox}>
+                      <div className={styles.petsTitle}>반려동물 정보</div>
+                      {user.pets.map((p) => (
+                        <div key={p.petId} className={styles.petItem}>
+                          <div className={styles.petLine}>
+                            <span className={styles.petLabel}>이름</span>
+                            <span className={styles.petValue}>{p.name ?? "-"}</span>
+                          </div>
+                          <div className={styles.petLine}>
+                            <span className={styles.petLabel}>종</span>
+                            <span className={styles.petValue}>{p.species ?? "-"}</span>
+                          </div>
+                          <div className={styles.petLine}>
+                            <span className={styles.petLabel}>품종</span>
+                            <span className={styles.petValue}>{p.breed ?? "-"}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
               </div>
             </div>

@@ -1,10 +1,10 @@
-// src/views/admin/product/productsView.tsx
+// src/views/admin/productsView.tsx
 import { useMemo, useState } from "react";
 import styles from "./productsView.module.css";
 
 import type { AdminProductListParams } from "@/types/admin/product";
 import { useAdminProducts } from "@/hooks/admin/adminProduct.hook";
-import ProductDetailView from "./productDetailView";
+import ProductDetailView from "@/views/admin/productDetailView";
 
 export default function ProductsView() {
   const [page, setPage] = useState<number>(1);
@@ -27,10 +27,12 @@ export default function ProductsView() {
     [page, size, status, keyword, productCode]
   );
 
+  // ✅ 훅의 data는 "unwrapOrThrow 결과" (= AdminPageResponse<AdminProduct>) 여야 함
   const listQ = useAdminProducts(params);
 
-  const rows = listQ.data?.content ?? [];
-  const totalPages = listQ.data?.totalPages ?? 1;
+  const rows = listQ.data?.list ?? [];
+  const totalCount = listQ.data?.totalCount ?? 0;
+  const totalPages = totalCount > 0 ? Math.ceil(totalCount / size) : 1;
 
   return (
     <div className={styles.wrap}>
@@ -40,17 +42,17 @@ export default function ProductsView() {
 
       <div className={styles.filters}>
         <label className={styles.label}>
-          status
+          판매상태
           <input
             className={styles.input}
             value={status}
             onChange={(e) => setStatus(e.target.value)}
-            placeholder="ON_SALE / STOPPED / HIDDEN / SOLD_OUT"
+            placeholder="예: ACTIVE / INACTIVE 등(백엔드 enum 기준)"
           />
         </label>
 
         <label className={styles.label}>
-          keyword(상품명)
+          상품명
           <input
             className={styles.input}
             value={keyword}
@@ -60,7 +62,7 @@ export default function ProductsView() {
         </label>
 
         <label className={styles.label}>
-          productCode
+          상품코드
           <input
             className={styles.input}
             value={productCode}
@@ -70,8 +72,15 @@ export default function ProductsView() {
         </label>
 
         <label className={styles.labelSmall}>
-          size
-          <select className={styles.select} value={size} onChange={(e) => setSize(Number(e.target.value))}>
+          페이지당 개수
+          <select
+            className={styles.select}
+            value={size}
+            onChange={(e) => {
+              setSize(Number(e.target.value));
+              setPage(1);
+            }}
+          >
             <option value={10}>10</option>
             <option value={20}>20</option>
             <option value={50}>50</option>
@@ -96,14 +105,14 @@ export default function ProductsView() {
           <table className={styles.table}>
             <thead>
               <tr>
-                <th>productId</th>
-                <th>productCode</th>
-                <th>name</th>
-                <th>basePrice</th>
-                <th>status</th>
-                <th>category</th>
-                <th>createdAt</th>
-                <th>actions</th>
+                <th>상품 ID</th>
+                <th>상품코드</th>
+                <th>상품명</th>
+                <th>기본가</th>
+                <th>판매상태</th>
+                <th>카테고리</th>
+                <th>생성일</th>
+                <th>관리</th>
               </tr>
             </thead>
             <tbody>
@@ -122,11 +131,14 @@ export default function ProductsView() {
                     <td>{p.basePrice}</td>
                     <td>{p.status}</td>
                     <td>
-                      {p.categoryName} (#{p.categoryId})
+                      {p.categoryName} (ID: {p.categoryId})
                     </td>
                     <td>{p.createdAt}</td>
                     <td className={styles.actions}>
-                      <button className={styles.smallBtn} onClick={() => setSelectedProductId(p.productId)}>
+                      <button
+                        className={styles.smallBtn}
+                        onClick={() => setSelectedProductId(p.productId)}
+                      >
                         상세
                       </button>
                     </td>
@@ -139,20 +151,31 @@ export default function ProductsView() {
       </div>
 
       <div className={styles.pager}>
-        <button className={styles.smallBtn} disabled={page <= 1} onClick={() => setPage((v: number) => Math.max(1, v - 1))}>
+        <button
+          className={styles.smallBtn}
+          disabled={page <= 1}
+          onClick={() => setPage((v: number) => Math.max(1, v - 1))}
+        >
           이전
         </button>
         <span className={styles.pageText}>
-          {page} / {totalPages}
+          {page} / {totalPages} (총 {totalCount}개)
         </span>
-        <button className={styles.smallBtn} disabled={page >= totalPages} onClick={() => setPage((v: number) => Math.min(totalPages, v + 1))}>
+        <button
+          className={styles.smallBtn}
+          disabled={page >= totalPages}
+          onClick={() => setPage((v: number) => Math.min(totalPages, v + 1))}
+        >
           다음
         </button>
       </div>
 
       {selectedProductId ? (
         <div className={styles.detailPanel}>
-          <ProductDetailView productId={selectedProductId} onClose={() => setSelectedProductId(null)} />
+          <ProductDetailView
+            productId={selectedProductId}
+            onClose={() => setSelectedProductId(null)}
+          />
         </div>
       ) : null}
     </div>
