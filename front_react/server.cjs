@@ -17,6 +17,8 @@ const registerPostsRoutes = require("./mock/posts.routes.cjs");
 const registerPopupsRoutes = require("./mock/popups.routes.cjs");
 const registerBannersRoutes = require("./mock/banners.routes.cjs");
 const registerPointsRoutes = require("./mock/points.routes.cjs");
+const registerOrdersRoutes = require("./mock/orders.routes.cjs");
+const registerProductInquiriesRoutes = require("./mock/productInquiries.routes.cjs");
 
 
 
@@ -52,6 +54,8 @@ registerPostsRoutes(server, router, common);
 registerPopupsRoutes(server, router, common);
 registerBannersRoutes(server, router, common);
 registerPointsRoutes(server, router, common);
+registerOrdersRoutes(server, router, common);
+registerProductInquiriesRoutes(server, router, common);
 
 
 // 기본 router

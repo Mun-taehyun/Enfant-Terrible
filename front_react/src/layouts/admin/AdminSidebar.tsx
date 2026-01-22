@@ -6,52 +6,47 @@ import styles from "./AdminSidebar.module.css";
 import SidebarSection from "../../components/admin/SidebarComp";
 import type { AdminNavSection } from "../../types/admin/navigation";
 
-
 const ADMIN_NAV: AdminNavSection[] = [
   {
     title: "운영",
     items: [
       { label: "쇼핑몰 매출확인", to: "/admin" },
-      { label: "카테고리 관리", to: "/admin/categories" },
+      
     ],
   },
   {
     title: "상품 제어",
     items: [
       { label: "상품 관리", to: "/admin/products" },
+      { label: "카테고리 관리", to: "/admin/categories" },
+      { label: "상품 문의 관리", to: "/admin/product-inquiries" },
       // 상품 옵션/sku/할인은 "상품 상세 패널 내부"에서 처리
     ],
   },
   {
-    title: "결제·정산",
+    title: "결제·주문",
     items: [
-      // AdminPaymentController: /api/admin/payments
+      { label: "주문 관리", to: "/admin/orders" }, // ✅ 추가
       { label: "결제 관리", to: "/admin/payments" },
     ],
   },
   {
     title: "콘텐츠",
     items: [
-      // AdminPostController: /api/admin/posts
       { label: "게시글 관리", to: "/admin/posts" },
-      // QnA(채팅방) 확정 라우트
       { label: "사용자 채팅방 관리", to: "/admin/qna" },
     ],
   },
   {
     title: "회원 관리",
     items: [
-      // AdminUserController: /api/admin/users
       { label: "사용자 정보 조회", to: "/admin/users" },
-      // 포인트는 사용자 상세 안에서 처리(/api/admin/points/users/{userId}/...)
     ],
   },
   {
     title: "광고 및 홍보",
     items: [
-      // AdminPopupController: /api/admin/popups
       { label: "광고 팝업 설정", to: "/admin/popups" },
-      // AdminBannerController: /api/admin/banners
       { label: "광고 배너 설정", to: "/admin/banners" },
     ],
   },

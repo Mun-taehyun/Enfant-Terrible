@@ -34,30 +34,84 @@
   font-weight: 700;
 }
 
+/* ✅ 두 카드가 "같은 높이"를 반드시 갖도록 최소 높이를 강제 */
 .grid {
   display: grid;
   grid-template-columns: 360px 1fr;
   gap: 12px;
-  align-items: start;
-  min-width: 0; /* ✅ 중요: grid 자식 overflow 계산 정상화 */
+
+  /* ✅ 카드가 행 높이에 끌려서 늘어나지 않게 */
+  align-items: start;      /* 아이템 자체를 위로 */
+  align-content: start;    /* 그리드 콘텐츠 자체도 위로 */
+  grid-auto-rows: min-content; /* 행 높이를 내용 기준으로 */
+
+  min-width: 0;
 }
 
+/* ✅ 카드 공통: 높이 동일, 내부를 flex로 분리 */
 .card {
   min-width: 0;
+
+  /* ✅ 내용 높이만큼만(늘어나지 않게) */
+  align-self: start;
+  height: fit-content;
 }
 
 .cardTitle {
   font-size: 14px;
   font-weight: 700;
   margin-bottom: 10px;
+  flex-shrink: 0;
+}
+
+.smallBtn {
+  height: 30px;
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 8px;
+  padding: 0 10px;
+  cursor: pointer;
+}
+
+.primaryBtn {
+  height: 38px;
+  border: none;
+  border-radius: 10px;
+  background: #111;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
+}
+
+/* =========================
+   ✅ 관리자 조정(왼쪽)
+   - 카드 높이가 커져도 버튼/에러가 아래로 밀리고
+   - 입력 영역은 스크롤 가능
+========================= */
+
+.adjustBody {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  flex: 1;
+  min-height: 0;
+}
+
+.formWrap {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding-right: 4px; /* 스크롤바 겹침 완화 */
 }
 
 .formRow {
   display: grid;
-  grid-template-columns: 80px 1fr;
+  grid-template-columns: 90px 1fr;
   align-items: center;
   gap: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .label {
@@ -72,59 +126,48 @@
   padding: 0 10px;
 }
 
-.primaryBtn {
-  height: 38px;
-  border: none;
-  border-radius: 10px;
-  background: #111;
-  color: #fff;
-  font-weight: 700;
-  cursor: pointer;
-  width: 100%;
-  margin-top: 6px;
+.adjustFooter {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-shrink: 0;
 }
 
-.smallBtn {
-  height: 30px;
-  border: 1px solid #ddd;
-  background: #fff;
-  border-radius: 8px;
-  padding: 0 10px;
-  cursor: pointer;
-}
+/* =========================
+   ✅ 히스토리(오른쪽)
+   - 툴바/메타/페이지는 고정
+   - 표 영역만 flex:1로 커지고 스크롤
+========================= */
 
-.errorBox {
-  margin-top: 10px;
-  padding: 10px;
-  background: #fff3f3;
-  border: 1px solid #ffd2d2;
-  border-radius: 8px;
-  color: #a40000;
-  font-size: 12px;
-}
-
-.loading {
-  padding: 12px 0;
-  font-size: 13px;
+.historyBody {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
 }
 
 .toolbar {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
-  margin-bottom: 10px;
+  gap: 14px;
+  align-items: flex-end;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+  flex-shrink: 0;
 }
 
+/* ✅ “정렬” 글자 아래 공간(라벨-셀렉트 간격) 확보 */
 .toolItem {
   display: flex;
+  flex-direction: column;
   gap: 6px;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .toolLabel {
   font-size: 12px;
   opacity: 0.7;
+  line-height: 1.2;
 }
 
 .select {
@@ -138,18 +181,22 @@
 .meta {
   font-size: 12px;
   opacity: 0.7;
-  margin-bottom: 8px;
+  flex-shrink: 0;
 }
 
+/* ✅ 표 영역을 카드 높이에 맞춰 동일하게 확보 */
 .tableWrap {
   overflow: auto;
   min-width: 0;
+  margin-top: 10px;
+  padding-top: 6px;
 }
 
 .table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 760px;
+  table-layout: fixed;   /* ✅ 고정 레이아웃으로 폭 안정화 */
+  min-width: 0;          /* ✅ 강제 최소폭 제거 */
 }
 
 .table th,
@@ -158,6 +205,10 @@
   padding: 8px;
   font-size: 12px;
   text-align: left;
+
+  /* ✅ 가로 폭이 부족하면 말줄임으로 */
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -167,10 +218,7 @@
   opacity: 0.7;
 }
 
-.positive {
-  font-weight: 700;
-}
-
+.positive,
 .negative {
   font-weight: 700;
 }
@@ -181,6 +229,7 @@
   gap: 8px;
   justify-content: center;
   margin-top: 10px;
+  flex-shrink: 0;
 }
 
 .pageText {
@@ -190,8 +239,23 @@
   text-align: center;
 }
 
+.errorBox {
+  padding: 10px;
+  background: #fff3f3;
+  border: 1px solid #ffd2d2;
+  border-radius: 8px;
+  color: #a40000;
+  font-size: 12px;
+}
+
+.loading {
+  padding: 12px 0;
+  font-size: 13px;
+}
+
 @media (max-width: 1100px) {
   .grid {
     grid-template-columns: 1fr;
+    min-height: auto;
   }
 }

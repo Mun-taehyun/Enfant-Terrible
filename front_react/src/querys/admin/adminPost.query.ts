@@ -1,4 +1,4 @@
-// src/query/admin/adminPost.query.ts
+// src/querys/admin/adminPost.query.ts
 import type { AdminPostId, AdminPostListRequest, AdminPostSaveRequest } from "@/types/admin/post";
 import {
   getAdminPosts,
@@ -8,6 +8,7 @@ import {
   deleteAdminPost,
 } from "@/apis/admin/request/adminPost.request";
 
+// ✅ named export (hook에서 import { adminPostQuery } ... 에 대응)
 export const adminPostQuery = {
   list: (params: AdminPostListRequest) => getAdminPosts(params),
   detail: (postId: AdminPostId) => getAdminPostDetail(postId),
@@ -15,3 +16,6 @@ export const adminPostQuery = {
   update: (postId: AdminPostId, body: AdminPostSaveRequest) => updateAdminPost(postId, body),
   remove: (postId: AdminPostId) => deleteAdminPost(postId),
 };
+
+// ✅ default export도 제공 (혹시 다른 곳이 default import면 그대로 동작)
+export default adminPostQuery;

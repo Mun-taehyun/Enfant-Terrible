@@ -1,19 +1,16 @@
 // src/views/admin/sales.view.tsx
+
 import { useMemo, useState } from "react";
 import styles from "./sales.view.module.css";
 
-import { useAdminAmount, useAdminAmountDaily } from "@/hooks/admin/adminSales.hook";
-import type {
-  AdminSalesRange,
-  AdminAmountDailyItem,
-  AdminAmountSummary,
-} from "@/types/admin/sales";
+import { useAdminSalesSummary } from "@/hooks/admin/adminSales.hook";
+import type { AdminSalesGroupBy, AdminSalesRange } from "@/types/admin/sales";
 
 function pad2(n: number) {
   return String(n).padStart(2, "0");
 }
 
-/** ✅ UTC(toISOString)로 날짜가 하루 밀리는 문제 피하려고 로컬 기준 YYYY-MM-DD */
+/** 로컬 기준 YYYY-MM-DD */
 function toYmdLocal(d: Date) {
   return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
 }
@@ -30,60 +27,44 @@ function formatWon(n: number) {
 
 export default function SalesView() {
   const today = useMemo(() => new Date(), []);
+
   const defaultRange: AdminSalesRange = useMemo(() => {
     const to = toYmdLocal(today);
-    const from = toYmdLocal(addDays(today, -6)); // 최근 7일(오늘 포함)
+    const from = toYmdLocal(addDays(today, -6));
     return { from, to };
   }, [today]);
 
   const [range, setRange] = useState<AdminSalesRange>(defaultRange);
+  const [groupBy, setGroupBy] = useState<AdminSalesGroupBy>("DAY");
 
-  const amountQuery = useAdminAmount(range);
-  const dailyQuery = useAdminAmountDaily(range);
+  const q = useAdminSalesSummary(range, groupBy);
 
-  const summary = amountQuery.data as AdminAmountSummary | undefined;
-
-  // ✅ any 금지: 공용 타입 사용
-  const daily = (dailyQuery.data ?? []) as AdminAmountDailyItem[];
-
-  // 백엔드 필드명이 totalAmount/amount 중 뭐가 와도 표시되게 처리
-  const totalAmount =
-    typeof summary?.totalAmount === "number"
-      ? summary.totalAmount
-      : typeof summary?.amount === "number"
-        ? summary.amount
-        : 0;
-
-  const orderCount =
-    typeof summary?.orderCount === "number"
-      ? summary.orderCount
-      : typeof summary?.count === "number"
-        ? summary.count
-        : undefined;
-
-  // ✅ 오늘 버튼 (오늘 하루)
+  // ✅ 오늘/7일/30일: 백엔드 기능이 아니라 프론트에서 기간 계산 후 paidFrom/paidTo로 보내는 UI
   const onClickToday = () => {
     const d = toYmdLocal(new Date());
     setRange({ from: d, to: d });
   };
 
   const onClick7days = () => {
-    const to = toYmdLocal(new Date());
-    const from = toYmdLocal(addDays(new Date(), -6));
+    const base = new Date();
+    const to = toYmdLocal(base);
+    const from = toYmdLocal(addDays(base, -6));
     setRange({ from, to });
   };
 
   const onClick30days = () => {
-    const to = toYmdLocal(new Date());
-    const from = toYmdLocal(addDays(new Date(), -29));
+    const base = new Date();
+    const to = toYmdLocal(base);
+    const from = toYmdLocal(addDays(base, -29));
     setRange({ from, to });
   };
 
-  const loading = amountQuery.isLoading || dailyQuery.isLoading;
-  const errorMsg =
-    (amountQuery.error as Error | null)?.message ||
-    (dailyQuery.error as Error | null)?.message ||
-    "";
+  const loading = q.isLoading;
+  const errorMsg = (q.error as Error | null)?.message || "";
+
+  const totalAmount = typeof q.data?.totalAmount === "number" ? q.data.totalAmount : 0;
+  const totalCount = typeof q.data?.totalCount === "number" ? q.data.totalCount : 0;
+  const items = Array.isArray(q.data?.items) ? q.data.items : [];
 
   return (
     <section className={styles.wrap}>
@@ -94,11 +75,9 @@ export default function SalesView() {
           <button type="button" className={styles.btn} onClick={onClickToday}>
             오늘
           </button>
-
           <button type="button" className={styles.btn} onClick={onClick7days}>
             최근 7일
           </button>
-
           <button type="button" className={styles.btn} onClick={onClick30days}>
             최근 30일
           </button>
@@ -113,6 +92,7 @@ export default function SalesView() {
                 onChange={(e) => setRange((p) => ({ ...p, from: e.target.value }))}
               />
             </label>
+
             <label className={styles.label}>
               to
               <input
@@ -121,6 +101,18 @@ export default function SalesView() {
                 value={range.to}
                 onChange={(e) => setRange((p) => ({ ...p, to: e.target.value }))}
               />
+            </label>
+
+            <label className={styles.label}>
+              기간 묶음
+              <select
+                className={styles.input}
+                value={groupBy}
+                onChange={(e) => setGroupBy(e.target.value as AdminSalesGroupBy)}
+              >
+                <option value="DAY">DAY</option>
+                <option value="MONTH">MONTH</option>
+              </select>
             </label>
           </div>
         </div>
@@ -145,55 +137,39 @@ export default function SalesView() {
             </div>
 
             <div className={styles.card}>
-              <div className={styles.cardLabel}>주문 수</div>
-              <div className={styles.cardValue}>
-                {typeof orderCount === "number" ? `${formatWon(orderCount)} 건` : "—"}
-              </div>
+              <div className={styles.cardLabel}>결제 건수</div>
+              <div className={styles.cardValue}>{formatWon(totalCount)} 건</div>
             </div>
           </div>
 
           <div className={styles.tableBox}>
-            <h2 className={styles.subTitle}>일별 매출</h2>
+            <h2 className={styles.subTitle}>
+              {groupBy === "DAY" ? "일별 매출" : "월별 매출"}
+            </h2>
 
             <table className={styles.table}>
               <thead>
                 <tr>
-                  <th>날짜</th>
+                  <th>기간</th>
                   <th>매출</th>
-                  <th>주문 수</th>
+                  <th>결제 건수</th>
                 </tr>
               </thead>
               <tbody>
-                {daily.length === 0 ? (
+                {items.length === 0 ? (
                   <tr>
                     <td colSpan={3} className={styles.empty}>
                       데이터가 없습니다.
                     </td>
                   </tr>
                 ) : (
-                  daily.map((row) => {
-                    const amount =
-                      typeof row.totalAmount === "number"
-                        ? row.totalAmount
-                        : typeof row.amount === "number"
-                          ? row.amount
-                          : 0;
-
-                    const cnt =
-                      typeof row.orderCount === "number"
-                        ? row.orderCount
-                        : typeof row.count === "number"
-                          ? row.count
-                          : undefined;
-
-                    return (
-                      <tr key={row.date}>
-                        <td>{row.date}</td>
-                        <td>{formatWon(amount)} 원</td>
-                        <td>{typeof cnt === "number" ? `${formatWon(cnt)} 건` : "—"}</td>
-                      </tr>
-                    );
-                  })
+                  items.map((row) => (
+                    <tr key={row.period}>
+                      <td>{row.period}</td>
+                      <td>{formatWon(row.totalAmount || 0)} 원</td>
+                      <td>{formatWon(row.paymentCount || 0)} 건</td>
+                    </tr>
+                  ))
                 )}
               </tbody>
             </table>

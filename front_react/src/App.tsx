@@ -10,12 +10,12 @@ import CategoriesView from "./views/admin/categories.view.tsx";
 import ProductsView from "./views/admin/productsView.tsx";
 import QnaMessagesView from "./views/admin/QnaMessagesView.tsx";
 import QnaRoomsView from "./views/admin/QnaRoomsView.tsx";
-
-// ✅ 추가: 관리자 신규 메뉴(백엔드 컨트롤러 존재)
 import PaymentsView from "@/views/admin/payments.view";
 import PostsView from "@/views/admin/posts.view";
 import PopupsView from "@/views/admin/popups.view";
 import BannersView from "@/views/admin/banners.view";
+import OrdersView from "@/views/admin/orders.view";
+import ProductInquiriesView from "@/views/admin/ProductInquiriesView";
 
 const isAuthenticated = () => {
   const token = localStorage.getItem("accessToken");
@@ -66,11 +66,13 @@ export default function App() {
         <Route path="posts" element={<PostsView />} />
         <Route path="popups" element={<PopupsView />} />
         <Route path="banners" element={<BannersView />} />
-
-        <Route path="qna" element={<QnaRoomsView />} />
-        <Route path="qna/:roomId" element={<QnaMessagesView />} />
+        <Route path="product-inquiries" element={<ProductInquiriesView />} />
+        <Route path="qna">
+          <Route index element={<QnaRoomsView />} />
+          <Route path=":roomId" element={<QnaMessagesView />} />
+        </Route>
         
-        <Route path="orders" element={<Navigate to="/admin" replace />} />
+        <Route path="orders" element={<OrdersView />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/admin/login" replace />} />

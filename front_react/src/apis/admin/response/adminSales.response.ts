@@ -1,6 +1,7 @@
 // src/apis/admin/response/adminSales.response.ts
-import type { ApiResponse } from "@/types/admin/api";
-import type { AdminAmountDailyItem, AdminAmountSummary } from "@/types/admin/sales";
 
-export type GetAdminAmountResponse = ApiResponse<AdminAmountSummary>;
-export type GetAdminAmountDailyResponse = ApiResponse<AdminAmountDailyItem[]>;
+import type { ApiResponse } from "@/types/admin/api";
+import type { AdminSalesSummaryData } from "@/types/admin/sales";
+
+/** GET /api/admin/sales */
+export type GetAdminSalesSummaryResponse = ApiResponse<AdminSalesSummaryData>;

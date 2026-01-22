@@ -178,7 +178,7 @@ export default function UsersView() {
                     setOptimisticStatus(null);
                   }}
                 >
-                  <span className={styles.idNo}>#{u.userId}</span>
+                  <span className={styles.idNo}>{u.userId}</span>
 
                   <div className={styles.userMainInfo}>
                     <span className={styles.nameText}>{u.name ?? "-"}</span>

@@ -75,14 +75,46 @@
       "orderCode": "ET20260110-0001",
       "orderedAt": "2026-01-10T10:15:00+09:00",
       "status": "PAID",
-      "totalAmount": 189000
+      "totalAmount": 189000,
+      "orderId": 1001,
+      "userId": 1,
+      "receiverName": "",
+      "receiverPhone": "",
+      "trackingNumber": "ㄴㅁㄴㅁ",
+      "shippedAt": "2026-01-22T07:32:24.224Z",
+      "deliveredAt": null,
+      "createdAt": "2026-01-22T06:58:20.392Z",
+      "updatedAt": "2026-01-22T07:32:24.224Z",
+      "items": []
     },
     {
       "id": 1002,
+      "orderId": 1002,
+      "userId": 1,
       "orderCode": "ET20260111-0001",
-      "orderedAt": "2026-01-11T12:05:00+09:00",
-      "status": "PAID",
-      "totalAmount": 25000
+      "status": "CANCELLED",
+      "totalAmount": 25000,
+      "receiverName": "",
+      "receiverPhone": "",
+      "zipCode": "",
+      "addressBase": "",
+      "addressDetail": "",
+      "trackingNumber": "ㅎㅁㅁㅎ",
+      "shippedAt": "2026-01-22T06:16:24.372Z",
+      "deliveredAt": null,
+      "createdAt": "2026-01-22T06:16:24.372Z",
+      "updatedAt": "2026-01-22T07:35:48.278Z",
+      "items": [
+        {
+          "skuId": 1,
+          "productName": "테스트 상품(1002-1)",
+          "price": 25000,
+          "quantity": 1,
+          "cancelledQuantity": 1,
+          "remainingQuantity": 0
+        }
+      ],
+      "cancelReason": "1"
     }
   ],
   "categories": [
@@ -280,9 +312,20 @@
       "optionValueId": 6,
       "groupId": 3,
       "optionGroupId": 3,
-      "value": "1",
-      "sortOrder": 1,
+      "value": "2",
+      "sortOrder": 3,
       "createdAt": "2026-01-21T03:11:45.568Z",
+      "deleted_at": null,
+      "updated_at": "2026-01-22T00:39:27.169Z"
+    },
+    {
+      "valueId": 7,
+      "optionValueId": 7,
+      "groupId": 3,
+      "optionGroupId": 3,
+      "value": "4",
+      "sortOrder": 1,
+      "createdAt": "2026-01-22T00:39:35.462Z",
       "deleted_at": null
     }
   ],
@@ -342,14 +385,26 @@
     {
       "postId": 1,
       "userId": 1,
-      "postType": "NOTICE",
+      "postType": "ㅁㄴㅇㄹ",
       "refType": null,
       "refId": null,
-      "title": "샘플 게시글",
-      "content": "샘플 내용",
+      "title": "fuckt",
+      "content": "샘플 내용sdffsaddsfa",
       "createdAt": "2026-01-21T00:00:00.000Z",
-      "updatedAt": "2026-01-21T00:00:00.000Z",
+      "updatedAt": "2026-01-22T06:09:18.177Z",
       "deletedAt": null
+    },
+    {
+      "postId": 2,
+      "userId": 1,
+      "postType": "asfd",
+      "refType": "sdf",
+      "refId": null,
+      "title": "dsfa",
+      "content": "sfda",
+      "createdAt": "2026-01-22T06:09:35.561Z",
+      "updatedAt": "2026-01-22T06:11:03.513Z",
+      "deletedAt": "2026-01-22T06:11:03.513Z"
     }
   ],
   "popups": [
@@ -428,36 +483,85 @@
     }
   ],
   "pointHistory": [
-  {
-    "pointHistoryId": 1,
-    "userId": 2,
-    "pointAmount": 1000,
-    "pointType": "EARN",
-    "reason": "가입 보너스",
-    "refType": "SIGNUP",
-    "refId": null,
-    "createdAt": "2026-01-18T10:10:00+09:00"
-  },
-  {
-    "pointHistoryId": 2,
-    "userId": 2,
-    "pointAmount": -200,
-    "pointType": "USE",
-    "reason": "주문 사용",
-    "refType": "ORDER",
-    "refId": 1001,
-    "createdAt": "2026-01-19T11:20:00+09:00"
-  },
-  {
-    "pointHistoryId": 3,
-    "userId": 3,
-    "pointAmount": 500,
-    "pointType": "EARN",
-    "reason": "이벤트",
-    "refType": "EVENT",
-    "refId": null,
-    "createdAt": "2026-01-20T09:00:00+09:00"
-  }
-]
-
+    {
+      "pointHistoryId": 1,
+      "userId": 2,
+      "pointAmount": 1000,
+      "pointType": "EARN",
+      "reason": "가입 보너스",
+      "refType": "SIGNUP",
+      "refId": null,
+      "createdAt": "2026-01-18T10:10:00+09:00"
+    },
+    {
+      "pointHistoryId": 2,
+      "userId": 2,
+      "pointAmount": -200,
+      "pointType": "USE",
+      "reason": "주문 사용",
+      "refType": "ORDER",
+      "refId": 1001,
+      "createdAt": "2026-01-19T11:20:00+09:00"
+    },
+    {
+      "pointHistoryId": 3,
+      "userId": 3,
+      "pointAmount": 500,
+      "pointType": "EARN",
+      "reason": "이벤트",
+      "refType": "EVENT",
+      "refId": null,
+      "createdAt": "2026-01-20T09:00:00+09:00"
+    },
+    {
+      "pointHistoryId": 4,
+      "userId": 2,
+      "pointAmount": 100,
+      "pointType": "ADMIN_ADJUST",
+      "reason": "그냥",
+      "refType": "이벤트",
+      "refId": 1001,
+      "createdAt": "2026-01-22T01:31:39.212Z"
+    },
+    {
+      "pointHistoryId": 5,
+      "userId": 2,
+      "pointAmount": 123,
+      "pointType": "ADMIN_ADJUST",
+      "reason": "213",
+      "refType": "123",
+      "refId": 213,
+      "createdAt": "2026-01-22T08:35:56.100Z"
+    }
+  ],
+  "productInquiries": [
+    {
+      "inquiryId": 1,
+      "productId": 1,
+      "userId": 2,
+      "content": "사이즈가 크게 나왔나요?",
+      "isPrivate": false,
+      "status": "WAITING",
+      "answerContent": null,
+      "answeredByUserId": null,
+      "answeredAt": null,
+      "createdAt": "2026-01-20T10:00:00.000Z",
+      "updatedAt": "2026-01-22T09:25:07.940Z",
+      "deletedAt": "2026-01-22T09:25:07.940Z"
+    },
+    {
+      "inquiryId": 2,
+      "productId": 2,
+      "userId": 3,
+      "content": "배송은 보통 며칠 걸리나요? 비공개로 답변 부탁드립니다.",
+      "isPrivate": true,
+      "status": "ANSWERED",
+      "answerContent": "일반적으로 1~3영업일 내 출고됩니다.",
+      "answeredByUserId": 1,
+      "answeredAt": "2026-01-22T09:30:41.716Z",
+      "createdAt": "2026-01-21T02:00:00.000Z",
+      "updatedAt": "2026-01-22T09:30:41.716Z",
+      "deletedAt": null
+    }
+  ]
 }

@@ -1,27 +1,17 @@
 // src/query/admin/adminSales.query.ts
-import type { AdminSalesRange } from "@/types/admin/sales";
-import { getAdminAmount, getAdminAmountDaily } from "@/apis/admin/request/adminSales.request";
 
-export const adminSalesKeys = {
-  all: ["admin", "sales"] as const,
-  amount: (range: AdminSalesRange) => [...adminSalesKeys.all, "amount", range.from, range.to] as const,
-  daily: (range: AdminSalesRange) => [...adminSalesKeys.all, "daily", range.from, range.to] as const,
-};
+import type { QueryKey } from "@tanstack/react-query";
+import { getAdminSalesSummary } from "@/apis/admin/request/adminSales.request";
+import type { AdminSalesSummaryParams } from "@/types/admin/sales";
 
-export function adminAmountQueryOptions(range: AdminSalesRange) {
-  return {
-    queryKey: adminSalesKeys.amount(range),
-    queryFn: () => getAdminAmount(range),
-    staleTime: 30_000,
-    refetchOnWindowFocus: false,
-  };
+export function adminSalesSummaryQueryKey(params: AdminSalesSummaryParams): QueryKey {
+  // 객체 통째로 넣지 말고 원시값으로 고정 (캐시/리렌더 안정)
+  return ["adminSalesSummary", params.paidFrom, params.paidTo, params.groupBy ?? "DAY"];
 }
 
-export function adminAmountDailyQueryOptions(range: AdminSalesRange) {
+export function adminSalesSummaryQueryOptions(params: AdminSalesSummaryParams) {
   return {
-    queryKey: adminSalesKeys.daily(range),
-    queryFn: () => getAdminAmountDaily(range),
-    staleTime: 30_000,
-    refetchOnWindowFocus: false,
-  };
+    queryKey: adminSalesSummaryQueryKey(params),
+    queryFn: () => getAdminSalesSummary(params),
+  } as const;
 }

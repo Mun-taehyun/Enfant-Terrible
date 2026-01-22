@@ -1,38 +1,29 @@
 // src/types/admin/point.ts
-export type AdminPointUserId = number;
 
+/** 포인트 조정 요청 */
+export type AdminPointAdjustRequest = {
+  amount: number;
+  reason: string;
+};
+
+/** 관리자 포인트 잔액 응답에서 data에 해당하는 형태 */
 export type AdminPointBalanceResponse = {
-  userId: AdminPointUserId;
   balance: number;
 };
 
-export type AdminPointHistorySortBy = "POINT_HISTORY_ID" | "CREATED_AT";
-export type AdminPointHistoryDirection = "ASC" | "DESC";
-
+/** 포인트 히스토리 조회 파라미터 */
 export type AdminPointHistoryParams = {
-  page: number; // 1-base
-  size: number; // 1~200
-  sortBy?: AdminPointHistorySortBy;
-  direction?: AdminPointHistoryDirection;
+  page: number;
+  size: number;
 };
 
+/** 포인트 히스토리 아이템(백 DTO에 맞춰 확정되면 필드 고정) */
 export type AdminPointHistoryItem = {
-  pointHistoryId: number;
-  userId: AdminPointUserId;
-
-  pointAmount: number;
-  pointType: string;
-
-  reason: string | null;
-  refType: string | null;
-  refId: number | null;
-
-  createdAt: string; // LocalDateTime -> ISO/string
-};
-
-export type AdminPointAdjustRequest = {
-  amount: number; // @NotNull (음수도 가능)
+  // 아래는 일반적으로 쓰는 필드 예시입니다.
+  // 백엔드 DTO 확정되면 정확한 필드명으로 교체하세요.
+  pointId?: number;
+  userId?: number;
+  amount?: number;
   reason?: string;
-  refType?: string;
-  refId?: number | null;
+  createdAt?: string; // ISO string
 };

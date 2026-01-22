@@ -227,7 +227,7 @@ export default function PopupsView() {
         </div>
 
         <div className={styles.filterItem}>
-          <label className={styles.label}>Size</label>
+          <label className={styles.label}>건수 정렬</label>
           <select
             className={styles.select}
             value={String(size)}
@@ -251,7 +251,7 @@ export default function PopupsView() {
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>popupId</th>
+              <th>팝업ID</th>
               <th>제목</th>
               <th>링크</th>
               <th>포지션</th>

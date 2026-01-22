@@ -2,7 +2,11 @@
 import { useMemo, useState } from "react";
 import styles from "./payments.view.module.css";
 
-import { useAdminPaymentCancel, useAdminPaymentDetail, useAdminPayments } from "@/hooks/admin/adminPayment.hook";
+import {
+  useAdminPaymentCancel,
+  useAdminPaymentDetail,
+  useAdminPayments,
+} from "@/hooks/admin/adminPayment.hook";
 import type { AdminPaymentListParams } from "@/types/admin/payment";
 
 function toNumberOrUndef(v: string): number | undefined {
@@ -76,7 +80,7 @@ export default function PaymentsView() {
 
     const amt = Number(cancelAmount);
     if (!Number.isFinite(amt) || amt <= 0) {
-      alert("환불 금액(amount)을 정확히 입력하세요.");
+      alert("환불 금액을 정확히 입력하세요.");
       return;
     }
 
@@ -102,7 +106,7 @@ export default function PaymentsView() {
       <section className={styles.filters}>
         <div className={styles.row}>
           <label className={styles.field}>
-            <span className={styles.label}>userId</span>
+            <span className={styles.label}>회원 ID</span>
             <input
               className={styles.input}
               value={userId}
@@ -112,7 +116,7 @@ export default function PaymentsView() {
           </label>
 
           <label className={styles.field}>
-            <span className={styles.label}>orderId</span>
+            <span className={styles.label}>주문 ID</span>
             <input
               className={styles.input}
               value={orderId}
@@ -122,7 +126,7 @@ export default function PaymentsView() {
           </label>
 
           <label className={styles.fieldWide}>
-            <span className={styles.label}>orderCode</span>
+            <span className={styles.label}>주문 코드</span>
             <input
               className={styles.input}
               value={orderCode}
@@ -132,7 +136,7 @@ export default function PaymentsView() {
           </label>
 
           <label className={styles.field}>
-            <span className={styles.label}>status</span>
+            <span className={styles.label}>결제 상태</span>
             <input
               className={styles.input}
               value={paymentStatus}
@@ -144,7 +148,7 @@ export default function PaymentsView() {
 
         <div className={styles.row}>
           <label className={styles.field}>
-            <span className={styles.label}>size</span>
+            <span className={styles.label}>목록 크기</span>
             <select
               className={styles.select}
               value={size}
@@ -180,24 +184,24 @@ export default function PaymentsView() {
         ) : (
           <>
             <div className={styles.meta}>
-              <span>totalCount: {totalCount}</span>
+              <span>총 {totalCount}건</span>
               <span>
-                page: {page} / {totalPages}
+                페이지: {page} / {totalPages}
               </span>
             </div>
 
             <table className={styles.table}>
               <thead>
                 <tr>
-                  <th>paymentId</th>
-                  <th>orderId</th>
-                  <th>userId</th>
-                  <th>orderCode</th>
-                  <th>method</th>
-                  <th>amount</th>
-                  <th>status</th>
-                  <th>pgTid</th>
-                  <th>paidAt</th>
+                  <th>결제 ID</th>
+                  <th>주문 ID</th>
+                  <th>회원 ID</th>
+                  <th>주문 코드</th>
+                  <th>결제 수단</th>
+                  <th>결제 금액</th>
+                  <th>결제 상태</th>
+                  <th>PG 거래 ID</th>
+                  <th>결제 일시</th>
                   <th>상세</th>
                 </tr>
               </thead>
@@ -239,7 +243,7 @@ export default function PaymentsView() {
               >
                 이전
               </button>
-              <span className={styles.pagerInfo}>Page {page}</span>
+              <span className={styles.pagerInfo}>페이지 {page}</span>
               <button
                 className={styles.btnSmall}
                 onClick={() => setPage((v) => Math.min(totalPages, v + 1))}
@@ -279,37 +283,37 @@ export default function PaymentsView() {
                   <>
                     <div className={styles.detailGrid}>
                       <div>
-                        <b>paymentId</b> {d.paymentId}
+                        <b>결제 ID</b> {d.paymentId}
                       </div>
                       <div>
-                        <b>orderId</b> {d.orderId}
+                        <b>주문 ID</b> {d.orderId}
                       </div>
                       <div>
-                        <b>userId</b> {d.userId}
+                        <b>회원 ID</b> {d.userId}
                       </div>
                       <div className={styles.mono}>
-                        <b>orderCode</b> {d.orderCode}
+                        <b>주문 코드</b> {d.orderCode}
                       </div>
                       <div>
-                        <b>method</b> {d.paymentMethod}
+                        <b>결제 수단</b> {d.paymentMethod}
                       </div>
                       <div>
-                        <b>amount</b> {d.paymentAmount.toLocaleString()}
+                        <b>결제 금액</b> {d.paymentAmount.toLocaleString()}
                       </div>
                       <div>
-                        <b>status</b> {d.paymentStatus}
+                        <b>결제 상태</b> {d.paymentStatus}
                       </div>
                       <div className={styles.mono}>
-                        <b>pgTid</b> {d.pgTid}
+                        <b>PG 거래 ID</b> {d.pgTid}
                       </div>
                       <div className={styles.mono}>
-                        <b>paidAt</b> {d.paidAt ?? "-"}
+                        <b>결제 일시</b> {d.paidAt ?? "-"}
                       </div>
                       <div className={styles.mono}>
-                        <b>createdAt</b> {d.createdAt}
+                        <b>생성일</b> {d.createdAt}
                       </div>
                       <div className={styles.mono}>
-                        <b>updatedAt</b> {d.updatedAt}
+                        <b>수정일</b> {d.updatedAt}
                       </div>
                     </div>
 
@@ -318,7 +322,7 @@ export default function PaymentsView() {
                     <h3 className={styles.subTitle}>환불 처리</h3>
                     <div className={styles.cancelBox}>
                       <label className={styles.field}>
-                        <span className={styles.label}>amount</span>
+                        <span className={styles.label}>환불 금액</span>
                         <input
                           className={styles.input}
                           value={cancelAmount}
@@ -328,7 +332,7 @@ export default function PaymentsView() {
                       </label>
 
                       <label className={styles.fieldWide}>
-                        <span className={styles.label}>reason</span>
+                        <span className={styles.label}>환불 사유</span>
                         <input
                           className={styles.input}
                           value={cancelReason}

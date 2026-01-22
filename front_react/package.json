@@ -11,6 +11,7 @@
     "mock": "json-server --watch db.json --port 8080"
   },
   "dependencies": {
+    "@stomp/stompjs": "^7.2.1",
     "@tanstack/react-query": "^5.90.16",
     "axios": "^1.13.2",
     "react": "^19.2.0",

@@ -1,14 +1,18 @@
-// src/views/admin/qna/QnaRoomsView.tsx
-
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import styles from "./QnaView.module.css";
+
 import { useAdminQnaRooms } from "@/hooks/admin/adminQna.hook";
+import { adminQnaKeys } from "@/querys/admin/adminQna.query";
 import type { AdminQnaRoomListItem } from "@/types/admin/qna";
+
+import { useAdminQnaSocket } from "@/hooks/admin/adminQnaSocket.hook";
 
 function toNumberOrUndef(v: string): number | undefined {
   const t = v.trim();
-  if (!t) return undefined;
+  if (t.length === 0) return undefined;
+
   const n = Number(t);
   return Number.isFinite(n) ? n : undefined;
 }
@@ -23,24 +27,31 @@ function errorText(err: unknown): string {
   }
 }
 
+function getAccessToken(): string {
+  // 프로젝트에서 실제 키가 다르면 여기만 수정
+  const t = localStorage.getItem("accessToken");
+  return (t ?? "").trim();
+}
+
 export default function QnaRoomsView() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const [pageInput, setPageInput] = useState<string>("1");
   const [sizeInput, setSizeInput] = useState<string>("20");
   const [userIdInput, setUserIdInput] = useState<string>("");
 
-  const page = useMemo(() => {
+  const page = useMemo<number>(() => {
     const n = toNumberOrUndef(pageInput);
     return n && n > 0 ? n : 1;
   }, [pageInput]);
 
-  const size = useMemo(() => {
+  const size = useMemo<number>(() => {
     const n = toNumberOrUndef(sizeInput);
     return n && n > 0 ? n : 20;
   }, [sizeInput]);
 
-  const userId = useMemo(() => toNumberOrUndef(userIdInput), [userIdInput]);
+  const userId = useMemo<number | undefined>(() => toNumberOrUndef(userIdInput), [userIdInput]);
 
   const { data, isLoading, isError, error, refetch } = useAdminQnaRooms({
     page,
@@ -51,10 +62,29 @@ export default function QnaRoomsView() {
   const list = useMemo<AdminQnaRoomListItem[]>(() => data?.list ?? [], [data?.list]);
   const totalCount = data?.totalCount ?? 0;
 
-  const totalPages = useMemo(() => {
+  const totalPages = useMemo<number>(() => {
     const n = Math.ceil(totalCount / size);
     return n <= 0 ? 1 : n;
   }, [totalCount, size]);
+
+  // 실시간 unread 오버라이드
+  const [unreadMap, setUnreadMap] = useState<Record<number, number>>({});
+
+  const accessToken = useMemo<string>(() => getAccessToken(), []);
+
+  useAdminQnaSocket({
+    token: accessToken,
+    subscribeMessage: false,
+    subscribeUnread: true,
+    subscribeNotify: true,
+    onUnread: (p) => {
+      setUnreadMap((prev) => ({ ...prev, [p.roomId]: p.unread }));
+    },
+    onNotify: () => {
+      // 새 메시지/알림이 오면 목록 갱신(최소 구현)
+      queryClient.invalidateQueries({ queryKey: adminQnaKeys.all });
+    },
+  });
 
   return (
     <div className={styles.wrap}>
@@ -65,7 +95,6 @@ export default function QnaRoomsView() {
         </div>
       </div>
 
-      {/* ✅ 한 줄 컨트롤 바 */}
       <div className={styles.ctrlBar}>
         <div className={styles.ctrlItem}>
           <span className={styles.ctrlLabel}>사용자 ID</span>
@@ -132,12 +161,12 @@ export default function QnaRoomsView() {
             <table className={styles.grid}>
               <thead>
                 <tr>
-                  <th style={{ width: 120 }}>상세</th>
+                  <th style={{ width: 120 }}>채팅방</th>
                   <th>채팅방 ID</th>
                   <th>사용자 ID</th>
                   <th>상태</th>
-                  <th>마지막 메시지 시간</th>
-                  <th>새 메세지</th>
+                  <th>마지막 채팅 시간</th>
+                  <th>안 읽음</th>
                 </tr>
               </thead>
               <tbody>
@@ -148,14 +177,14 @@ export default function QnaRoomsView() {
                         className={styles.button}
                         onClick={() => navigate(`/admin/qna/${it.roomId}`)}
                       >
-                        메시지
+                        입장
                       </button>
                     </td>
                     <td>{it.roomId}</td>
                     <td>{it.userId}</td>
                     <td>{it.status}</td>
                     <td>{it.lastMessageAt}</td>
-                    <td>{it.unread}</td>
+                    <td>{unreadMap[it.roomId] ?? it.unread}</td>
                   </tr>
                 ))}
               </tbody>

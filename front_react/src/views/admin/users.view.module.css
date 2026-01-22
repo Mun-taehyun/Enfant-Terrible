@@ -19,11 +19,9 @@
 /* 좌우 배치 레이아웃 */
 .layout {
   display: grid;
-  /* [여기가 핵심] 왼쪽을 600px로 크게 고정, 오른쪽은 나머지(1fr) */
-  grid-template-columns: 600px 1fr; 
+  grid-template-columns: 600px 1fr;
   gap: 16px;
-  /* 높이를 화면에 딱 맞게 고정 */
-  height: calc(100vh - 100px); 
+  height: calc(100vh - 100px);
   align-items: stretch;
 }
 
@@ -34,11 +32,11 @@
   border-radius: 10px;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  min-height: 0; /* 내부 스크롤을 위해 필수 */
+  overflow: hidden; /* 패널 밖으로는 숨김 */
+  min-height: 0;    /* 내부 스크롤 필수 */
 }
 
-/* [추가] 오른쪽 패널만 배경색을 다르게 해서 시각적으로 좁아 보이게 함 */
+/* 오른쪽 패널 배경 */
 .panel:last-child {
   background-color: #fcfcfc;
 }
@@ -120,6 +118,7 @@
   background: #fff;
   justify-content: center;
   border-top: 1px solid #e6e6e6;
+  flex-shrink: 0;
 }
 
 .pageBtn {
@@ -131,20 +130,40 @@
   cursor: pointer;
 }
 
-/* [중요] 오른쪽 상세 정보 레이아웃 제한 */
-.detailWrapper {
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  /* 오른쪽 박스 안의 내용이 너무 퍼지지 않게 너비 제한 */
-  max-width: 550px; 
+.pageInfo {
+  font-size: 13px;
+  opacity: 0.85;
 }
 
+/* ✅ 오른쪽 상세: 여기서 스크롤을 담당 */
+.detailWrapper {
+  padding: 16px;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;   /* 내용이 길면 스크롤 */
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+/* ✅ TSX에서 쓰는 래퍼: 간격 + shrink 방지 */
+.detailBodyBox {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  /* ✅ 핵심: 내부 요소가 "눌려서 잘리는" 현상 방지 */
+  min-height: max-content;
+}
+
+/* 상세 정보 표 */
 .infoTable {
   border: 1px solid #eee;
   border-radius: 10px;
   overflow: hidden;
   background: #fff;
+
+  /* ✅ 핵심: 포인트 패널이 붙어도 회원정보가 줄어들지 않게 */
+  flex-shrink: 0;
 }
 
 .infoRow {
@@ -160,8 +179,21 @@
   border-bottom: none;
 }
 
-.labelCell { font-size: 13px; color: #666; }
-.displayText { font-size: 14px; font-weight: 600; color: #111; }
+.labelCell {
+  font-size: 13px;
+  color: #666;
+}
+
+.valueCell {
+  min-width: 0;
+}
+
+.displayText {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111;
+  word-break: break-word; /* 긴 값도 잘리지 않게 */
+}
 
 .statusSelect {
   width: 100%;
@@ -169,6 +201,12 @@
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 8px;
+}
+
+.statusHint {
+  margin-top: 6px;
+  font-size: 12px;
+  opacity: 0.75;
 }
 
 .emptyState {
@@ -182,4 +220,36 @@
   margin: 16px;
   border-radius: 8px;
   background: #fafafa;
+}
+
+/* pets */
+.petsBox {
+  padding: 12px 16px;
+}
+
+.petsTitle {
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.petItem {
+  border-top: 1px solid #eee;
+  padding-top: 8px;
+  margin-top: 8px;
+}
+
+.petLine {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.petLabel {
+  width: 48px;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.petValue {
+  font-size: 13px;
 }

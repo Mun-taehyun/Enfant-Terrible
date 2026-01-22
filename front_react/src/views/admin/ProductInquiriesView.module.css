@@ -1,0 +1,238 @@
+/* src/views/admin/inquiry/ProductInquiriesView.module.css */
+
+.page {
+  padding: 16px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.headerRight {
+  display: flex;
+  gap: 8px;
+}
+
+/* ===== Filters ===== */
+.filters {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.filterRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  min-width: 140px;
+  text-align: center;
+  align-items: center;
+}
+
+.input,
+.select {
+  height: 34px;
+  padding: 6px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  outline: none;
+  text-align: center;
+}
+
+.filterButtons {
+  display: flex;
+  gap: 8px;
+  margin-left: 0;
+  justify-content: center;
+}
+
+.pagingRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.pagingInfo {
+  font-size: 12px;
+  color: #374151;
+  text-align: center;
+}
+
+.pagingButtons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+/* ===== Content ===== */
+.content {
+  margin-top: 12px;
+}
+
+.info {
+  padding: 12px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.error {
+  padding: 12px;
+  font-size: 13px;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+  background: #fff1f2;
+  border-radius: 10px;
+  text-align: center;
+}
+
+/* ===== Table ===== */
+.tableWrap {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.table th,
+.table td {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 10px;
+  vertical-align: middle;
+  font-size: 12px;
+  text-align: center;
+}
+
+.table th {
+  background: #f9fafb;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.empty {
+  padding: 18px;
+  text-align: center;
+  color: #6b7280;
+}
+
+/* ===== Value emphasis (CSS로 전부 합침) ===== */
+.cellValueEm {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+}
+
+/* ✅ mono + cellValueEm을 TSX에서 합치지 않도록 CSS에 합친 클래스 */
+.monoEm {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+/* ===== Cells ===== */
+.userCell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+}
+
+.userEmail {
+  font-size: 12px;
+  font-weight: 400;
+  color: #6b7280;
+  word-break: break-all;
+}
+
+.subText {
+  margin-top: 6px;
+  color: #6b7280;
+  font-size: 11px;
+  word-break: break-all;
+  text-align: center;
+}
+
+.textCell {
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 88px;
+  resize: vertical;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 8px;
+  outline: none;
+  font-size: 12px;
+  line-height: 1.35;
+  text-align: center;
+}
+
+/* ===== Actions ===== */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.button,
+.buttonPrimary,
+.buttonDanger {
+  height: 34px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.buttonPrimary {
+  border-color: #111827;
+  background: #111827;
+  color: #fff;
+}
+
+.buttonDanger {
+  border-color: #b91c1c;
+  background: #b91c1c;
+  color: #fff;
+}
