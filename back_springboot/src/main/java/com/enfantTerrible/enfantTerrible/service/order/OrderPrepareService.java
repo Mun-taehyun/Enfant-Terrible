@@ -95,16 +95,17 @@ public class OrderPrepareService {
       throw new BusinessException("수량은 1 이상이어야 합니다.");
     }
 
-    if (optionValueIds == null || optionValueIds.isEmpty()) {
-      throw new BusinessException("옵션 선택이 필요합니다.");
-    }
-
     ProductRow product = productMapper.findByIdForUser(productId);
     if (product == null) {
       throw new BusinessException("상품을 찾을 수 없습니다.");
     }
 
-    ProductSkuRow sku = skuQueryMapper.findSkuByExactOptionMatch(productId, optionValueIds, optionValueIds.size());
+    ProductSkuRow sku;
+    if (optionValueIds == null || optionValueIds.isEmpty()) {
+      sku = skuQueryMapper.findDefaultSkuByProductId(productId);
+    } else {
+      sku = skuQueryMapper.findSkuByExactOptionMatch(productId, optionValueIds, optionValueIds.size());
+    }
     if (sku == null) {
       throw new BusinessException("해당 옵션 조합의 SKU를 찾을 수 없습니다.");
     }

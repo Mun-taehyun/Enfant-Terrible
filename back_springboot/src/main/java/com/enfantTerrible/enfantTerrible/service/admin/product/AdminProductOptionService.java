@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -151,9 +152,8 @@ public class AdminProductOptionService {
 
     List<AdminProductOptionGroupRow> groups = groupMapper.findByProductId(productId);
     if (groups == null || groups.isEmpty()) {
-      // 옵션 그룹이 없으면 유효한 SKU 조합이 없다고 보고, 기존 SKU를 정리
-      cleanupAllSkus(productId);
-      skuMapper.refreshProductBasePrice(productId);
+      // 옵션 그룹이 없으면 "옵션 없는 상품" → 기본 SKU 1개를 보장
+      ensureDefaultSku(productId, product.getBasePrice());
       return;
     }
 
@@ -165,12 +165,23 @@ public class AdminProductOptionService {
           .map(AdminProductOptionValueRow::getOptionValueId)
           .toList();
       if (ids.isEmpty()) {
-        // 어떤 그룹이라도 값이 없으면 조합을 만들 수 없으므로 기존 SKU 정리
-        cleanupAllSkus(productId);
-        skuMapper.refreshProductBasePrice(productId);
+        // 어떤 그룹이라도 값이 없으면 조합을 만들 수 없음 → 기본 SKU 1개 보장
+        ensureDefaultSku(productId, product.getBasePrice());
         return;
       }
       groupValues.add(ids);
+    }
+
+    // 옵션이 존재하는 상태에서는 옵션 없는(매핑 0개) SKU는 불필요 → 정리
+    List<Long> noOptionSkuIds = skuMapper.findSkuIdsWithNoOptionsByProductId(productId);
+    if (noOptionSkuIds != null) {
+      for (Long skuId : noOptionSkuIds) {
+        if (skuId == null) {
+          continue;
+        }
+        skuOptionMapper.deleteBySkuId(skuId);
+        skuMapper.softDelete(skuId);
+      }
     }
 
     // 전체 조합 생성(옵션값 ID는 오름차순으로 정렬된 키로 사용)
@@ -239,12 +250,30 @@ public class AdminProductOptionService {
     skuMapper.refreshProductBasePrice(productId);
   }
 
-  private void cleanupAllSkus(Long productId) {
-    List<Long> skuIds = skuMapper.findSkuIdsByProductId(productId);
-    for (Long skuId : skuIds) {
-      skuOptionMapper.deleteBySkuId(skuId);
-      skuMapper.softDelete(skuId);
+  private void ensureDefaultSku(Long productId, Long basePrice) {
+    if (productId == null) {
+      return;
     }
+
+    Long defaultSkuId = skuMapper.findDefaultSkuIdByProductId(productId);
+    if (defaultSkuId != null) {
+      skuMapper.refreshProductBasePrice(productId);
+      return;
+    }
+
+    AdminSkuSaveInternalRequest internal = new AdminSkuSaveInternalRequest(
+        productId,
+        "SKU-" + productId + "-" + UUID.randomUUID().toString().replace("-", "").substring(0, 12),
+        basePrice,
+        0L,
+        SkuStatus.STOPPED.name()
+    );
+
+    if (skuMapper.insertInternal(internal) == 0 || internal.getSkuId() == null) {
+      throw new BusinessException("기본 SKU 생성에 실패했습니다.");
+    }
+
+    skuMapper.refreshProductBasePrice(productId);
   }
 
   private void buildKeys(List<List<Long>> groupValues, int idx, List<Long> acc, Set<String> out) {

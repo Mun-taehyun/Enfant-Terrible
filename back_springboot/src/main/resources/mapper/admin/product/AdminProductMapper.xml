@@ -93,7 +93,7 @@
       AND p.deleted_at IS NULL
   </select>
 
-  <insert id="insert">
+  <insert id="insert" useGeneratedKeys="true" keyProperty="productId">
     INSERT INTO et_product (
       product_code,
       category_id,

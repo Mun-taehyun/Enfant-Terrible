@@ -403,8 +403,11 @@
 - Method/Path: GET /api/products/{productId}/skus/resolve?optionValueIds=1,2,3
 - Auth: 필요
 - 제목: SKU 확정(옵션 조합)
+- 참고: 옵션이 없는 상품(해당 상품의 SKU가 모두 optionValueIds가 없는 기본 SKU만 존재)인 경우 optionValueIds를 생략하면 기본 SKU가 자동 확정됩니다.
 - Request 예시
   /api/products/1/skus/resolve?optionValueIds=10,11
+- Request 예시(옵션 없는 상품)
+  /api/products/1/skus/resolve
 - Response 예시 (필드 일부)
   {
     "success": true,
@@ -661,6 +664,8 @@
 - 제목: 바로구매 주문 페이지 사전조회
 - Query 예시
   /api/orders/prepare/direct?productId=1&optionValueIds=10&optionValueIds=11&quantity=1
+- Query 예시(옵션 없는 상품)
+  /api/orders/prepare/direct?productId=1&quantity=1
 - Response 예시(형태)
   {
     "success": true,
@@ -716,6 +721,16 @@
   {
     "productId": 1,
     "optionValueIds": [10, 11],
+    "quantity": 1,
+    "receiverName": "수령인",
+    "receiverPhone": "01099998888",
+    "zipCode": "12345",
+    "addressBase": "서울시 ...",
+    "addressDetail": "..."
+  }
+- Request 예시(옵션 없는 상품)
+  {
+    "productId": 1,
     "quantity": 1,
     "receiverName": "수령인",
     "receiverPhone": "01099998888",

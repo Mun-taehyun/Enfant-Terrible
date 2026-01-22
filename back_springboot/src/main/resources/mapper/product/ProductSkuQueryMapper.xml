@@ -33,6 +33,23 @@
     )
   </select>
 
+  <select id="findDefaultSkuByProductId" resultType="ProductSkuRow">
+    SELECT
+      s.sku_id,
+      s.product_id,
+      s.price,
+      s.stock,
+      s.status
+    FROM et_product_sku s
+    LEFT JOIN et_product_sku_option so ON so.sku_id = s.sku_id
+    WHERE s.product_id = #{productId}
+      AND s.deleted_at IS NULL
+    GROUP BY s.sku_id
+    HAVING COUNT(so.option_value_id) = 0
+    ORDER BY s.sku_id ASC
+    LIMIT 1
+  </select>
+
   <!-- skuId 직접 조회 (옵션 없는 SKU / 내부용) -->
   <select id="findById" resultType="ProductSkuRow">
     SELECT

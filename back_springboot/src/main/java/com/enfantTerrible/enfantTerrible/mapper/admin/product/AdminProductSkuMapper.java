@@ -25,6 +25,10 @@ public interface AdminProductSkuMapper {
 
   List<Long> findSkuIdsByProductId(@Param("productId") Long productId);
 
+  Long findDefaultSkuIdByProductId(@Param("productId") Long productId);
+
+  List<Long> findSkuIdsWithNoOptionsByProductId(@Param("productId") Long productId);
+
   // SKU insert: skuId를 generatedKeys로 받는다
   int insertInternal(AdminSkuSaveInternalRequest req);
 

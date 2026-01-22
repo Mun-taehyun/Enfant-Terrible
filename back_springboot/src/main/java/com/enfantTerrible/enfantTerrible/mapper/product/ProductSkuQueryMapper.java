@@ -19,6 +19,10 @@ public interface ProductSkuQueryMapper {
       @Param("optionCount") int optionCount
   );
 
+  ProductSkuRow findDefaultSkuByProductId(
+      @Param("productId") Long productId
+  );
+
   /**
    * (선택) skuId 직접 조회
    */
