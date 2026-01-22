@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 8.0.43, for Win64 (x86_64)
 --
--- Host: localhost    Database: enfant_terrible
+-- Host: localhost    Database: kosmo
 -- ------------------------------------------------------
 -- Server version	8.0.43
 
@@ -25,25 +25,17 @@ DROP TABLE IF EXISTS `et_banner`;
 CREATE TABLE `et_banner` (
   `banner_id` bigint NOT NULL AUTO_INCREMENT,
   `title` varchar(255) DEFAULT NULL,
-  `image_url` varchar(255) DEFAULT NULL,
   `link_url` varchar(255) DEFAULT NULL,
-  `is_active` tinyint DEFAULT '1',
   `sort_order` int DEFAULT '0',
+  `is_active` tinyint DEFAULT '1',
+  `start_at` datetime DEFAULT NULL,
+  `end_at` datetime DEFAULT NULL,
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`banner_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `et_banner`
---
-
-LOCK TABLES `et_banner` WRITE;
-/*!40000 ALTER TABLE `et_banner` DISABLE KEYS */;
-/*!40000 ALTER TABLE `et_banner` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `et_cart`
@@ -57,21 +49,11 @@ CREATE TABLE `et_cart` (
   `user_id` bigint NOT NULL,
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`cart_id`),
   KEY `fk_cart_user` (`user_id`),
   CONSTRAINT `fk_cart_user` FOREIGN KEY (`user_id`) REFERENCES `et_user` (`user_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `et_cart`
---
-
-LOCK TABLES `et_cart` WRITE;
-/*!40000 ALTER TABLE `et_cart` DISABLE KEYS */;
-/*!40000 ALTER TABLE `et_cart` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `et_cart_item`
@@ -86,6 +68,7 @@ CREATE TABLE `et_cart_item` (
   `sku_id` bigint NOT NULL,
   `quantity` int DEFAULT '1',
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`cart_item_id`),
   KEY `fk_cartitem_cart` (`cart_id`),
   KEY `fk_cartitem_sku` (`sku_id`),
@@ -93,15 +76,6 @@ CREATE TABLE `et_cart_item` (
   CONSTRAINT `fk_cartitem_sku` FOREIGN KEY (`sku_id`) REFERENCES `et_product_sku` (`sku_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `et_cart_item`
---
-
-LOCK TABLES `et_cart_item` WRITE;
-/*!40000 ALTER TABLE `et_cart_item` DISABLE KEYS */;
-/*!40000 ALTER TABLE `et_cart_item` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `et_category`
@@ -113,26 +87,18 @@ DROP TABLE IF EXISTS `et_category`;
 CREATE TABLE `et_category` (
   `category_id` bigint NOT NULL AUTO_INCREMENT,
   `parent_id` bigint DEFAULT NULL,
-  `name` varchar(255) DEFAULT NULL,
+  `name` varchar(255) NOT NULL,
+  `depth` int NOT NULL,
   `sort_order` int DEFAULT '0',
-  `is_active` tinyint DEFAULT '1',
+  `is_active` char(1) DEFAULT 'Y',
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`category_id`),
-  KEY `fk_category_parent` (`parent_id`),
+  UNIQUE KEY `uk_category_parent_name` (`parent_id`,`name`,`deleted_at`),
   CONSTRAINT `fk_category_parent` FOREIGN KEY (`parent_id`) REFERENCES `et_category` (`category_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `et_category`
---
-
-LOCK TABLES `et_category` WRITE;
-/*!40000 ALTER TABLE `et_category` DISABLE KEYS */;
-/*!40000 ALTER TABLE `et_category` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `et_email_verification`
@@ -142,26 +108,16 @@ DROP TABLE IF EXISTS `et_email_verification`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `et_email_verification` (
-  `verification_id` bigint NOT NULL AUTO_INCREMENT,
+  `email_verification_id` bigint NOT NULL AUTO_INCREMENT,
   `email` varchar(255) NOT NULL,
-  `code` varchar(255) NOT NULL,
+  `verification_code` varchar(255) NOT NULL,
+  `purpose` varchar(20) NOT NULL,
   `expires_at` datetime DEFAULT NULL,
-  `is_verified` tinyint DEFAULT '0',
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `used_at` datetime DEFAULT NULL,
-  `deleted_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`verification_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `verified_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`email_verification_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `et_email_verification`
---
-
-LOCK TABLES `et_email_verification` WRITE;
-/*!40000 ALTER TABLE `et_email_verification` DISABLE KEYS */;
-/*!40000 ALTER TABLE `et_email_verification` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `et_file`
@@ -175,6 +131,7 @@ CREATE TABLE `et_file` (
   `ref_type` varchar(100) DEFAULT NULL,
   `ref_id` bigint DEFAULT NULL,
   `file_url` varchar(255) DEFAULT NULL,
+  `file_role` varchar(50) DEFAULT NULL,
   `original_name` varchar(255) DEFAULT NULL,
   `stored_name` varchar(255) DEFAULT NULL,
   `file_type` varchar(50) DEFAULT NULL,
@@ -184,15 +141,6 @@ CREATE TABLE `et_file` (
   PRIMARY KEY (`file_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `et_file`
---
-
-LOCK TABLES `et_file` WRITE;
-/*!40000 ALTER TABLE `et_file` DISABLE KEYS */;
-/*!40000 ALTER TABLE `et_file` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `et_order`
@@ -214,25 +162,17 @@ CREATE TABLE `et_order` (
   `address_detail` varchar(255) DEFAULT NULL,
   `ordered_at` datetime DEFAULT CURRENT_TIMESTAMP,
   `delivery_status` varchar(50) DEFAULT NULL,
+  `tracking_number` varchar(100) DEFAULT NULL,
+  `shipped_at` datetime DEFAULT NULL,
   `delivered_at` datetime DEFAULT NULL,
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`order_id`),
   UNIQUE KEY `order_code` (`order_code`),
   KEY `fk_order_user` (`user_id`),
   CONSTRAINT `fk_order_user` FOREIGN KEY (`user_id`) REFERENCES `et_user` (`user_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `et_order`
---
-
-LOCK TABLES `et_order` WRITE;
-/*!40000 ALTER TABLE `et_order` DISABLE KEYS */;
-/*!40000 ALTER TABLE `et_order` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `et_order_item`
@@ -248,23 +188,15 @@ CREATE TABLE `et_order_item` (
   `product_name` varchar(255) DEFAULT NULL,
   `price` bigint DEFAULT NULL,
   `quantity` int DEFAULT NULL,
+  `cancelled_quantity` int NOT NULL DEFAULT '0',
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`order_item_id`),
   KEY `fk_orderitem_order` (`order_id`),
   KEY `fk_orderitem_sku` (`sku_id`),
   CONSTRAINT `fk_orderitem_order` FOREIGN KEY (`order_id`) REFERENCES `et_order` (`order_id`) ON DELETE CASCADE,
   CONSTRAINT `fk_orderitem_sku` FOREIGN KEY (`sku_id`) REFERENCES `et_product_sku` (`sku_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `et_order_item`
---
-
-LOCK TABLES `et_order_item` WRITE;
-/*!40000 ALTER TABLE `et_order_item` DISABLE KEYS */;
-/*!40000 ALTER TABLE `et_order_item` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `et_payment`
@@ -276,8 +208,10 @@ DROP TABLE IF EXISTS `et_payment`;
 CREATE TABLE `et_payment` (
   `payment_id` bigint NOT NULL AUTO_INCREMENT,
   `order_id` bigint NOT NULL,
-  `payment_method` varchar(50) DEFAULT NULL,
-  `payment_status` varchar(50) DEFAULT NULL,
+  `payment_method` varchar(50) NOT NULL,
+  `payment_amount` bigint NOT NULL,
+  `payment_status` varchar(50) NOT NULL,
+  `pg_tid` varchar(100) DEFAULT NULL,
   `paid_at` datetime DEFAULT NULL,
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -288,13 +222,31 @@ CREATE TABLE `et_payment` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `et_payment`
+-- Table structure for table `et_pet`
 --
 
-LOCK TABLES `et_payment` WRITE;
-/*!40000 ALTER TABLE `et_payment` DISABLE KEYS */;
-/*!40000 ALTER TABLE `et_payment` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `et_pet`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `et_pet` (
+  `pet_id` bigint NOT NULL AUTO_INCREMENT,
+  `user_id` bigint NOT NULL,
+  `name` varchar(50) DEFAULT NULL,
+  `species` varchar(50) NOT NULL,
+  `breed` varchar(50) DEFAULT NULL,
+  `age` int DEFAULT NULL,
+  `gender` varchar(10) DEFAULT NULL,
+  `is_neutered` tinyint DEFAULT NULL,
+  `activity_level` tinyint DEFAULT NULL,
+  `weight` float DEFAULT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`pet_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `et_pet_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `et_user` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `et_point_history`
@@ -307,24 +259,16 @@ CREATE TABLE `et_point_history` (
   `point_history_id` bigint NOT NULL AUTO_INCREMENT,
   `user_id` bigint NOT NULL,
   `point_amount` int NOT NULL,
-  `type` varchar(50) DEFAULT NULL,
+  `point_type` varchar(30) NOT NULL,
+  `reason` varchar(255) DEFAULT NULL,
+  `ref_type` varchar(30) DEFAULT NULL,
   `ref_id` bigint DEFAULT NULL,
-  `description` varchar(255) DEFAULT NULL,
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`point_history_id`),
   KEY `fk_point_user` (`user_id`),
   CONSTRAINT `fk_point_user` FOREIGN KEY (`user_id`) REFERENCES `et_user` (`user_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `et_point_history`
---
-
-LOCK TABLES `et_point_history` WRITE;
-/*!40000 ALTER TABLE `et_point_history` DISABLE KEYS */;
-/*!40000 ALTER TABLE `et_point_history` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `et_popup`
@@ -337,7 +281,6 @@ CREATE TABLE `et_popup` (
   `popup_id` bigint NOT NULL AUTO_INCREMENT,
   `title` varchar(255) DEFAULT NULL,
   `content` text,
-  `image_url` varchar(255) DEFAULT NULL,
   `link_url` varchar(255) DEFAULT NULL,
   `position` varchar(50) DEFAULT NULL,
   `width` int DEFAULT NULL,
@@ -351,15 +294,6 @@ CREATE TABLE `et_popup` (
   PRIMARY KEY (`popup_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `et_popup`
---
-
-LOCK TABLES `et_popup` WRITE;
-/*!40000 ALTER TABLE `et_popup` DISABLE KEYS */;
-/*!40000 ALTER TABLE `et_popup` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `et_post`
@@ -386,15 +320,6 @@ CREATE TABLE `et_post` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `et_post`
---
-
-LOCK TABLES `et_post` WRITE;
-/*!40000 ALTER TABLE `et_post` DISABLE KEYS */;
-/*!40000 ALTER TABLE `et_post` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `et_product`
 --
 
@@ -406,8 +331,11 @@ CREATE TABLE `et_product` (
   `category_id` bigint DEFAULT NULL,
   `product_code` varchar(255) DEFAULT NULL,
   `name` varchar(255) DEFAULT NULL,
+  `status` varchar(20) NOT NULL DEFAULT 'ON_SALE',
   `base_price` bigint DEFAULT NULL,
   `description` text,
+  `average_rating` float DEFAULT '0' COMMENT '리뷰 평균 별점 (캐시)',
+  `review_count` int DEFAULT '0' COMMENT '리뷰 개수 (캐시)',
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `deleted_at` datetime DEFAULT NULL,
@@ -415,17 +343,8 @@ CREATE TABLE `et_product` (
   UNIQUE KEY `product_code` (`product_code`),
   KEY `fk_product_category` (`category_id`),
   CONSTRAINT `fk_product_category` FOREIGN KEY (`category_id`) REFERENCES `et_category` (`category_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `et_product`
---
-
-LOCK TABLES `et_product` WRITE;
-/*!40000 ALTER TABLE `et_product` DISABLE KEYS */;
-/*!40000 ALTER TABLE `et_product` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `et_product_discount`
@@ -441,22 +360,12 @@ CREATE TABLE `et_product_discount` (
   `discount_type` varchar(50) DEFAULT NULL,
   `start_at` datetime DEFAULT NULL,
   `end_at` datetime DEFAULT NULL,
-  `is_active` tinyint DEFAULT '1',
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`discount_id`),
   KEY `fk_discount_product` (`product_id`),
   CONSTRAINT `fk_discount_product` FOREIGN KEY (`product_id`) REFERENCES `et_product` (`product_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `et_product_discount`
---
-
-LOCK TABLES `et_product_discount` WRITE;
-/*!40000 ALTER TABLE `et_product_discount` DISABLE KEYS */;
-/*!40000 ALTER TABLE `et_product_discount` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `et_product_option_group`
@@ -479,15 +388,6 @@ CREATE TABLE `et_product_option_group` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `et_product_option_group`
---
-
-LOCK TABLES `et_product_option_group` WRITE;
-/*!40000 ALTER TABLE `et_product_option_group` DISABLE KEYS */;
-/*!40000 ALTER TABLE `et_product_option_group` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `et_product_option_value`
 --
 
@@ -506,15 +406,6 @@ CREATE TABLE `et_product_option_value` (
   CONSTRAINT `fk_opt_value_group` FOREIGN KEY (`option_group_id`) REFERENCES `et_product_option_group` (`option_group_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `et_product_option_value`
---
-
-LOCK TABLES `et_product_option_value` WRITE;
-/*!40000 ALTER TABLE `et_product_option_value` DISABLE KEYS */;
-/*!40000 ALTER TABLE `et_product_option_value` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `et_product_review`
@@ -544,15 +435,6 @@ CREATE TABLE `et_product_review` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `et_product_review`
---
-
-LOCK TABLES `et_product_review` WRITE;
-/*!40000 ALTER TABLE `et_product_review` DISABLE KEYS */;
-/*!40000 ALTER TABLE `et_product_review` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `et_product_sku`
 --
 
@@ -563,24 +445,35 @@ CREATE TABLE `et_product_sku` (
   `sku_id` bigint NOT NULL AUTO_INCREMENT,
   `product_id` bigint NOT NULL,
   `sku_code` varchar(255) DEFAULT NULL,
-  `price` bigint DEFAULT NULL,
-  `stock` bigint DEFAULT NULL,
-  `status` varchar(50) DEFAULT NULL,
+  `price` bigint NOT NULL,
+  `stock` bigint NOT NULL,
+  `status` varchar(30) NOT NULL DEFAULT 'ON_SALE',
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`sku_id`),
+  UNIQUE KEY `sku_code` (`sku_code`),
   KEY `fk_sku_product` (`product_id`),
   CONSTRAINT `fk_sku_product` FOREIGN KEY (`product_id`) REFERENCES `et_product` (`product_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `et_product_sku`
+-- Table structure for table `et_product_sku_option`
 --
 
-LOCK TABLES `et_product_sku` WRITE;
-/*!40000 ALTER TABLE `et_product_sku` DISABLE KEYS */;
-/*!40000 ALTER TABLE `et_product_sku` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `et_product_sku_option`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `et_product_sku_option` (
+  `sku_id` bigint NOT NULL,
+  `option_value_id` bigint NOT NULL,
+  PRIMARY KEY (`sku_id`,`option_value_id`),
+  KEY `fk_sku_opt_value` (`option_value_id`),
+  CONSTRAINT `fk_sku_opt_sku` FOREIGN KEY (`sku_id`) REFERENCES `et_product_sku` (`sku_id`),
+  CONSTRAINT `fk_sku_opt_value` FOREIGN KEY (`option_value_id`) REFERENCES `et_product_option_value` (`option_value_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `et_qna_message`
@@ -592,24 +485,14 @@ DROP TABLE IF EXISTS `et_qna_message`;
 CREATE TABLE `et_qna_message` (
   `message_id` bigint NOT NULL AUTO_INCREMENT,
   `room_id` bigint NOT NULL,
-  `sender` varchar(20) DEFAULT NULL,
-  `message` text,
+  `sender` enum('USER','ADMIN') NOT NULL,
+  `message` text NOT NULL,
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`message_id`),
   KEY `fk_qna_msg_room` (`room_id`),
   CONSTRAINT `fk_qna_msg_room` FOREIGN KEY (`room_id`) REFERENCES `et_qna_room` (`room_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `et_qna_message`
---
-
-LOCK TABLES `et_qna_message` WRITE;
-/*!40000 ALTER TABLE `et_qna_message` DISABLE KEYS */;
-/*!40000 ALTER TABLE `et_qna_message` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `et_qna_room`
@@ -621,25 +504,16 @@ DROP TABLE IF EXISTS `et_qna_room`;
 CREATE TABLE `et_qna_room` (
   `room_id` bigint NOT NULL AUTO_INCREMENT,
   `user_id` bigint NOT NULL,
-  `status` varchar(50) DEFAULT NULL,
+  `status` varchar(20) DEFAULT 'OPEN',
+  `user_last_read_message_id` bigint DEFAULT '0',
+  `admin_last_read_message_id` bigint DEFAULT '0',
   `last_message_at` datetime DEFAULT NULL,
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`room_id`),
   KEY `fk_qna_room_user` (`user_id`),
   CONSTRAINT `fk_qna_room_user` FOREIGN KEY (`user_id`) REFERENCES `et_user` (`user_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `et_qna_room`
---
-
-LOCK TABLES `et_qna_room` WRITE;
-/*!40000 ALTER TABLE `et_qna_room` DISABLE KEYS */;
-/*!40000 ALTER TABLE `et_qna_room` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `et_social_account`
@@ -662,15 +536,6 @@ CREATE TABLE `et_social_account` (
   CONSTRAINT `fk_social_user` FOREIGN KEY (`user_id`) REFERENCES `et_user` (`user_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `et_social_account`
---
-
-LOCK TABLES `et_social_account` WRITE;
-/*!40000 ALTER TABLE `et_social_account` DISABLE KEYS */;
-/*!40000 ALTER TABLE `et_social_account` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `et_user`
@@ -699,80 +564,8 @@ CREATE TABLE `et_user` (
   `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `et_user`
---
-
-LOCK TABLES `et_user` WRITE;
-/*!40000 ALTER TABLE `et_user` DISABLE KEYS */;
-/*!40000 ALTER TABLE `et_user` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `et_user_attribute`
---
-
-DROP TABLE IF EXISTS `et_user_attribute`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `et_user_attribute` (
-  `attribute_id` bigint NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) NOT NULL,
-  `attribute_key` varchar(100) DEFAULT NULL,
-  `type` varchar(30) DEFAULT NULL,
-  `is_required` tinyint DEFAULT '0',
-  `sort_order` int DEFAULT '0',
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `deleted_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`attribute_id`),
-  UNIQUE KEY `key` (`attribute_key`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `et_user_attribute`
---
-
-LOCK TABLES `et_user_attribute` WRITE;
-/*!40000 ALTER TABLE `et_user_attribute` DISABLE KEYS */;
-/*!40000 ALTER TABLE `et_user_attribute` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `et_user_attribute_value`
---
-
-DROP TABLE IF EXISTS `et_user_attribute_value`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `et_user_attribute_value` (
-  `value_id` bigint NOT NULL AUTO_INCREMENT,
-  `user_id` bigint NOT NULL,
-  `attribute_id` bigint NOT NULL,
-  `value_text` text,
-  `value_number` int DEFAULT NULL,
-  `value_date` date DEFAULT NULL,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`value_id`),
-  KEY `fk_uav_user` (`user_id`),
-  KEY `fk_uav_attr` (`attribute_id`),
-  CONSTRAINT `fk_uav_attr` FOREIGN KEY (`attribute_id`) REFERENCES `et_user_attribute` (`attribute_id`),
-  CONSTRAINT `fk_uav_user` FOREIGN KEY (`user_id`) REFERENCES `et_user` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `et_user_attribute_value`
---
-
-LOCK TABLES `et_user_attribute_value` WRITE;
-/*!40000 ALTER TABLE `et_user_attribute_value` DISABLE KEYS */;
-/*!40000 ALTER TABLE `et_user_attribute_value` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `et_user_recommendation`
@@ -795,15 +588,6 @@ CREATE TABLE `et_user_recommendation` (
   CONSTRAINT `fk_reco_user` FOREIGN KEY (`user_id`) REFERENCES `et_user` (`user_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `et_user_recommendation`
---
-
-LOCK TABLES `et_user_recommendation` WRITE;
-/*!40000 ALTER TABLE `et_user_recommendation` DISABLE KEYS */;
-/*!40000 ALTER TABLE `et_user_recommendation` ENABLE KEYS */;
-UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -814,6 +598,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-01-06  9:46:07
-
-
+-- Dump completed on 2026-01-21 17:02:15
