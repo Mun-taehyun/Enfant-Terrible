@@ -112,7 +112,7 @@
     "email": "user1@example.com",
     "password": "Password1234",
     "name": "홍길동",
-    "tel": "01012345678",
+    "tel": "010-1234-5678",
     "zipCode": "12345",
     "addressBase": "서울시 ...",
     "addressDetail": "101동 1001호 (null 허용)"
@@ -124,7 +124,7 @@
       "userId": 1,
       "email": "user1@example.com",
       "name": "홍길동",
-      "tel": "01012345678",
+      "tel": "010-1234-5678",
       "zipCode": "12345",
       "addressBase": "서울시 ...",
       "addressDetail": "101동 1001호 (null 허용)",
@@ -147,7 +147,7 @@
       "userId": 1,
       "email": "user1@example.com",
       "name": "홍길동",
-      "tel": "01012345678",
+      "tel": "010-1234-5678",
       "zipCode": "12345",
       "addressBase": "서울시 ...",
       "addressDetail": "101동 1001호 (null 허용)",
@@ -164,7 +164,7 @@
 - Request 예시
   {
     "name": "홍길동(수정)",
-    "tel": "01011112222",
+    "tel": "010-1111-2222",
     "zipCode": "54321",
     "addressBase": "부산시 ...",
     "addressDetail": "202동 2002호 (null 허용)"
@@ -176,7 +176,7 @@
       "userId": 1,
       "email": "user1@example.com",
       "name": "홍길동(수정)",
-      "tel": "01011112222",
+      "tel": "010-1111-2222",
       "zipCode": "54321",
       "addressBase": "부산시 ...",
       "addressDetail": "202동 2002호 (null 허용)",
@@ -213,7 +213,7 @@
 - 제목: 추가 정보 입력
 - Request 예시
   {
-    "tel": "01012345678",
+    "tel": "010-1234-5678",
     "zipCode": "12345",
     "addressBase": "서울시 ...",
     "addressDetail": "101동 1001호 (null 허용)"
@@ -657,7 +657,7 @@
     "data": {
       "userId": 1,
       "receiverName": "홍길동",
-      "receiverPhone": "01099998888",
+      "receiverPhone": "010-9999-8888",
       "zipCode": "12345",
       "addressBase": "서울시 ...",
       "addressDetail": "...",
@@ -693,7 +693,7 @@
     "data": {
       "userId": 1,
       "receiverName": "홍길동",
-      "receiverPhone": "01099998888",
+      "receiverPhone": "010-9999-8888",
       "zipCode": "12345",
       "addressBase": "서울시 ...",
       "addressDetail": "...",
@@ -722,7 +722,7 @@
 - Request 예시
   {
     "receiverName": "수령인",
-    "receiverPhone": "01099998888",
+    "receiverPhone": "010-9999-8888",
     "zipCode": "12345",
     "addressBase": "서울시 ...",
     "addressDetail": "..."
@@ -744,7 +744,7 @@
     "optionValueIds": [10, 11],
     "quantity": 1,
     "receiverName": "수령인",
-    "receiverPhone": "01099998888",
+    "receiverPhone": "010-9999-8888",
     "zipCode": "12345",
     "addressBase": "서울시 ...",
     "addressDetail": "..."
@@ -754,7 +754,7 @@
     "productId": 1,
     "quantity": 1,
     "receiverName": "수령인",
-    "receiverPhone": "01099998888",
+    "receiverPhone": "010-9999-8888",
     "zipCode": "12345",
     "addressBase": "서울시 ...",
     "addressDetail": "..."
@@ -806,7 +806,7 @@
       "status": "PAID",
       "totalAmount": 20000,
       "receiverName": "수령인",
-      "receiverPhone": "01099998888",
+      "receiverPhone": "010-9999-8888",
       "zipCode": "12345",
       "addressBase": "서울시 ...",
       "addressDetail": "...",
