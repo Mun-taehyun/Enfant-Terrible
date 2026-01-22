@@ -2,16 +2,18 @@ package com.enfantTerrible.enfantTerrible.controller.review;
 
 import java.util.List;
 
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.enfantTerrible.enfantTerrible.common.response.ApiResponse;
 import com.enfantTerrible.enfantTerrible.dto.review.ProductReviewCreateRequest;
@@ -19,6 +21,7 @@ import com.enfantTerrible.enfantTerrible.dto.review.ProductReviewResponse;
 import com.enfantTerrible.enfantTerrible.dto.review.ProductReviewUpdateRequest;
 import com.enfantTerrible.enfantTerrible.exception.BusinessException;
 import com.enfantTerrible.enfantTerrible.security.CustomUserPrincipal;
+import com.enfantTerrible.enfantTerrible.service.file.LocalFileStorageService;
 import com.enfantTerrible.enfantTerrible.service.review.ProductReviewService;
 
 import jakarta.validation.Valid;
@@ -30,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 public class ProductReviewController {
 
   private final ProductReviewService productReviewService;
+  private final LocalFileStorageService localFileStorageService;
 
   @GetMapping("/products/{productId}/reviews")
   public ApiResponse<List<ProductReviewResponse>> getProductReviews(
@@ -43,14 +47,23 @@ public class ProductReviewController {
     );
   }
 
-  @PostMapping("/products/{productId}/reviews")
+  @PostMapping(value = "/products/{productId}/reviews", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ApiResponse<ProductReviewResponse> create(
       @AuthenticationPrincipal CustomUserPrincipal principal,
       @PathVariable Long productId,
-      @Valid @RequestBody ProductReviewCreateRequest req
+      @Valid @RequestPart("req") ProductReviewCreateRequest req,
+      @RequestPart(value = "images", required = false) List<MultipartFile> images
   ) {
     if (principal == null) {
       throw new BusinessException("로그인이 필요합니다.");
+    }
+
+    if (images != null && !images.isEmpty()) {
+      List<String> imageUrls = images.stream()
+          .filter(f -> f != null && !f.isEmpty())
+          .map(f -> localFileStorageService.save(f, "reviews"))
+          .toList();
+      req.setImageUrls(imageUrls);
     }
 
     return ApiResponse.success(
@@ -59,14 +72,23 @@ public class ProductReviewController {
     );
   }
 
-  @PutMapping("/reviews/{reviewId}")
+  @PutMapping(value = "/reviews/{reviewId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ApiResponse<ProductReviewResponse> update(
       @AuthenticationPrincipal CustomUserPrincipal principal,
       @PathVariable Long reviewId,
-      @Valid @RequestBody ProductReviewUpdateRequest req
+      @Valid @RequestPart("req") ProductReviewUpdateRequest req,
+      @RequestPart(value = "images", required = false) List<MultipartFile> images
   ) {
     if (principal == null) {
       throw new BusinessException("로그인이 필요합니다.");
+    }
+
+    if (images != null) {
+      List<String> imageUrls = images.stream()
+          .filter(f -> f != null && !f.isEmpty())
+          .map(f -> localFileStorageService.save(f, "reviews"))
+          .toList();
+      req.setImageUrls(imageUrls);
     }
 
     return ApiResponse.success(

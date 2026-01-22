@@ -1,6 +1,7 @@
 package com.enfantTerrible.enfantTerrible.websocket.qna;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -8,7 +9,10 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.enfantTerrible.enfantTerrible.common.enums.FileRefType;
+import com.enfantTerrible.enfantTerrible.common.enums.FileRole;
 import com.enfantTerrible.enfantTerrible.common.enums.UserRole;
+import com.enfantTerrible.enfantTerrible.dto.file.FileRow;
 import com.enfantTerrible.enfantTerrible.dto.qna.QnaMessagePayload;
 import com.enfantTerrible.enfantTerrible.dto.qna.QnaNotifyPayload;
 import com.enfantTerrible.enfantTerrible.dto.qna.QnaReadRequest;
@@ -19,6 +23,7 @@ import com.enfantTerrible.enfantTerrible.exception.BusinessException;
 import com.enfantTerrible.enfantTerrible.mapper.qna.QnaMessageMapper;
 import com.enfantTerrible.enfantTerrible.mapper.qna.QnaRoomMapper;
 import com.enfantTerrible.enfantTerrible.security.CustomUserPrincipal;
+import com.enfantTerrible.enfantTerrible.service.file.FileCommandService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +36,8 @@ public class QnaWebSocketController {
   private final QnaMessageMapper qnaMessageMapper;
   private final SimpMessagingTemplate messagingTemplate;
 
+  private final FileCommandService fileCommandService;
+
   @MessageMapping("/qna.send")
   @Transactional
   public void send(
@@ -42,6 +49,12 @@ public class QnaWebSocketController {
     boolean isAdmin = principal.getRole() == UserRole.ADMIN;
     Long roomId = resolveRoomId(principal, isAdmin, req.getRoomId());
 
+    boolean hasText = req.getMessage() != null && !req.getMessage().isBlank();
+    boolean hasImages = req.getImageUrls() != null && !req.getImageUrls().isEmpty();
+    if (!hasText && !hasImages) {
+      throw new BusinessException("메시지 또는 이미지가 필요합니다.");
+    }
+
     String sender = isAdmin ? "ADMIN" : "USER";
 
     int inserted = qnaMessageMapper.insert(roomId, sender, req.getMessage());
@@ -50,6 +63,11 @@ public class QnaWebSocketController {
     }
 
     Long messageId = qnaMessageMapper.findLastInsertId();
+
+    if (messageId != null && hasImages) {
+      saveMessageImages(messageId, req.getImageUrls());
+    }
+
     qnaRoomMapper.touchLastMessage(roomId);
 
     QnaMessagePayload payload = new QnaMessagePayload();
@@ -57,6 +75,7 @@ public class QnaWebSocketController {
     payload.setMessageId(messageId);
     payload.setSender(sender);
     payload.setMessage(req.getMessage());
+    payload.setImageUrls(hasImages ? req.getImageUrls() : List.of());
     payload.setCreatedAt(LocalDateTime.now());
 
     // 보낸 사람에게 에코
@@ -187,5 +206,30 @@ public class QnaWebSocketController {
       return cup;
     }
     throw new BusinessException("인증 정보가 없습니다.");
+  }
+
+  private void saveMessageImages(Long messageId, List<String> imageUrls) {
+    if (messageId == null || imageUrls == null || imageUrls.isEmpty()) {
+      return;
+    }
+
+    for (String imageUrl : imageUrls) {
+      if (imageUrl == null || imageUrl.isBlank()) {
+        continue;
+      }
+
+      FileRow file = new FileRow();
+      file.setRefType(FileRefType.QNA_MESSAGE);
+      file.setRefId(messageId);
+      file.setFileRole(FileRole.CONTENT);
+
+      file.setFileUrl(imageUrl);
+      file.setOriginalName(imageUrl);
+      file.setStoredName(imageUrl);
+      file.setFileType("URL");
+      file.setFilePath("");
+
+      fileCommandService.save(file);
+    }
   }
 }

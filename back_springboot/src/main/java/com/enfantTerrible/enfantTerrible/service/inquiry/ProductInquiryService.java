@@ -5,13 +5,18 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.enfantTerrible.enfantTerrible.common.enums.FileRefType;
+import com.enfantTerrible.enfantTerrible.common.enums.FileRole;
 import com.enfantTerrible.enfantTerrible.common.enums.UserRole;
+import com.enfantTerrible.enfantTerrible.dto.file.FileRow;
 import com.enfantTerrible.enfantTerrible.dto.inquiry.ProductInquiryCreateRequest;
 import com.enfantTerrible.enfantTerrible.dto.inquiry.ProductInquiryResponse;
 import com.enfantTerrible.enfantTerrible.dto.inquiry.ProductInquiryRow;
 import com.enfantTerrible.enfantTerrible.exception.BusinessException;
 import com.enfantTerrible.enfantTerrible.mapper.inquiry.ProductInquiryMapper;
 import com.enfantTerrible.enfantTerrible.mapper.product.ProductMapper;
+import com.enfantTerrible.enfantTerrible.service.file.FileCommandService;
+import com.enfantTerrible.enfantTerrible.service.file.FileQueryService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,8 +27,14 @@ public class ProductInquiryService {
 
   private static final String MASKED_CONTENT = "비공개 문의입니다.";
 
+  private static final String REF_TYPE_INQUIRY = "inquiry";
+  private static final String FILE_ROLE_ATTACHMENT = "ATTACHMENT";
+
   private final ProductInquiryMapper productInquiryMapper;
   private final ProductMapper productMapper;
+
+  private final FileCommandService fileCommandService;
+  private final FileQueryService fileQueryService;
 
   @Transactional(readOnly = true)
   public List<ProductInquiryResponse> getProductInquiries(Long productId, Long viewerUserId, UserRole viewerRole, Integer pageParam,
@@ -62,6 +73,10 @@ public class ProductInquiryService {
     }
 
     Long inquiryId = productInquiryMapper.findLastInsertId();
+
+    if (inquiryId != null && req.getImageUrls() != null && !req.getImageUrls().isEmpty()) {
+      replaceInquiryAttachments(inquiryId, req.getImageUrls());
+    }
     ProductInquiryRow row = productInquiryMapper.findById(inquiryId);
     if (row == null || row.getDeletedAt() != null) {
       throw new BusinessException("문의 등록에 실패했습니다.");
@@ -88,6 +103,8 @@ public class ProductInquiryService {
     if (deleted != 1) {
       throw new BusinessException("문의 삭제에 실패했습니다.");
     }
+
+    fileCommandService.deleteByRef(REF_TYPE_INQUIRY, inquiryId);
   }
 
   private void ensureProductExistsForUser(Long productId) {
@@ -125,13 +142,42 @@ public class ProductInquiryService {
     if (canViewContent) {
       res.setContent(row.getContent());
       res.setAnswerContent(row.getAnswerContent());
+      res.setImageUrls(fileQueryService.findFileUrls(REF_TYPE_INQUIRY, row.getInquiryId(), FILE_ROLE_ATTACHMENT));
     } else {
       res.setContent(MASKED_CONTENT);
       res.setAnswerContent(null);
       res.setAnsweredByUserId(null);
       res.setAnsweredAt(null);
+      res.setImageUrls(null);
     }
 
     return res;
+  }
+
+  private void replaceInquiryAttachments(Long inquiryId, List<String> imageUrls) {
+    fileCommandService.deleteByRef(REF_TYPE_INQUIRY, inquiryId);
+
+    if (imageUrls == null || imageUrls.isEmpty()) {
+      return;
+    }
+
+    for (String imageUrl : imageUrls) {
+      if (imageUrl == null || imageUrl.isBlank()) {
+        continue;
+      }
+
+      FileRow file = new FileRow();
+      file.setRefType(FileRefType.INQUIRY);
+      file.setRefId(inquiryId);
+      file.setFileRole(FileRole.ATTACHMENT);
+
+      file.setFileUrl(imageUrl);
+      file.setOriginalName(imageUrl);
+      file.setStoredName(imageUrl);
+      file.setFileType("URL");
+      file.setFilePath("");
+
+      fileCommandService.save(file);
+    }
   }
 }

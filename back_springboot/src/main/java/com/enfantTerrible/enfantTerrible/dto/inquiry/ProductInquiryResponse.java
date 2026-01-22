@@ -1,6 +1,7 @@
 package com.enfantTerrible.enfantTerrible.dto.inquiry;
 
 import java.time.LocalDateTime;
+ import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -15,6 +16,7 @@ public class ProductInquiryResponse {
   private String userEmail;
 
   private String content;
+  private List<String> imageUrls;
   private Boolean isPrivate;
   private String status;
 

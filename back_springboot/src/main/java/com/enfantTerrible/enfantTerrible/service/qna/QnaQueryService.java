@@ -14,6 +14,7 @@ import com.enfantTerrible.enfantTerrible.dto.qna.QnaRoomRow;
 import com.enfantTerrible.enfantTerrible.exception.BusinessException;
 import com.enfantTerrible.enfantTerrible.mapper.qna.QnaMessageMapper;
 import com.enfantTerrible.enfantTerrible.mapper.qna.QnaRoomMapper;
+import com.enfantTerrible.enfantTerrible.service.file.FileQueryService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,8 +23,12 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class QnaQueryService {
 
+  private static final String REF_TYPE_QNA_MESSAGE = "qna_message";
+  private static final String FILE_ROLE_CONTENT = "CONTENT";
+
   private final QnaRoomMapper qnaRoomMapper;
   private final QnaMessageMapper qnaMessageMapper;
+  private final FileQueryService fileQueryService;
 
   @Transactional
   public QnaRoomResponse getOrCreateMyRoom(Long userId) {
@@ -72,6 +77,7 @@ public class QnaQueryService {
       m.setRoomId(r.getRoomId());
       m.setSender(r.getSender() == null ? null : r.getSender().name());
       m.setMessage(r.getMessage());
+      m.setImageUrls(fileQueryService.findFileUrls(REF_TYPE_QNA_MESSAGE, r.getMessageId(), FILE_ROLE_CONTENT));
       m.setCreatedAt(r.getCreatedAt());
       list.add(m);
     }

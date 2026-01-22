@@ -5,13 +5,18 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.enfantTerrible.enfantTerrible.common.enums.FileRefType;
+import com.enfantTerrible.enfantTerrible.common.enums.FileRole;
 import com.enfantTerrible.enfantTerrible.dto.review.ProductReviewCreateRequest;
 import com.enfantTerrible.enfantTerrible.dto.review.ProductReviewResponse;
 import com.enfantTerrible.enfantTerrible.dto.review.ProductReviewRow;
 import com.enfantTerrible.enfantTerrible.dto.review.ProductReviewUpdateRequest;
+import com.enfantTerrible.enfantTerrible.dto.file.FileRow;
 import com.enfantTerrible.enfantTerrible.exception.BusinessException;
 import com.enfantTerrible.enfantTerrible.mapper.product.ProductMapper;
 import com.enfantTerrible.enfantTerrible.mapper.review.ProductReviewMapper;
+import com.enfantTerrible.enfantTerrible.service.file.FileCommandService;
+import com.enfantTerrible.enfantTerrible.service.file.FileQueryService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,8 +25,14 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class ProductReviewService {
 
+  private static final String REF_TYPE_REVIEW = "review";
+  private static final String FILE_ROLE_CONTENT = "CONTENT";
+
   private final ProductReviewMapper productReviewMapper;
   private final ProductMapper productMapper;
+
+  private final FileCommandService fileCommandService;
+  private final FileQueryService fileQueryService;
 
   @Transactional(readOnly = true)
   public List<ProductReviewResponse> getProductReviews(Long productId, Integer pageParam, Integer sizeParam) {
@@ -52,6 +63,10 @@ public class ProductReviewService {
     productReviewMapper.insert(userId, productId, req.getOrderId(), req.getRating(), req.getContent());
     Long reviewId = productReviewMapper.findLastInsertId();
 
+    if (reviewId != null && req.getImageUrls() != null && !req.getImageUrls().isEmpty()) {
+      replaceReviewImages(reviewId, req.getImageUrls());
+    }
+
     ProductReviewRow row = productReviewMapper.findById(reviewId);
     if (row == null) {
       throw new BusinessException("리뷰 생성에 실패했습니다.");
@@ -78,6 +93,10 @@ public class ProductReviewService {
       throw new BusinessException("리뷰 수정에 실패했습니다.");
     }
 
+    if (req.getImageUrls() != null) {
+      replaceReviewImages(reviewId, req.getImageUrls());
+    }
+
     productMapper.refreshReviewCache(row.getProductId());
 
     ProductReviewRow updatedRow = productReviewMapper.findById(reviewId);
@@ -100,6 +119,8 @@ public class ProductReviewService {
       throw new BusinessException("리뷰 삭제에 실패했습니다.");
     }
 
+    fileCommandService.deleteByRef(REF_TYPE_REVIEW, reviewId);
+
     productMapper.refreshReviewCache(row.getProductId());
   }
 
@@ -115,8 +136,36 @@ public class ProductReviewService {
     res.setOrderId(row.getOrderId());
     res.setRating(row.getRating());
     res.setContent(row.getContent());
+    res.setImageUrls(fileQueryService.findFileUrls(REF_TYPE_REVIEW, row.getReviewId(), FILE_ROLE_CONTENT));
     res.setCreatedAt(row.getCreatedAt());
     res.setUpdatedAt(row.getUpdatedAt());
     return res;
+  }
+
+  private void replaceReviewImages(Long reviewId, List<String> imageUrls) {
+    fileCommandService.deleteByRef(REF_TYPE_REVIEW, reviewId);
+
+    if (imageUrls == null || imageUrls.isEmpty()) {
+      return;
+    }
+
+    for (String imageUrl : imageUrls) {
+      if (imageUrl == null || imageUrl.isBlank()) {
+        continue;
+      }
+
+      FileRow file = new FileRow();
+      file.setRefType(FileRefType.REVIEW);
+      file.setRefId(reviewId);
+      file.setFileRole(FileRole.CONTENT);
+
+      file.setFileUrl(imageUrl);
+      file.setOriginalName(imageUrl);
+      file.setStoredName(imageUrl);
+      file.setFileType("URL");
+      file.setFilePath("");
+
+      fileCommandService.save(file);
+    }
   }
 }

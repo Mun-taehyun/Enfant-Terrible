@@ -3,6 +3,7 @@
 기준
 - Base URL: http://localhost:8080
 - Content-Type: application/json
+  - 단, 파일 업로드가 포함된 API는 multipart/form-data 사용
 - 공통 응답(ApiResponse<T>)
   {
     "success": true,
@@ -433,7 +434,7 @@
   {
     "success": true,
     "data": [
-      { "reviewId": 1, "rating": 5, "content": "좋아요" }
+      { "reviewId": 1, "rating": 5, "content": "좋아요", "imageUrls": ["https://.../1.jpg", "https://.../2.jpg"] }
     ],
     "message": "상품 리뷰 목록 조회 성공"
   }
@@ -442,12 +443,18 @@
 - Method/Path: POST /api/products/{productId}/reviews
 - Auth: 필요
 - 제목: 리뷰 작성
+- Content-Type: multipart/form-data
+- RequestPart
+  - req: ProductReviewCreateRequest (JSON)
+  - images: MultipartFile[] (선택)
 - Request 예시
-  { "orderId": 1, "rating": 5, "content": "좋아요" }
+  - req(JSON)
+    { "orderId": 1, "rating": 5, "content": "좋아요" }
+  - images(파일): 리뷰 이미지 파일들
 - Response 예시 (필드 일부)
   {
     "success": true,
-    "data": { "reviewId": 1, "rating": 5, "content": "좋아요" },
+    "data": { "reviewId": 1, "rating": 5, "content": "좋아요", "imageUrls": ["https://.../1.jpg", "https://.../2.jpg"] },
     "message": "리뷰 작성 성공"
   }
 
@@ -455,8 +462,14 @@
 - Method/Path: PUT /api/reviews/{reviewId}
 - Auth: 필요
 - 제목: 리뷰 수정
+- Content-Type: multipart/form-data
+- RequestPart
+  - req: ProductReviewUpdateRequest (JSON)
+  - images: MultipartFile[] (선택)
 - Request 예시
-  { "rating": 4, "content": "수정" }
+  - req(JSON)
+    { "rating": 4, "content": "수정" }
+  - images(파일): 리뷰 이미지 파일들
 - Response 예시
   { "success": true, "data": { "reviewId": 1, "rating": 4 }, "message": "리뷰 수정 성공" }
 
@@ -487,6 +500,7 @@
         "userId": 2,
         "userEmail": "user2@example.com",
         "content": "문의 내용",
+        "imageUrls": ["https://.../1.jpg", "https://.../2.jpg"],
         "isPrivate": false,
         "status": "OPEN",
         "answerContent": null,
@@ -503,8 +517,14 @@
 - Method/Path: POST /api/products/{productId}/inquiries
 - Auth: 필요
 - 제목: 상품 문의 작성
+- Content-Type: multipart/form-data
+- RequestPart
+  - req: ProductInquiryCreateRequest (JSON)
+  - images: MultipartFile[] (선택)
 - Request 예시
-  { "content": "문의 내용", "isPrivate": true }
+  - req(JSON)
+    { "content": "문의 내용", "isPrivate": true }
+  - images(파일): 문의 첨부 이미지 파일들
 - Response 예시(형태)
   {
     "success": true,
@@ -513,6 +533,7 @@
       "productId": 1,
       "userId": 2,
       "content": "문의 내용",
+      "imageUrls": ["https://.../1.jpg"],
       "isPrivate": true,
       "status": "OPEN",
       "answerContent": null,
@@ -923,7 +944,20 @@
 - Request 예시
   /api/qna/messages?roomId=1&limit=30
 - Response 예시
-  { "success": true, "data": [], "message": "QnA 메시지 조회 성공" }
+  {
+    "success": true,
+    "data": [
+      {
+        "messageId": 1,
+        "roomId": 1,
+        "sender": "USER",
+        "message": "문의드립니다.",
+        "imageUrls": ["https://.../1.jpg"],
+        "createdAt": "2026-01-22T12:00:00"
+      }
+    ],
+    "message": "QnA 메시지 조회 성공"
+  }
 
 ------------------------------------------------------------
 [CONTENT] 배너/팝업/게시글(공개)
@@ -950,14 +984,40 @@
 - Request 예시
   /api/posts?page=1&size=20&postType=NOTICE
 - Response 예시
-  { "success": true, "data": [], "message": "게시글 목록 조회 성공" }
+  {
+    "success": true,
+    "data": [
+      {
+        "postId": 1,
+        "postType": "NOTICE",
+        "title": "공지",
+        "content": "내용",
+        "fileUrls": ["https://.../notice.pdf"],
+        "createdAt": "2026-01-22T12:00:00",
+        "updatedAt": "2026-01-22T12:00:00"
+      }
+    ],
+    "message": "게시글 목록 조회 성공"
+  }
 
 4) 게시글 상세 조회
 - Method/Path: GET /api/posts/{postId}
 - Auth: 없음
 - 제목: 게시글 상세 조회
 - Response 예시
-  { "success": true, "data": { "postId": 1, "title": "공지" }, "message": "게시글 상세 조회 성공" }
+  {
+    "success": true,
+    "data": {
+      "postId": 1,
+      "postType": "NOTICE",
+      "title": "공지",
+      "content": "내용",
+      "fileUrls": ["https://.../notice.pdf"],
+      "createdAt": "2026-01-22T12:00:00",
+      "updatedAt": "2026-01-22T12:00:00"
+    },
+    "message": "게시글 상세 조회 성공"
+  }
 
 ============================================================
 2. 관리자(Admin) API (ROLE_ADMIN)
@@ -1349,21 +1409,33 @@
 - Method/Path: GET /api/admin/posts/{postId}
 - 제목: 관리자 게시글 상세 조회
 - Response 예시
-  { "success": true, "data": { "postId": 1, "title": "공지" }, "message": "관리자 게시글 상세 조회 성공" }
+  { "success": true, "data": { "postId": 1, "title": "공지", "fileUrls": ["https://.../notice.pdf"] }, "message": "관리자 게시글 상세 조회 성공" }
 
 3) 게시글 생성
 - Method/Path: POST /api/admin/posts
 - 제목: 게시글 생성
+- Content-Type: multipart/form-data
+- RequestPart
+  - req: AdminPostSaveRequest (JSON)
+  - files: MultipartFile[] (선택)
 - Request 예시
-  { "postType": "NOTICE", "title": "공지", "content": "내용" }
+  - req(JSON)
+    { "postType": "NOTICE", "title": "공지", "content": "내용" }
+  - files(파일): 첨부 파일들
 - Response 예시
   { "success": true, "data": 1, "message": "게시글 생성 성공" }
 
 4) 게시글 수정
 - Method/Path: PUT /api/admin/posts/{postId}
 - 제목: 게시글 수정
+- Content-Type: multipart/form-data
+- RequestPart
+  - req: AdminPostSaveRequest (JSON)
+  - files: MultipartFile[] (선택)
 - Request 예시
-  { "postType": "NOTICE", "title": "공지(수정)", "content": "내용" }
+  - req(JSON)
+    { "postType": "NOTICE", "title": "공지(수정)", "content": "내용" }
+  - files(파일): 첨부 파일들
 - Response 예시
   { "success": true, "data": null, "message": "게시글 수정 성공" }
 
@@ -1394,16 +1466,28 @@
 3) 배너 생성
 - Method/Path: POST /api/admin/banners
 - 제목: 배너 생성
+- Content-Type: multipart/form-data
+- RequestPart
+  - req: AdminBannerSaveRequest (JSON)
+  - image: MultipartFile (선택)
 - Request 예시
-  { "title": "메인배너", "imageUrl": "https://.../banner.png", "isActive": true }
+  - req(JSON)
+    { "title": "메인배너", "isActive": true }
+  - image(파일): 배너 이미지
 - Response 예시
   { "success": true, "data": 1, "message": "배너 생성 성공" }
 
 4) 배너 수정
 - Method/Path: PUT /api/admin/banners/{bannerId}
 - 제목: 배너 수정
+- Content-Type: multipart/form-data
+- RequestPart
+  - req: AdminBannerSaveRequest (JSON)
+  - image: MultipartFile (선택)
 - Request 예시
-  { "title": "메인배너(수정)", "imageUrl": "https://.../banner.png", "isActive": true }
+  - req(JSON)
+    { "title": "메인배너(수정)", "isActive": true }
+  - image(파일): 배너 이미지
 - Response 예시
   { "success": true, "data": null, "message": "배너 수정 성공" }
 
@@ -1434,24 +1518,71 @@
 3) 팝업 생성
 - Method/Path: POST /api/admin/popups
 - 제목: 팝업 생성
+- Content-Type: multipart/form-data
+- RequestPart
+  - req: AdminPopupSaveRequest (JSON)
+  - image: MultipartFile (선택)
 - Request 예시
-  { "title": "쿠폰팝업", "content": "내용", "isActive": true }
+  - req(JSON)
+    { "title": "쿠폰팝업", "content": "내용", "isActive": true }
+  - image(파일): 팝업 이미지
 - Response 예시
   { "success": true, "data": 1, "message": "팝업 생성 성공" }
 
 4) 팝업 수정
 - Method/Path: PUT /api/admin/popups/{popupId}
 - 제목: 팝업 수정
+- Content-Type: multipart/form-data
+- RequestPart
+  - req: AdminPopupSaveRequest (JSON)
+  - image: MultipartFile (선택)
 - Request 예시
-  { "title": "쿠폰팝업(수정)", "content": "내용", "isActive": true }
+  - req(JSON)
+    { "title": "쿠폰팝업(수정)", "content": "내용", "isActive": true }
+  - image(파일): 팝업 이미지
 - Response 예시
   { "success": true, "data": null, "message": "팝업 수정 성공" }
-
 5) 팝업 삭제
 - Method/Path: DELETE /api/admin/popups/{popupId}
 - 제목: 팝업 삭제
 - Response 예시
   { "success": true, "data": null, "message": "팝업 삭제 성공" }
+
+------------------------------------------------------------
+[ADMIN-SALES] 매출 조회
+------------------------------------------------------------
+
+1) 기간별 매출 조회
+- Method/Path: GET /api/admin/sales
+- 제목: 관리자 기간별 매출 조회
+- Query
+  - paidFrom (필수, LocalDateTime)
+  - paidTo (필수, LocalDateTime)
+  - groupBy (선택, DAY / MONTH, 기본 DAY)
+- 비고
+  - payment_status = SUCCESS 인 결제건만 집계
+- Request 예시
+  /api/admin/sales?paidFrom=2026-01-01T00:00:00&paidTo=2026-01-31T23:59:59&groupBy=DAY
+- Response 예시(형태)
+  {
+    "success": true,
+    "data": {
+      "totalAmount": 30000,
+      "totalCount": 3,
+      "items": [
+        { "period": "2026-01-01", "totalAmount": 10000, "paymentCount": 1 },
+        { "period": "2026-01-02", "totalAmount": 20000, "paymentCount": 2 }
+      ]
+    },
+    "message": "관리자 기간별 매출 조회 성공"
+  }
+
+------------------------------------------------------------
+업로드 파일 URL 서빙
+------------------------------------------------------------
+
+- 업로드된 파일은 /uploads/** 경로로 접근 가능합니다.
+- 예: http://localhost:8080/uploads/reviews/2026-01-22/xxxx.png
 
 ------------------------------------------------------------
 [ADMIN-QNA] QnA 관리
