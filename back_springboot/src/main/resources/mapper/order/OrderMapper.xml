@@ -10,6 +10,9 @@
       user_id,
       order_code,
       order_status,
+      original_amount,
+      used_point,
+      used_point_refunded,
       total_amount,
       receiver_name,
       receiver_phone,
@@ -20,6 +23,9 @@
       #{userId},
       #{orderCode},
       #{orderStatus},
+      #{originalAmount},
+      #{usedPoint},
+      #{usedPointRefunded},
       #{totalAmount},
       #{receiverName},
       #{receiverPhone},
@@ -39,6 +45,9 @@
       user_id,
       order_code,
       order_status AS order_status,
+      original_amount,
+      used_point,
+      used_point_refunded,
       total_amount
     FROM et_order
     WHERE order_id = #{orderId}
@@ -50,6 +59,9 @@
       user_id,
       order_code,
       order_status AS order_status,
+      original_amount,
+      used_point,
+      used_point_refunded,
       total_amount
     FROM et_order
     WHERE order_code = #{orderCode}
@@ -66,6 +78,15 @@
     SET
       order_status = #{orderStatus},
       total_amount = #{totalAmount}
+    WHERE order_id = #{orderId}
+  </update>
+
+  <update id="updateStatusTotalAndUsedPointRefunded">
+    UPDATE et_order
+    SET
+      order_status = #{orderStatus},
+      total_amount = #{totalAmount},
+      used_point_refunded = #{usedPointRefunded}
     WHERE order_id = #{orderId}
   </update>
 
@@ -87,5 +108,77 @@
       AND shipped_at IS NOT NULL
       AND shipped_at &lt;= #{cutoff}
   </update>
+
+  <select id="countMyOrders" resultType="int">
+    SELECT COUNT(*)
+    FROM et_order
+    WHERE user_id = #{userId}
+  </select>
+
+  <select id="findMyOrders" resultType="com.enfantTerrible.enfantTerrible.dto.order.MyOrderListItemResponse">
+    SELECT
+      order_id AS orderId,
+      order_code AS orderCode,
+      order_status AS status,
+      total_amount AS totalAmount,
+
+      rep.product_name AS representativeProductName,
+      rep.thumbnail_url AS representativeThumbnailUrl,
+
+      tracking_number AS trackingNumber,
+      ordered_at AS orderedAt,
+      shipped_at AS shippedAt,
+      delivered_at AS deliveredAt
+    FROM et_order
+    LEFT JOIN (
+      SELECT
+        x.order_id,
+        oi.product_name,
+        f.file_url AS thumbnail_url
+      FROM (
+        SELECT order_id, MIN(order_item_id) AS min_order_item_id
+        FROM et_order_item
+        GROUP BY order_id
+      ) x
+      JOIN et_order_item oi
+        ON oi.order_id = x.order_id
+       AND oi.order_item_id = x.min_order_item_id
+      JOIN et_product_sku ps
+        ON ps.sku_id = oi.sku_id
+      LEFT JOIN (
+        SELECT ref_id, MIN(file_id) AS min_file_id
+        FROM et_file
+        WHERE ref_type = 'product'
+          AND file_role = 'THUMBNAIL'
+          AND deleted_at IS NULL
+        GROUP BY ref_id
+      ) tf ON tf.ref_id = ps.product_id
+      LEFT JOIN et_file f ON f.file_id = tf.min_file_id
+    ) rep ON rep.order_id = et_order.order_id
+    WHERE user_id = #{userId}
+    ORDER BY order_id DESC
+    LIMIT #{size} OFFSET #{offset}
+  </select>
+
+  <select id="findMyOrderDetail" resultType="com.enfantTerrible.enfantTerrible.dto.order.MyOrderDetailRow">
+    SELECT
+      order_id,
+      user_id,
+      order_code,
+      order_status AS order_status,
+      total_amount,
+      receiver_name,
+      receiver_phone,
+      zip_code,
+      address_base,
+      address_detail,
+      tracking_number,
+      ordered_at,
+      shipped_at,
+      delivered_at
+    FROM et_order
+    WHERE order_id = #{orderId}
+      AND user_id = #{userId}
+  </select>
 
 </mapper>

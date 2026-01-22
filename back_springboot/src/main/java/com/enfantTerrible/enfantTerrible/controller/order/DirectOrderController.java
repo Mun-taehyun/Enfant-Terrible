@@ -71,6 +71,7 @@ public class DirectOrderController {
     cmd.setZipCode(req.getZipCode());
     cmd.setAddressBase(req.getAddressBase());
     cmd.setAddressDetail(req.getAddressDetail());
+    cmd.setUsedPoint(req.getUsedPoint());
 
     return ApiResponse.success(
         orderService.create(cmd),

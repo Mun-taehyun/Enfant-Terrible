@@ -1,18 +1,18 @@
 package com.enfantTerrible.enfantTerrible.dto.admin.qna;
 
-import java.time.LocalDateTime;
+import java.util.List;
+
+import com.enfantTerrible.enfantTerrible.dto.qna.QnaMessageResponse;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class AdminQnaRoomListResponse {
+public class AdminQnaMessagesResponse {
 
   private Long roomId;
   private Long userId;
   private String userEmail;
-  private String status;
-  private LocalDateTime lastMessageAt;
-  private Integer unread;
+  private List<QnaMessageResponse> messages;
 }

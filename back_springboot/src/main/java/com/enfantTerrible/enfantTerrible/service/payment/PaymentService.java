@@ -178,6 +178,24 @@ public class PaymentService {
 
       orderMapper.updateOrderStatus(order.getOrderId(), OrderStatus.CANCELLED.name());
 
+      int usedPoint = order.getUsedPoint() == null ? 0 : order.getUsedPoint();
+      int alreadyRefundedPoint = order.getUsedPointRefunded() == null ? 0 : order.getUsedPointRefunded();
+      int refundablePoint = Math.max(0, usedPoint - alreadyRefundedPoint);
+
+      if (refundablePoint > 0) {
+        int updated = orderMapper.updateStatusTotalAndUsedPointRefunded(
+            order.getOrderId(),
+            OrderStatus.CANCELLED.name(),
+            0L,
+            alreadyRefundedPoint + refundablePoint
+        );
+        if (updated != 1) {
+          throw new BusinessException("주문 상태 갱신에 실패했습니다.");
+        }
+
+        pointService.refundUsedForOrder(order.getUserId(), order.getOrderId(), refundablePoint, "주문 환불 포인트 반환");
+      }
+
       pointService.revokeEarnForOrderIfExists(order.getUserId(), order.getOrderId(), order.getTotalAmount());
 
       PaymentCancelResponse res = new PaymentCancelResponse();

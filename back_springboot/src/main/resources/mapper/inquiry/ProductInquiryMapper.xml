@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.enfantTerrible.enfantTerrible.mapper.inquiry.ProductInquiryMapper">
+
+  <insert id="insert">
+    INSERT INTO et_product_inquiry (
+      product_id,
+      user_id,
+      content,
+      is_private,
+      status
+    ) VALUES (
+      #{productId},
+      #{userId},
+      #{content},
+      #{isPrivate},
+      'OPEN'
+    )
+  </insert>
+
+  <select id="findLastInsertId" resultType="long">
+    SELECT LAST_INSERT_ID()
+  </select>
+
+  <select id="findById" resultType="com.enfantTerrible.enfantTerrible.dto.inquiry.ProductInquiryRow">
+    SELECT
+      inquiry_id,
+      product_id,
+      user_id,
+      u.email AS user_email,
+      content,
+      is_private,
+      status,
+      answer_content,
+      answered_by_user_id,
+      answered_at,
+      created_at,
+      updated_at,
+      deleted_at
+    FROM et_product_inquiry i
+    INNER JOIN et_user u ON u.user_id = i.user_id
+    WHERE inquiry_id = #{inquiryId}
+  </select>
+
+  <select id="findByProductId" resultType="com.enfantTerrible.enfantTerrible.dto.inquiry.ProductInquiryRow">
+    SELECT
+      inquiry_id,
+      product_id,
+      user_id,
+      u.email AS user_email,
+      content,
+      is_private,
+      status,
+      answer_content,
+      answered_by_user_id,
+      answered_at,
+      created_at,
+      updated_at,
+      deleted_at
+    FROM et_product_inquiry i
+    INNER JOIN et_user u ON u.user_id = i.user_id
+    WHERE i.product_id = #{productId}
+      AND i.deleted_at IS NULL
+    ORDER BY i.inquiry_id DESC
+    LIMIT #{size} OFFSET #{offset}
+  </select>
+
+  <update id="softDeleteByUser">
+    UPDATE et_product_inquiry
+    SET deleted_at = NOW()
+    WHERE inquiry_id = #{inquiryId}
+      AND user_id = #{userId}
+      AND deleted_at IS NULL
+  </update>
+
+  <update id="softDeleteByAdmin">
+    UPDATE et_product_inquiry
+    SET deleted_at = NOW()
+    WHERE inquiry_id = #{inquiryId}
+      AND deleted_at IS NULL
+  </update>
+
+  <update id="answer">
+    UPDATE et_product_inquiry
+    SET
+      answer_content = #{answerContent},
+      answered_by_user_id = #{answeredByUserId},
+      answered_at = NOW(),
+      status = #{status}
+    WHERE inquiry_id = #{inquiryId}
+      AND deleted_at IS NULL
+  </update>
+
+  <update id="clearAnswer">
+    UPDATE et_product_inquiry
+    SET
+      answer_content = NULL,
+      answered_by_user_id = NULL,
+      answered_at = NULL,
+      status = #{status}
+    WHERE inquiry_id = #{inquiryId}
+      AND deleted_at IS NULL
+  </update>
+
+</mapper>

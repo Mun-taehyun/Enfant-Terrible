@@ -1,7 +1,5 @@
 package com.enfantTerrible.enfantTerrible.controller.admin.qna;
 
-import java.util.List;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,7 +32,7 @@ public class AdminQnaController {
   }
 
   @GetMapping("/messages")
-  public ApiResponse<List<QnaMessageResponse>> messages(
+  public ApiResponse<java.util.List<QnaMessageResponse>> messages(
       @RequestParam Long roomId,
       @RequestParam(required = false, defaultValue = "50") int limit
   ) {

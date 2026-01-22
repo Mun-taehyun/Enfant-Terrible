@@ -9,10 +9,12 @@ import com.enfantTerrible.enfantTerrible.common.enums.OrderStatus;
 import com.enfantTerrible.enfantTerrible.dto.order.OrderCreateCommand;
 import com.enfantTerrible.enfantTerrible.dto.order.OrderCreateResponse;
 import com.enfantTerrible.enfantTerrible.dto.order.OrderItemCommand;
+import com.enfantTerrible.enfantTerrible.dto.point.PointChangeRequest;
 import com.enfantTerrible.enfantTerrible.exception.BusinessException;
 import com.enfantTerrible.enfantTerrible.mapper.order.OrderItemMapper;
 import com.enfantTerrible.enfantTerrible.mapper.order.OrderMapper;
 import com.enfantTerrible.enfantTerrible.mapper.order.StockMapper;
+import com.enfantTerrible.enfantTerrible.service.point.PointService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,6 +26,7 @@ public class OrderService {
   private final OrderMapper orderMapper;
   private final OrderItemMapper orderItemMapper;
   private final StockMapper stockMapper;
+  private final PointService pointService;
 
   public OrderCreateResponse create(OrderCreateCommand cmd) {
 
@@ -31,8 +34,8 @@ public class OrderService {
       throw new BusinessException("주문 상품이 없습니다.");
     }
 
-    // 가격 검증 및 총액 계산
-    long totalAmount = 0;
+    // 가격 검증 및 총액 계산 (원금)
+    long originalAmount = 0;
     for (OrderItemCommand item : cmd.getItems()) {
       // 가격 유효성 검증
       if (item.getPrice() == null || item.getPrice() <= 0) {
@@ -44,8 +47,19 @@ public class OrderService {
         throw new BusinessException("주문 수량이 유효하지 않습니다.");
       }
       
-      totalAmount += item.getPrice() * item.getQuantity();
+      originalAmount += item.getPrice() * item.getQuantity();
     }
+
+    int usedPoint = cmd.getUsedPoint() == null ? 0 : cmd.getUsedPoint();
+    if (usedPoint < 0) {
+      throw new BusinessException("사용 포인트가 올바르지 않습니다.");
+    }
+
+    if (usedPoint > originalAmount) {
+      usedPoint = (int) Math.min(Integer.MAX_VALUE, originalAmount);
+    }
+
+    long totalAmount = originalAmount - usedPoint;
 
     String orderCode = "ORD-" + UUID.randomUUID();
 
@@ -53,6 +67,9 @@ public class OrderService {
         cmd.getUserId(),
         orderCode,
         OrderStatus.ORDERED.name(),
+        originalAmount,
+        usedPoint,
+        0,
         totalAmount,
         cmd.getReceiverName(),
         cmd.getReceiverPhone(),
@@ -62,6 +79,15 @@ public class OrderService {
     );
 
     Long orderId = orderMapper.findLastInsertId();
+
+    if (usedPoint > 0) {
+      PointChangeRequest pointReq = new PointChangeRequest();
+      pointReq.setAmount(usedPoint);
+      pointReq.setReason("주문 사용");
+      pointReq.setRefType("ORDER");
+      pointReq.setRefId(orderId);
+      pointService.use(cmd.getUserId(), pointReq);
+    }
 
     for (OrderItemCommand item : cmd.getItems()) {
 

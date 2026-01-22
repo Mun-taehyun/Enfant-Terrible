@@ -28,4 +28,6 @@ public class OrderFromCartRequest {
 
   @Size(max = 200)
   private String addressDetail;
+
+  private Integer usedPoint;
 }

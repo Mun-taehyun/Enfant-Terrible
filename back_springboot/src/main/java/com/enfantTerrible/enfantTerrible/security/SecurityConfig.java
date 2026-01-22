@@ -71,7 +71,8 @@ public class SecurityConfig {
         .requestMatchers(HttpMethod.GET,
           "/api/products",
           "/api/products/*",
-          "/api/products/*/reviews"
+          "/api/products/*/reviews",
+          "/api/products/*/inquiries"
         ).permitAll()
 
         // 회원가입은 인증 없이 허용

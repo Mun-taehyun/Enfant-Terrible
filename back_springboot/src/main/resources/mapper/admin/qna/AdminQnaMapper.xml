@@ -17,6 +17,7 @@
     SELECT
       r.room_id,
       r.user_id,
+      u.email AS user_email,
       r.status,
       r.last_message_at,
       (
@@ -27,6 +28,7 @@
           AND m.message_id &gt; r.admin_last_read_message_id
       ) AS unread
     FROM et_qna_room r
+    INNER JOIN et_user u ON u.user_id = r.user_id
     <include refid="adminQnaRoomWhere" />
     ORDER BY
     <choose>

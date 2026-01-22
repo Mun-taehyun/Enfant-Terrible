@@ -113,6 +113,25 @@ public class PointService {
     );
   }
 
+  public void refundUsedForOrder(Long userId, Long orderId, int amount, String reason) {
+    if (userId == null || orderId == null) {
+      return;
+    }
+
+    if (amount <= 0) {
+      return;
+    }
+
+    pointHistoryMapper.insert(
+        userId,
+        amount,
+        PointType.ADJUST.name(),
+        reason == null ? "주문 포인트 반환" : reason,
+        "ORDER",
+        orderId
+    );
+  }
+
   public void earnForOrderIfAbsent(Long userId, Long orderId, Long orderAmount) {
     if (userId == null || orderId == null || orderAmount == null) {
       return;

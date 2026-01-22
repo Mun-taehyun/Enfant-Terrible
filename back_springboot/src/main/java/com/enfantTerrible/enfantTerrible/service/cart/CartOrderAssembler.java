@@ -18,7 +18,8 @@ public class CartOrderAssembler {
       String receiverPhone,
       String zipCode,
       String addressBase,
-      String addressDetail
+      String addressDetail,
+      Integer usedPoint
   ) {
 
     OrderCreateCommand cmd = new OrderCreateCommand();
@@ -28,6 +29,7 @@ public class CartOrderAssembler {
     cmd.setZipCode(zipCode);
     cmd.setAddressBase(addressBase);
     cmd.setAddressDetail(addressDetail);
+    cmd.setUsedPoint(usedPoint);
 
     cmd.setItems(
         cartItems.stream()

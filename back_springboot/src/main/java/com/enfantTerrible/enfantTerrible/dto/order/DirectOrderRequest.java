@@ -41,4 +41,6 @@ public class DirectOrderRequest {
 
   @Size(max = 200)
   private String addressDetail;
+
+  private Integer usedPoint;
 }

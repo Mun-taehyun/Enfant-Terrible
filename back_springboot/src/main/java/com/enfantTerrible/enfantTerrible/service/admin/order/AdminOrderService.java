@@ -208,6 +208,25 @@ public class AdminOrderService {
       throw new BusinessException("환불 금액이 0입니다.");
     }
 
+    long originalAmount = order.getOriginalAmount() == null ? 0L : order.getOriginalAmount();
+    int usedPoint = order.getUsedPoint() == null ? 0 : order.getUsedPoint();
+    int alreadyRefundedPoint = order.getUsedPointRefunded() == null ? 0 : order.getUsedPointRefunded();
+    int maxRefundablePoint = Math.max(0, usedPoint - alreadyRefundedPoint);
+
+    int refundPoint = 0;
+    if (originalAmount > 0 && maxRefundablePoint > 0) {
+      long shouldRefundTotal = (refundAmount * usedPoint) / originalAmount;
+      if (shouldRefundTotal > Integer.MAX_VALUE) {
+        shouldRefundTotal = Integer.MAX_VALUE;
+      }
+      refundPoint = (int) Math.min(maxRefundablePoint, Math.max(0L, shouldRefundTotal));
+    }
+
+    long refundCashAmount = refundAmount - refundPoint;
+    if (refundCashAmount < 0) {
+      refundCashAmount = 0;
+    }
+
     // 1) 주문 아이템 취소 수량 누적 + 2) 재고 복구
     for (Map.Entry<Long, Integer> e : cancelQtyMap.entrySet()) {
       Long skuId = e.getKey();
@@ -221,29 +240,36 @@ public class AdminOrderService {
       stockMapper.increaseStock(skuId, cancelQty);
     }
 
-    // 3) PortOne 부분취소
-    portOneClient.cancelPayment(paid.getPgTid(), refundAmount, req.getReason());
+    // 3) PortOne 부분취소 (현금 환불액)
+    portOneClient.cancelPayment(paid.getPgTid(), refundCashAmount, req.getReason());
 
     // 4) 환불 결제 이력 기록 (누적 환불용)
     PaymentRow refundRow = new PaymentRow();
     refundRow.setOrderId(orderId);
     refundRow.setPaymentMethod(paid.getPaymentMethod());
-    refundRow.setPaymentAmount(refundAmount);
+    refundRow.setPaymentAmount(refundCashAmount);
     refundRow.setPaymentStatus(PaymentStatus.REFUND);
     refundRow.setPgTid(paid.getPgTid());
     refundRow.setPaidAt(paid.getPaidAt());
     paymentMapper.insert(refundRow);
 
-    // 5) 주문 잔액/상태 갱신
-    Long remainingAmount = orderItemMapper.sumRemainingAmount(orderId);
+    // 5) 주문 잔액/상태 갱신 (남은 현금 결제금액)
     Long cancelledAmount = orderItemMapper.sumCancelledAmount(orderId);
-    long rem = remainingAmount == null ? 0L : remainingAmount;
+    long remCash = (order.getTotalAmount() == null ? 0L : order.getTotalAmount()) - refundCashAmount;
+    if (remCash < 0) {
+      remCash = 0;
+    }
 
-    OrderStatus nextStatus = rem <= 0 ? OrderStatus.CANCELLED : OrderStatus.PARTIALLY_CANCELLED;
+    OrderStatus nextStatus = remCash <= 0 ? OrderStatus.CANCELLED : OrderStatus.PARTIALLY_CANCELLED;
 
-    int orderUpdated = orderMapper.updateStatusAndTotalAmount(orderId, nextStatus.name(), rem);
+    int newRefundedPoint = alreadyRefundedPoint + refundPoint;
+    int orderUpdated = orderMapper.updateStatusTotalAndUsedPointRefunded(orderId, nextStatus.name(), remCash, newRefundedPoint);
     if (orderUpdated != 1) {
       throw new BusinessException("주문 상태 갱신에 실패했습니다.");
+    }
+
+    if (refundPoint > 0) {
+      pointService.refundUsedForOrder(order.getUserId(), orderId, refundPoint, "주문 부분취소 포인트 반환");
     }
 
     // 6) 포인트 부분 회수(환불 누적 금액 기준)
@@ -252,8 +278,8 @@ public class AdminOrderService {
     AdminOrderItemCancelResponse res = new AdminOrderItemCancelResponse();
     res.setOrderId(orderId);
     res.setOrderStatus(nextStatus.name());
-    res.setRefundAmount(refundAmount);
-    res.setRemainingAmount(rem);
+    res.setRefundAmount(refundCashAmount);
+    res.setRemainingAmount(remCash);
     return res;
   }
 
