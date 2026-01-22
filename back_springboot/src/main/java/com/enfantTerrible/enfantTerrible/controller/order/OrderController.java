@@ -95,7 +95,7 @@ public class OrderController {
   public ApiResponse<OrderPrepareResponse> prepareDirect(
       @AuthenticationPrincipal CustomUserPrincipal principal,
       @RequestParam Long productId,
-      @RequestParam java.util.List<Long> optionValueIds,
+      @RequestParam(required = false) java.util.List<Long> optionValueIds,
       @RequestParam Integer quantity
   ) {
     if (principal == null) {

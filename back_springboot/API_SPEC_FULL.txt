@@ -402,7 +402,7 @@
 
 3) 옵션 조합 → SKU 확정
 - Method/Path: GET /api/products/{productId}/skus/resolve?optionValueIds=1,2,3
-- Auth: 필요
+- Auth: 없음
 - 제목: SKU 확정(옵션 조합)
 - 참고: 옵션이 없는 상품(해당 상품의 SKU가 모두 optionValueIds가 없는 기본 SKU만 존재)인 경우 optionValueIds를 생략하면 기본 SKU가 자동 확정됩니다.
 - Request 예시
@@ -419,6 +419,13 @@
     },
     "message": "SKU 확정 성공"
   }
+
+4) 추천 상품 조회
+- Method/Path: GET /api/products/recommendations
+- Auth: 없음
+- 제목: 추천 상품 조회
+- Response 예시
+  { "success": true, "data": [], "message": "추천 상품 조회 성공" }
 
 ------------------------------------------------------------
 [REVIEW] 리뷰
