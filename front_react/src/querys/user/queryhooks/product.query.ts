@@ -26,11 +26,11 @@ export const productQueries = {
 
 
     //쿼리 : 상품 sku 조회 
-    useProductSkuResolve(productId: number, optionValueIds: number[]) {
+    useProductSkuResolve(productId: number, optionValueIds: number[], isEnabled: boolean) {
         return useQuery({
             queryKey: productKeys.sku(productId, optionValueIds),
             queryFn: () => getProductSkuResolveRequest(productId, optionValueIds),
-            enabled: !!productId
+            enabled: !!productId && isEnabled
             //조건 productId가 존재해야만 실행. 
         });
     }

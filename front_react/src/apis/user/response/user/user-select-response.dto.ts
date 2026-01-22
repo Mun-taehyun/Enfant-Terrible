@@ -6,7 +6,7 @@ export default interface UserSelectResponseDto {
     zipCode: string;
     addressBase: string;
     addressDetail: string | null;
-    role: "USER";
-    status : 'ACTIVE' | 'SUSPENDED' | 'DELETED';
+    role: "USER"| null;
+    status : 'ACTIVE' | 'SUSPENDED' | 'DELETED' | null;
 }
 //내 정보 조회

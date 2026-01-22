@@ -1,9 +1,10 @@
 import Pagination from "@/components/user/Pagination";
+import ProductFilterCard from "@/components/user/Product/filter";
 import ProductCard from "@/components/user/Product/Item";
 import { SORT_OPTIONS } from "@/constant/user/sort.index";
 import { useProduct } from "@/hooks/user/product/use-product.hook";
 import { productQueries } from "@/querys/user/queryhooks";
-
+import './style.css';
 
 
 
@@ -24,7 +25,7 @@ export default function ProductFilter() {
     return(
         <div className="layout-container">        
             <div className="filter-sidebar">
-                {/* 좌측 영역: 필터 */}
+                <ProductFilterCard />
             </div>
             <div className="content-area">
                 <div className="content-header">

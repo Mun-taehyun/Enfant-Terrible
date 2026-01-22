@@ -1,8 +1,18 @@
+import CartItemRequestDto from "@/apis/user/request/cart/cart-item-request.dto";
 import { GetProductListRequestDto } from "@/apis/user/request/product";
 import { PRODUCT_PATH } from "@/constant/user/route.index";
-import { categoryQueries } from "@/querys/user/queryhooks";
+import { categoryQueries, productQueries } from "@/querys/user/queryhooks";
 import { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useCart } from "../cart/use-cart.hook";
+
+
+
+
+
+
+
+
 
 
 
@@ -14,11 +24,20 @@ export const useProduct = () => {
     //서버상태 : 카테고리 트리 
     const {data : categoryTree } = categoryQueries.useCategoryList();
 
+    //커스텀 훅 : 장바구니 추가 
+    const {insertMutation} = useCart();
+
     //상태: 쿼리스트링 훅 사용
     const [searchParams, setSearchParams] = useSearchParams();
 
     //상태 : 정렬 선택 시 상태 변화 
     const [currentSort , setCurrentSort] = useState<string>("RESENT");
+
+    //상태 : 옵션 선택상태 기록장 
+    const [selectedOptions, setSelectedOptions] = useState<Record<number, number>>({});
+
+    //상태 : 더 보기 클릭 이벤트 처리 
+    const [isDescOpen, setIsDescOpen] = useState(false);
 
     //함수 : 네비게이트 
     const navigate = useNavigate();
@@ -27,10 +46,44 @@ export const useProduct = () => {
     const params = {
         page: searchParams.get("page") || "1",       
         size: searchParams.get("size") || "20",       
-        sort: searchParams.get("sort") || "RESENT",
+        sort: searchParams.get("sort") || "RECENT",
         keyword: searchParams.get("keyword") || "",
+        minPrice: searchParams.get("minPrice") || "0",
+        maxPrice: searchParams.get("maxPrice") || "100000000",
+        minRating: searchParams.get("minRating") || "1",
+        hasDiscount: searchParams.get("hasDiscount") || "false",
         categoryId: searchParams.get("categoryId") || "",
     }; //sort 의 변수는 최신순 , 가격순(오름차 내림차) , 이름순이 존재 
+
+     //경로 상태 : productId string => number
+    const {productId} = useParams();
+    const product = Number(productId);
+
+    //서버 상태 : 상세 상품 데이터
+    const { data: productDetail } = productQueries.useProductDetail(product);   
+
+
+    // 2. 옵션 조합 및 SKU 조회 조건 판단 로직
+    const optionGroups = productDetail?.optionGroups || [];
+    const optionValueIds = Object.values(selectedOptions).sort();
+    const isAllSelected = optionGroups.length > 0 && optionGroups.length === optionValueIds.length;
+
+    // 3. SKU 확정 조회 (팩토리 훅 사용)
+    const { data: resolvedSku, isFetching: isResolving } = productQueries.useProductSkuResolve(
+        product, 
+        optionValueIds,
+        isAllSelected 
+        //마지막 인자로 인해 sku옵션이 완전히 결정이 되었을 경우 요청
+    );
+
+
+    //이벤트핸들러: 옵션 클릭 이벤트 처리
+    const optionClickEventhandle = (groupId: number, valueId: number) => {
+        setSelectedOptions(prev => ({ ...prev, [groupId]: valueId }));
+    };
+
+    //이벤트핸들러: 더보기 이벤트 처리 
+    const toggleDesc = () => setIsDescOpen(prev => !prev);
 
 
     const updateSearchFilter = (newFilters : Partial<GetProductListRequestDto>) => {
@@ -81,6 +134,34 @@ export const useProduct = () => {
     const sortChangeEventHandler = (sortValue : string) => {
         setCurrentSort(sortValue); // 이 호출 하나로 useQuery가 다시 실행됨
     };
+
+
+    const handleAddToCart = () => {
+        // 1. 모든 옵션이 선택되었는지 먼저 확인
+        if (!isAllSelected) {
+            alert("모든 옵션을 선택해야 장바구니에 담을 수 있습니다.");
+            return;
+        }
+
+        //resolvedSku가 확정되었을 때
+        if (!resolvedSku || !resolvedSku.skuId) return;
+        
+
+        // requestBody에 skuId , quantity 기입 
+        const requestBody: CartItemRequestDto = {
+            skuId: resolvedSku.skuId, // Resolved된 SKU의 PK
+            quantity: 1        // 현재 컴포넌트의 수량 State
+        };
+
+        // 장바구니 추가 요청 
+        insertMutation.mutate(requestBody, {
+            onSuccess: () => {
+                if (window.confirm("장바구니에 상품을 담았습니다. 장바구니로 이동하시겠습니까?")) {
+                    navigate('/cart');
+                }
+            }
+        });
+    };
   
     
     return { 
@@ -89,6 +170,10 @@ export const useProduct = () => {
 
         categoryTree,
         //카테고리 변수를 활용.. 
+
+        productDetail,        resolvedSku, isResolving, isDescOpen, selectedOptions,
+        //상세보기데이터 , sku 설정 , 설정여부 대기 , 더보기 , 옵션상태 기록
+
         updateSearchFilter, 
         // URL 검색누적 필터 
 
@@ -101,7 +186,14 @@ export const useProduct = () => {
         sortChangeEventHandler,
         //요소 정렬
 
-        resetAllFilters , onPageClickHandler
+        resetAllFilters , onPageClickHandler,
+
+        toggleDesc,                 optionClickEventhandle,           
+        //더보기 토글 이벤트 처리 /옵션 이벤트 처리
+
+        handleAddToCart
+        //장바구니 추가 이벤트 처리 
+
     };
     
 }

@@ -1,3 +1,5 @@
+import { CategoryChildItem } from "@/apis/user/response/category/get-category-children.response.dto";
+
 export default interface CategoryItem {
     categoryId : number;
     parentId : number | null;
@@ -5,6 +7,9 @@ export default interface CategoryItem {
     depth : number | string;
     sortOrder : number; 
     status : string;
+
+    child : CategoryChildItem[];
+    //자식 요소들 배열 
 }
 
 //   카테고리 상태 

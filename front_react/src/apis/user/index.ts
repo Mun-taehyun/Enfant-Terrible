@@ -25,7 +25,7 @@ import { PointChangeRequestDto } from "./request/point";
 import PostListRequestDto from "./request/post/post-list-request.dto";
 import PostResponseDto from "./response/post/post-response.dto";
 import ProductSkuResolveResponse from "./response/product/product-sku-resolve-response.dto";
-import { QnaMessageResponseDto, QnaRoomResponseDto } from "./response/chat";
+import { QnaMessageResponseDto, QnaRoomResponseDto } from "./response/qna";
 import ProductReviewResponseDto from "./response/review/product-review-response.dto";
 import { ProductReviewCreateRequestDto, ProductReviewUpdateRequestDto } from "./request/review";
 
@@ -165,13 +165,13 @@ export const resetPasswordChangeRequest = async (requestBody: ResetPasswordChang
 
 // ================================ 카테고리 =============================
 const GET_CATEGORY_LIST_URL = () => `/categories/tree`;
-const GET_CATEGORY_CHILDREN_URL = (parentId : number | string) => `/categories/children?parentId=${parentId}`;
+const GET_CATEGORY_CHILDREN_URL = (parentId : number) => `/categories/children?parentId=${parentId}`;
 
 export const getCategoryListRequest = async () : Promise<GetCategoryListResponseDto> => {
     return apiClient.get(GET_CATEGORY_LIST_URL())};
 //카테고리 리스트를 서버에 요청 
 
-export const getCategoryChildrenRequest = async (parentId : number | string) : Promise<GetCategoryChildrenResponseDto> => {
+export const getCategoryChildrenRequest = async (parentId : number) : Promise<GetCategoryChildrenResponseDto> => {
     return apiClient.get(GET_CATEGORY_CHILDREN_URL(parentId))};
 //소분류 카테고리 리스트를 서버에 요청 
 

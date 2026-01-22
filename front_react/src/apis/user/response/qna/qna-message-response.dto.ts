@@ -4,5 +4,7 @@ export default interface QnaMessageResponseDto {
     sender : string;    //보낸사람 
     message : string;   //메세지
     createdAt : string; //채팅생성시간
+
+    imageUrls : string[];   //이미지 배열
 }
 //채팅 메세지 

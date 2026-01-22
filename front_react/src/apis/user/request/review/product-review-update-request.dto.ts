@@ -1,6 +1,8 @@
 export default interface ProductReviewUpdateRequestDto {
     rating : number;
-    contant : string;
+    content : string;
+
+    imageUrls : string[];
 }
 
 //리뷰 수정 dto

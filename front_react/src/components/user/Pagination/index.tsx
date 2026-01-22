@@ -36,8 +36,8 @@ export default function Pagination ({totalCount} : Props) {
 
             {viewPageList.map(page =>  //해당 페이지 -> 해당 페이지 이동은 안하므로.. 
             page === currentPage ?
-            <div className='pagination-text-active'>{page}</div> :
-            <div className='pagination-text' onClick={() => onPageClickHandler(page)}>{page}</div>
+            ( <div key={page} className='pagination-text-active'>{page}</div> ):
+            <div key={page} className='pagination-text' onClick={() => onPageClickHandler(page)}>{page}</div>
             )}
 
             <div className='pagination-divider'>{'|'}</div>

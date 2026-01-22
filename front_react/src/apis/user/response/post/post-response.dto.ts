@@ -5,4 +5,6 @@ export default interface PostResponseDto {
     contant : string;               //게시물 내용
     createAt : string;              //게시물 생성날
     updateAt : string;              //게시물 수정날
+
+    imageUrls : string[];           //이미지 배열 
 }
