@@ -15,7 +15,6 @@ import {
   type AdminUserStatus,
 } from "../../types/admin/user";
 
-// ✅ 포인트 패널(이 파일은 제가 이전에 준 컴포넌트 그대로 쓰시면 됩니다)
 import PointsPanel from "@/components/admin/PointsPanel";
 
 /** 상세 정보 한 행 */
@@ -87,7 +86,9 @@ function StatusRow({
  * usersQuery.data가 {} / unknown 으로 잡혀도,
  * totalCount/list 접근에서 TS 에러 안 나게 하는 안전 파서
  */
-function parseAdminPageResponse(data: unknown): { list: AdminUserListItem[]; totalCount: number } {
+function parseAdminPageResponse(
+  data: unknown
+): { list: AdminUserListItem[]; totalCount: number } {
   if (!data || typeof data !== "object") return { list: [], totalCount: 0 };
 
   const d = data as Record<string, unknown>;
@@ -106,23 +107,19 @@ export default function UsersView() {
 
   const usersQuery = useAdminUsers({ page, size: PAGE_SIZE });
 
-  // ✅ 여기서 타입 추론이 {}여도 안전하게 처리
   const { list: rows, totalCount } = parseAdminPageResponse(usersQuery.data);
 
   const totalPages = totalCount > 0 ? Math.ceil(totalCount / PAGE_SIZE) : 1;
-
   const disablePrev = page <= 1;
   const disableNext = page >= totalPages;
 
-  // ✅ 백엔드: GET /api/admin/users/{userId}
   const detailQuery = useAdminUserDetail(selectedUserId);
   const user = detailQuery.data;
 
-  // ✅ 상태 변경
   const updateMutation = useAdminUserStatusUpdate();
 
-  // optimistic 적용
-  const [optimisticStatus, setOptimisticStatus] = useState<AdminUserStatus | null>(null);
+  const [optimisticStatus, setOptimisticStatus] =
+    useState<AdminUserStatus | null>(null);
 
   const serverStatus: AdminUserStatus = isAdminUserStatus(user?.status)
     ? user.status
@@ -247,7 +244,6 @@ export default function UsersView() {
                     onChange={handleStatusChange}
                   />
 
-                  {/* pets 표시(DTO에 존재) - UI 필요 없으면 이 블록 제거 가능 */}
                   {Array.isArray(user.pets) && user.pets.length > 0 ? (
                     <div className={styles.petsBox}>
                       <div className={styles.petsTitle}>반려동물 정보</div>
@@ -271,8 +267,8 @@ export default function UsersView() {
                   ) : null}
                 </div>
 
-                {/* ✅ 포인트 패널: 사용자 상세 하단 */}
-                <div style={{ marginTop: 16 }}>
+                {/* ✅ 포인트 패널 래퍼: 폭 100% 강제 + 왼쪽 잘림 방지 */}
+                <div className={styles.pointsWrap}>
                   <PointsPanel userId={Number(user.userId)} />
                 </div>
               </div>

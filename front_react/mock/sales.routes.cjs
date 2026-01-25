@@ -1,206 +1,104 @@
 // mock/sales.routes.cjs
 module.exports = function registerSalesRoutes(server, router, common) {
-  const { ok, fail, parseYmd, inRange, eachYmd } = common;
+  const { ok, fail, inRange, eachYmd } = common;
 
-  function getSalesDailyRows(db, fromStr, toStr) {
-    const rows = db.get("salesDaily").value() || db.get("amountDaily").value() || [];
-    return rows
-      .filter((r) => r?.date && inRange(String(r.date), fromStr, toStr))
-      .map((r) => ({
-        date: String(r.date),
-        orderCount: Number(r.orderCount ?? 0),
-        refundCount: Number(r.refundCount ?? 0),
-        totalAmount: Number(r.totalAmount ?? 0),
-        completedDeliveryCount: Number(r.completedDeliveryCount ?? 0),
-      }));
+  function ymdFromLocalDateTime(v) {
+    if (!v) return null;
+    const s = String(v);
+    const idx = s.indexOf("T");
+    if (idx === -1) return null;
+    const ymd = s.slice(0, idx);
+    // YYYY-MM-DD 최소 검증
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(ymd)) return null;
+    return ymd;
   }
 
-  function handleSalesDaily(req, res) {
-    const from = parseYmd(req.query.from);
-    const to = parseYmd(req.query.to);
-
-    if (!from || !to) {
-      return res.status(400).json(fail("from/to는 YYYY-MM-DD 형식으로 필수입니다."));
-    }
-    if (from.str > to.str) {
-      return res.status(400).json(fail("from은 to보다 클 수 없습니다."));
-    }
-
-    const db = router.db;
-    const raw = getSalesDailyRows(db, from.str, to.str);
-
-    const map = new Map(raw.map((r) => [r.date, r]));
-    const allDates = eachYmd(from.str, to.str);
-
-    const filled = allDates.map((date) => {
-      const r = map.get(date);
-      return (
-        r ?? {
-          date,
-          orderCount: 0,
-          refundCount: 0,
-          totalAmount: 0,
-          completedDeliveryCount: 0,
-        }
-      );
-    });
-
-    // 주문 0건은 화면에서 제외
-    const visible = filled.filter((r) => Number(r.orderCount ?? 0) !== 0);
-
-    const pageData = {
-      from: from.str,
-      to: to.str,
-      content: visible,
-      rows: visible,
-      totalElements: visible.length,
-      totalPages: 1,
-      page: 1,
-      size: visible.length,
-      number: 1,
-      pageSize: visible.length,
-    };
-
-    return res.json({
-      ...ok(pageData, "일별 매출 조회 성공"),
-      content: visible,
-      rows: visible,
-      page: 1,
-      size: visible.length,
-      totalElements: visible.length,
-      totalPages: 1,
-      from: from.str,
-      to: to.str,
-    });
+  function monthKey(ymd) {
+    // YYYY-MM-DD -> YYYY-MM
+    return String(ymd).slice(0, 7);
   }
 
-  function handleSalesSummary(req, res) {
-    const from = parseYmd(req.query.from);
-    const to = parseYmd(req.query.to);
-
-    if (!from || !to) {
-      return res.status(400).json(fail("from/to는 YYYY-MM-DD 형식으로 필수입니다."));
-    }
-    if (from.str > to.str) {
-      return res.status(400).json(fail("from은 to보다 클 수 없습니다."));
-    }
-
-    const db = router.db;
-    const rows = getSalesDailyRows(db, from.str, to.str);
-
-    const summary = rows.reduce(
-      (acc, r) => {
-        acc.orderCount += r.orderCount;
-        acc.refundCount += r.refundCount;
-        acc.totalAmount += r.totalAmount;
-        acc.completedDeliveryCount += r.completedDeliveryCount;
-        return acc;
-      },
-      {
-        from: from.str,
-        to: to.str,
-        orderCount: 0,
-        refundCount: 0,
-        totalAmount: 0,
-        completedDeliveryCount: 0,
-      }
+  // db.json에서 일별 매출 후보 키를 최대한 넓게 허용
+  function getSalesDailyRows(db) {
+    return (
+      db.get("salesDaily").value() ||
+      db.get("amountDaily").value() ||
+      db.get("sales").value() ||
+      []
     );
-
-    return res.json({
-      ...ok(summary, "기간 매출 요약 조회 성공"),
-      ...summary,
-    });
   }
 
-  /**
-   * ✅ Spring 스펙 맞춤: GET /api/admin/sales
-   * Query: paidFrom=YYYY-MM-DDTHH:mm:ss, paidTo=..., groupBy=DAY|MONTH
-   * Response(data):
-   * { totalAmount, totalCount, items:[{period,totalAmount,paymentCount}] }
-   */
-  function handleApiAdminSales(req, res) {
-    const paidFromRaw = String(req.query.paidFrom ?? "");
-    const paidToRaw = String(req.query.paidTo ?? "");
-    const groupByRaw = String(req.query.groupBy ?? "DAY").toUpperCase();
-    const groupBy = groupByRaw === "MONTH" ? "MONTH" : "DAY";
+  function normalizeDailyRow(r) {
+    const date = String(r?.date ?? r?.period ?? "");
+    const totalAmount = Number(r?.totalAmount ?? r?.amount ?? 0);
+    const orderCount = Number(r?.orderCount ?? r?.paymentCount ?? r?.count ?? 0);
+    return { date, totalAmount, orderCount };
+  }
 
-    // paidFrom/paidTo가 LocalDateTime이므로 date 부분(YYYY-MM-DD)만 뽑아서 기존 유틸(parseYmd/inRange) 재사용
-    const paidFromDate = paidFromRaw.slice(0, 10);
-    const paidToDate = paidToRaw.slice(0, 10);
+  function handleAdminSalesSummary(req, res) {
+    const paidFromYmd = ymdFromLocalDateTime(req.query.paidFrom);
+    const paidToYmd = ymdFromLocalDateTime(req.query.paidTo);
+    const groupBy = String(req.query.groupBy || "DAY").toUpperCase();
 
-    const from = parseYmd(paidFromDate);
-    const to = parseYmd(paidToDate);
-
-    if (!from || !to) {
-      return res.status(400).json(fail("paidFrom/paidTo는 LocalDateTime 형식으로 필수입니다. 예: 2026-01-16T00:00:00"));
+    if (!paidFromYmd || !paidToYmd) {
+      return res.status(400).json(fail("paidFrom/paidTo는 LocalDateTime(YYYY-MM-DDTHH:mm:ss) 형식으로 필수입니다."));
     }
-    if (from.str > to.str) {
+    if (paidFromYmd > paidToYmd) {
       return res.status(400).json(fail("paidFrom은 paidTo보다 클 수 없습니다."));
     }
+    if (groupBy !== "DAY" && groupBy !== "MONTH") {
+      return res.status(400).json(fail("groupBy는 DAY 또는 MONTH 여야 합니다."));
+    }
 
     const db = router.db;
-    const rows = getSalesDailyRows(db, from.str, to.str);
+    const raw = getSalesDailyRows(db)
+      .map(normalizeDailyRow)
+      .filter((r) => r.date && /^\d{4}-\d{2}-\d{2}$/.test(r.date))
+      .filter((r) => inRange(r.date, paidFromYmd, paidToYmd));
 
-    // 여기서 totalCount는 백엔드 DTO상 "결제 건수(totalCount)"인데,
-    // mock 원천 데이터가 일 단위 집계(salesDaily)라서 paymentCount를 orderCount로 매핑합니다.
-    // (실제 백엔드는 결제 테이블 기반으로 paymentCount를 산출)
+    // 날짜가 빠진 구간도 채우고 싶으면 eachYmd 사용
+    // (백이 빈 날짜를 내려주는지 불명확하니, 여기서는 "있는 데이터만" items로 구성)
+    // 단, total은 있는 데이터 기준
+
+    let items = [];
     if (groupBy === "DAY") {
-      const items = rows
-        .filter((r) => Number(r.orderCount ?? 0) !== 0)
-        .map((r) => ({
-          period: r.date,                 // YYYY-MM-DD
-          totalAmount: Number(r.totalAmount ?? 0),
-          paymentCount: Number(r.orderCount ?? 0), // mock에서는 orderCount를 결제건수로 사용
-        }));
-
-      const totalAmount = items.reduce((a, b) => a + b.totalAmount, 0);
-      const totalCount = items.reduce((a, b) => a + b.paymentCount, 0);
-
-      return res.json(
-        ok(
-          { totalAmount, totalCount, items },
-          "관리자 기간별 매출 조회 성공"
-        )
-      );
+      // 날짜별 합산 (같은 date가 여러 줄일 수 있어서 group)
+      const map = new Map();
+      for (const r of raw) {
+        const prev = map.get(r.date) || { period: r.date, totalAmount: 0, paymentCount: 0 };
+        prev.totalAmount += r.totalAmount;
+        prev.paymentCount += r.orderCount;
+        map.set(r.date, prev);
+      }
+      items = Array.from(map.values()).sort((a, b) => (a.period > b.period ? 1 : -1));
+    } else {
+      // 월별 합산
+      const map = new Map();
+      for (const r of raw) {
+        const key = monthKey(r.date);
+        const prev = map.get(key) || { period: key, totalAmount: 0, paymentCount: 0 };
+        prev.totalAmount += r.totalAmount;
+        prev.paymentCount += r.orderCount;
+        map.set(key, prev);
+      }
+      items = Array.from(map.values()).sort((a, b) => (a.period > b.period ? 1 : -1));
     }
 
-    // MONTH: YYYY-MM로 그룹핑
-    const bucket = new Map(); // key: YYYY-MM -> { totalAmount, paymentCount }
-    for (const r of rows) {
-      if (Number(r.orderCount ?? 0) === 0) continue;
-      const ym = String(r.date).slice(0, 7); // YYYY-MM
-      const prev = bucket.get(ym) || { totalAmount: 0, paymentCount: 0 };
-      prev.totalAmount += Number(r.totalAmount ?? 0);
-      prev.paymentCount += Number(r.orderCount ?? 0);
-      bucket.set(ym, prev);
-    }
+    const totalAmount = items.reduce((acc, it) => acc + Number(it.totalAmount || 0), 0);
+    const totalCount = items.reduce((acc, it) => acc + Number(it.paymentCount || 0), 0);
 
-    const items = Array.from(bucket.entries())
-      .sort((a, b) => String(a[0]).localeCompare(String(b[0])))
-      .map(([period, v]) => ({
-        period, // YYYY-MM
-        totalAmount: v.totalAmount,
-        paymentCount: v.paymentCount,
-      }));
+    const data = {
+      totalAmount,
+      totalCount,
+      items,
+    };
 
-    const totalAmount = items.reduce((a, b) => a + b.totalAmount, 0);
-    const totalCount = items.reduce((a, b) => a + b.paymentCount, 0);
-
-    return res.json(
-      ok(
-        { totalAmount, totalCount, items },
-        "관리자 기간별 매출 조회 성공"
-      )
-    );
+    return res.json(ok(data, "관리자 기간별 매출 조회 성공"));
   }
 
-  // 기존(레거시) 엔드포인트
-  server.get("/admin/amount/daily", handleSalesDaily);
-  server.get("/admin/amount", handleSalesSummary);
+  // ✅ Spring 스펙과 동일한 경로
+  server.get("/api/admin/sales", handleAdminSalesSummary);
 
-  server.get("/admin/sales/daily", handleSalesDaily);
-  server.get("/admin/sales", handleSalesSummary);
-
-  // ✅ Spring 스펙 엔드포인트 추가(404 해결)
-  server.get("/api/admin/sales", handleApiAdminSales);
+  // (기존에 /admin/amount, /admin/sales 같은 레거시가 필요하면 유지 가능)
+  // 여기서는 "sales 404 해결"이 목적이라 /api/admin/sales만 확실히 보장합니다.
 };

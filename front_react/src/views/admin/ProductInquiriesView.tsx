@@ -1,4 +1,4 @@
-// src/views/admin/inquiry/ProductInquiriesView.tsx
+// src/views/admin/ProductInquiriesView.tsx
 import { useMemo, useState } from "react";
 import styles from "./ProductInquiriesView.module.css";
 
@@ -15,7 +15,7 @@ function toIntOrUndef(v: string): number | undefined {
   if (!s) return undefined;
   const n = Number(s);
   if (!Number.isFinite(n)) return undefined;
-  return n;
+  return Math.floor(n);
 }
 
 function getErrorMessage(err: unknown, fallback = "요청에 실패했습니다."): string {
@@ -36,8 +36,8 @@ export default function ProductInquiriesView() {
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(20);
 
-  // 사용자 수정분만 저장
   const [draftAnswers, setDraftAnswers] = useState<Record<number, string>>({});
+  const [openIds, setOpenIds] = useState<Record<number, boolean>>({});
 
   const params = useMemo(() => {
     const productId = toIntOrUndef(productIdText);
@@ -51,9 +51,7 @@ export default function ProductInquiriesView() {
     };
   }, [productIdText, userIdText, status, page, size]);
 
-  const { data, isLoading, error, refetch, isFetching } = useAdminInquiries(
-    params
-  );
+  const { data, isLoading, error, refetch, isFetching } = useAdminInquiries(params);
 
   const upsertAnswer = useAdminInquiryAnswerUpsert();
   const clearAnswer = useAdminInquiryAnswerClear();
@@ -62,6 +60,11 @@ export default function ProductInquiriesView() {
   const totalCount = data?.totalCount ?? 0;
   const list = data?.list ?? [];
   const totalPages = Math.max(1, Math.ceil(totalCount / (size || 20)));
+
+  const goPage = (p: number) => {
+    const next = Math.min(Math.max(1, p), totalPages);
+    setPage(next);
+  };
 
   const onClickSearch = () => {
     setPage(1);
@@ -75,6 +78,12 @@ export default function ProductInquiriesView() {
     setPage(1);
     setSize(20);
     setDraftAnswers({});
+    setOpenIds({});
+    refetch();
+  };
+
+  const onToggleOpen = (id: number) => {
+    setOpenIds((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
   const onChangeDraft = (inquiryId: number, v: string) => {
@@ -99,12 +108,8 @@ export default function ProductInquiriesView() {
         body: { answerContent: draft },
       });
 
-      // 저장 직후에도 입력값 유지
       setDraftAnswers((prev) => ({ ...prev, [row.inquiryId]: draft }));
-
-      // answeredAt/answeredByUserId 반영
       await refetch();
-
       window.alert("답변이 저장되었습니다.");
     } catch (e: unknown) {
       window.alert(getErrorMessage(e, "답변 저장에 실패했습니다."));
@@ -144,6 +149,12 @@ export default function ProductInquiriesView() {
         return next;
       });
 
+      setOpenIds((prev) => {
+        const next = { ...prev };
+        delete next[row.inquiryId];
+        return next;
+      });
+
       await refetch();
       window.alert("문의가 삭제되었습니다.");
     } catch (e: unknown) {
@@ -153,56 +164,71 @@ export default function ProductInquiriesView() {
 
   return (
     <div className={styles.page}>
-      <header className={styles.header}>
+      <div className={styles.topBar}>
         <h1 className={styles.title}>상품 문의 관리</h1>
-        <div className={styles.headerRight}>
-          <button
-            type="button"
-            className={styles.button}
-            onClick={() => refetch()}
-            disabled={isFetching}
-          >
+        <div className={styles.topActions}>
+          <button type="button" className={styles.btn} onClick={() => refetch()} disabled={isFetching}>
             새로고침
           </button>
         </div>
-      </header>
+      </div>
 
-      <section className={styles.filters}>
-        <div className={styles.filterRow}>
-          <label className={styles.label}>
-            상품ID
-            <input
-              className={styles.input}
-              value={productIdText}
-              onChange={(e) => setProductIdText(e.target.value)}
-              placeholder="예: 1"
-              inputMode="numeric"
-            />
+      {/* 검색 카드 */}
+      <section className={styles.card}>
+        <div className={styles.cardHeader}>
+          <div className={styles.cardTitle}>검색 조건</div>
+
+          <div className={styles.cardHeaderRight}>
+            <div className={styles.pageSummary}>
+              총 <b>{totalCount}</b>건 · <b>{page}</b>/<b>{totalPages}</b>페이지
+            </div>
+
+            <div className={styles.pager}>
+              <button type="button" className={styles.btn} onClick={() => goPage(1)} disabled={page <= 1}>
+                처음
+              </button>
+              <button type="button" className={styles.btn} onClick={() => goPage(page - 1)} disabled={page <= 1}>
+                이전
+              </button>
+              <button type="button" className={styles.btn} onClick={() => goPage(page + 1)} disabled={page >= totalPages}>
+                다음
+              </button>
+              <button type="button" className={styles.btn} onClick={() => goPage(totalPages)} disabled={page >= totalPages}>
+                끝
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.filtersGrid}>
+          <label className={styles.field}>
+            <span className={styles.fieldLabel}>상품ID</span>
+            <input className={styles.input} value={productIdText} onChange={(e) => setProductIdText(e.target.value)} inputMode="numeric" />
           </label>
 
-          <label className={styles.label}>
-            사용자ID
-            <input
-              className={styles.input}
-              value={userIdText}
-              onChange={(e) => setUserIdText(e.target.value)}
-              placeholder="예: 2"
-              inputMode="numeric"
-            />
+          <label className={styles.field}>
+            <span className={styles.fieldLabel}>사용자ID</span>
+            <input className={styles.input} value={userIdText} onChange={(e) => setUserIdText(e.target.value)} inputMode="numeric" />
           </label>
 
-          <label className={styles.label}>
-            상태
-            <input
-              className={styles.input}
+          <label className={styles.field}>
+            <span className={styles.fieldLabel}>상태</span>
+            <select
+              className={styles.select}
               value={status}
-              onChange={(e) => setStatus(e.target.value)}
-              placeholder="예: WAITING / ANSWERED"
-            />
+              onChange={(e) => {
+                setStatus(e.target.value);
+                setPage(1);
+              }}
+            >
+              <option value="">전체</option>
+              <option value="WAITING">WAITING</option>
+              <option value="ANSWERED">ANSWERED</option>
+            </select>
           </label>
 
-          <label className={styles.label}>
-            페이지
+          <label className={styles.field}>
+            <span className={styles.fieldLabel}>페이지</span>
             <input
               className={styles.input}
               value={String(page)}
@@ -214,8 +240,8 @@ export default function ProductInquiriesView() {
             />
           </label>
 
-          <label className={styles.label}>
-            사이즈
+          <label className={styles.field}>
+            <span className={styles.fieldLabel}>사이즈</span>
             <select
               className={styles.select}
               value={String(size)}
@@ -235,177 +261,159 @@ export default function ProductInquiriesView() {
           </label>
 
           <div className={styles.filterButtons}>
-            <button
-              type="button"
-              className={styles.buttonPrimary}
-              onClick={onClickSearch}
-              disabled={isFetching}
-            >
+            <button type="button" className={styles.btnPrimary} onClick={onClickSearch} disabled={isFetching}>
               검색
             </button>
-            <button
-              type="button"
-              className={styles.button}
-              onClick={onClickReset}
-              disabled={isFetching}
-            >
+            <button type="button" className={styles.btn} onClick={onClickReset} disabled={isFetching}>
               초기화
-            </button>
-          </div>
-        </div>
-
-        <div className={styles.pagingRow}>
-          <div className={styles.pagingInfo}>
-            총 {totalCount}건 / {page}페이지 (총 {totalPages}페이지)
-          </div>
-          <div className={styles.pagingButtons}>
-            <button
-              type="button"
-              className={styles.button}
-              onClick={() => setPage(1)}
-              disabled={page <= 1}
-            >
-              처음
-            </button>
-            <button
-              type="button"
-              className={styles.button}
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page <= 1}
-            >
-              이전
-            </button>
-            <button
-              type="button"
-              className={styles.button}
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page >= totalPages}
-            >
-              다음
-            </button>
-            <button
-              type="button"
-              className={styles.button}
-              onClick={() => setPage(totalPages)}
-              disabled={page >= totalPages}
-            >
-              끝
             </button>
           </div>
         </div>
       </section>
 
-      <section className={styles.content}>
-        {isLoading && <div className={styles.info}>로딩 중...</div>}
-        {error && (
-          <div className={styles.error}>
-            {error.message || "목록 조회 실패"}
-          </div>
-        )}
+      {/* 목록 카드 */}
+      <section className={styles.card}>
+        <div className={styles.cardHeader}>
+          <div className={styles.cardTitle}>문의 목록</div>
+          <div className={styles.cardHeaderRight}>{isFetching ? <div className={styles.muted}>조회 중...</div> : null}</div>
+        </div>
 
-        {!isLoading && !error && (
+        {isLoading ? <div className={styles.info}>로딩 중...</div> : null}
+        {error ? <div className={styles.errorBox}>{error.message || "목록 조회 실패"}</div> : null}
+
+        {!isLoading && !error ? (
           <div className={styles.tableWrap}>
             <table className={styles.table}>
               <thead>
-                <tr>
-                  <th>문의ID</th>
-                  <th>상품ID</th>
-                  <th>사용자</th>
-                  <th>비공개</th>
-                  <th>상태</th>
-                  <th>문의내용</th>
-                  <th>답변</th>
-                  <th>작업</th>
+                {/* ✅ 헤더도 동일한 5칸 그리드로 “균형” 고정 */}
+                <tr className={styles.gridRow}>
+                  <th className={styles.thCell}>문의ID</th>
+                  <th className={styles.thCell}>상품ID</th>
+                  <th className={styles.thCell}>사용자</th>
+                  <th className={`${styles.thCell} ${styles.thCenter}`}>상태</th>
+                  <th className={`${styles.thCell} ${styles.thRight}`}>작업</th>
                 </tr>
               </thead>
+
               <tbody>
-                {list.length === 0 && (
+                {list.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className={styles.empty}>
+                    <td colSpan={5} className={styles.empty}>
                       데이터가 없습니다.
                     </td>
                   </tr>
-                )}
+                ) : null}
 
                 {list.map((row) => {
+                  const isOpen = !!openIds[row.inquiryId];
                   const draft = getDraftValue(row);
+                  const saved = (row.answerContent ?? "").trim();
 
                   return (
-                    <tr key={row.inquiryId}>
-                      <td className={styles.monoEm}>{row.inquiryId}</td>
-                      <td className={styles.monoEm}>{row.productId}</td>
+                    <>
+                      {/* ✅ 요약행: 5칸 균형 그리드 (데이터 길이에 영향 안 받음) */}
+                      <tr key={`sum-${row.inquiryId}`} className={`${styles.gridRow} ${styles.summaryRow}`}>
+                        <td className={styles.tdCell}>
+                          <span className={styles.idValue}>{row.inquiryId}</span>
+                        </td>
 
-                      <td className={styles.cellValueEm}>
-                        <div className={styles.userCell}>
-                          <div className={styles.mono}>#{row.userId}</div>
-                          <div className={styles.userEmail}>{row.userEmail}</div>
-                        </div>
-                      </td>
+                        <td className={styles.tdCell}>
+                          <span className={styles.idValue}>{row.productId}</span>
+                        </td>
 
-                      <td className={styles.cellValueEm}>
-                        {row.isPrivate ? "Y" : "N"}
-                      </td>
+                        <td className={styles.tdCell}>
+                          <div className={styles.userCell}>
+                            <span className={styles.userIdValue}>{row.userId}</span>
+                            <span className={styles.userEmail}>{row.userEmail}</span>
+                          </div>
+                        </td>
 
-                      <td className={styles.monoEm}>{row.status}</td>
+                        <td className={`${styles.tdCell} ${styles.centerCell}`}>
+                          <span className={`${styles.badge} ${styles.badgeStatus}`}>{row.status}</span>
+                        </td>
 
-                      <td>
-                        <div className={styles.textCell}>{row.content}</div>
-                        <div className={styles.subText}>생성: {row.createdAt}</div>
-                      </td>
+                        <td className={`${styles.tdCell} ${styles.rightCell}`}>
+                          <div className={styles.actionRow}>
+                            <button type="button" className={styles.btn} onClick={() => onToggleOpen(row.inquiryId)}>
+                              {isOpen ? "접기" : "보기"}
+                            </button>
+                            <button
+                              type="button"
+                              className={styles.btnDanger}
+                              onClick={() => onDeleteInquiry(row)}
+                              disabled={deleteInquiry.isPending}
+                            >
+                              삭제
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
 
-                      <td>
-                        <textarea
-                          className={styles.textarea}
-                          value={draft}
-                          onChange={(e) =>
-                            onChangeDraft(row.inquiryId, e.target.value)
-                          }
-                          placeholder="답변을 입력하세요"
-                        />
-                        <div className={styles.subText}>
-                          {row.answeredAt
-                            ? `답변일: ${row.answeredAt} (by #${
-                                row.answeredByUserId ?? "-"
-                              })`
-                            : "답변 없음"}
-                        </div>
-                      </td>
+                      {/* 상세행: 기존처럼 아래에서만 내용/답변 길어짐 */}
+                      {isOpen ? (
+                        <tr key={`det-${row.inquiryId}`} className={styles.detailRow}>
+                          <td colSpan={5} className={styles.detailCell}>
+                            <div className={styles.detailGrid}>
+                              <div className={styles.detailBlock}>
+                                <div className={styles.blockTitle}>문의내용</div>
+                                <div className={styles.blockBody}>{row.content}</div>
+                                <div className={styles.metaText}>생성: {row.createdAt}</div>
+                              </div>
 
-                      <td>
-                        <div className={styles.actions}>
-                          <button
-                            type="button"
-                            className={styles.buttonPrimary}
-                            onClick={() => onSaveAnswer(row)}
-                            disabled={upsertAnswer.isPending}
-                          >
-                            저장
-                          </button>
-                          <button
-                            type="button"
-                            className={styles.button}
-                            onClick={() => onClearAnswer(row)}
-                            disabled={clearAnswer.isPending}
-                          >
-                            답변삭제
-                          </button>
-                          <button
-                            type="button"
-                            className={styles.buttonDanger}
-                            onClick={() => onDeleteInquiry(row)}
-                            disabled={deleteInquiry.isPending}
-                          >
-                            문의삭제
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
+                              <div className={styles.detailBlock}>
+                                <div className={styles.blockTitle}>답변</div>
+
+                                {saved ? (
+                                  <div className={styles.answerPreview}>
+                                    <div className={styles.answerPreviewBody}>{saved}</div>
+                                  </div>
+                                ) : (
+                                  <div className={styles.answerEmpty}>저장된 답변 없음</div>
+                                )}
+
+                                <div className={styles.answerEditTitle}>답변 작성/수정</div>
+                                <textarea
+                                  className={styles.textarea}
+                                  value={draft}
+                                  onChange={(e) => onChangeDraft(row.inquiryId, e.target.value)}
+                                />
+
+                                <div className={styles.detailButtons}>
+                                  <button
+                                    type="button"
+                                    className={styles.btnPrimary}
+                                    onClick={() => onSaveAnswer(row)}
+                                    disabled={upsertAnswer.isPending}
+                                  >
+                                    저장
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className={styles.btn}
+                                    onClick={() => onClearAnswer(row)}
+                                    disabled={clearAnswer.isPending}
+                                  >
+                                    답변삭제
+                                  </button>
+                                </div>
+
+                                <div className={styles.metaText}>
+                                  {row.answeredAt
+                                    ? `답변일: ${row.answeredAt} (by ${row.answeredByUserId ?? "-"})`
+                                    : "답변 이력 없음"}
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      ) : null}
+                    </>
                   );
                 })}
               </tbody>
             </table>
           </div>
-        )}
+        ) : null}
       </section>
     </div>
   );

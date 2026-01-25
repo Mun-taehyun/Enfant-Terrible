@@ -5,7 +5,6 @@ const bodyParser = require("body-parser");
 
 const common = require("./mock/common.cjs");
 
-
 const registerSalesRoutes = require("./mock/sales.routes.cjs");
 const registerUsersRoutes = require("./mock/users.routes.cjs");
 const registerCategoriesRoutes = require("./mock/categories.routes.cjs");
@@ -19,9 +18,6 @@ const registerBannersRoutes = require("./mock/banners.routes.cjs");
 const registerPointsRoutes = require("./mock/points.routes.cjs");
 const registerOrdersRoutes = require("./mock/orders.routes.cjs");
 const registerProductInquiriesRoutes = require("./mock/productInquiries.routes.cjs");
-
-
-
 
 const server = jsonServer.create();
 const router = jsonServer.router(path.join(__dirname, "db.json"));
@@ -42,7 +38,7 @@ server.use((req, res, next) => {
   next();
 });
 
-// 라우트 등록(반드시 server.use(router)보다 위)
+// ✅ 라우트 등록(반드시 server.use(router)보다 위)
 registerSalesRoutes(server, router, common);
 registerUsersRoutes(server, router, common);
 registerCategoriesRoutes(server, router, common);
@@ -56,7 +52,6 @@ registerBannersRoutes(server, router, common);
 registerPointsRoutes(server, router, common);
 registerOrdersRoutes(server, router, common);
 registerProductInquiriesRoutes(server, router, common);
-
 
 // 기본 router
 server.use(router);

@@ -48,34 +48,38 @@ export default function PointsPanel({ userId }: Props) {
   const totalPages = size > 0 ? Math.max(1, Math.ceil(totalCount / size)) : 1;
 
   const onSubmitAdjust = async () => {
-  const n = toInt(amount.trim(), NaN as unknown as number);
-  if (!Number.isFinite(n)) {
-    alert("amount는 숫자여야 합니다.");
-    return;
-  }
-  if (n === 0) {
-    alert("amount는 0이 될 수 없습니다.");
-    return;
-  }
+    const n = toInt(amount.trim(), NaN as unknown as number);
+    if (!Number.isFinite(n)) {
+      alert("amount는 숫자여야 합니다.");
+      return;
+    }
+    if (n === 0) {
+      alert("amount는 0이 될 수 없습니다.");
+      return;
+    }
 
-  const refIdValue = refId.trim() ? toInt(refId.trim(), 0) : undefined;
+    const refIdValue = refId.trim() ? toInt(refId.trim(), 0) : undefined;
 
-  await adj.mutateAsync({
-    userId,
-    body: {
-      amount: n,
-      reason: reason.trim() ? reason.trim() : undefined,
-      refType: refType.trim() ? refType.trim() : undefined,
-      refId: refIdValue, // ✅ null 금지
-    },
-  });
+    await adj.mutateAsync({
+      userId,
+      body: {
+        amount: n,
+        reason: reason.trim() ? reason.trim() : undefined,
+        refType: refType.trim() ? refType.trim() : undefined,
+        refId: refIdValue, // null 금지
+      },
+    });
 
-  setAmount("");
-  setReason("");
-  setRefType("");
-  setRefId("");
-  alert("관리자 포인트 조정 완료");
-};
+    setAmount("");
+    setReason("");
+    setRefType("");
+    setRefId("");
+    alert("관리자 포인트 조정 완료");
+
+    // 조정 후 히스토리/잔액 갱신
+    bal.refetch();
+    hist.refetch();
+  };
 
   return (
     <section className={styles.wrap}>
@@ -93,8 +97,9 @@ export default function PointsPanel({ userId }: Props) {
         </div>
       </header>
 
-      <div className={styles.grid}>
-        {/* 왼쪽: 관리자 조정 */}
+      {/* ✅ 요구사항대로: 조정 카드 -> 히스토리 카드 (세로 배치) */}
+      <div className={styles.stack}>
+        {/* 1) 관리자 조정 */}
         <div className={styles.card}>
           <div className={styles.cardTitle}>관리자 조정</div>
 
@@ -160,7 +165,7 @@ export default function PointsPanel({ userId }: Props) {
           </div>
         </div>
 
-        {/* 오른쪽: 히스토리 */}
+        {/* 2) 포인트 히스토리 (조정 실행 버튼 바로 아래로 내려옴) */}
         <div className={styles.card}>
           <div className={styles.cardTitle}>포인트 히스토리</div>
 

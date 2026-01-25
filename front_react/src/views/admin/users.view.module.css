@@ -1,3 +1,6 @@
+/* src/views/admin/users.view.module.css */
+/* (성일님이 주신 코드에서 필요한 부분만 “정상 동작”으로 반영한 풀버전) */
+
 /* 전체 컨테이너 및 레이아웃 */
 .container {
   display: flex;
@@ -23,6 +26,7 @@
   gap: 16px;
   height: calc(100vh - 100px);
   align-items: stretch;
+  min-width: 0;
 }
 
 /* 패널 공통 스타일 */
@@ -32,8 +36,9 @@
   border-radius: 10px;
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* 패널 밖으로는 숨김 */
-  min-height: 0;    /* 내부 스크롤 필수 */
+  overflow: hidden;
+  min-height: 0;
+  min-width: 0;
 }
 
 /* 오른쪽 패널 배경 */
@@ -56,6 +61,7 @@
   flex: 1;
   overflow-y: auto;
   scrollbar-width: thin;
+  min-width: 0;
 }
 
 .userItem {
@@ -96,6 +102,7 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+  min-width: 0;
 }
 
 .nameText {
@@ -140,19 +147,20 @@
   padding: 16px;
   flex: 1;
   min-height: 0;
-  overflow: auto;   /* 내용이 길면 스크롤 */
-  overflow-x: hidden;
+  overflow: auto;          /* 세로 스크롤 */
+  overflow-x: hidden;      /* ✅ 전체 가로 스크롤은 차단(이제 내부에서만 스크롤) */
   box-sizing: border-box;
+  min-width: 0;
 }
 
-/* ✅ TSX에서 쓰는 래퍼: 간격 + shrink 방지 */
+/* ✅ TSX에서 쓰는 래퍼 */
 .detailBodyBox {
   display: flex;
   flex-direction: column;
   gap: 16px;
-
-  /* ✅ 핵심: 내부 요소가 "눌려서 잘리는" 현상 방지 */
-  min-height: max-content;
+  min-width: 0;
+  width: 100%;
+  align-items: stretch;
 }
 
 /* 상세 정보 표 */
@@ -161,9 +169,9 @@
   border-radius: 10px;
   overflow: hidden;
   background: #fff;
-
-  /* ✅ 핵심: 포인트 패널이 붙어도 회원정보가 줄어들지 않게 */
   flex-shrink: 0;
+  min-width: 0;
+  width: 100%;
 }
 
 .infoRow {
@@ -192,7 +200,7 @@
   font-size: 14px;
   font-weight: 600;
   color: #111;
-  word-break: break-word; /* 긴 값도 잘리지 않게 */
+  word-break: break-word;
 }
 
 .statusSelect {
@@ -252,4 +260,12 @@
 
 .petValue {
   font-size: 13px;
+}
+
+/* 반응형 */
+@media (max-width: 1100px) {
+  .layout {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
 }
