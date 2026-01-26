@@ -8,6 +8,7 @@ from django.conf import settings
 from django.db import connection
 from django.http import JsonResponse
 from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt  # CSRF 면제를 위해 추가
 
 # 서비스 로직 임포트
 from .services.recommendations_batch import rebuild_usercf_recommendations_from_csv
@@ -47,8 +48,10 @@ def popular_recommendation_view(request):
         return JsonResponse({"status": "error", "message": str(e)}, status=500)
 
 # 3. 관리자용 추천 엔진 강제 업데이트 (POST/GET /api/admin/recommendation/update/)
+# Spring Boot 서버의 호출을 허용하기 위해 @csrf_exempt 추가
+@csrf_exempt
 def admin_recommendation_update(request):
-    # 랜덤 시드 고정 (사용자 요청 반영)
+    # 랜덤 시드 고정 (사용자 요청 반영: 시드 1)
     random.seed(1)
     np.random.seed(1)
     
