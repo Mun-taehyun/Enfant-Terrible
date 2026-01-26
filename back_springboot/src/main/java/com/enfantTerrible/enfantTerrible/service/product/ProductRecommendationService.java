@@ -40,6 +40,9 @@ public class ProductRecommendationService {
     List<Long> productIds;
     if (userId != null) {
       productIds = recommendationMapper.findRecommendedProductIdsByUserId(userId, limit);
+      if (productIds == null || productIds.isEmpty()) {
+        productIds = recommendationMapper.findBestSellingProductIds(limit);
+      }
     } else {
       productIds = recommendationMapper.findBestSellingProductIds(limit);
     }
