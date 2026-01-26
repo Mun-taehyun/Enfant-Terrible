@@ -19,3 +19,5 @@ export type UpdateAdminProductDiscountResponse =
 /** DELETE /api/admin/product-discounts/{discountId} */
 export type DeleteAdminProductDiscountResponse =
   ApiResponse<null>;
+
+  

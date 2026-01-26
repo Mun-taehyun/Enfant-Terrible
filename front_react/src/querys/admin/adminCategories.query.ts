@@ -1,4 +1,4 @@
-//src/query/admin/adminCategories.query.ts
+// src/query/admin/adminCategories.query.ts
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
@@ -13,7 +13,7 @@ import {
 
 import type {
   AdminCategory,
-  AdminCategoryActive,
+  CategoryActiveCode, // ✅ AdminCategoryActive -> CategoryActiveCode
   AdminCategoryCreatePayload,
   AdminCategoryUpdatePayload,
 } from "@/types/admin/category";
@@ -52,7 +52,7 @@ export function useAdminCategoryUpdate() {
 
 export function useAdminCategoryToggleActive() {
   const qc = useQueryClient();
-  return useMutation<void, Error, { categoryId: number; isActive: AdminCategoryActive }>({
+  return useMutation<void, Error, { categoryId: number; isActive: CategoryActiveCode }>({
     mutationFn: (args) => updateAdminCategoryActive(args.categoryId, args.isActive),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: QK.tree });

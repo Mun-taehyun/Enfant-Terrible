@@ -10,7 +10,11 @@ export type AdminOrderStatus =
   | "CANCELLED";
 
 /** 목록 정렬 기준 */
-export type AdminOrderSortBy = "ORDER_ID" | "TOTAL_AMOUNT" | "SHIPPED_AT" | "DELIVERED_AT";
+export type AdminOrderSortBy =
+  | "ORDER_ID"
+  | "TOTAL_AMOUNT"
+  | "SHIPPED_AT"
+  | "DELIVERED_AT";
 
 /** 목록 파라미터 = 백 AdminOrderListRequest 기준 */
 export type AdminOrderListParams = {
@@ -24,7 +28,7 @@ export type AdminOrderListParams = {
   minTotalAmount?: number;
   maxTotalAmount?: number;
 
-  shippedFrom?: string;   // ISO string or "YYYY-MM-DDTHH:mm:ss"
+  shippedFrom?: string; // ISO string or "YYYY-MM-DDTHH:mm:ss"
   shippedTo?: string;
   deliveredFrom?: string;
   deliveredTo?: string;
@@ -97,6 +101,24 @@ export type AdminOrderCancelItem = {
 export type AdminOrderCancelPayload = {
   items: AdminOrderCancelItem[];
   reason?: string;
+};
+
+/**
+ * ✅ 부분취소 결과(백 응답 DTO가 확정되면 여기만 수정)
+ * 현재 프론트에서 필요한 최소 형태로 정의합니다.
+ * - 어떤 skuId를 얼마나 취소했는지
+ * - 주문 상태/금액 등 추가 필드가 있으면 확장
+ */
+export type AdminOrderCancelResultItem = {
+  skuId: number;
+  cancelledQuantity: number;
+};
+
+export type AdminOrderCancelResult = {
+  orderId: number;
+  status: AdminOrderStatus;
+  cancelledItems: AdminOrderCancelResultItem[];
+  message?: string;
 };
 
 /** 응답 타입 별칭 (원하시면 response 폴더로 분리해도 됨) */

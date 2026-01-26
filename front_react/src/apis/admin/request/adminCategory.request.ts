@@ -1,9 +1,9 @@
 // src/apis/admin/request/adminCategory.request.ts
 
-import { mainAxios } from "@/apis/admin/main_axios"; // ✅ 통일
+import { mainAxios } from "@/apis/admin/main_axios";
 import type {
   AdminCategory,
-  AdminCategoryActive,
+  CategoryActiveCode, // ✅ "Y" | "N"
   AdminCategoryCreatePayload,
   AdminCategoryUpdatePayload,
 } from "@/types/admin/category";
@@ -26,19 +26,36 @@ export async function createAdminCategory(payload: AdminCategoryCreatePayload): 
   await mainAxios.post<ApiResponse<null>>(BASE, payload);
 }
 
-export async function updateAdminCategory(categoryId: number, payload: AdminCategoryUpdatePayload): Promise<void> {
+export async function updateAdminCategory(
+  categoryId: number,
+  payload: AdminCategoryUpdatePayload
+): Promise<void> {
   // ✅ 운영 백: PATCH /api/admin/categories/{categoryId}
   await mainAxios.patch<ApiResponse<null>>(`${BASE}/${categoryId}`, payload);
 }
 
-export async function updateAdminCategoryActive(categoryId: number, isActive: AdminCategoryActive): Promise<void> {
+export async function updateAdminCategoryActive(
+  categoryId: number,
+  isActive: CategoryActiveCode // ✅ AdminCategoryActive -> CategoryActiveCode
+): Promise<void> {
   // ✅ 운영 백: PATCH /{id}/active?isActive=Y|N (RequestParam)
-  await mainAxios.patch<ApiResponse<null>>(`${BASE}/${categoryId}/active`, {}, { params: { isActive } });
+  await mainAxios.patch<ApiResponse<null>>(
+    `${BASE}/${categoryId}/active`,
+    {},
+    { params: { isActive } }
+  );
 }
 
-export async function updateAdminCategorySortOrder(categoryId: number, sortOrder: number): Promise<void> {
+export async function updateAdminCategorySortOrder(
+  categoryId: number,
+  sortOrder: number
+): Promise<void> {
   // ✅ 운영 백: PATCH /{id}/sort-order?sortOrder=...
-  await mainAxios.patch<ApiResponse<null>>(`${BASE}/${categoryId}/sort-order`, {}, { params: { sortOrder } });
+  await mainAxios.patch<ApiResponse<null>>(
+    `${BASE}/${categoryId}/sort-order`,
+    {},
+    { params: { sortOrder } }
+  );
 }
 
 export async function moveAdminCategory(categoryId: number, parentId: number | null): Promise<void> {

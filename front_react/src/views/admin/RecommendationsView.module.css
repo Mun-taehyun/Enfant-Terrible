@@ -1,0 +1,23 @@
+.wrap { padding: 16px; }
+.title { margin: 0 0 10px; font-size: 20px; font-weight: 700; }
+.hint { margin-bottom: 10px; font-size: 13px; color: #444; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+
+.panel { border: 1px solid #ddd; border-radius: 10px; padding: 12px; margin-bottom: 12px; }
+.row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+.label { width: 60px; font-size: 14px; color: #333; }
+.input { width: 140px; height: 36px; padding: 0 10px; border: 1px solid #cfcfcf; border-radius: 8px; font-size: 14px; }
+
+.segment { display: flex; gap: 8px; }
+.segBtn { height: 36px; padding: 0 12px; border: 1px solid #cfcfcf; border-radius: 8px; background: #fff; cursor: pointer; }
+.segActive { border-color: #333; font-weight: 700; }
+
+.primaryBtn { height: 36px; padding: 0 12px; border: 1px solid #333; border-radius: 8px; background: #333; color: #fff; cursor: pointer; }
+.ghostBtn { height: 36px; padding: 0 12px; border: 1px solid #333; border-radius: 8px; background: #fff; cursor: pointer; }
+
+.msg { min-height: 20px; font-size: 14px; color: #333; }
+
+.tableWrap { border: 1px solid #ddd; border-radius: 10px; overflow: hidden; }
+.table { width: 100%; border-collapse: collapse; }
+.table th, .table td { border-bottom: 1px solid #eee; padding: 10px; text-align: center; font-size: 14px; }
+.empty { padding: 18px; color: #666; }

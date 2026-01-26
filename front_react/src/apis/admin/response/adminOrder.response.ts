@@ -1,6 +1,10 @@
 // src/apis/admin/response/adminOrder.response.ts
 import type { ApiResponse, AdminPageResponse } from "@/types/admin/api";
-import type { AdminOrderDetail, AdminOrderListItem, AdminOrderCancelResult } from "@/types/admin/order";
+import type {
+  AdminOrderDetail,
+  AdminOrderListItem,
+  AdminOrderCancelResult,
+} from "@/types/admin/order";
 
 /** GET /api/admin/orders */
 export type GetAdminOrdersResponse = ApiResponse<AdminPageResponse<AdminOrderListItem>>;

@@ -1,5 +1,5 @@
 // src/views/admin/posts.view.tsx
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import styles from "./posts.view.module.css";
 
 import {
@@ -21,11 +21,22 @@ type AdminPostListParams = {
   userId?: number;
 };
 
+const POST_TYPE_OPTIONS = [
+  { label: "공지", value: "NOTICE" },
+  { label: "이벤트", value: "EVENT" },
+  { label: "상품상세", value: "PRODUCT_DETAIL" },
+] as const;
+
 function toNumOrNull(v: string): number | null {
   const s = v.trim();
   if (!s) return null;
   const n = Number(s);
   return Number.isFinite(n) ? n : null;
+}
+
+function normalizeOrNull(v: string): string | null {
+  const s = v.trim();
+  return s ? s : null;
 }
 
 export default function PostsView() {
@@ -34,11 +45,19 @@ export default function PostsView() {
   const [filterUserId, setFilterUserId] = useState("");
 
   // list
-  const { data, loading, errorMsg, params, setParams, setPage, setSize, refetch } =
-    useAdminPosts({
-      page: 1,
-      size: 20,
-    });
+  const {
+    data,
+    loading,
+    errorMsg,
+    params,
+    setParams,
+    setPage,
+    setSize,
+    refetch,
+  } = useAdminPosts({
+    page: 1,
+    size: 20,
+  });
 
   // selection + detail
   const [selectedPostId, setSelectedPostId] = useState<AdminPostId | null>(null);
@@ -51,8 +70,10 @@ export default function PostsView() {
     detail.refetch();
   });
 
-  const page = data?.page ?? ((params as unknown as AdminPostListParams)?.page ?? 1);
-  const size = data?.size ?? ((params as unknown as AdminPostListParams)?.size ?? 20);
+  const page =
+    data?.page ?? ((params as unknown as AdminPostListParams)?.page ?? 1);
+  const size =
+    data?.size ?? ((params as unknown as AdminPostListParams)?.size ?? 20);
   const totalCount = data?.totalCount ?? 0;
 
   const list: AdminPostListItem[] = (data?.list ?? []) as AdminPostListItem[];
@@ -62,20 +83,15 @@ export default function PostsView() {
     return Math.max(1, Math.ceil(totalCount / size));
   }, [totalCount, size]);
 
-  // ✅ 선택된 글이 404면 “오류”로 터뜨리지 않고 안내만 보여줌(원하면 선택 해제 버튼 제공)
-  useEffect(() => {
-    // 자동으로 선택 해제까지 원하면 아래 3줄 주석을 해제하시면 됩니다.
-    // if (selectedPostId != null && detail.notFound) {
-    //   setSelectedPostId(null);
-    // }
-  }, [selectedPostId, detail.notFound]);
-
   // editor refs (비제어)
-  const postTypeRef = useRef<HTMLInputElement>(null);
+  const postTypeRef = useRef<HTMLSelectElement>(null);
   const refTypeRef = useRef<HTMLInputElement>(null);
   const refIdRef = useRef<HTMLInputElement>(null);
   const titleRef = useRef<HTMLInputElement>(null);
   const contentRef = useRef<HTMLTextAreaElement>(null);
+
+  // ✅ 렌더 중 ref 접근 금지, effect setState 금지: 선택 타입은 이벤트로만 갱신
+  const [editorPostType, setEditorPostType] = useState<string>("");
 
   const handleApplyFilters = () => {
     const userIdNum = toNumOrNull(filterUserId);
@@ -98,25 +114,36 @@ export default function PostsView() {
     }));
   };
 
-  const handleSelect = (pid: AdminPostId) => {
+  const handleSelect = (pid: AdminPostId, postType: string) => {
     setSelectedPostId(pid);
+    setEditorPostType(postType ?? "");
   };
 
   const handleNewMode = () => {
     setSelectedPostId(null);
+    setEditorPostType("");
   };
 
   const buildSaveBodyFromRefs = (): AdminPostSaveRequest | null => {
-    const postType = postTypeRef.current?.value.trim() ?? "";
+    // select의 value는 백엔드 enum 문자열(NOTICE/EVENT/PRODUCT_DETAIL)
+    const postType = (postTypeRef.current?.value ?? "").trim();
     const title = titleRef.current?.value.trim() ?? "";
     const content = contentRef.current?.value.trim() ?? "";
-    const refType = refTypeRef.current?.value.trim() ?? "";
+
+    const refTypeRaw = refTypeRef.current?.value ?? "";
     const refIdText = refIdRef.current?.value ?? "";
+    const refId = toNumOrNull(refIdText);
 
     if (!postType) {
       alert("게시판 종류는 필수입니다.");
       return null;
     }
+
+    if (postType === "PRODUCT_DETAIL" && refId == null) {
+      alert("상품상세 게시글은 연결 ID가 필수입니다.");
+      return null;
+    }
+
     if (!title) {
       alert("제목은 필수입니다.");
       return null;
@@ -127,11 +154,11 @@ export default function PostsView() {
     }
 
     return {
-      postType, // 값은 그대로
+      postType,
       title,
       content,
-      refType: refType ? refType : null,
-      refId: toNumOrNull(refIdText),
+      refType: normalizeOrNull(refTypeRaw),
+      refId,
     };
   };
 
@@ -173,6 +200,7 @@ export default function PostsView() {
     if (detail.notFound) {
       alert("해당 게시글은 이미 삭제되었거나 존재하지 않습니다.");
       setSelectedPostId(null);
+      setEditorPostType("");
       return;
     }
 
@@ -197,14 +225,35 @@ export default function PostsView() {
   const canSubmit =
     mutations.loading === false &&
     (mode === "create" ||
-      (mode === "update" && selectedPostId != null && detail.data != null && detail.notFound === false));
+      (mode === "update" &&
+        selectedPostId != null &&
+        detail.data != null &&
+        detail.notFound === false));
+
+  const initialPostType =
+    mode === "update" ? (detail.data?.postType ?? "") : "";
+  const initialRefType = mode === "update" ? (detail.data?.refType ?? "") : "";
+  const initialRefId =
+    mode === "update"
+      ? detail.data?.refId == null
+        ? ""
+        : String(detail.data.refId)
+      : "";
+
+  const isProductDetailSelected =
+    (editorPostType || initialPostType) === "PRODUCT_DETAIL";
 
   return (
     <div className={styles.wrap}>
       <div className={styles.header}>
         <h2 className={styles.title}>게시글 관리</h2>
         <div className={styles.headerActions}>
-          <button type="button" className={styles.btn} onClick={refetch} disabled={loading}>
+          <button
+            type="button"
+            className={styles.btn}
+            onClick={refetch}
+            disabled={loading}
+          >
             새로고침
           </button>
         </div>
@@ -277,10 +326,20 @@ export default function PostsView() {
                 />
               </label>
 
-              <button type="button" className={styles.btn} onClick={handleApplyFilters} disabled={loading}>
+              <button
+                type="button"
+                className={styles.btn}
+                onClick={handleApplyFilters}
+                disabled={loading}
+              >
                 검색
               </button>
-              <button type="button" className={styles.btn} onClick={handleClearFilters} disabled={loading}>
+              <button
+                type="button"
+                className={styles.btn}
+                onClick={handleClearFilters}
+                disabled={loading}
+              >
                 초기화
               </button>
             </div>
@@ -298,38 +357,60 @@ export default function PostsView() {
                 <button
                   key={pid}
                   type="button"
-                  className={isActive ? `${styles.row} ${styles.rowActive}` : styles.row}
-                  onClick={() => handleSelect(pid)}
+                  className={
+                    isActive
+                      ? `${styles.row} ${styles.rowActive}`
+                      : styles.row
+                  }
+                  onClick={() => handleSelect(pid, item.postType)}
                 >
                   <div className={styles.rowTop}>
                     <span className={styles.badge}>게시글 ID: {pid}</span>
-                    <span className={styles.badge}>작성자 ID: {item.userId}</span>
-                    <span className={styles.badge}>게시판 종류: {item.postType}</span>
+                    <span className={styles.badge}>
+                      작성자 ID: {item.userId}
+                    </span>
+                    <span className={styles.badge}>
+                      게시판 종류: {item.postType}
+                    </span>
                   </div>
 
                   <div className={styles.rowTitle}>{item.title}</div>
 
                   <div className={styles.rowMeta}>
-                    생성일: {item.createdAt ?? "-"} / 수정일: {item.updatedAt ?? "-"}
+                    생성일: {item.createdAt ?? "-"} / 수정일:{" "}
+                    {item.updatedAt ?? "-"}
                   </div>
                 </button>
               );
             })}
 
-            {!loading && list.length === 0 && <div className={styles.empty}>데이터가 없습니다.</div>}
+            {!loading && list.length === 0 && (
+              <div className={styles.empty}>데이터가 없습니다.</div>
+            )}
           </div>
         </section>
 
         {/* RIGHT: detail + editor */}
         <section className={styles.panel}>
           <div className={styles.panelHeader}>
-            <div className={styles.panelTitle}>상세 / {mode === "create" ? "생성" : "수정"}</div>
+            <div className={styles.panelTitle}>
+              상세 / {mode === "create" ? "생성" : "수정"}
+            </div>
 
             <div className={styles.rightActions}>
-              <button type="button" className={styles.btn} onClick={handleNewMode}>
+              <button
+                type="button"
+                className={styles.btn}
+                onClick={handleNewMode}
+              >
                 신규 작성
               </button>
-              <button type="button" className={styles.btnDanger} onClick={handleDelete} disabled={mutations.loading}>
+              <button
+                type="button"
+                className={styles.btnDanger}
+                onClick={handleDelete}
+                disabled={mutations.loading}
+              >
                 삭제
               </button>
             </div>
@@ -337,22 +418,38 @@ export default function PostsView() {
 
           <div className={styles.detailBox}>
             {selectedPostId == null ? (
-              <div className={styles.hint}>선택된 게시글이 없습니다. 아래 폼으로 신규 작성할 수 있습니다.</div>
+              <div className={styles.hint}>
+                선택된 게시글이 없습니다. 아래 폼으로 신규 작성할 수 있습니다.
+              </div>
             ) : detail.notFound ? (
               <div className={styles.hint}>
                 해당 게시글은 존재하지 않습니다(삭제되었거나 접근 불가).
                 <div style={{ marginTop: 8 }}>
-                  <button type="button" className={styles.btn} onClick={() => setSelectedPostId(null)}>
+                  <button
+                    type="button"
+                    className={styles.btn}
+                    onClick={handleNewMode}
+                  >
                     선택 해제
                   </button>
                 </div>
               </div>
             ) : (
               <>
-                <div className={styles.detailTitle}>선택 게시글 ID: {selectedPostId}</div>
-                {detail.errorMsg && <div className={styles.error}>상세 오류: {detail.errorMsg}</div>}
-                {detail.loading && <div className={styles.loading}>상세 불러오는 중...</div>}
-                {detail.data && <pre className={styles.detailPre}>{JSON.stringify(detail.data, null, 2)}</pre>}
+                <div className={styles.detailTitle}>
+                  선택 게시글 ID: {selectedPostId}
+                </div>
+                {detail.errorMsg && (
+                  <div className={styles.error}>상세 오류: {detail.errorMsg}</div>
+                )}
+                {detail.loading && (
+                  <div className={styles.loading}>상세 불러오는 중...</div>
+                )}
+                {detail.data && (
+                  <pre className={styles.detailPre}>
+                    {JSON.stringify(detail.data, null, 2)}
+                  </pre>
+                )}
               </>
             )}
           </div>
@@ -362,21 +459,30 @@ export default function PostsView() {
             <div className={styles.formGrid}>
               <label className={styles.fLabel}>
                 게시판 종류 (필수)
-                <input
-                  className={styles.input}
+                <select
+                  className={styles.select}
                   ref={postTypeRef}
-                  defaultValue={mode === "update" ? detail.data?.postType ?? "" : ""}
-                  placeholder="예: NOTICE"
-                />
+                  defaultValue={initialPostType}
+                  required
+                  onChange={(e) => setEditorPostType(e.target.value)}
+                >
+                  <option value="" disabled>
+                    선택하세요
+                  </option>
+                  {POST_TYPE_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
               </label>
 
               <label className={styles.fLabel}>
-                연관 카테고리
+                연관 타입
                 <input
                   className={styles.input}
                   ref={refTypeRef}
-                  defaultValue={mode === "update" ? detail.data?.refType ?? "" : ""}
-                  placeholder="없으면 비워두세요"
+                  defaultValue={initialRefType}
                 />
               </label>
 
@@ -385,9 +491,10 @@ export default function PostsView() {
                 <input
                   className={styles.input}
                   ref={refIdRef}
-                  defaultValue={mode === "update" ? (detail.data?.refId == null ? "" : String(detail.data.refId)) : ""}
-                  placeholder="없으면 비워두세요"
+                  defaultValue={initialRefId}
                 />
+                {/* 상품상세일 때만 필수라는 사실만 남기고, 설명 박스/안내 문구는 제거 */}
+                {isProductDetailSelected ? null : null}
               </label>
 
               <label className={styles.fLabelWide}>
@@ -405,16 +512,25 @@ export default function PostsView() {
                 <textarea
                   className={styles.textarea}
                   ref={contentRef}
-                  defaultValue={mode === "update" ? detail.data?.content ?? "" : ""}
+                  defaultValue={
+                    mode === "update" ? detail.data?.content ?? "" : ""
+                  }
                   placeholder="내용을 입력하세요"
                 />
               </label>
             </div>
 
-            {mutations.errorMsg && <div className={styles.error}>저장 오류: {mutations.errorMsg}</div>}
+            {mutations.errorMsg && (
+              <div className={styles.error}>저장 오류: {mutations.errorMsg}</div>
+            )}
 
             <div className={styles.editorActions}>
-              <button type="button" className={styles.btnPrimary} onClick={handleSubmit} disabled={!canSubmit}>
+              <button
+                type="button"
+                className={styles.btnPrimary}
+                onClick={handleSubmit}
+                disabled={!canSubmit}
+              >
                 {mode === "create" ? "저장(생성)" : "저장(수정)"}
               </button>
             </div>

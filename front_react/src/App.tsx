@@ -16,6 +16,7 @@ import PopupsView from "@/views/admin/popups.view";
 import BannersView from "@/views/admin/banners.view";
 import OrdersView from "@/views/admin/orders.view";
 import ProductInquiriesView from "@/views/admin/ProductInquiriesView";
+import RecommendationsView from "@/views/admin/RecommendationsView.tsx";
 
 const isAuthenticated = () => {
   const token = localStorage.getItem("accessToken");
@@ -71,7 +72,7 @@ export default function App() {
           <Route index element={<QnaRoomsView />} />
           <Route path=":roomId" element={<QnaMessagesView />} />
         </Route>
-        
+        <Route path="recommendations" element={<RecommendationsView />} />
         <Route path="orders" element={<OrdersView />} />
       </Route>
 

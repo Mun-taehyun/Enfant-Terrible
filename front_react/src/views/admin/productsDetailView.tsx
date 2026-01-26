@@ -56,6 +56,17 @@ type ProductFormState = {
   thumbnailFileId: string;
 };
 
+const PRODUCT_STATUS_OPTIONS = [
+  { value: "ON_SALE", label: "판매중" },
+  { value: "STOPPED", label: "판매중지" },
+  { value: "SOLD_OUT", label: "품절" },
+  { value: "HIDDEN", label: "비노출" },
+] as const;
+
+const PRODUCT_STATUS_SET: ReadonlySet<string> = new Set(
+  PRODUCT_STATUS_OPTIONS.map((o) => o.value)
+);
+
 function toNumberOrThrow(v: string, label: string): number {
   const n = Number(v);
   if (!Number.isFinite(n)) throw new Error(`${label}은(는) 숫자여야 합니다.`);
@@ -137,6 +148,11 @@ export default function ProductDetailView({ productId, onClose }: Props) {
       if (!payload.name) throw new Error("상품명은 필수입니다.");
       if (!payload.status) throw new Error("판매상태는 필수입니다.");
 
+      // ✅ 백 enum(ProductStatus.name())과 정확히 맞추기: ON_SALE|STOPPED|SOLD_OUT|HIDDEN만 허용
+      if (!PRODUCT_STATUS_SET.has(payload.status)) {
+        throw new Error(`유효하지 않은 상품 상태입니다: ${payload.status}`);
+      }
+
       await updateMut.mutateAsync({ productId, payload });
     } catch (e) {
       setUiError(e instanceof Error ? e.message : "저장 중 오류가 발생했습니다.");
@@ -146,7 +162,9 @@ export default function ProductDetailView({ productId, onClose }: Props) {
   async function onDeleteProduct() {
     setUiError("");
     try {
-      const ok = window.confirm(`상품을 삭제(soft delete)하시겠습니까?\n상품 ID=${productId}`);
+      const ok = window.confirm(
+        `상품을 삭제(soft delete)하시겠습니까?\n상품 ID=${productId}`
+      );
       if (!ok) return;
       await deleteMut.mutateAsync(productId);
       onClose();
@@ -173,7 +191,14 @@ export default function ProductDetailView({ productId, onClose }: Props) {
   const skusQ = useAdminSkus(skuParams);
   const skuUpdateMut = useAdminSkuUpdate();
 
-  async function onEditSku(row: { skuId: number; productId: number; price: number; stock: number; status: string; optionValueIds?: number[] }) {
+  async function onEditSku(row: {
+    skuId: number;
+    productId: number;
+    price: number;
+    stock: number;
+    status: string;
+    optionValueIds?: number[];
+  }) {
     setUiError("");
     try {
       const pid = prompt("상품 ID (필수)", String(row.productId));
@@ -185,7 +210,10 @@ export default function ProductDetailView({ productId, onClose }: Props) {
       const s = prompt("재고 (필수)", String(row.stock));
       if (s === null) return;
 
-      const st = prompt("상태 (필수: ON_SALE | SOLD_OUT | STOPPED)", String(row.status));
+      const st = prompt(
+        "상태 (필수: ON_SALE | SOLD_OUT | STOPPED)",
+        String(row.status)
+      );
       if (st === null) return;
 
       const currentOpt = row.optionValueIds?.join(",") ?? "";
@@ -193,7 +221,8 @@ export default function ProductDetailView({ productId, onClose }: Props) {
       if (optCsv === null) return;
 
       const optionValueIds = toOptionalNumberArray(optCsv);
-      if (optionValueIds === null) throw new Error("옵션 값 ID 목록은 쉼표로 구분된 숫자 목록이어야 합니다.");
+      if (optionValueIds === null)
+        throw new Error("옵션 값 ID 목록은 쉼표로 구분된 숫자 목록이어야 합니다.");
 
       const payload: AdminSkuSavePayload = {
         productId: toNumberOrThrow(pid, "상품 ID"),
@@ -224,8 +253,18 @@ export default function ProductDetailView({ productId, onClose }: Props) {
   const valueUpdate = useAdminOptionValueUpdate(selectedGroupId);
   const valueDelete = useAdminOptionValueDelete(selectedGroupId);
 
-  const [groupForm, setGroupForm] = useState<{ name: string; sortOrder: string }>({ name: "", sortOrder: "1" });
-  const [valueForm, setValueForm] = useState<{ value: string; sortOrder: string }>({ value: "", sortOrder: "1" });
+  const [groupForm, setGroupForm] = useState<{ name: string; sortOrder: string }>(
+    {
+      name: "",
+      sortOrder: "1",
+    }
+  );
+  const [valueForm, setValueForm] = useState<{ value: string; sortOrder: string }>(
+    {
+      value: "",
+      sortOrder: "1",
+    }
+  );
 
   async function onCreateGroup() {
     setUiError("");
@@ -256,7 +295,9 @@ export default function ProductDetailView({ productId, onClose }: Props) {
   async function onDeleteGroup(groupId: number) {
     setUiError("");
     try {
-      const ok = window.confirm(`옵션 그룹을 삭제하시겠습니까?\ngroupId=${groupId}`);
+      const ok = window.confirm(
+        `옵션 그룹을 삭제하시겠습니까?\n그룹 ID=${groupId}`
+      );
       if (!ok) return;
       await groupDelete.mutateAsync(groupId);
       if (selectedGroupId === groupId) setSelectedGroupId(0);
@@ -292,7 +333,11 @@ export default function ProductDetailView({ productId, onClose }: Props) {
     setUiError("");
     try {
       if (selectedGroupId <= 0) throw new Error("옵션 그룹이 유효하지 않습니다.");
-      const payload: AdminOptionValueSavePayload = { optionGroupId: selectedGroupId, value, sortOrder };
+      const payload: AdminOptionValueSavePayload = {
+        optionGroupId: selectedGroupId,
+        value,
+        sortOrder,
+      };
       await valueUpdate.mutateAsync({ valueId, payload });
     } catch (e) {
       setUiError(e instanceof Error ? e.message : "옵션 값 수정 오류");
@@ -302,7 +347,7 @@ export default function ProductDetailView({ productId, onClose }: Props) {
   async function onDeleteValue(valueId: number) {
     setUiError("");
     try {
-      const ok = window.confirm(`옵션 값을 삭제하시겠습니까?\nvalueId=${valueId}`);
+      const ok = window.confirm(`옵션 값을 삭제하시겠습니까?\n옵션 값 ID=${valueId}`);
       if (!ok) return;
       await valueDelete.mutateAsync(valueId);
     } catch (e) {
@@ -332,9 +377,9 @@ export default function ProductDetailView({ productId, onClose }: Props) {
     setUiError("");
     try {
       const discountValue = Number(discountForm.discountValue);
-      if (!Number.isFinite(discountValue)) throw new Error("discountValue는 숫자여야 합니다.");
+      if (!Number.isFinite(discountValue)) throw new Error("할인 값은 숫자여야 합니다.");
       const discountType = discountForm.discountType.trim();
-      if (!discountType) throw new Error("discountType은 필수입니다.");
+      if (!discountType) throw new Error("할인 유형은 필수입니다.");
 
       const payload: AdminProductDiscountSavePayload = {
         productId,
@@ -354,22 +399,22 @@ export default function ProductDetailView({ productId, onClose }: Props) {
   async function onEditDiscount(row: AdminProductDiscountItem) {
     setUiError("");
     try {
-      const v = prompt("discountValue (필수)", String(row.discountValue));
+      const v = prompt("할인 값 (필수)", String(row.discountValue));
       if (v === null) return;
 
-      const t = prompt("discountType (필수)", String(row.discountType));
+      const t = prompt("할인 유형 (필수)", String(row.discountType));
       if (t === null) return;
 
-      const s = prompt("startAt (선택, 예: 2026-01-21T10:30)", String(row.startAt ?? ""));
+      const s = prompt("시작 일시 (선택, 예: 2026-01-21T10:30)", String(row.startAt ?? ""));
       if (s === null) return;
 
-      const e = prompt("endAt (선택, 예: 2026-01-21T23:59)", String(row.endAt ?? ""));
+      const e = prompt("종료 일시 (선택, 예: 2026-01-21T23:59)", String(row.endAt ?? ""));
       if (e === null) return;
 
       const discountValue = Number(v);
-      if (!Number.isFinite(discountValue)) throw new Error("discountValue는 숫자여야 합니다.");
+      if (!Number.isFinite(discountValue)) throw new Error("할인 값은 숫자여야 합니다.");
       const discountType = t.trim();
-      if (!discountType) throw new Error("discountType은 필수입니다.");
+      if (!discountType) throw new Error("할인 유형은 필수입니다.");
 
       const payload: AdminProductDiscountSavePayload = {
         productId,
@@ -388,7 +433,7 @@ export default function ProductDetailView({ productId, onClose }: Props) {
   async function onDeleteDiscount(discountId: number) {
     setUiError("");
     try {
-      const ok = window.confirm(`상품 할인을 삭제하시겠습니까?\ndiscountId=${discountId}`);
+      const ok = window.confirm(`상품 할인을 삭제하시겠습니까?\n할인 ID=${discountId}`);
       if (!ok) return;
       await discountDelete.mutateAsync(discountId);
     } catch (e) {
@@ -412,16 +457,38 @@ export default function ProductDetailView({ productId, onClose }: Props) {
     <div className={styles.wrap}>
       <div className={styles.topBar}>
         <div className={styles.topTitle}>상품 상세 패널 (상품 ID: {productId})</div>
-        <button className={styles.closeBtn} onClick={onClose}>닫기</button>
+        <button className={styles.closeBtn} onClick={onClose}>
+          닫기
+        </button>
       </div>
 
       {uiError ? <div className={styles.errorBox}>{uiError}</div> : null}
 
       <div className={styles.tabs}>
-        <button className={`${styles.tabBtn} ${tab === "PRODUCT" ? styles.active : ""}`} onClick={() => setTab("PRODUCT")}>상품</button>
-        <button className={`${styles.tabBtn} ${tab === "SKU" ? styles.active : ""}`} onClick={() => setTab("SKU")}>SKU</button>
-        <button className={`${styles.tabBtn} ${tab === "OPTION" ? styles.active : ""}`} onClick={() => setTab("OPTION")}>옵션</button>
-        <button className={`${styles.tabBtn} ${tab === "DISCOUNT" ? styles.active : ""}`} onClick={() => setTab("DISCOUNT")}>할인</button>
+        <button
+          className={`${styles.tabBtn} ${tab === "PRODUCT" ? styles.active : ""}`}
+          onClick={() => setTab("PRODUCT")}
+        >
+          상품
+        </button>
+        <button
+          className={`${styles.tabBtn} ${tab === "SKU" ? styles.active : ""}`}
+          onClick={() => setTab("SKU")}
+        >
+          SKU
+        </button>
+        <button
+          className={`${styles.tabBtn} ${tab === "OPTION" ? styles.active : ""}`}
+          onClick={() => setTab("OPTION")}
+        >
+          옵션
+        </button>
+        <button
+          className={`${styles.tabBtn} ${tab === "DISCOUNT" ? styles.active : ""}`}
+          onClick={() => setTab("DISCOUNT")}
+        >
+          할인
+        </button>
       </div>
 
       {/* 상품 탭 */}
@@ -430,7 +497,9 @@ export default function ProductDetailView({ productId, onClose }: Props) {
           {detailQ.isLoading ? (
             <div className={styles.loading}>불러오는 중...</div>
           ) : detailQ.error ? (
-            <div className={styles.errorBox}>{detailQ.error instanceof Error ? detailQ.error.message : "상세 조회 오류"}</div>
+            <div className={styles.errorBox}>
+              {detailQ.error instanceof Error ? detailQ.error.message : "상세 조회 오류"}
+            </div>
           ) : !product ? (
             <div className={styles.empty}>상세 데이터가 없습니다.</div>
           ) : (
@@ -438,38 +507,92 @@ export default function ProductDetailView({ productId, onClose }: Props) {
               <div className={styles.formGrid}>
                 <label className={styles.label}>
                   상품코드
-                  <input className={styles.input} value={form.productCode} onChange={(e) => setForm((p) => ({ ...p, productCode: e.target.value }))} />
+                  <input
+                    className={styles.input}
+                    value={form.productCode}
+                    onChange={(e) =>
+                      setForm((p) => ({ ...p, productCode: e.target.value }))
+                    }
+                  />
                 </label>
 
                 <label className={styles.label}>
                   카테고리 ID
-                  <input className={styles.input} value={form.categoryId} onChange={(e) => setForm((p) => ({ ...p, categoryId: e.target.value }))} />
+                  <input
+                    className={styles.input}
+                    value={form.categoryId}
+                    onChange={(e) =>
+                      setForm((p) => ({ ...p, categoryId: e.target.value }))
+                    }
+                  />
                 </label>
 
                 <label className={styles.label}>
                   상품명
-                  <input className={styles.input} value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} />
+                  <input
+                    className={styles.input}
+                    value={form.name}
+                    onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
+                  />
                 </label>
 
                 <label className={styles.label}>
                   기본가
-                  <input className={styles.input} value={form.basePrice} onChange={(e) => setForm((p) => ({ ...p, basePrice: e.target.value }))} />
+                  <input
+                    className={styles.input}
+                    value={form.basePrice}
+                    onChange={(e) =>
+                      setForm((p) => ({ ...p, basePrice: e.target.value }))
+                    }
+                  />
                 </label>
 
+                {/* ✅ status를 select로 변경 (백 enum name과 동일 값만 전송) */}
                 <label className={styles.label}>
                   판매상태
-                  <input className={styles.input} value={form.status} onChange={(e) => setForm((p) => ({ ...p, status: e.target.value }))} />
+                  <select
+                    className={styles.select}
+                    value={form.status}
+                    onChange={(e) =>
+                      setForm((p) => ({ ...p, status: e.target.value }))
+                    }
+                  >
+                    <option value="">선택</option>
+                    {PRODUCT_STATUS_OPTIONS.map((o) => (
+                      <option key={o.value} value={o.value}>
+                        {o.label} ({o.value})
+                      </option>
+                    ))}
+                  </select>
                 </label>
 
                 <label className={styles.label}>
                   썸네일 파일 ID (선택)
-                  <input className={styles.input} value={form.thumbnailFileId} onChange={(e) => setForm((p) => ({ ...p, thumbnailFileId: e.target.value }))} />
+                  <input
+                    className={styles.input}
+                    value={form.thumbnailFileId}
+                    onChange={(e) =>
+                      setForm((p) => ({ ...p, thumbnailFileId: e.target.value }))
+                    }
+                  />
                 </label>
               </div>
 
               <div className={styles.actions}>
-                <button className={styles.primaryBtn} onClick={onSaveProduct} disabled={updateMut.isPending}>저장</button>
-                <button className={styles.dangerBtn} onClick={onDeleteProduct} disabled={deleteMut.isPending}>삭제</button>
+                <button
+                  className={styles.primaryBtn}
+                  onClick={onSaveProduct}
+                  disabled={updateMut.isPending}
+                >
+                  저장
+                </button>
+                <button
+                  className={styles.dangerBtn}
+                  onClick={onDeleteProduct}
+                  disabled={deleteMut.isPending}
+                >
+                  삭제
+                </button>
               </div>
             </>
           )}
@@ -482,22 +605,40 @@ export default function ProductDetailView({ productId, onClose }: Props) {
           <div className={styles.row}>
             <label className={styles.label}>
               상태
-              <input className={styles.input} value={skuStatus} onChange={(e) => setSkuStatus(e.target.value)} placeholder="ON_SALE / SOLD_OUT / STOPPED" />
+              <input
+                className={styles.input}
+                value={skuStatus}
+                onChange={(e) => setSkuStatus(e.target.value)}
+                placeholder="ON_SALE / SOLD_OUT / STOPPED"
+              />
             </label>
 
             <label className={styles.labelSmall}>
               조회 개수
-              <select className={styles.select} value={skuSize} onChange={(e) => { setSkuSize(Number(e.target.value)); setSkuPage(1); }}>
+              <select
+                className={styles.select}
+                value={skuSize}
+                onChange={(e) => {
+                  setSkuSize(Number(e.target.value));
+                  setSkuPage(1);
+                }}
+              >
                 <option value={10}>10</option>
                 <option value={20}>20</option>
                 <option value={50}>50</option>
               </select>
             </label>
 
-            <button className={styles.secondaryBtn} onClick={() => setSkuPage(1)}>적용</button>
+            <button className={styles.secondaryBtn} onClick={() => setSkuPage(1)}>
+              적용
+            </button>
           </div>
 
-          {skusQ.error ? <div className={styles.errorBox}>{skusQ.error instanceof Error ? skusQ.error.message : "SKU 조회 오류"}</div> : null}
+          {skusQ.error ? (
+            <div className={styles.errorBox}>
+              {skusQ.error instanceof Error ? skusQ.error.message : "SKU 조회 오류"}
+            </div>
+          ) : null}
 
           <div className={styles.tableWrap}>
             {skusQ.isLoading ? (
@@ -518,7 +659,9 @@ export default function ProductDetailView({ productId, onClose }: Props) {
                 <tbody>
                   {skus.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className={styles.empty}>데이터가 없습니다.</td>
+                      <td colSpan={7} className={styles.empty}>
+                        데이터가 없습니다.
+                      </td>
                     </tr>
                   ) : (
                     skus.map((s) => (
@@ -530,7 +673,13 @@ export default function ProductDetailView({ productId, onClose }: Props) {
                         <td>{s.status}</td>
                         <td>{s.createdAt}</td>
                         <td className={styles.actionsTd}>
-                          <button className={styles.smallBtn} onClick={() => onEditSku(s)} disabled={skuUpdateMut.isPending}>수정</button>
+                          <button
+                            className={styles.smallBtn}
+                            onClick={() => onEditSku(s)}
+                            disabled={skuUpdateMut.isPending}
+                          >
+                            수정
+                          </button>
                         </td>
                       </tr>
                     ))
@@ -541,9 +690,23 @@ export default function ProductDetailView({ productId, onClose }: Props) {
           </div>
 
           <div className={styles.pager}>
-            <button className={styles.smallBtn} disabled={skuPage <= 1} onClick={() => setSkuPage((v) => Math.max(1, v - 1))}>이전</button>
-            <span className={styles.pageText}>{skuPage} / {skuTotalPages} (총 {skuTotalCount}개)</span>
-            <button className={styles.smallBtn} disabled={skuPage >= skuTotalPages} onClick={() => setSkuPage((v) => Math.min(skuTotalPages, v + 1))}>다음</button>
+            <button
+              className={styles.smallBtn}
+              disabled={skuPage <= 1}
+              onClick={() => setSkuPage((v) => Math.max(1, v - 1))}
+            >
+              이전
+            </button>
+            <span className={styles.pageText}>
+              {skuPage} / {skuTotalPages} (총 {skuTotalCount}개)
+            </span>
+            <button
+              className={styles.smallBtn}
+              disabled={skuPage >= skuTotalPages}
+              onClick={() => setSkuPage((v) => Math.min(skuTotalPages, v + 1))}
+            >
+              다음
+            </button>
           </div>
         </div>
       ) : null}
@@ -559,9 +722,27 @@ export default function ProductDetailView({ productId, onClose }: Props) {
               </div>
 
               <div className={styles.formRow}>
-                <input className={styles.input} value={groupForm.name} onChange={(e) => setGroupForm((p) => ({ ...p, name: e.target.value }))} placeholder="그룹명" />
-                <input className={styles.inputSmall} value={groupForm.sortOrder} onChange={(e) => setGroupForm((p) => ({ ...p, sortOrder: e.target.value }))} placeholder="정렬순서" />
-                <button className={styles.primaryBtn} onClick={onCreateGroup} disabled={groupCreate.isPending}>추가</button>
+                <input
+                  className={styles.input}
+                  value={groupForm.name}
+                  onChange={(e) => setGroupForm((p) => ({ ...p, name: e.target.value }))}
+                  placeholder="그룹명"
+                />
+                <input
+                  className={styles.inputSmall}
+                  value={groupForm.sortOrder}
+                  onChange={(e) =>
+                    setGroupForm((p) => ({ ...p, sortOrder: e.target.value }))
+                  }
+                  placeholder="정렬순서"
+                />
+                <button
+                  className={styles.primaryBtn}
+                  onClick={onCreateGroup}
+                  disabled={groupCreate.isPending}
+                >
+                  추가
+                </button>
               </div>
 
               <div className={styles.list}>
@@ -571,9 +752,19 @@ export default function ProductDetailView({ productId, onClose }: Props) {
                   <div className={styles.empty}>그룹이 없습니다.</div>
                 ) : (
                   groups.map((g) => (
-                    <div key={g.optionGroupId} className={`${styles.item} ${selectedGroupId === g.optionGroupId ? styles.activeItem : ""}`}>
-                      <button className={styles.itemMain} onClick={() => setSelectedGroupId(g.optionGroupId)}>
-                        <div className={styles.itemTitle}>#{g.optionGroupId} {g.name}</div>
+                    <div
+                      key={g.optionGroupId}
+                      className={`${styles.item} ${
+                        selectedGroupId === g.optionGroupId ? styles.activeItem : ""
+                      }`}
+                    >
+                      <button
+                        className={styles.itemMain}
+                        onClick={() => setSelectedGroupId(g.optionGroupId)}
+                      >
+                        <div className={styles.itemTitle}>
+                          #{g.optionGroupId} {g.name}
+                        </div>
                         <div className={styles.itemSub}>정렬순서: {g.sortOrder}</div>
                       </button>
 
@@ -596,7 +787,13 @@ export default function ProductDetailView({ productId, onClose }: Props) {
                         >
                           수정
                         </button>
-                        <button className={styles.dangerBtn} onClick={() => onDeleteGroup(g.optionGroupId)} disabled={groupDelete.isPending}>삭제</button>
+                        <button
+                          className={styles.dangerBtn}
+                          onClick={() => onDeleteGroup(g.optionGroupId)}
+                          disabled={groupDelete.isPending}
+                        >
+                          삭제
+                        </button>
                       </div>
                     </div>
                   ))
@@ -608,16 +805,38 @@ export default function ProductDetailView({ productId, onClose }: Props) {
             <div className={styles.card}>
               <div className={styles.cardHeader}>
                 <div className={styles.cardTitle}>옵션 값</div>
-                <div className={styles.cardHint}>groupId: {selectedGroupId || "-"}</div>
+                <div className={styles.cardHint}>그룹 ID: {selectedGroupId || "-"}</div>
               </div>
 
               <div className={styles.formRow}>
-                <input className={styles.input} value={valueForm.value} onChange={(e) => setValueForm((p) => ({ ...p, value: e.target.value }))} placeholder="옵션 값" />
-                <input className={styles.inputSmall} value={valueForm.sortOrder} onChange={(e) => setValueForm((p) => ({ ...p, sortOrder: e.target.value }))} placeholder="정렬순서" />
-                <button className={styles.primaryBtn} onClick={onCreateValue} disabled={valueCreate.isPending}>추가</button>
+                <input
+                  className={styles.input}
+                  value={valueForm.value}
+                  onChange={(e) => setValueForm((p) => ({ ...p, value: e.target.value }))}
+                  placeholder="옵션 값"
+                />
+                <input
+                  className={styles.inputSmall}
+                  value={valueForm.sortOrder}
+                  onChange={(e) =>
+                    setValueForm((p) => ({ ...p, sortOrder: e.target.value }))
+                  }
+                  placeholder="정렬순서"
+                />
+                <button
+                  className={styles.primaryBtn}
+                  onClick={onCreateValue}
+                  disabled={valueCreate.isPending}
+                >
+                  추가
+                </button>
               </div>
 
-              {valuesQ.error ? <div className={styles.errorBox}>{valuesQ.error instanceof Error ? valuesQ.error.message : "옵션 값 조회 오류"}</div> : null}
+              {valuesQ.error ? (
+                <div className={styles.errorBox}>
+                  {valuesQ.error instanceof Error ? valuesQ.error.message : "옵션 값 조회 오류"}
+                </div>
+              ) : null}
 
               <div className={styles.list}>
                 {valuesQ.isLoading ? (
@@ -630,7 +849,9 @@ export default function ProductDetailView({ productId, onClose }: Props) {
                   values.map((v) => (
                     <div key={v.optionValueId} className={styles.item}>
                       <div className={styles.itemMainStatic}>
-                        <div className={styles.itemTitle}>#{v.optionValueId} {v.value}</div>
+                        <div className={styles.itemTitle}>
+                          #{v.optionValueId} {v.value}
+                        </div>
                         <div className={styles.itemSub}>정렬순서: {v.sortOrder}</div>
                       </div>
 
@@ -654,7 +875,13 @@ export default function ProductDetailView({ productId, onClose }: Props) {
                         >
                           수정
                         </button>
-                        <button className={styles.dangerBtn} onClick={() => onDeleteValue(v.optionValueId)} disabled={valueDelete.isPending}>삭제</button>
+                        <button
+                          className={styles.dangerBtn}
+                          onClick={() => onDeleteValue(v.optionValueId)}
+                          disabled={valueDelete.isPending}
+                        >
+                          삭제
+                        </button>
                       </div>
                     </div>
                   ))
@@ -671,51 +898,65 @@ export default function ProductDetailView({ productId, onClose }: Props) {
           {discountsQ.isLoading ? (
             <div className={styles.loading}>불러오는 중...</div>
           ) : discountsQ.error ? (
-            <div className={styles.errorBox}>{discountsQ.error instanceof Error ? discountsQ.error.message : "할인 조회 오류"}</div>
+            <div className={styles.errorBox}>
+              {discountsQ.error instanceof Error ? discountsQ.error.message : "할인 조회 오류"}
+            </div>
           ) : (
             <>
               <div className={styles.row}>
                 <label className={styles.label}>
-                  discountValue
+                  할인 값
                   <input
                     className={styles.input}
                     value={discountForm.discountValue}
-                    onChange={(e) => setDiscountForm((p) => ({ ...p, discountValue: e.target.value }))}
+                    onChange={(e) =>
+                      setDiscountForm((p) => ({ ...p, discountValue: e.target.value }))
+                    }
                     placeholder="예: 10"
                   />
                 </label>
 
                 <label className={styles.label}>
-                  discountType
+                  할인 유형
                   <input
                     className={styles.input}
                     value={discountForm.discountType}
-                    onChange={(e) => setDiscountForm((p) => ({ ...p, discountType: e.target.value }))}
+                    onChange={(e) =>
+                      setDiscountForm((p) => ({ ...p, discountType: e.target.value }))
+                    }
                     placeholder="예: PERCENT / AMOUNT"
                   />
                 </label>
 
                 <label className={styles.label}>
-                  startAt(선택)
+                  시작 일시(선택)
                   <input
                     className={styles.input}
                     value={discountForm.startAt}
-                    onChange={(e) => setDiscountForm((p) => ({ ...p, startAt: e.target.value }))}
+                    onChange={(e) =>
+                      setDiscountForm((p) => ({ ...p, startAt: e.target.value }))
+                    }
                     placeholder="2026-01-21T10:30"
                   />
                 </label>
 
                 <label className={styles.label}>
-                  endAt(선택)
+                  종료 일시(선택)
                   <input
                     className={styles.input}
                     value={discountForm.endAt}
-                    onChange={(e) => setDiscountForm((p) => ({ ...p, endAt: e.target.value }))}
+                    onChange={(e) =>
+                      setDiscountForm((p) => ({ ...p, endAt: e.target.value }))
+                    }
                     placeholder="2026-01-21T23:59"
                   />
                 </label>
 
-                <button className={styles.primaryBtn} onClick={onCreateDiscount} disabled={discountCreate.isPending}>
+                <button
+                  className={styles.primaryBtn}
+                  onClick={onCreateDiscount}
+                  disabled={discountCreate.isPending}
+                >
                   할인 등록
                 </button>
               </div>
@@ -724,20 +965,22 @@ export default function ProductDetailView({ productId, onClose }: Props) {
                 <table className={styles.table}>
                   <thead>
                     <tr>
-                      <th>discountId</th>
-                      <th>productId</th>
-                      <th>discountValue</th>
-                      <th>discountType</th>
-                      <th>startAt</th>
-                      <th>endAt</th>
-                      <th>createdAt</th>
+                      <th>할인 ID</th>
+                      <th>상품 ID</th>
+                      <th>할인 값</th>
+                      <th>할인 유형</th>
+                      <th>시작 일시</th>
+                      <th>종료 일시</th>
+                      <th>생성일</th>
                       <th>관리</th>
                     </tr>
                   </thead>
                   <tbody>
                     {discounts.length === 0 ? (
                       <tr>
-                        <td colSpan={8} className={styles.empty}>할인이 없습니다.</td>
+                        <td colSpan={8} className={styles.empty}>
+                          할인이 없습니다.
+                        </td>
                       </tr>
                     ) : (
                       discounts.map((d) => (
@@ -750,8 +993,20 @@ export default function ProductDetailView({ productId, onClose }: Props) {
                           <td>{d.endAt ?? "-"}</td>
                           <td>{d.createdAt ?? "-"}</td>
                           <td className={styles.actionsTd}>
-                            <button className={styles.smallBtn} onClick={() => onEditDiscount(d)} disabled={discountUpdate.isPending}>수정</button>
-                            <button className={styles.dangerBtn} onClick={() => onDeleteDiscount(d.discountId)} disabled={discountDelete.isPending}>삭제</button>
+                            <button
+                              className={styles.smallBtn}
+                              onClick={() => onEditDiscount(d)}
+                              disabled={discountUpdate.isPending}
+                            >
+                              수정
+                            </button>
+                            <button
+                              className={styles.dangerBtn}
+                              onClick={() => onDeleteDiscount(d.discountId)}
+                              disabled={discountDelete.isPending}
+                            >
+                              삭제
+                            </button>
                           </td>
                         </tr>
                       ))

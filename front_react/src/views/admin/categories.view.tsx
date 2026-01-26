@@ -3,7 +3,8 @@
 import { useMemo, useState } from "react";
 import styles from "./categories.view.module.css";
 
-import type { AdminCategory } from "@/types/admin/category";
+import type { AdminCategory, CategoryActiveCode } from "@/types/admin/category";
+import { statusToActiveCode } from "@/types/admin/category";
 import { useAdminCategoriesPage } from "@/hooks/admin/adminCategories.hook";
 
 type CodeMap = Map<number, string>;
@@ -23,11 +24,7 @@ function buildCodeMap(tree: AdminCategory[]): CodeMap {
   return map;
 }
 
-// ✅ enum 확정에 따른 고정 규칙
-type ActiveCode = "Y" | "N";
 const isActiveStatus = (status: AdminCategory["status"]) => status === "ACTIVE";
-const nextActiveCode = (status: AdminCategory["status"]): ActiveCode =>
-  isActiveStatus(status) ? "N" : "Y";
 
 // ✅ 백/훅에서 throw된 Error.message(=백 message) 우선 표시
 function errorText(err: unknown, fallback: string) {
@@ -118,7 +115,7 @@ export default function CategoriesView() {
   };
 
   const handleCreateChild = async () => {
-    if (!selectedId) {
+    if (selectedId == null) {
       alert("상위(부모) 카테고리를 먼저 선택하세요.");
       return;
     }
@@ -134,7 +131,7 @@ export default function CategoriesView() {
   };
 
   const handleRename = async () => {
-    if (!selectedId) return;
+    if (selectedId == null) return;
     const name = editName.trim();
     if (!name) return;
 
@@ -146,11 +143,11 @@ export default function CategoriesView() {
   };
 
   const handleToggleActive = async () => {
-    if (!selectedId || !selected) return;
+    if (selectedId == null || !selected) return;
 
     try {
-      // ✅ status(ACTIVE/INACTIVE)로 판단 → 요청은 Y/N(code)
-      const next: ActiveCode = nextActiveCode(selected.status);
+      const nextStatus = selected.status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
+      const next: CategoryActiveCode = statusToActiveCode(nextStatus);
       await toggleMut.mutateAsync({ categoryId: selectedId, isActive: next });
     } catch (e) {
       alert(errorText(e, "활성/비활성 변경에 실패했습니다."));
@@ -158,7 +155,7 @@ export default function CategoriesView() {
   };
 
   const handleSortOrder = async () => {
-    if (!selectedId) return;
+    if (selectedId == null) return;
 
     try {
       await sortMut.mutateAsync({ categoryId: selectedId, sortOrder: Number(editSortOrder) });
@@ -168,7 +165,7 @@ export default function CategoriesView() {
   };
 
   const handleMoveParent = async () => {
-    if (!selectedId) return;
+    if (selectedId == null) return;
 
     const pid = moveParentId === "null" ? null : Number(moveParentId);
 
@@ -185,7 +182,7 @@ export default function CategoriesView() {
   };
 
   const handleDelete = async () => {
-    if (!selectedId) return;
+    if (selectedId == null) return;
     const ok = window.confirm("해당 카테고리를 삭제(soft delete)하시겠습니까?");
     if (!ok) return;
 
@@ -246,7 +243,7 @@ export default function CategoriesView() {
             </div>
           </div>
 
-          {!selectedId || !selected ? (
+          {selectedId == null || !selected ? (
             <div className={styles.empty}>왼쪽 트리에서 카테고리를 선택하세요.</div>
           ) : (
             <>
@@ -305,7 +302,6 @@ export default function CategoriesView() {
                       setMoveParentId(e.target.value === "null" ? "null" : Number(e.target.value))
                     }
                   >
-                    {/* ✅ 표기만 한글화 */}
                     <option value="null">루트(null)</option>
                     {flat
                       .filter((c) => c.categoryId !== selectedId)
