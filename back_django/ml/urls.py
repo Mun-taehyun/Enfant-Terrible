@@ -1,28 +1,40 @@
 from django.urls import path
 from . import views
 
+# 반드시 이름이 'urlpatterns' (복수형) 리스트여야 합니다.
 urlpatterns = [
-    # 1. 특정 사용자 맞춤 추천 조회 API
-    # 예: GET /api/recommendations/1/ (user_id 1번 추천 상품 목록)
+    # 1. 개인 맞춤 추천 API
     path(
-        "recommendations/<int:user_id>/", 
-        views.recommendation, 
+        "recommendations/user/<int:user_id>/", 
+        views.get_user_specific_recommendations, 
         name="user_recommendation",
     ),
 
-    # 2. 개인화되지 않은 전체 인기 추천 (로그인 안 한 유저용 등)
-    # 예: GET /api/recommendations/popular/
+    # 2. 범용 인기 추천 API
     path(
         "recommendations/popular/", 
-        views.popular_recommendation_view, # 별도 뷰가 있다면 연결
+        views.get_popular_recommendations, 
         name="popular_recommendation",
     ),
 
-    # 3. 관리자용 추천 엔진 강제 업데이트 (POST 권장)
-    # 예: POST /api/admin/recommendation/update/
+    # 3. 반려동물 종별 인기 추천 API
     path(
-        "admin/recommendation/update/", 
-        views.admin_recommendation_update, 
-        name="admin_recommendation_update",
+        "recommendations/popular/<str:species>/", 
+        views.get_popular_recommendations, 
+        name="species_popular_recommendation",
+    ),
+
+    # 4. 카테고리별 추천 API
+    path(
+        "recommendations/category/<int:category_id>/",
+        views.get_category_recommendations,
+        name="category_recommendation",
+    ),
+
+    # 5. 관리자용: AI 추천 엔진 수동 갱신 (rebuild)
+    path(
+        "admin/recommendation/rebuild/", 
+        views.trigger_recommendation_rebuild, 
+        name="admin_recommendation_rebuild",
     ),
 ]

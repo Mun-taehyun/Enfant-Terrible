@@ -18,51 +18,57 @@ django.setup()
 from django.conf import settings
 from sqlalchemy import create_engine, text
 
-# [개인화 설정] 랜덤 시드 1 고정
+# [개인화 설정] 랜덤 시드 1 고정 및 kosmo 통일
 random.seed(1)
 np.random.seed(1)
+PROJECT_NAME = "kosmo"
 
 def get_db_engine():
-    db_conf = settings.DATABASES['default']
+    # 모든 접속 정보를 'kosmo'로 통일
     u = 'kosmo' 
-    p = db_conf['PASSWORD']
-    h = db_conf['HOST']
-    port = db_conf['PORT']
+    p = '1234' # 설정하신 비밀번호
+    h = '127.0.0.1'
+    port = '3306'
     db_name = 'kosmo'  
     
     db_url = f"mysql+pymysql://{u}:{p}@{h}:{port}/{db_name}?charset=utf8mb4"
     return create_engine(db_url, pool_pre_ping=True)
 
 def seed_recommendations(engine):
-    # 경로 수정: logs 폴더 내의 파일을 참조하도록 변경
+    """최종 추천 결과를 DB에 반영"""
     log_dir = Path(settings.BASE_DIR).parent / "logs"
-    csv_path = log_dir / "service_ready_data.csv"
+    # 추천 엔진 결과 파일명 (rebuild_... 스크립트 결과와 매칭)
+    csv_path = log_dir / "service_ready_data.csv" 
     
     if not csv_path.exists():
-        print(f"⚠️ {csv_path.name} 파일이 없어 추천 데이터 로드를 건너뜁니다.")
+        print(f"⚠️ {csv_path.name} 파일이 없어 추천 데이터 로드를 건너뜜 (배치 먼저 실행 필요)")
         return
 
     print(f"🤖 AI 추천 데이터를 로드합니다: {csv_path.name}")
     df = pd.read_csv(csv_path)
-    df = df.rename(columns={'final_preference': 'score'})
+    
+    if 'final_preference' in df.columns:
+        df = df.rename(columns={'final_preference': 'score'})
+    
     df = df.sort_values(by=['user_id', 'score'], ascending=[True, False])
     df['rank_no'] = df.groupby('user_id')['score'].rank(method='first', ascending=False).astype(int)
+    df['created_at'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     
     with engine.begin() as conn:
         conn.execute(text("TRUNCATE TABLE et_user_recommendation"))
-        df.to_sql('et_user_recommendation', con=conn, if_exists='append', index=False)
+        df[['user_id', 'product_id', 'score', 'rank_no', 'created_at']].to_sql(
+            'et_user_recommendation', con=conn, if_exists='append', index=False
+        )
     print(f"✅ 추천 데이터 {len(df)}건 세팅 완료!")
 
-def seed_orders_operational(truncate_all: bool = False):
+def seed_kosmo_operational(truncate_all: bool = False):
     engine = get_db_engine()
     log_dir = Path(settings.BASE_DIR).parent / "logs"
 
     with engine.begin() as conn:
-        # 0) 기존 데이터 초기화 (순서 중요)
         if truncate_all:
-            print(f"🧹 [kosmo DB] 완전 초기화 중...")
+            print(f"🧹 [{PROJECT_NAME} DB] 전체 데이터 초기화 중...")
             conn.execute(text("SET FOREIGN_KEY_CHECKS=0"))
-            # et_category 추가
             tables = ["et_user_recommendation", "et_product_review", "et_order_item", 
                       "et_payment", "et_order", "et_product_sku", "et_product", 
                       "et_user", "et_category"]
@@ -71,44 +77,49 @@ def seed_orders_operational(truncate_all: bool = False):
                 except: pass
             conn.execute(text("SET FOREIGN_KEY_CHECKS=1"))
 
-        # 1) 카테고리 확보 및 삽입 (추가된 부분)
+        # 1) 카테고리 삽입 (사료/장난감 등 5종 포함)
         cat_csv = log_dir / "category_master.csv"
         if cat_csv.exists():
             df_cat = pd.read_csv(cat_csv)
             df_cat.to_sql('et_category', con=conn, if_exists='append', index=False)
-            print("📁 카테고리 데이터 삽입 완료")
-        else:
-            print("❌ 카테고리 CSV 파일을 찾을 수 없습니다.")
-            return
-
-        # 2) 상품 확보 (CSV 기반)
-        prod_csv = log_dir / "product_master_erd.csv"
+            print("📁 카테고리 삽입 완료")
+        
+        # 2) 상품 삽입 (장난감/용품 포함 100건 이상)
+        prod_csv = log_dir / "product_master.csv"
         if prod_csv.exists():
             df_prod = pd.read_csv(prod_csv)
-            df_prod.to_sql('et_product', con=conn, if_exists='append', index=False)
-            product_rows = conn.execute(text("SELECT product_id, base_price FROM et_product")).fetchall()
-            print("📦 상품 데이터 삽입 완료")
-        else:
-            print("❌ 상품 CSV 파일을 찾을 수 없습니다.")
-            return
-
-        # 3) SKU 생성
+            # DB 스키마에 존재하는 컬럼만 선별
+            prod_cols = ['product_id', 'category_id', 'product_code', 'name', 'status', 'base_price', 'description', 'created_at']
+            valid_df = df_prod[[c for c in prod_cols if c in df_prod.columns]]
+            valid_df.to_sql('et_product', con=conn, if_exists='append', index=False)
+            print(f"📦 상품 데이터 {len(valid_df)}건 삽입 완료")
+        
+        # 3) SKU 생성 (주문/결제 기능을 위해 필수)
+        product_rows = conn.execute(text("SELECT product_id, base_price FROM et_product")).fetchall()
         ins_sku = [{"p_id": p[0], "code": f"SKU-{p[0]}-01", "price": int(p[1])} for p in product_rows]
         conn.execute(text("""
             INSERT INTO et_product_sku (product_id, sku_code, price, stock, status) 
             VALUES (:p_id, :code, :price, 999, 'ON_SALE')
         """), ins_sku)
+        print("🔧 상품 SKU 생성 완료")
 
-        # 4) 사용자 생성 (100명)
-        users = [{"email": f"user{i}@example.com", "name": f"사용자{i}"} for i in range(1, 101)]
+        # 4) 사용자 생성 (회원 테이블)
+        users = []
+        for i in range(1, 101):
+            users.append({
+                "email": f"user{i}@example.com",
+                "name": f"코스모유저{i}"
+            })
+
         conn.execute(text("""
             INSERT INTO et_user (email, password, name, role, status) 
-            VALUES (:email, 'hashed_password_123', :name, 'USER', 'ACTIVE')
+            VALUES (:email, 'hashed_pw', :name, 'USER', 'ACTIVE')
         """), users)
+        print(f"👥 기본 사용자 100명 생성 완료")
 
-    # 5) AI 추천 데이터 로드
+    # 5) AI 추천 결과 세팅
     seed_recommendations(engine)
-    print(f"✨ 모든 작업이 완료되었습니다! (User: kosmo)")
+    print(f"✨ 모든 작업이 완료되었습니다! (User: {PROJECT_NAME})")
 
 if __name__ == "__main__":
-    seed_orders_operational(truncate_all=True)
+    seed_kosmo_operational(truncate_all=True)
