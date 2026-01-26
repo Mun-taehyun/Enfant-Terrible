@@ -24,16 +24,16 @@ public class ProductSkuResolveService {
       List<Long> optionValueIds
   ) {
 
+    ProductSkuRow sku;
     if (optionValueIds == null || optionValueIds.isEmpty()) {
-      throw new BusinessException("옵션을 선택해주세요.");
+      sku = skuQueryMapper.findDefaultSkuByProductId(productId);
+    } else {
+      sku = skuQueryMapper.findSkuByExactOptionMatch(
+          productId,
+          optionValueIds,
+          optionValueIds.size()
+      );
     }
-
-    ProductSkuRow sku =
-        skuQueryMapper.findSkuByExactOptionMatch(
-            productId,
-            optionValueIds,
-            optionValueIds.size()
-        );
 
     if (sku == null) {
       throw new BusinessException("선택한 옵션 조합에 해당하는 상품이 없습니다.");

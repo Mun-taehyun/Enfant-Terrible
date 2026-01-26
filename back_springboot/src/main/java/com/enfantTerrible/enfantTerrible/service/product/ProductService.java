@@ -56,6 +56,10 @@ public class ProductService {
     List<ProductRow> rows = productMapper.findProducts(
         req.getCategoryId(),
         req.getKeyword(),
+        req.getMinPrice(),
+        req.getMaxPrice(),
+        req.getMinRating(),
+        req.getHasDiscount(),
         ProductSortType.from(req.getSort()).name(),
         size,
         offset

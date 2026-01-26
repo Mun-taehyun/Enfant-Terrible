@@ -92,8 +92,42 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   @Override
   protected boolean shouldNotFilter(HttpServletRequest request) {
     String uri = request.getRequestURI();
-    return uri.startsWith("/login/oauth2/")
-        || uri.startsWith("/oauth2/");
+    String method = request.getMethod();
+
+    // CORS preflight
+    if ("OPTIONS".equals(method)) {
+      return true;
+    }
+
+    // 인증 / OAuth
+    if (uri.startsWith("/api/auth/")
+        || uri.startsWith("/oauth2/")
+        || uri.startsWith("/login/oauth2/")
+        || uri.startsWith("/ws/")
+    ) {
+      return true;
+    }
+
+    // 회원가입
+    if ("POST".equals(method) && uri.equals("/api/users/signup")) {
+      return true;
+    }
+
+    // 공개 GET API
+    if ("GET".equals(method)) {
+      if (uri.startsWith("/api/categories/")
+          || uri.startsWith("/api/posts/")
+          || uri.startsWith("/api/banners/")
+          || uri.startsWith("/api/popups/")
+          || uri.equals("/api/products")
+          || uri.matches("^/api/products/[^/]+$")
+          || uri.matches("^/api/products/[^/]+/reviews$")
+      ) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }
 

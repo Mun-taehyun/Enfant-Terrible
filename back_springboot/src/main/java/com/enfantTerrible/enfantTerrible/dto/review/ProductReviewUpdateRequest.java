@@ -1,5 +1,7 @@
 package com.enfantTerrible.enfantTerrible.dto.review;
 
+ import java.util.List;
+
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -16,4 +18,6 @@ public class ProductReviewUpdateRequest {
   private Integer rating;
 
   private String content;
+
+  private List<String> imageUrls;
 }

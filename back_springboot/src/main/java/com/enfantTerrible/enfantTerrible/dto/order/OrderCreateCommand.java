@@ -11,6 +11,8 @@ public class OrderCreateCommand {
   private Long userId;
   private List<OrderItemCommand> items;
 
+  private Integer usedPoint;
+
   private String receiverName;
   private String receiverPhone;
   private String zipCode;

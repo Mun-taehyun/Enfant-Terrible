@@ -36,19 +36,16 @@ public class DirectOrderController {
     List<Long> optionValueIds = req.getOptionValueIds();
     int optionCount = optionValueIds == null ? 0 : optionValueIds.size();
 
-    // 옵션 없는 상품도 있을 수 있으니,
-    // optionCount=0이면 "옵션 없는 SKU 찾기" 쿼리가 별도로 필요할 수 있음.
-    // (지금은 optionValueIds가 비어있으면 바로 예외 처리로 단순화)
+    ProductSkuRow skuRow;
     if (optionCount == 0) {
-      throw new BusinessException("옵션 선택이 필요합니다.");
-    }
-
-    ProductSkuRow skuRow =
-      skuQueryMapper.findSkuByExactOptionMatch(
+      skuRow = skuQueryMapper.findDefaultSkuByProductId(req.getProductId());
+    } else {
+      skuRow = skuQueryMapper.findSkuByExactOptionMatch(
           req.getProductId(),
           optionValueIds,
           optionCount
       );
+    }
 
 
     if (skuRow == null) {
@@ -71,6 +68,7 @@ public class DirectOrderController {
     cmd.setZipCode(req.getZipCode());
     cmd.setAddressBase(req.getAddressBase());
     cmd.setAddressDetail(req.getAddressDetail());
+    cmd.setUsedPoint(req.getUsedPoint());
 
     return ApiResponse.success(
         orderService.create(cmd),

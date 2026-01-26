@@ -2,11 +2,14 @@ package com.enfantTerrible.enfantTerrible.common.enums;
 
 public enum FileRefType {
     PRODUCT("product", "상품"),
-    USER("user", "사용자"),
     ORDER("order", "주문"),
     CATEGORY("category", "카테고리"),
     BANNER("banner", "배너"),
-    POPUP("popup", "팝업");
+    POPUP("popup", "팝업"),
+    REVIEW("review", "리뷰"),
+    INQUIRY("inquiry", "상품 문의"),
+    QNA_MESSAGE("qna_message", "1:1 채팅 메시지"),
+    POST("post", "게시글");
 
     private final String code;
     private final String description;

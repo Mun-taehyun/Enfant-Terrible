@@ -18,6 +18,12 @@ public class ProductListRequest {
    * ======================== */
   private Long categoryId;     // 카테고리 필터
 
+  private Long minPrice;
+  private Long maxPrice;
+
+  private Float minRating;
+  private Boolean hasDiscount;
+
   /* ========================
    * Search
    * ======================== */

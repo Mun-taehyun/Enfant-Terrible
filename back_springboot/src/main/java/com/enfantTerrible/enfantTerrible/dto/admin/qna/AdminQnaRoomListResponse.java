@@ -11,6 +11,7 @@ public class AdminQnaRoomListResponse {
 
   private Long roomId;
   private Long userId;
+  private String userEmail;
   private String status;
   private LocalDateTime lastMessageAt;
   private Integer unread;

@@ -1,6 +1,7 @@
 package com.enfantTerrible.enfantTerrible.dto.qna;
 
-import jakarta.validation.constraints.NotBlank;
+ import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,6 +11,7 @@ public class QnaSendRequest {
 
   private Long roomId;
 
-  @NotBlank
   private String message;
+
+  private List<String> imageUrls;
 }

@@ -31,13 +31,17 @@ public class ProductSkuController {
   @GetMapping("/{productId}/skus/resolve")
   public ApiResponse<ProductSkuResolveResponse> resolveSku(
       @PathVariable Long productId,
-      @RequestParam String optionValueIds
+      @RequestParam(required = false) String optionValueIds
   ) {
 
-    List<Long> optionIds = Arrays.stream(optionValueIds.split(","))
-        .map(String::trim)
-        .map(Long::valueOf)
-        .collect(Collectors.toList());
+    List<Long> optionIds = null;
+    if (optionValueIds != null && !optionValueIds.isBlank()) {
+      optionIds = Arrays.stream(optionValueIds.split(","))
+          .map(String::trim)
+          .filter(s -> !s.isBlank())
+          .map(Long::valueOf)
+          .collect(Collectors.toList());
+    }
 
     ProductSkuResolveResponse res =
         skuResolveService.resolveSku(productId, optionIds);

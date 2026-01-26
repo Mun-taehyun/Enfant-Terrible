@@ -22,6 +22,12 @@ public class AdminUserSearchRequest {
   private LocalDateTime createdFrom;
   private LocalDateTime createdTo;
 
+  // 정렬 기준 (USER_ID / CREATED_AT / LAST_LOGIN_AT)
+  private String sortBy;
+
+  // 정렬 방향 (ASC / DESC)
+  private String direction;
+
   public int getOffset() {
     return (page - 1) * size;
   }

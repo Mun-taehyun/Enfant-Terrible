@@ -14,6 +14,7 @@ import com.enfantTerrible.enfantTerrible.dto.product.ProductDetailResponse;
 import com.enfantTerrible.enfantTerrible.dto.product.ProductResponse;
 import com.enfantTerrible.enfantTerrible.security.CustomUserPrincipal;
 import com.enfantTerrible.enfantTerrible.service.product.ProductQueryService;
+import com.enfantTerrible.enfantTerrible.service.product.ProductRecommendationService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 public class ProductController {
 
   private final ProductQueryService productQueryService;
+  private final ProductRecommendationService productRecommendationService;
 
   /**
    * 사용자 상품 목록 조회
@@ -40,15 +42,41 @@ public class ProductController {
       @RequestParam(required = false) Integer size,
       @RequestParam(required = false) Long categoryId,
       @RequestParam(required = false) String keyword,
+      @RequestParam(required = false) Long minPrice,
+      @RequestParam(required = false) Long maxPrice,
+      @RequestParam(required = false) Float minRating,
+      @RequestParam(required = false) Boolean hasDiscount,
       @RequestParam(required = false) String sort
   ) {
 
     List<ProductResponse> products =
-        productQueryService.getProducts(page, size, categoryId, keyword, sort);
+        productQueryService.getProducts(
+            page,
+            size,
+            categoryId,
+            keyword,
+            minPrice,
+            maxPrice,
+            minRating,
+            hasDiscount,
+            sort
+        );
 
     return ApiResponse.success(
         products,
         "상품 목록 조회 성공"
+    );
+  }
+
+  @GetMapping("/recommendations")
+  public ApiResponse<List<ProductResponse>> getRecommendations(
+      @AuthenticationPrincipal CustomUserPrincipal principal
+  ) {
+    Long userId = principal != null ? principal.getUserId() : null;
+
+    return ApiResponse.success(
+        productRecommendationService.getRecommendations(userId),
+        "추천 상품 조회 성공"
     );
   }
 

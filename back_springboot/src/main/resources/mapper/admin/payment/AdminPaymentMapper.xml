@@ -23,6 +23,22 @@
     <if test="req.paymentStatus != null and req.paymentStatus != ''">
       AND p.payment_status = #{req.paymentStatus}
     </if>
+
+    <if test="req.minPaymentAmount != null">
+      AND p.payment_amount &gt;= #{req.minPaymentAmount}
+    </if>
+
+    <if test="req.maxPaymentAmount != null">
+      AND p.payment_amount &lt;= #{req.maxPaymentAmount}
+    </if>
+
+    <if test="req.paidFrom != null">
+      AND p.paid_at &gt;= #{req.paidFrom}
+    </if>
+
+    <if test="req.paidTo != null">
+      AND p.paid_at &lt;= #{req.paidTo}
+    </if>
   </sql>
 
   <select id="findPayments" resultType="com.enfantTerrible.enfantTerrible.dto.admin.payment.AdminPaymentListResponse">
@@ -40,7 +56,17 @@
     FROM et_payment p
     JOIN et_order o ON o.order_id = p.order_id
     <include refid="adminPaymentWhere" />
-    ORDER BY p.payment_id DESC
+    ORDER BY
+    <choose>
+      <when test="req.sortBy == 'PAYMENT_AMOUNT'">p.payment_amount</when>
+      <when test="req.sortBy == 'PAID_AT'">p.paid_at</when>
+      <when test="req.sortBy == 'CREATED_AT'">p.created_at</when>
+      <otherwise>p.payment_id</otherwise>
+    </choose>
+    <choose>
+      <when test="req.direction == 'ASC'">ASC</when>
+      <otherwise>DESC</otherwise>
+    </choose>
     LIMIT #{req.size} OFFSET #{req.offset}
   </select>
 

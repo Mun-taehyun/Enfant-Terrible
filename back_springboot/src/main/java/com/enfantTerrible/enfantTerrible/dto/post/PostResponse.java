@@ -1,6 +1,7 @@
 package com.enfantTerrible.enfantTerrible.dto.post;
 
 import java.time.LocalDateTime;
+ import java.util.List;
 
 import com.enfantTerrible.enfantTerrible.common.enums.PostType;
 
@@ -16,6 +17,8 @@ public class PostResponse {
 
   private String title;
   private String content;
+
+  private List<String> fileUrls;
 
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;

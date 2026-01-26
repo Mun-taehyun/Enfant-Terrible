@@ -17,7 +17,31 @@
     </if>
 
     <if test="req.status != null and req.status != ''">
-      AND o.status = #{req.status}
+      AND o.order_status = #{req.status}
+    </if>
+
+    <if test="req.minTotalAmount != null">
+      AND o.total_amount &gt;= #{req.minTotalAmount}
+    </if>
+
+    <if test="req.maxTotalAmount != null">
+      AND o.total_amount &lt;= #{req.maxTotalAmount}
+    </if>
+
+    <if test="req.shippedFrom != null">
+      AND o.shipped_at &gt;= #{req.shippedFrom}
+    </if>
+
+    <if test="req.shippedTo != null">
+      AND o.shipped_at &lt;= #{req.shippedTo}
+    </if>
+
+    <if test="req.deliveredFrom != null">
+      AND o.delivered_at &gt;= #{req.deliveredFrom}
+    </if>
+
+    <if test="req.deliveredTo != null">
+      AND o.delivered_at &lt;= #{req.deliveredTo}
     </if>
   </sql>
 
@@ -26,7 +50,7 @@
       o.order_id,
       o.user_id,
       o.order_code,
-      o.status,
+      o.order_status AS status,
       o.total_amount,
       o.receiver_name,
       o.receiver_phone,
@@ -35,7 +59,25 @@
       o.delivered_at
     FROM et_order o
     <include refid="adminOrderWhere" />
-    ORDER BY o.order_id DESC
+    ORDER BY
+    <choose>
+      <when test="req.sortBy == 'TOTAL_AMOUNT'">
+        o.total_amount
+      </when>
+      <when test="req.sortBy == 'SHIPPED_AT'">
+        o.shipped_at
+      </when>
+      <when test="req.sortBy == 'DELIVERED_AT'">
+        o.delivered_at
+      </when>
+      <otherwise>
+        o.order_id
+      </otherwise>
+    </choose>
+    <choose>
+      <when test="req.direction == 'ASC'">ASC</when>
+      <otherwise>DESC</otherwise>
+    </choose>
     LIMIT #{req.size} OFFSET #{req.offset}
   </select>
 
@@ -50,7 +92,7 @@
       o.order_id,
       o.user_id,
       o.order_code,
-      o.status,
+      o.order_status AS status,
       o.total_amount,
       o.receiver_name,
       o.receiver_phone,
@@ -79,7 +121,7 @@
 
   <update id="updateOrderStatus">
     UPDATE et_order
-    SET status = #{status}
+    SET order_status = #{status}
     WHERE order_id = #{orderId}
   </update>
 

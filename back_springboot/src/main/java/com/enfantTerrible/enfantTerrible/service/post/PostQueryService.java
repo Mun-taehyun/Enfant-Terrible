@@ -10,6 +10,7 @@ import com.enfantTerrible.enfantTerrible.dto.post.PostResponse;
 import com.enfantTerrible.enfantTerrible.dto.post.PostRow;
 import com.enfantTerrible.enfantTerrible.exception.BusinessException;
 import com.enfantTerrible.enfantTerrible.mapper.post.PostMapper;
+import com.enfantTerrible.enfantTerrible.service.file.FileQueryService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,7 +19,11 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class PostQueryService {
 
+  private static final String REF_TYPE_POST = "post";
+  private static final String FILE_ROLE_ATTACHMENT = "ATTACHMENT";
+
   private final PostMapper postMapper;
+  private final FileQueryService fileQueryService;
 
   public List<PostResponse> getPosts(Integer pageParam, Integer sizeParam, String postTypeParam) {
 
@@ -54,6 +59,7 @@ public class PostQueryService {
     res.setPostType(row.getPostType());
     res.setTitle(row.getTitle());
     res.setContent(row.getContent());
+    res.setFileUrls(fileQueryService.findFileUrls(REF_TYPE_POST, row.getPostId(), FILE_ROLE_ATTACHMENT));
     res.setCreatedAt(row.getCreatedAt());
     res.setUpdatedAt(row.getUpdatedAt());
     return res;

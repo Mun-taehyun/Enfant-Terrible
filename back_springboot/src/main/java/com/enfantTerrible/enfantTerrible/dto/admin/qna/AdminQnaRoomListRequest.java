@@ -12,6 +12,12 @@ public class AdminQnaRoomListRequest {
 
   private Long userId;
 
+  // 정렬 기준 (LAST_MESSAGE_AT / CREATED_AT / ROOM_ID)
+  private String sortBy;
+
+  // 정렬 방향 (ASC / DESC)
+  private String direction;
+
   public int getOffset() {
     return (page - 1) * size;
   }

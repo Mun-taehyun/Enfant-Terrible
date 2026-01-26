@@ -39,7 +39,7 @@ public class AdminPointService {
     normalizePaging(req);
 
     int total = adminPointMapper.countHistory(userId);
-    List<AdminPointHistoryResponse> list = adminPointMapper.findHistory(userId, req.getSize(), req.getOffset());
+    List<AdminPointHistoryResponse> list = adminPointMapper.findHistory(userId, req);
 
     return new AdminPageResponse<>(
         req.getPage(),

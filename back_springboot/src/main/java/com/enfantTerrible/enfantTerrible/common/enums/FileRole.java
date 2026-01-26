@@ -3,7 +3,6 @@ package com.enfantTerrible.enfantTerrible.common.enums;
 public enum FileRole {
     THUMBNAIL("THUMBNAIL", "썸네일"),
     CONTENT("CONTENT", "본문 이미지"),
-    PROFILE("PROFILE", "프로필 이미지"),
     ATTACHMENT("ATTACHMENT", "첨부 파일");
 
     private final String code;

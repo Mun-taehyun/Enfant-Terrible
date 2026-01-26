@@ -1,5 +1,7 @@
 package com.enfantTerrible.enfantTerrible.dto.admin.product;
 
+import java.time.LocalDateTime;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,4 +23,18 @@ public class AdminProductListRequest {
 
   // 상품 상태 (ON_SALE / STOPPED / HIDDEN / SOLD_OUT)
   private String status;
+
+  private Long categoryId;
+
+  private Long minPrice;
+  private Long maxPrice;
+
+  private LocalDateTime createdFrom;
+  private LocalDateTime createdTo;
+
+  // 정렬 기준 (PRODUCT_ID / CREATED_AT / BASE_PRICE / NAME)
+  private String sortBy;
+
+  // 정렬 방향 (ASC / DESC)
+  private String direction;
 }

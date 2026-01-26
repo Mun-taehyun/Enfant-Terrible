@@ -11,6 +11,8 @@ import lombok.Setter;
 @Setter
 public class AdminProductSaveRequest {
 
+  private Long productId;
+
   @NotBlank
   private String productCode;
 

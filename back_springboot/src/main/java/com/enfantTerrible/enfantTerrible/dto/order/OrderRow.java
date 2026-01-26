@@ -12,5 +12,10 @@ public class OrderRow {
   private Long userId;
   private String orderCode;
   private OrderStatus orderStatus;
+
+  private Long originalAmount;
+  private Integer usedPoint;
+  private Integer usedPointRefunded;
+
   private Long totalAmount;
 }

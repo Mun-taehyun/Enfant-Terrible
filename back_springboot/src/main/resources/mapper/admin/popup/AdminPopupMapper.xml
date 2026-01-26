@@ -29,7 +29,15 @@
       p.created_at
     FROM et_popup p
     <include refid="adminPopupWhere" />
-    ORDER BY p.popup_id DESC
+    ORDER BY
+    <choose>
+      <when test="req.sortBy == 'CREATED_AT'">p.created_at</when>
+      <otherwise>p.popup_id</otherwise>
+    </choose>
+    <choose>
+      <when test="req.direction == 'ASC'">ASC</when>
+      <otherwise>DESC</otherwise>
+    </choose>
     LIMIT #{req.size} OFFSET #{req.offset}
   </select>
 

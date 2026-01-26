@@ -1,6 +1,7 @@
 package com.enfantTerrible.enfantTerrible.service.admin.product;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,6 +10,9 @@ import com.enfantTerrible.enfantTerrible.common.response.AdminPageResponse;
 import com.enfantTerrible.enfantTerrible.dto.admin.product.*;
 import com.enfantTerrible.enfantTerrible.exception.BusinessException;
 import com.enfantTerrible.enfantTerrible.mapper.admin.product.AdminProductMapper;
+import com.enfantTerrible.enfantTerrible.mapper.admin.product.AdminProductSkuMapper;
+import com.enfantTerrible.enfantTerrible.common.enums.SkuStatus;
+import com.enfantTerrible.enfantTerrible.dto.admin.product.AdminSkuSaveInternalRequest;
 import com.enfantTerrible.enfantTerrible.service.file.FileCommandService;
 import com.enfantTerrible.enfantTerrible.service.file.FileQueryService;
 
@@ -23,6 +27,7 @@ public class AdminProductService {
   private static final String ROLE_THUMBNAIL = "THUMBNAIL";
 
   private final AdminProductMapper productMapper;
+  private final AdminProductSkuMapper skuMapper;
   private final FileCommandService fileCommandService;
   private final FileQueryService fileQueryService;
 
@@ -55,6 +60,28 @@ public class AdminProductService {
 
   public void create(AdminProductSaveRequest req) {
     productMapper.insert(req);
+
+    if (req.getProductId() == null) {
+      throw new BusinessException("상품 생성 키를 가져오지 못했습니다.");
+    }
+
+    // 옵션 없는 상품을 위한 기본 SKU 1개 보장
+    Long defaultSkuId = skuMapper.findDefaultSkuIdByProductId(req.getProductId());
+    if (defaultSkuId == null) {
+      AdminSkuSaveInternalRequest skuReq = new AdminSkuSaveInternalRequest(
+          req.getProductId(),
+          "SKU-" + req.getProductId() + "-" + UUID.randomUUID().toString().replace("-", "").substring(0, 12),
+          req.getBasePrice(),
+          0L,
+          SkuStatus.STOPPED.name()
+      );
+
+      if (skuMapper.insertInternal(skuReq) == 0 || skuReq.getSkuId() == null) {
+        throw new BusinessException("기본 SKU 생성에 실패했습니다.");
+      }
+
+      skuMapper.refreshProductBasePrice(req.getProductId());
+    }
   }
 
   public void update(Long productId, AdminProductSaveRequest req) {

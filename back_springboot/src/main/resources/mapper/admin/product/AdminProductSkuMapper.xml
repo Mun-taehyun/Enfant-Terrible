@@ -25,13 +25,39 @@
     <if test="req.status != null and req.status != ''">
       AND s.status = #{req.status}
     </if>
+
+    <if test="req.minPrice != null">
+      AND s.price &gt;= #{req.minPrice}
+    </if>
+
+    <if test="req.maxPrice != null">
+      AND s.price &lt;= #{req.maxPrice}
+    </if>
+
+    <if test="req.minStock != null">
+      AND s.stock &gt;= #{req.minStock}
+    </if>
+
+    <if test="req.maxStock != null">
+      AND s.stock &lt;= #{req.maxStock}
+    </if>
   </sql>
 
   <select id="findSkus" resultType="AdminSkuRow">
     SELECT <include refid="selectColumns" />
     FROM et_product_sku s
     <include refid="where" />
-    ORDER BY s.sku_id DESC
+    ORDER BY
+    <choose>
+      <when test="req.sortBy == 'CREATED_AT'">s.created_at</when>
+      <when test="req.sortBy == 'PRICE'">s.price</when>
+      <when test="req.sortBy == 'STOCK'">s.stock</when>
+      <otherwise>s.sku_id</otherwise>
+    </choose>
+    <choose>
+      <when test="req.direction == 'ASC'">ASC</when>
+      <otherwise>DESC</otherwise>
+    </choose>
     LIMIT #{size} OFFSET #{offset}
   </select>
 
@@ -53,6 +79,29 @@
     FROM et_product_sku s
     WHERE s.product_id = #{productId}
       AND s.deleted_at IS NULL
+    ORDER BY s.sku_id ASC
+  </select>
+
+  <select id="findDefaultSkuIdByProductId" resultType="long">
+    SELECT s.sku_id
+    FROM et_product_sku s
+    LEFT JOIN et_product_sku_option so ON so.sku_id = s.sku_id
+    WHERE s.product_id = #{productId}
+      AND s.deleted_at IS NULL
+    GROUP BY s.sku_id
+    HAVING COUNT(so.option_value_id) = 0
+    ORDER BY s.sku_id ASC
+    LIMIT 1
+  </select>
+
+  <select id="findSkuIdsWithNoOptionsByProductId" resultType="long">
+    SELECT s.sku_id
+    FROM et_product_sku s
+    LEFT JOIN et_product_sku_option so ON so.sku_id = s.sku_id
+    WHERE s.product_id = #{productId}
+      AND s.deleted_at IS NULL
+    GROUP BY s.sku_id
+    HAVING COUNT(so.option_value_id) = 0
     ORDER BY s.sku_id ASC
   </select>
 

@@ -1,5 +1,7 @@
 package com.enfantTerrible.enfantTerrible.dto.admin.post;
 
+ import java.util.List;
+
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,4 +21,6 @@ public class AdminPostSaveRequest {
 
   @NotBlank
   private String content;
+
+  private List<String> fileUrls;
 }

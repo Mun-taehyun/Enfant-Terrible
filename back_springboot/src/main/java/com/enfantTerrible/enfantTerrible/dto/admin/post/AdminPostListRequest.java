@@ -1,5 +1,7 @@
 package com.enfantTerrible.enfantTerrible.dto.admin.post;
 
+import java.time.LocalDateTime;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,6 +14,16 @@ public class AdminPostListRequest {
 
   private String postType;
   private Long userId;
+
+  private String keyword;
+  private LocalDateTime createdFrom;
+  private LocalDateTime createdTo;
+
+  // 정렬 기준 (POST_ID / CREATED_AT / UPDATED_AT)
+  private String sortBy;
+
+  // 정렬 방향 (ASC / DESC)
+  private String direction;
 
   public int getOffset() {
     return (page - 1) * size;
