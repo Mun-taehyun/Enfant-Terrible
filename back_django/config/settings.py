@@ -40,9 +40,27 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'config.urls'
+
+# --- [수정 포인트] TEMPLATES 설정 추가 (admin.E403 에러 해결) ---
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates'], # 프로젝트 수준의 템플릿 폴더
+        'APP_DIRS': True,                # 각 앱(ml 등) 폴더 내 templates 검색 허용
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# 데이터베이스 설정 (수정됨)
+# 데이터베이스 설정
 DATABASES = {
     'default': {
         'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.mysql'),
@@ -71,3 +89,7 @@ TIME_ZONE = 'Asia/Seoul'
 USE_I18N = True
 USE_TZ = True
 STATIC_URL = 'static/'
+
+# 미디어 파일 설정 (이미지 업로드 등 대비)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
