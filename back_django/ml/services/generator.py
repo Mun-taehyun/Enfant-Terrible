@@ -10,82 +10,111 @@ from pathlib import Path
 # --- Django 환경 초기화 ---
 current_path = Path(__file__).resolve()
 project_root = current_path.parent.parent.parent 
-
 if str(project_root) not in sys.path:
     sys.path.append(str(project_root))
-
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings') 
 django.setup()
 # -------------------------
 
 from django.conf import settings
 
-# [개인화 설정] 랜덤 시드는 1로 고정
+# [개인화 설정] 랜덤 시드 1 고정
 np.random.seed(1)
 random.seed(1)
 
-def generate_grand_product_master_erd(num_products=100):
+def generate_universal_pet_data(num_products=100):
     LOGS_PATH = Path(settings.BASE_DIR).parent / "logs"
-    if not os.path.exists(LOGS_PATH): 
-        os.makedirs(LOGS_PATH)
+    if not os.path.exists(LOGS_PATH): os.makedirs(LOGS_PATH)
+    current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-    # 1. 스키마 기반 카테고리 매핑 (et_category 구조 대응)
-    # 실제 DB의 et_category 테이블에 ID 1, 2, 3이 먼저 존재해야 합니다.
-    cat_templates = {
-        1: {'name': '사료/간식', 'items': ['연어 사료', '닭가슴살 육포', '덴탈 껌', '북어 트릿'], 'price_range': (15, 60)},
-        2: {'name': '의류/리빙', 'items': ['순면 티셔츠', '방수 레인코트', '마약 방석', '쿨매트'], 'price_range': (20, 120)},
-        3: {'name': '위생/건강', 'items': ['저자극 샴푸', '눈세정제', '관절 영양제', '배변 패드'], 'price_range': (10, 80)}
-    }
+    # 1. 범용 카테고리 정의 (확장이 매우 쉬운 구조)
+    species_list = ['강아지', '고양이', '관상어', '소동물(햄스터/토끼)'] # 대분류
+    item_types = [
+        {'name': '기능성 사료', 'price_range': (20, 90)},
+        {'name': '맛있는 간식', 'price_range': (5, 40)},
+        {'name': '생활/리빙용품', 'price_range': (15, 150)},
+        {'name': '위생/청결용품', 'price_range': (10, 60)},
+        {'name': '장난감/교구', 'price_range': (5, 35)}
+    ] # 중분류 템플릿
 
-    brands = ['앙팡', 'Enfant', '테리블', '네이처팡', '퓨어도그']
-    qualities = ['프리미엄', '유기농', '그레인프리', '수제', '내추럴']
+    categories = []
+    cat_id_counter = 1
+    
+    # 계층형 카테고리 생성 로직
+    # Depth 1: 반려동물 종
+    species_map = {}
+    for species in species_list:
+        categories.append({
+            'category_id': cat_id_counter,
+            'parent_id': None,
+            'name': species,
+            'depth': 1,
+            'sort_order': cat_id_counter
+        })
+        species_map[species] = cat_id_counter
+        cat_id_counter += 1
+
+    # Depth 2: 각 종별 제품 카테고리
+    product_cat_ids = []
+    cat_info = {} # 상품 생성 시 참고할 가격 정보 저장
+    for species, p_id in species_map.items():
+        for i, itype in enumerate(item_types):
+            categories.append({
+                'category_id': cat_id_counter,
+                'parent_id': p_id,
+                'name': f"{species} {itype['name']}",
+                'depth': 2,
+                'sort_order': i + 1
+            })
+            product_cat_ids.append(cat_id_counter)
+            cat_info[cat_id_counter] = itype
+            cat_id_counter += 1
+
+    df_cat = pd.DataFrame(categories)
+    df_cat['is_active'] = 'Y'
+    df_cat['created_at'] = current_time
+    df_cat['updated_at'] = current_time
+    df_cat['deleted_at'] = None
+    df_cat.to_csv(LOGS_PATH / "category_master.csv", index=False, encoding='utf-8-sig')
+
+    # 2. 상품 생성 (생성된 카테고리 기반)
+    brands = ['앙팡', 'Enfant', '테리블', '네이처팡', '퓨어펫']
+    prefixes = ['프리미엄', '유기농', '데일리', '수제', '전문가용']
     
     products = []
-    current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    
     for i in range(1, num_products + 1):
-        # 고정된 시드에 따라 일관된 결과 생성
-        c_id = np.random.choice([1, 2, 3])
+        # 생성된 소분류 카테고리 중 하나 선택
+        c_id = np.random.choice(product_cat_ids)
+        target_cat = cat_info[c_id]
+        
         brand = np.random.choice(brands)
-        quality = np.random.choice(qualities)
-        item_name = np.random.choice(cat_templates[c_id]['items'])
+        prefix = np.random.choice(prefixes)
         
-        p_name = f"[{brand}] {quality} {item_name}"
+        # 상품명 예시: [앙팡] 프리미엄 강아지 기능성 사료
+        p_name = f"[{brand}] {prefix} {df_cat[df_cat['category_id']==c_id]['name'].values[0]}"
         
-        # 가격 결정
-        min_p, max_p = cat_templates[c_id]['price_range']
-        price = int(np.random.randint(min_p, max_p)) * 500
+        min_p, max_p = target_cat['price_range']
+        price = int(np.random.randint(min_p, max_p)) * 1000
         
-        # --- 최신 kosmo.et_product 덤프 스키마(2026-01-20) 완벽 대응 ---
         products.append({
             'product_id': i,
             'category_id': c_id, 
             'product_code': f"ET-P-{i:03d}", 
             'name': p_name, 
-            'status': 'ON_SALE',        # 스키마 DEFAULT 'ON_SALE' 반영
+            'status': 'ON_SALE',
             'base_price': price,
-            'description': f"{brand} 브랜드의 {quality} 라인업 {item_name} 상품입니다.", 
-            'average_rating': 0.0,      # 스키마 float DEFAULT '0' 반영
-            'review_count': 0,          # 스키마 int DEFAULT '0' 반영
+            'description': f"{brand}에서 제안하는 {prefix} 품질의 제품입니다.", 
+            'average_rating': 0.0,
+            'review_count': 0,
             'created_at': current_time,
             'updated_at': current_time,
-            'deleted_at': None          # 스키마 datetime DEFAULT NULL 반영
+            'deleted_at': None
         })
 
-    # 데이터프레임 생성
-    df = pd.DataFrame(products)
+    df_prod = pd.DataFrame(products)
+    df_prod.to_csv(LOGS_PATH / "product_master_erd.csv", index=False, encoding='utf-8-sig')
     
-    # 덤프 파일의 컬럼 순서와 유사하게 정렬 (가독성 목적)
-    cols = ['product_id', 'category_id', 'product_code', 'name', 'status', 
-            'base_price', 'description', 'average_rating', 'review_count', 
-            'created_at', 'updated_at', 'deleted_at']
-    df = df[cols]
-
-    output_file = LOGS_PATH / "product_master_erd.csv"
-    df.to_csv(output_file, index=False, encoding='utf-8-sig')
-    
-    print(f"✅ [User: enfant] 최신 스키마 및 시드(1) 기반 {num_products}개 상품 생성 완료!")
-    print(f"📍 저장 위치: {output_file}")
+    print(f"✅ [User: enfant] {len(species_list)}개 종, {len(item_types)}개 분류 기반 총 {num_products}개 상품 생성 완료!")
 
 if __name__ == "__main__":
-    generate_grand_product_master_erd()
+    generate_universal_pet_data()

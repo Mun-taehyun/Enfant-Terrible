@@ -1,68 +1,13 @@
 from django.db import models
 
-# 1. 추천 결과 저장 테이블
-class UserRecommendation(models.Model):
-    """
-    스키마: recommendation_id(PK), user_id, product_id, rank_no, score, created_at
-    """
-    recommendation_id = models.BigAutoField(primary_key=True)
-    user_id = models.BigIntegerField()
-    product_id = models.BigIntegerField()
-    rank_no = models.IntegerField(null=True, blank=True)
-    score = models.FloatField(null=True, blank=True)
-    # 덤프 스키마의 DEFAULT CURRENT_TIMESTAMP 반영
-    created_at = models.DateTimeField(auto_now_add=True) 
-
-    class Meta:
-        db_table = "et_user_recommendation"
-        managed = False  # 실제 DB 테이블이 존재하므로 Django가 관리하지 않음
-
-
-# 2. 상품 마스터 테이블
-class Product(models.Model):
-    """
-    스키마: product_id(PK), category_id(FK), product_code, name, status, base_price, 
-           description, average_rating, review_count, created_at, updated_at, deleted_at
-    """
-    product_id = models.BigAutoField(primary_key=True)
-    category_id = models.BigIntegerField() # 실제로는 ForeignKey이나 managed=False이므로 ID로 취급 가능
-    product_code = models.CharField(max_length=50, unique=True)
-    name = models.CharField(max_length=255)
-    
-    # Enum 형태의 status (ON_SALE, OUT_OF_STOCK, HIDE 등)
-    status = models.CharField(max_length=20, default='ON_SALE') 
-    base_price = models.IntegerField()
-    description = models.TextField(null=True, blank=True)
-    
-    # 캐시 컬럼: 스키마상 타입에 맞춰 FloatField 또는 DecimalField 사용 (덤프는 float/double 기준)
-    average_rating = models.FloatField(default=0.0)
-    review_count = models.IntegerField(default=0)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    # 최신 스키마의 핵심 필드
-    deleted_at = models.DateTimeField(null=True, blank=True) 
-
-    class Meta:
-        db_table = "et_product"
-        managed = False
-
-
-# 3. 유저 테이블
+# 1. 유저 테이블
 class User(models.Model):
-    """
-    스키마: user_id(PK), email, password, name, role, status, created_at, updated_at, deleted_at
-    """
     user_id = models.BigAutoField(primary_key=True)
     email = models.EmailField(unique=True)
-    password = models.CharField(max_length=255) # 덤프에 password 필드 존재함
+    password = models.CharField(max_length=255)
     name = models.CharField(max_length=100)
-    
-    # role: 'USER', 'ADMIN' 등
     role = models.CharField(max_length=20, default='USER')
-    # status: 'ACTIVE', 'INACTIVE', 'BANNED' 등
     status = models.CharField(max_length=20, default='ACTIVE')
-    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True, blank=True)
@@ -70,3 +15,54 @@ class User(models.Model):
     class Meta:
         db_table = "et_user"
         managed = False
+
+    def __str__(self):
+        return f"{self.name} ({self.email})"
+
+
+# 2. 상품 마스터 테이블
+class Product(models.Model):
+    product_id = models.BigAutoField(primary_key=True)
+    # 실제 DB에는 category_id라는 BIGINT 컬럼이 있으므로 그대로 유지하거나 
+    # 나중에 Category 모델을 만들면 ForeignKey로 변경 가능합니다.
+    category_id = models.BigIntegerField() 
+    product_code = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=255)
+    status = models.CharField(max_length=20, default='ON_SALE') 
+    base_price = models.IntegerField()
+    description = models.TextField(null=True, blank=True)
+    average_rating = models.FloatField(default=0.0)
+    review_count = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    deleted_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = "et_product"
+        managed = False
+
+    def __str__(self):
+        return self.name
+
+
+# 3. 추천 결과 저장 테이블
+class UserRecommendation(models.Model):
+    recommendation_id = models.BigAutoField(primary_key=True)
+    
+    # [수정] 단순 ID 보다는 ForeignKey로 설정하면 추천 API 작성이 매우 편해집니다.
+    # db_column을 지정하면 기존 BIGINT 컬럼과 완벽히 매핑됩니다.
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, db_column='user_id', related_name='recommendations'
+    )
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, db_column='product_id', related_name='recommended_to'
+    )
+    
+    rank_no = models.IntegerField(null=True, blank=True)
+    score = models.FloatField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True) 
+
+    class Meta:
+        db_table = "et_user_recommendation"
+        managed = False
+        ordering = ['rank_no'] # 기본 정렬을 순위순으로 설정
