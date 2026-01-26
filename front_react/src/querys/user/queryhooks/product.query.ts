@@ -1,7 +1,7 @@
 import { GetProductListRequestDto } from "@/apis/user/request/product";
 import { useQuery } from "@tanstack/react-query";
 import { productKeys } from "../keys";
-import { getProductDetailRequest, getProductListRequest, getProductSkuResolveRequest } from "@/apis/user";
+import { getProductDetailRequest, getProductListRequest, getProductRecommendationRequest, getProductSkuResolveRequest } from "@/apis/user";
 
 export const productQueries = {
 
@@ -33,5 +33,13 @@ export const productQueries = {
             enabled: !!productId && isEnabled
             //조건 productId가 존재해야만 실행. 
         });
-    }
+    },
+    //쿼리 : 추천 상품 조회 
+    useProductRecommendation() {
+        return useQuery({
+            queryKey: productKeys.recommendation(),
+            queryFn: () => getProductRecommendationRequest(),
+            select: (data) => data.productList,
+        });
+    },
 };

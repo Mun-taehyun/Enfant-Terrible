@@ -1,0 +1,98 @@
+
+
+/* 컨테이너 및 높이 제한 */
+.detail-content-section {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  overflow: hidden;
+  transition: max-height 0.4s ease-in-out; /* 부드러운 펼치기 애니메이션 */
+}
+
+/* 접혀있을 때 상태 */
+.detail-content-section.collapsed {
+  max-height: 800px; /* 원하는 초기 노출 높이 */
+}
+
+/* 펼쳐졌을 때 상태 */
+.detail-content-section.expanded {
+  max-height: none; /* 내용물에 맞게 늘어남 */
+}
+
+/* 구분선 스타일 */
+.section-divider {
+  display: flex;
+  align-items: center;
+  margin: 40px 0 20px;
+  color: #333;
+  font-weight: 700;
+}
+
+.section-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #eee;
+  margin-left: 10px;
+}
+
+/* 이미지 리스트 */
+.image-content-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.image-content-list img {
+  width: 100%;
+  display: block; /* 이미지 하단 미세 공백 제거 */
+  height: auto;
+}
+
+/* ✨ 하단 그라데이션 오버레이 (핵심!) */
+.fade-overlay {
+  position: absolute;
+  bottom: 60px; /* 버튼 위쪽까지 */
+  left: 0;
+  right: 0;
+  height: 150px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
+  pointer-events: none; /* 클릭 방해 금지 */
+}
+
+/* 버튼 래퍼 */
+.toggle-button-wrapper {
+  position: relative;
+  padding: 20px 0;
+  background: #fff;
+  z-index: 10;
+  cursor: pointer;
+}
+
+/* 버튼 자체 디자인 */
+.toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 90%;
+  max-width: 400px;
+  height: 50px;
+  margin: 0 auto;
+  border: 1px solid #333;
+  border-radius: 8px;
+  background-color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  transition: all 0.2s;
+}
+
+.toggle-btn:hover {
+  background-color: #f8f8f8;
+}
+
+/* 펼쳐졌을 때 버튼 스타일 변화 (선택사항) */
+.expanded .toggle-btn {
+  border-color: #eee;
+  color: #888;
+}

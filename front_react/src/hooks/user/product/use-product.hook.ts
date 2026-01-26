@@ -42,7 +42,7 @@ export const useProduct = () => {
     //함수 : 네비게이트 
     const navigate = useNavigate();
 
-    //기본값 설정 page , size(제품 수), 카테고리Id , 검색글자 , 정렬순서 
+    //기본값 설정 page , size(제품 수), 카테고리Id , 검색글자 , 정렬순서  "상품일 경우에.."
     const params = {
         page: searchParams.get("page") || "1",       
         size: searchParams.get("size") || "20",       
@@ -173,6 +173,9 @@ export const useProduct = () => {
 
         productDetail,        resolvedSku, isResolving, isDescOpen, selectedOptions,
         //상세보기데이터 , sku 설정 , 설정여부 대기 , 더보기 , 옵션상태 기록
+
+        product,
+        //pk 구분자 가져오기 
 
         updateSearchFilter, 
         // URL 검색누적 필터 

@@ -6,6 +6,7 @@ import type Pet from "./pet.interface";
 import type Product from "./product.interface";
 import type OptionGroup from "./option-groups.interface";
 import type OptionValue from "./option-value.interface";
+import type InquiryItem from "./inquiry.interface";
 
 export type {
     PopupItem,
@@ -15,5 +16,6 @@ export type {
     Pet,
     Product,
     OptionGroup,
-    OptionValue
+    OptionValue,
+    InquiryItem
 }

@@ -2,7 +2,7 @@ import OptionValue from "@/types/user/interface/option-value.interface";
 
 export default interface DirectOrderRequestDto {
     productId : number;
-    optionValueIds : OptionValue[]; 
+    optionValueIds : OptionValue[] | null; //옵션이 없을 수도 있음.  
 
     quantity : number;
     receiverName : string;
@@ -10,5 +10,7 @@ export default interface DirectOrderRequestDto {
     zipCode : string;
     addressBase : string;
     addressDetail : string | null;
+
+    usedPoint: number;
 }
 //일반 상품 주문 요청 시 기입... 

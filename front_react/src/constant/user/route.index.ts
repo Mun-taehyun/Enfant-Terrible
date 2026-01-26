@@ -29,5 +29,8 @@ export const CART_PATH = (userId: number | string) => `/cart/${userId}`;
 export const ORDER_PATH = (userId: number | string) => `/order/${userId}`;
 //주문 페이지 
 
+export const POINT_PATH = (userId: number | string) => `/point/${userId}`
+
+
 export const CHAT_PATH = (roomId: number | string) => `/chat/room/${roomId}`
 //채팅 룸 페이지 

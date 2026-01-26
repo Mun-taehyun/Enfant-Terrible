@@ -13,7 +13,7 @@ interface Prop {
 export default function Popup( {popupItem} : Prop) {
 
     //속성 : 인터페이스 "하나의 객체만 생각 => 이미 App.tsx에서 걸러짐"
-    const {title, content, linkUrl , fileUrl} = popupItem;//구 .분 .할
+    const {title, content, linkUrl, imageUrl} = popupItem;//구 .분 .할
 
     //상태 : 팝업창을 닫는 상태변수 (접속 시 10분정도 / 재접속 시 뜸 ) => 사용자 관리
     const {isPopup, popupCloseTime} = usePopupControl();
@@ -35,7 +35,7 @@ export default function Popup( {popupItem} : Prop) {
             <div className="popup-title-box">{title}</div>
             <div className="popup-content-box">{content}</div>
             <div className="popup-image-box">
-                <img src={fileUrl} style={{cursor: 'pointer'}} onClick={PopupLinkEventHandler}/>
+                <img src={imageUrl} style={{cursor: 'pointer'}} onClick={PopupLinkEventHandler}/>
                 <button onClick={() => popupCloseTime(10)}>
                     10분 동안 닫기
                 </button>

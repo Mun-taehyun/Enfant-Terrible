@@ -1,0 +1,29 @@
+.main-page {
+  position: relative;
+}
+
+/* 채팅 컨테이너 */
+.main-chat-container {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 999;
+}
+
+/* 동그라미 버튼 */
+.chat-floating-button {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: #111;
+  color: #fff;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 22px;
+  cursor: pointer;
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}

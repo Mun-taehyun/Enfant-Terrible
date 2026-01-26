@@ -1,205 +1,204 @@
+
+/* 1. 전체 배경: 살짝 따스한 톤의 라이트 그레이 */
 #auth-wrapper {
-    padding: 100px 0px 150px;
-    min-width: 1440px;
-    height: calc(100vh - 68px - 100px - 150px);
-    /*기본 높이 100vh , - 헤더높이 - 상단패딩 - 하단 패딩 계산*/
-    min-height: 960px;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    background-color: pink;
-    background-position: 50% 50%;
-    background-repeat: no-repeat;
-    background-size: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #fcfcfc;
+  padding: 40px;
 }
-/*
-background-image 는 이미지를 웹페이지 배경에 넣을 수 있게 해준다.
-background-repeat 는 배경이미지의 반복성을 나타낸다 (이미지크기보다 크면 여러개 나옴)
-*/
 
+/* 2. 메인 컨테이너: 쥬뵨트론과 카드를 감싸는 박스 */
 .auth-container {
-    width: 1200px;
-    height: 100%;
-
-    display: grid;
-    grid-template-columns: 7fr 5fr; 
-    column-gap: 78px;
+  display: flex;
+  width: 100%;
+  max-width: 1000px;
+  background: #ffffff;
+  border-radius: 30px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
 }
-/*
-display:flex => 1차원적으로 가로 , 세로 배열이 가능하다.
-display:grid => 2차원적으로 행렬 구조로 배치가 가능하다. 
 
-grid-template-columns 는 열구조를 정의하는 속성이다.
-grid-template-columns: 7fr 5fr; 는 7 : 5 비율로 왼쪽 오른쪽을 구분한다는 의미다
-
-상태  |     columns 7비율     |  columns 5비율 |
-
-*/
-
+/* 3. 왼쪽 쥬뵨트론 섹션: 브랜드 홍보 영역 */
 .auth-jumbotron-box {
-    grid-column: 1 / 2;
-
-    height: 100%;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  flex: 1;
+  background: linear-gradient(135deg, #ff9f43 0%, #ff6b6b 100%); /* 펫 쇼핑몰의 활기찬 에너지 */
+  padding: 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: #ffffff;
 }
-/* column 7비율 자리를 차치 */
 
-.auth-jumbotron-contents {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-} /* 아이콘 , 내용 , 내용  기준 => 세로 교차축 가로 중앙선 배열 */
-
+/* 로고 스타일 */
 .auth-logo-icon {
-    width: 50px;
-    height: 50px;
-
-    background-color: black;
-    background-position: 50% 50%;
-    background-size: 100% 100%;
+  font-size: 28px;
+  font-weight: 900;
+  margin-bottom: 40px;
+  letter-spacing: -1px;
+  background: rgba(255, 255, 255, 0.2);
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 12px;
 }
 
 .auth-jumbotron-text-box {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .auth-jumbotron-text {
-    color: white;
-
-    font-size:40px;
-    font-weight: 400;
-    line-height: 140%;
-    letter-spacing: -1.2px;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.4;
+  word-break: keep-all;
 }
 
-.auth-card {
-    grid-column: 2 / 3;
-
-    border-radius: 10px;
-    padding: 50px 50px 30px;
-
-    background-color: white;
-    box-shadow: 0px 4px 47px 0px gray;
+/* 4. 오른쪽 카드 영역 (SignInCard, SignUpCard 등이 들어가는 곳) */
+/* 카드 컴포넌트들이 이 클래스를 가지고 있다고 가정 */
+.auth-card, .SignInCard, .SignUpCard {
+  flex: 1;
+  padding: 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: #fff;
 }
-/* 
-column 5비율 자리를 차지
-box-shadow 박스 주변에 음영이 생긴다.. 
-*/
 
-.auth-card-box {
-    height: 100%;
-
-
-    display: flex;
+/* 모바일 대응: 세로 배치 */
+@media (max-width: 850px) {
+  #auth-wrapper {
+    padding: 20px;
+  }
+  
+  .auth-container {
     flex-direction: column;
-    justify-content: space-between;
-}
-.auth-card-top {
-    display: flex;
-    flex-direction: column;
-    gap: 40px
-}/*세로로 요소 정렬.. gap 40px*/
+    max-width: 450px;
+  }
+  
+  .auth-jumbotron-box {
+    padding: 40px;
+    text-align: center;
+  }
+  
+  .auth-logo-icon {
+    margin: 0 auto 20px;
+  }
+  
+  .auth-jumbotron-text {
+    font-size: 24px;
+  }
 
+  .auth-card, .SignInCard, .SignUpCard {
+    padding: 40px 30px;
+  }
+} /*메인 컴포넌트*/
+
+
+/* 1. 카드 헤더 및 페이지 표시 */
 .auth-card-title-box {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 24px;
 }
 
 .auth-card-title {
-    color: black;
-
-    font-size: 24px;
-    font-weight: 600;
-    line-height: 140%;
+  font-size: 22px;
+  font-weight: 800;
+  color: #333;
 }
 
 .auth-card-page {
-    color: gray;
-
-    font-size: 24px;
-    font-weight: 600;
-    line-height: 140%;   
+  font-size: 14px;
+  font-weight: 600;
+  color: #ff9f43; /* 포인트 컬러로 현재 단계 강조 */
+  background-color: #fff5eb;
+  padding: 4px 12px;
+  border-radius: 20px;
 }
 
-.auth-card-bottom {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+/* 2. 이메일 입력 + 인증 버튼 레이아웃 */
+.auth-email-box {
+  display: flex;
+  align-items: flex-end; /* 인풋 라벨 높이 때문에 하단 정렬 */
+  gap: 8px;
+  margin-bottom: 16px;
 }
 
+/* 이메일 박스 내의 인풋박스 너비 조정 */
+.auth-email-box > div:first-child {
+  flex: 1;
+}
+
+/* 인증/전송 버튼 스타일 */
+.email-mail-button-click {
+  height: 50px; /* 인풋 높이와 통일 */
+  padding: 0 16px;
+  background-color: #f8f8f8;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  color: #666;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 0px; /* 인풋 에러 메시지 공간 고려 */
+}
+
+.email-mail-button-click:hover {
+  background-color: #ff9f43;
+  color: #fff;
+  border-color: #ff9f43;
+}
+
+/* 3. 에러 메시지 영역 */
 .auth-sign-in-error-box {
-    margin-bottom: -4px;
+  background-color: #fff1f0;
+  border: 1px solid #ffa39e;
+  border-radius: 12px;
+  padding: 14px;
+  margin: 20px 0;
 }
 
 .auth-sign-in-error-message {
-    color: red;
-
-    font-size: 12px;
-    font-weight: 400;
-    line-height: 140%;
-
-    white-space: pre-wrap;
-}/* 글씨가 자동으로 줄바꿈 유지 + 자동 줄바꿈을 할 수 있게.. */
-
-.auth-description-box {
-    color: gray;
-
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 140%;
+  color: #ff4d4f;
+  font-size: 13px;
+  text-align: center;
+  line-height: 1.5;
+  white-space: pre-wrap;
 }
 
-.auth-description-link {
-    color : black;
-    cursor: pointer;
-    font-weight: 600;
+/* 4. 하단 버튼 영역 */
+.auth-card-bottom {
+  margin-top: 10px;
 }
 
-.auth-consent-box {
-    display: flex;
-    align-items: center;
-    gap: 6px;
+.black-large-full-button {
+  width: 100%;
+  height: 56px;
+  background-color: #333;
+  color: #fff;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.auth-check-box {
-    cursor: pointer;
-
-    width: 24px;
-    height: 24px;
+.black-large-full-button:hover {
+  background-color: #000;
+  transform: translateY(-2px);
 }
 
-.auth-consent-title {
-    color: black;
+/*회원 로그인 비번찾기 공통 css*/
 
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 140%;
-}
-
-.auth-consent-title-error {
-    color: red;
-
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 140%;
-}
-
-.auth-consent-link {
-    color: black;
-
-    font-size: 14px;
-    font-weight: 600;
-    line-height: 140%;    
-}
 
 
 

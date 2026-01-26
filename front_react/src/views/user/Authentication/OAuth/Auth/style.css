@@ -1,0 +1,89 @@
+
+/* 전체 배경: 포근한 느낌의 미색 */
+.auth-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #fffaf5; 
+  padding: 40px 20px;
+}
+
+/* 카드 본체: 둥글둥글하고 깔끔한 화이트 박스 */
+.auth-card-box {
+  width: 100%;
+  max-width: 460px;
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 40px;
+  box-shadow: 0 12px 40px rgba(255, 159, 67, 0.1); /* 은은한 주황빛 그림자 */
+}
+
+/* 타이틀 영역 */
+.auth-card-top {
+  margin-bottom: 30px;
+}
+
+.auth-card-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #333;
+  text-align: center;
+  letter-spacing: -0.5px;
+}
+
+/* 발바닥 포인트 (타이틀 아래나 옆에 장식) */
+.auth-card-title::after {
+  content: ' 🐾';
+  color: #ff9f43;
+}
+
+/* 하단 영역 (에러메시지 + 버튼) */
+.auth-card-bottom {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* 에러 메시지 박스: 눈에 띄지만 부드럽게 */
+.auth-sign-in-error-box {
+  background-color: #fff1f0;
+  border: 1px solid #ffa39e;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.auth-sign-in-error-message {
+  color: #ff4d4f;
+  font-size: 13px;
+  text-align: center;
+  line-height: 1.5;
+  white-space: pre-wrap; /* \n 개행 적용 */
+}
+
+/* 회원가입 버튼: 펫 쇼핑몰의 메인 컬러(오렌지/블랙) */
+.black-large-full-button {
+  width: 100%;
+  height: 56px;
+  background-color: #333; /* 시크한 블랙 혹은 #ff9f43 오렌지 추천 */
+  color: #ffffff;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.black-large-full-button:hover {
+  background-color: #000;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.black-large-full-button:active {
+  transform: translateY(0);
+}

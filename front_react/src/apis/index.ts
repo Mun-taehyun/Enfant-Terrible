@@ -1,4 +1,8 @@
+import { AUTH_LOGIN_PATH, AUTH_PATH } from "@/constant/user/route.index";
 import axios from "axios";
+
+
+
 
 const API_DOMAIN = "http://localhost:8080/api";
 // const BASE_URL = "https://4eb28f5b-12e9-4051-8cf1-74cb997b3a9f.mock.pstmn.io"
@@ -54,6 +58,11 @@ apiClient.interceptors.response.use(
 
         // 2. 에러 메시지 추출 경로를 더 정밀하게 체크
         const serverMessage = error.response?.data?.message;
+
+
+        //만약 인증오류가 뜬다면 로그인 페이지로 이동 (토큰 여부로 체크)
+        const serverStatus = error.response?.status === 401;
+        if(serverStatus) return window.location.href = AUTH_PATH() + AUTH_LOGIN_PATH();
         
         // 만약 error.response가 없다면 (네트워크 자체 문제)
         if (!error.response) {

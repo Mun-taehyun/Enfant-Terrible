@@ -1,7 +1,7 @@
 import PutCartItemRequestDto from "@/apis/user/request/cart/put-cart-item-request.dto";
 import { OrderFromCartRequestDto } from "@/apis/user/request/order";
 import { AUTH_LOGIN_PATH, AUTH_PATH } from "@/constant/user/route.index";
-import { cartQueries, orderQueries } from "@/querys/user/queryhooks";
+import { cartQueries, orderQueries, pointQueries } from "@/querys/user/queryhooks";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/use-sign.hook";
@@ -30,6 +30,9 @@ export const useCart = () => {
     const orderMutation = orderQueries.usePostOrderFromCart();
 
     const items = Array.isArray(cartData) ? cartData : [];
+
+    //서버상태 : 포인트 요청
+    const {data: pointData} = pointQueries.useBalance();
 
     //상태 : 선택여부 
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
@@ -78,7 +81,8 @@ export const useCart = () => {
             receiverPhone: myInfo!.tel,
             zipCode: myInfo!.zipCode,
             addressBase: myInfo!.addressBase,
-            addressDetail: myInfo ? myInfo!.addressDetail : null
+            addressDetail: myInfo ? myInfo!.addressDetail : null,
+            usedPoint: pointData ? pointData!.balance : 0,           
         };
 
         orderMutation.mutate(requestBody, {

@@ -7,6 +7,7 @@ import { bannerKeys } from "./key";
 import { orderKeys } from "./key";
 import { paymentKeys } from "./key";
 import { pointKeys } from "./key";
+import { inquiryKeys } from "./key";
 
 export {
     userKey,
@@ -17,5 +18,6 @@ export {
     bannerKeys,
     orderKeys,
     paymentKeys,
-    pointKeys
+    pointKeys,
+    inquiryKeys
 }

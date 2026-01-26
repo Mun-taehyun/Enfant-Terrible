@@ -1,4 +1,5 @@
 import { useProduct } from "@/hooks/user/product/use-product.hook";
+import './style.css';
 
 
 //컴포넌트 : 제품상세이미지 보기

@@ -1,10 +1,14 @@
 import PetCard from "@/components/user/PetCard";
 import { useAuth } from "@/hooks/user/auth/use-sign.hook";
-import { userQueries } from "@/querys/user/queryhooks";
+import { orderQueries, pointQueries, reviewQueries, userQueries } from "@/querys/user/queryhooks";
 import './style.css';
 import { usePet } from "@/hooks/user/pet/pet.hook";
 import { useNavigate } from "react-router-dom";
-import { AUTH_ADD_INFOMATION_PATH, AUTH_PATH, MAIN_PATH, USER_PATH, USER_UPDATE_PATH } from "@/constant/user/route.index";
+import { AUTH_ADD_INFOMATION_PATH, AUTH_PATH, MAIN_PATH, POINT_PATH, USER_PATH, USER_UPDATE_PATH } from "@/constant/user/route.index";
+import ReviewCard from "../../Product/ProductReview";
+import Pagination from "@/components/user/Pagination";
+import { useProduct } from "@/hooks/user/product/use-product.hook";
+import { OrderList } from "@/components/user/Order/OrderList";
 
 
 //컴포넌트 : 유저 마이페이지 
@@ -20,14 +24,18 @@ export default function UserPage() {
         scrollRef, showLeftBtn, handleScroll, onPetScrollHandler
     } = usePet();
 
+    //커스텀 훅 : url 정보
+    const { searchParams , product} = useProduct();
+
+
     //서버상태 : 펫 정보 
     const {data: petData , isError} = userQueries.usePets();
     //서버상태 : 적립금 불러오기 
-
+    const {data: pointData} = pointQueries.useBalance();
     //서버상태 : 주문내역 불러오기 
-
+    const {data: orderData} = orderQueries.useGetOrderMy(Number(searchParams.get("page")), 5);
     //서버상태 : 내가 쓴 리뷰 불러오기 
-
+    const {data: reviewData} = reviewQueries.useGetReviews(product, Number(searchParams.get("page")) , 5);
     //함수 : 네비게이트 
     const navigate = useNavigate();
 
@@ -42,6 +50,11 @@ export default function UserPage() {
         navigate(myInfo ? USER_PATH() + USER_UPDATE_PATH(myInfo.userId) : MAIN_PATH());
     }
 
+    //이벤트핸들러 : 포인트 히스토리 이동 이벤트 처리 
+    const onPointPageButtonHandler = () => {
+        navigate(myInfo ? POINT_PATH(myInfo.userId) : MAIN_PATH());
+    }
+
     if(!myInfo) return;
     return (
         <div className="user-my-page-component">
@@ -50,7 +63,7 @@ export default function UserPage() {
                     <div className="user-my-page-user-info-welcome">{myInfo.name}님 반갑습니다</div>
                     <div className="user-my-page-user-info-update" onClick={onUserUpdatePageButtonHandler}>{'회원정보 수정'}</div>
                 </div>
-                <div className="user-my-page-user-point">{'적립금 : 5000원'}</div>
+                <div className="user-my-page-user-point" onClick={onPointPageButtonHandler}>{pointData?.balance}</div>          
             </div>
             <div className="user-my-page-user-pet-container">
                 {/* 별도로 구현된 스크롤 버튼 */}
@@ -80,12 +93,22 @@ export default function UserPage() {
             </div>
             <div className="user-my-page-user-order-container">
                 <div className="user-my-page-user-order-box">
-                    <div className="user-my-page-user-order-title"> 주문내역 </div>
-                    {/* {여기에 주문 내역을 넣을 예정} */}
+                    <div className="user-my-page-user-order-title"> 주문내역 </div> 
+                    {orderData ? orderData.items.map((item) => (
+                        <OrderList key={item.orderId} item={item} />
+                    )) : //주문내역 리스트.. 
+                        <div> 주문 내역이 없습니다.</div>
+                    }
                 </div>
                 <div className="user-my-page-user-review-box">
                     <div className="user-my-page-user-review-title"> 상품 리뷰 내역 </div>
-                    {/* {여기에 리뷰 내역을 넣을 예정} */}
+                    {reviewData ? reviewData?.reviewList.map((item) => (//리뷰 목록 렌더링
+                        <ReviewCard key={item.reviewId} props={item} />
+                    )) : "리뷰가 존재하지 않습니다"
+                    }
+                    <div className="pagination-review">
+                        <Pagination totalCount={reviewData?.reviewList.length} />
+                    </div>
                 </div>
                 <div className="user-my-page-user-product-inquiry-box">
                     <div className="user-my-page-user-product-inquiry-title"> 상품 문의 내역 </div>

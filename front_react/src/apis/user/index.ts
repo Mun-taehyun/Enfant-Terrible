@@ -15,9 +15,7 @@ import GetBannerResponseDto from "./response/banner/get-banner-list.response.dto
 import CartItemRequestDto from "./request/cart/cart-item-request.dto";
 import CartItemResponseDto from "./response/cart/cart-item-response.dto";
 import PutCartItemRequestDto from "./request/cart/put-cart-item-request.dto";
-import OrderFromCartRequestDto from "./request/order/order-from-cart-request.dto";
-import OrderCreateResponseDto from "./response/order/order-create-response.dto";
-import { DirectOrderRequestDto } from "./request/order";
+import { DirectOrderRequestDto, GetOrderParamRequestDto, MyOrderCancelRequestDto } from "./request/order";
 import { PaymentCancelRequestDto, PaymentConfirmRequestDto } from "./request/payment";
 import { PaymentCancelResponseDto, PaymentConfirmResponseDto } from "./response/payment";
 import { PointBalanceResponseDto, PointHistoryResponseDto } from "./response/point";
@@ -28,6 +26,10 @@ import ProductSkuResolveResponse from "./response/product/product-sku-resolve-re
 import { QnaMessageResponseDto, QnaRoomResponseDto } from "./response/qna";
 import ProductReviewResponseDto from "./response/review/product-review-response.dto";
 import { ProductReviewCreateRequestDto, ProductReviewUpdateRequestDto } from "./request/review";
+import OrderCreateResponseDto from "./response/order/order-create-response.dto";
+import OrderFromCartRequestDto from "./request/order/order-from-cart-request.dto";
+import { MyOrderCancelResponseDto, MyOrderDetailResponseDto, MyOrderListItemResponseDto, OrderPrepareResponseDto } from "./response/order";
+import ProductInquiryResponseDto from "./response/inquiry/product-inquiry-response.dto";
 
 
 
@@ -183,6 +185,8 @@ const GET_PRODUCT_DETAIL_URL = (productId : number) => `/products/${productId}`;
 //상품 상세 조회
 const GET_PRODUCT_SKU_RESOLVE_URL = (productId : number) => `/products/${productId}/skus/resolve`;
 //상품 sku 확정
+const GET_PRODUCT_RECOMMENDATION_URL = () => `/products/recommendations`;
+//추천 상품 조회 
 
 export const getProductListRequest = async (params : GetProductListRequestDto) : Promise<GetProductListResponseDto> => {
     return apiClient.get(GET_PRODUCT_LIST_URL() , {params} )};
@@ -193,11 +197,25 @@ export const getProductDetailRequest = async (productId : number) : Promise<GetP
 export const getProductSkuResolveRequest = async (productId :number , optionValueIds : number[]) : Promise<ProductSkuResolveResponse> => {
     return apiClient.get(GET_PRODUCT_SKU_RESOLVE_URL(productId) , {params: {optionValueIds: optionValueIds.join(',')}});}
 
+export const getProductRecommendationRequest = async () : Promise<GetProductListResponseDto> => {
+    return apiClient.get(GET_PRODUCT_RECOMMENDATION_URL());}
+
 // ================================ 주문 ============================
 const POST_ORDER_FROM_CART_URL = () => `/order/from-cart`;
 //장바구니에서 주문하기 시.. 
 const POST_ORDER_DIRECT_URL = () => `/order/direct`;
 //즉시 구매 주문하기 시..
+const GET_ORDER_MY_URL = (page : number , size : number) => `/order/my?page=${page}&size=${size}`;
+//내 주문목록 조회
+const GET_ORDER_MY_DETAIL_URL = (orderId : number) => `order/my/${orderId}`;
+//내 주문 상세 조회
+const POST_ORDER_MY_CANCEL_URL = (orderId : number) => `order/my/${orderId}/cancel`;
+//내 주문 취소 
+const GET_ORDER_PREPARE_FROM_CART_URL = () => `/order/prepare/from-cart`;
+//장바구니 주문 사전조회
+const GET_ORDER_PREPARE_DIRECT = () => `/order/prepare/direct`;
+//즉시 주문 사전조회
+
 
 export const postOrderFromCartRequest = async(requestBody : OrderFromCartRequestDto) : Promise<OrderCreateResponseDto> => {
     return apiClient.post(POST_ORDER_FROM_CART_URL(), requestBody);}
@@ -205,6 +223,21 @@ export const postOrderFromCartRequest = async(requestBody : OrderFromCartRequest
 export const postOrderDirectRequest = async(requestBody: DirectOrderRequestDto) : Promise<OrderCreateResponseDto> => {
     return apiClient.post(POST_ORDER_DIRECT_URL(), requestBody);}
 
+export const getOrderMyRequest = async(page:number, size:number) : Promise<MyOrderListItemResponseDto> => {
+    return apiClient.get(GET_ORDER_MY_URL(page,size));} 
+
+export const getOrderMyDetailRequest = async(orderId :number) : Promise<MyOrderDetailResponseDto> => {
+    return apiClient.get(GET_ORDER_MY_DETAIL_URL(orderId));}
+
+export const postOrderMyCancelRequest = async(orderId : number , requestBody : MyOrderCancelRequestDto) : Promise<MyOrderCancelResponseDto> => {
+    return apiClient.post(POST_ORDER_MY_CANCEL_URL(orderId), requestBody);}
+
+export const getOrderPrepareFromCartRequest =async() : Promise<OrderPrepareResponseDto> => {
+    return apiClient.get(GET_ORDER_PREPARE_FROM_CART_URL());}
+
+export const getOrderPrepareDirectRequest = async(params : GetOrderParamRequestDto) : Promise<OrderPrepareResponseDto> => {
+    return apiClient.get(GET_ORDER_PREPARE_DIRECT(), {params});}
+    
 
 //================================= 결제 ============================
 const POST_PAYMENTS_CONFIRM_URL = () => `/payments/confirm`;
@@ -307,6 +340,23 @@ export const putProductReviewRequest = (reviewId : number, requestBody : Product
 export const deleteProductReviewRequest = (reviewId : number) => {
     return apiClient.delete(DELETE_PRODUCTS_REVIEWS_URL(reviewId));}
 
+// ===============================  문의 =================================
+const GET_PRODUCT_INQUIRIES_URL = (productId : number, page : number , size: number) => `/products/${productId}/inquiries?page=${page}&size=${size}`
+//문의 조회 
+const POST_PRODUCT_INQUIRIES_URL = (productId : number) => `/products/${productId}/inquiries`;
+//문의 등록
+const DELETE_PRODUCT_INQUIRIES_URL = (inquiryId: number) => `/inquiries/${inquiryId}`;
+//문의 삭제
+
+
+export const getProductInquiriesRequest = (productId:number, page:number, size:number) : Promise<ProductInquiryResponseDto> => {
+    return apiClient.get(GET_PRODUCT_INQUIRIES_URL(productId,page,size));}
+
+export const postProductInquiriesRequest = (productId:number) : Promise<ProductInquiryResponseDto> => {
+    return apiClient.post(POST_PRODUCT_INQUIRIES_URL(productId))}
+
+export const deleteProductInquiriesRequest = (inquiryId:number) => {
+    return apiClient.delete(DELETE_PRODUCT_INQUIRIES_URL(inquiryId));}
 
 
 // ================================ QNA채팅 ================================
@@ -343,10 +393,8 @@ export const getBannerListRequest = async () : Promise<GetBannerResponseDto> => 
 
 //====================================== 파일 ===============================
 
-const FILE_DOMAIN = `/file`;
-
-const FILE_UPLOAD_URL = () => `${FILE_DOMAIN}/upload`;
+const FILE_DOMAIN = `/upload`;
 
 export const fileUploadRequest = async (data: FormData) => {
-    return apiClient.post(FILE_UPLOAD_URL(), data)
+    return apiClient.post(FILE_DOMAIN, data)
 }; //백엔드 파일 DB데이터 가져오기 

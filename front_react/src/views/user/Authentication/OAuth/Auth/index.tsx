@@ -24,7 +24,7 @@ export default function OAuthAddPage() {
                         <InputBox ref={refForms.tel} label='핸드폰 번호*' type='text' placeholder='핸드폰 번호를 입력해주세요.' 
                                     name='tel' value={formData.tel} onChange={onInputChange} 
                                     error={errors.tel.state} message={errors.tel.message} 
-                                    onkeyDown={(event) => onKeyDown(event, refForms.addressBase)} />
+                                    onkeyDown={(event) => onKeyDown(event, 'addressBase')} />
                         <InputBox ref={refForms.zipCode} label='우편 번호*' type='text' placeholder='우편 번호를 입력해주세요.' 
                                     name='zipCode' value={formData.zipCode} onChange={onInputChange} 
                                     error={errors.zipCode.state} message={errors.zipCode.message}/>
@@ -32,7 +32,7 @@ export default function OAuthAddPage() {
                                     name='addressBase' value={formData.addressBase} onChange={onInputChange} 
                                     error={errors.addressBase.state} message={errors.addressBase.message} 
                                     icon='expend-right-light-icon' onButtonClick={onAddressButtonClickHandler} 
-                                    onkeyDown={(event) => onKeyDown(event, refForms.addressDetail, onAddressButtonClickHandler)}/>
+                                    onkeyDown={(event) => onKeyDown(event, 'addressDetail', onAddressButtonClickHandler)}/>
                         <InputBox ref={refForms.addressDetail} label='상세 주소*' type='text' placeholder='상세 주소를 입력해주세요.' 
                                     name='addressDetail' value={formData.addressDetail} onChange={onInputChange} 
                                     error={false} onkeyDown={(event) => onKeyDown(event, undefined , onOAuthAddHandler)}/>

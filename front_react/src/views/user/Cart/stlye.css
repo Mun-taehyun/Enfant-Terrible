@@ -1,0 +1,140 @@
+/* 1. 전체 레이아웃 (데스크톱 기준 2컬럼) */
+.cart-page-wrapper {
+  display: flex;
+  max-width: 1100px;
+  margin: 40px auto;
+  gap: 30px;
+  padding: 0 20px;
+  align-items: flex-start;
+  font-family: 'Pretendard', sans-serif;
+}
+
+/* 2. 왼쪽 영역: 상품 리스트 */
+.cart-left-container {
+  flex: 1;
+}
+
+/* 상단 컨트롤 (전체선택/삭제) */
+.cart-top-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 10px;
+  border-bottom: 2px solid #f5f5f5;
+  margin-bottom: 15px;
+}
+
+.all-select-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #444;
+  cursor: pointer;
+}
+
+.all-select-group input[type="checkbox"] {
+  accent-color: #ff9f43; /* 펫 쇼핑몰 시그니처 오렌지 */
+  width: 18px;
+  height: 18px;
+}
+
+.action-btn {
+  font-size: 13px;
+  color: #999;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.action-btn:hover {
+  background-color: #f8f8f8;
+  color: #666;
+}
+
+/* 3. 오른쪽 영역: 결제 요약 박스 */
+.cart-right-container {
+  width: 320px;
+  position: sticky; /* 스크롤 내려도 따라오게 */
+  top: 100px;
+}
+
+.order-summary-box {
+  background-color: #fff;
+  border: 1px solid #ffecd2; /* 부드러운 오렌지빛 테두리 */
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 8px 24px rgba(255, 159, 67, 0.08);
+}
+
+.summary-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.order-meta {
+  font-size: 12px;
+  color: #ff9f43;
+  margin-bottom: 20px;
+}
+
+.price-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0;
+  border-top: 1px dashed #ffecd2;
+  margin-top: 10px;
+}
+
+.price-label {
+  font-size: 15px;
+  color: #666;
+  font-weight: 500;
+}
+
+.price-value {
+  font-size: 22px;
+  font-weight: 800;
+  color: #ff6b6b; /* 강조 컬러 */
+}
+
+/* 주문하기 버튼 */
+.order-submit-btn {
+  width: 100%;
+  height: 56px;
+  background-color: #ff9f43;
+  color: #fff;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  margin-top: 10px;
+}
+
+.order-submit-btn:hover {
+  background-color: #e68a2e;
+}
+
+.order-submit-btn:active {
+  transform: scale(0.98);
+}
+
+/* 모바일 대응 */
+@media (max-width: 850px) {
+  .cart-page-wrapper {
+    flex-direction: column;
+  }
+  .cart-right-container {
+    width: 100%;
+    position: static;
+    margin-top: 20px;
+  }
+}

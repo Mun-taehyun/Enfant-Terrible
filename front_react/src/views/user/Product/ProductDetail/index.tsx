@@ -4,6 +4,8 @@ import { useState } from "react";
 import ProductContent from "../ProductContent";
 import ReviewCard from "../ProductReview";
 import { useReview } from "@/hooks/user/review/use-review.hook";
+import Pagination from "@/components/user/Pagination";
+
 
 
 
@@ -23,14 +25,15 @@ export default function ProductDetail() {
             handleAddToCart, //장바구니 추가
         } = useProduct();
 
-    //커스텀 훅 : 리뷰 관련 이벤트 처리 
-    const { } = useReview();
 
 
     //상태 : 탭에 따른 뷰 변화
     const [activeTab, setActiveTab] = useState<'detail' | 'review' | 'qna' | 'delivery'>('detail');
     //상태 : 별점 값 저장 
     const [rating, setRating] = useState("5");
+
+    //커스텀 훅 : 리뷰 데이터 호출
+    const {reviewData } = useReview();
 
 
     if(!productDetail) return;
@@ -141,9 +144,13 @@ export default function ProductDetail() {
                         </div>
 
                         
-                        {reviewData?.map((item) => (//리뷰 목록 렌더링
-                            <ReviewCard key={item.id} item={item} />
-                        ))}
+                        {reviewData ? reviewData?.reviewList.map((item) => (//리뷰 목록 렌더링
+                            <ReviewCard key={item.reviewId} props={item} />
+                        )) : "리뷰가 존재하지 않습니다"
+                        }
+                        <div className="pagination-review">
+                            <Pagination totalCount={reviewData?.reviewList.length} />
+                        </div>
                     </div>
                 )}
             </div>

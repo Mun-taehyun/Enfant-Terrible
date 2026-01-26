@@ -2,7 +2,8 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { productKeys, reviewKeys } from "../keys/key";
 import { deleteProductReviewRequest, getProductReviewRequest, postProductReviewRequest, putProductReviewRequest } from "@/apis/user";
 import { queryClient } from "../queryClient";
-import { ProductReviewCreateRequestDto, ProductReviewUpdateRequestDto } from "@/apis/user/request/review";
+import { ProductReviewUpdateRequestDto } from "@/apis/user/request/review";
+import { ProductReviewItem } from "@/apis/user/request/review/product-review-create-request.dto";
 
 
 
@@ -21,8 +22,9 @@ export const reviewQueries = {
     //쿼리: 리뷰 생성
     usePostReview(productId: number) {
         return useMutation({
-            mutationFn: (body: ProductReviewCreateRequestDto) => 
-                postProductReviewRequest(productId, body),
+            mutationFn: (body: ProductReviewItem) => 
+                postProductReviewRequest(productId, {reviewList: [body]}),
+                //감쌈으로써 사용이 편리해짐.
             onSuccess: () => {
                 // 정해진 상품의 리뷰 변화 
                 queryClient.invalidateQueries({ queryKey: reviewKeys.lists(productId) });

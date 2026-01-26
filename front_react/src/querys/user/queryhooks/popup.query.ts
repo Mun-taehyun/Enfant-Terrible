@@ -4,11 +4,13 @@ import { getPopupListRequest } from "@/apis/user";
 
 
 
-export const usePopups = () => {
+export const popupQueries = {
 
     //쿼리 : 광고팝업 조회
-    return useQuery({
-        queryKey: popupKeys.lists(),
-        queryFn: getPopupListRequest,
-    });
+    usePopup () {
+        return useQuery({
+            queryKey: popupKeys.lists(),
+            queryFn: getPopupListRequest,
+        });
+    }
 };

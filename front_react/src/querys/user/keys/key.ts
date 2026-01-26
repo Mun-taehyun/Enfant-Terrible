@@ -1,3 +1,4 @@
+import { GetOrderParamRequestDto } from "@/apis/user/request/order";
 import PostListRequestDto from "@/apis/user/request/post/post-list-request.dto";
 import { GetProductListRequestDto } from "@/apis/user/request/product";
 
@@ -44,15 +45,24 @@ export const productKeys = {
     skus: (productId: number) => [...productKeys.detail(productId), 'skus'] as const,
     sku: (productId: number, optionValueIds: number[]) => 
         [...productKeys.skus(productId), { optionValueIds }] as const,
+
+    recommendation: () =>
+        [...productKeys.all, 'recommendation'] as const,
 };
 
 //key 관리 : order(주문)
 export const orderKeys = {
-    all: ['orders'] as const,
-    lists: () => [...orderKeys.all, 'list'] as const,
-    details: () => [...orderKeys.all, 'detail'] as const,
-    detail: (orderId: number) => [...orderKeys.details(), orderId] as const,
+  all: ['orders'] as const,
+  // 사전조회
+  prepares: () => [...orderKeys.all, 'prepare'] as const,
+  prepare: (type: 'cart' | 'direct', params?: GetOrderParamRequestDto) => [...orderKeys.prepares(), type, params] as const,
+  // 목록 및 상세
+  myLists: () => [...orderKeys.all, 'my-list'] as const,
+  myList: (page: number, size: number) => [...orderKeys.myLists(), { page, size }] as const,
+  details: () => [...orderKeys.all, 'detail'] as const,
+  detail: (orderId: number) => [...orderKeys.details(), orderId] as const,
 };
+
 
 //key 관리 : payment(결제)
 export const paymentKeys = {
@@ -98,7 +108,15 @@ export const reviewKeys = {
         [...reviewKeys.lists(productId), { page, size }] as const,
 };
 
-//key 관리 : qna(문의)
+//key 관리 : inquiry(상품 문의)
+export const inquiryKeys = {
+  all: ['inquiries'] as const,
+  lists: (productId: number) => [...inquiryKeys.all, 'list', productId] as const,
+  list: (productId: number, page: number, size: number) => 
+    [...inquiryKeys.lists(productId), { page, size }] as const,
+};
+
+//key 관리 : qna(채팅 문의)
 export const qnaKeys = {
     all: ['qna'] as const,
     // 채팅방 목록
