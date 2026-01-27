@@ -1,0 +1,10 @@
+.history/
+# 전부 무시
+*
+
+# front_react만 예외로 추적
+!front_react/
+!front_react/**
+
+# .gitignore 자체는 추적되어야 함
+!.gitignore

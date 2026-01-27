@@ -1,0 +1,14 @@
+{
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Spring Boot-EnfantTerribleApplication<enfantTerrible>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "com.enfantTerrible.enfantTerrible.EnfantTerribleApplication",
+      "projectName": "enfantTerrible",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env"
+    }
+  ]
+}
