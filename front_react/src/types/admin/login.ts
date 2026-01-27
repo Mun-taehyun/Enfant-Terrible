@@ -1,11 +1,11 @@
 // src/types/admin/login.ts
 
 export type AdminLoginRequest = {
-  email: string;
+  adminId: string;
   password: string;
 };
 
 export type AdminLoginResponse = {
+  adminId: string;
   accessToken: string;
-  refreshToken: string;
 };

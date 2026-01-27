@@ -1,8 +1,0 @@
-timestamp,productId,userId,sessionId,clientIp,userAgent
-2026-01-20T16:14:47,2,2,,0:0:0:0:0:0:0:1,PostmanRuntime/7.51.0
-2026-01-20T16:14:52,2,2,,0:0:0:0:0:0:0:1,PostmanRuntime/7.51.0
-2026-01-20T16:14:53,2,2,,0:0:0:0:0:0:0:1,PostmanRuntime/7.51.0
-2026-01-20T16:14:54,2,2,,0:0:0:0:0:0:0:1,PostmanRuntime/7.51.0
-2026-01-20T16:14:55,2,2,,0:0:0:0:0:0:0:1,PostmanRuntime/7.51.0
-2026-01-20T16:14:56,2,2,,0:0:0:0:0:0:0:1,PostmanRuntime/7.51.0
-2026-01-20T16:15:54,2,2,,0:0:0:0:0:0:0:1,PostmanRuntime/7.51.0
