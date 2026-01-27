@@ -1,0 +1,85 @@
+
+
+/* 하단 고정 컨테이너 */
+.order-submit-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: 600px; /* 주문 리스트와 너비 맞춤 */
+  margin: 0 auto;
+  background-color: #ffffff;
+  padding: 16px 20px calc(16px + env(safe-area-inset-bottom)); /* 아이폰 하단 노치 대응 */
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 1000;
+}
+
+/* 금액 표시 영역 */
+.total-amount-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.total-label {
+  font-size: 15px;
+  color: #666;
+  font-weight: 500;
+}
+
+.total-value {
+  font-size: 20px;
+  color: #ff4d4f; /* 강조를 위한 포인트 컬러 */
+  font-weight: 800;
+}
+
+/* 결제 버튼 스타일 */
+.submit-button {
+  width: 100%;
+  height: 54px;
+  border: none;
+  border-radius: 12px;
+  background-color: #333; /* 기본 블랙 테마 */
+  color: #fff;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.submit-button:active:not(:disabled) {
+  transform: scale(0.98);
+  background-color: #000;
+}
+
+/* 🚫 비활성화 상태 (결제 수단 미선택, 구매 불가, 진행 중) */
+.submit-button.disabled {
+  background-color: #ddd;
+  color: #fff;
+  cursor: not-allowed;
+}
+
+/* 로딩 애니메이션 (선택사항) */
+.loading-text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.loading-text::before {
+  content: "";
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

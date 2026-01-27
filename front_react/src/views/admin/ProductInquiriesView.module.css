@@ -1,0 +1,461 @@
+/* src/views/admin/ProductInquiriesView.module.css */
+
+.page {
+  padding: 18px;
+  background: #f6f7fb;
+  min-height: calc(100vh - 60px);
+  box-sizing: border-box;
+}
+
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: #111827;
+}
+
+.topActions {
+  display: flex;
+  gap: 8px;
+}
+
+/* ===== Card ===== */
+.card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid #eef2f7;
+  background: #ffffff;
+}
+
+.cardTitle {
+  font-size: 13px;
+  font-weight: 800;
+  color: #111827;
+}
+
+.cardHeaderRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pageSummary {
+  font-size: 12px;
+  color: #374151;
+  white-space: nowrap;
+}
+
+.pager {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* ===== Filters ===== */
+.filtersGrid {
+  padding: 14px;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+  align-items: end;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.fieldLabel {
+  font-size: 12px;
+  color: #374151;
+  font-weight: 700;
+}
+
+.input,
+.select {
+  height: 38px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 0 12px;
+  font-size: 13px;
+  outline: none;
+  background: #ffffff;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.input:focus,
+.select:focus {
+  border-color: #9ca3af;
+}
+
+.filterButtons {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  align-items: center;
+  height: 38px;
+}
+
+/* ===== Buttons ===== */
+.btn,
+.btnPrimary,
+.btnDanger {
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  color: #111827;
+  white-space: nowrap;
+}
+
+.btn:disabled,
+.btnPrimary:disabled,
+.btnDanger:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.btnPrimary {
+  border-color: #111827;
+  background: #111827;
+  color: #ffffff;
+}
+
+.btnDanger {
+  border-color: #b91c1c;
+  background: #b91c1c;
+  color: #ffffff;
+}
+
+.muted {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.info {
+  padding: 14px;
+  font-size: 13px;
+  color: #374151;
+}
+
+.errorBox {
+  margin: 12px 14px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #fecaca;
+  background: #fff1f2;
+  color: #b91c1c;
+  font-size: 13px;
+}
+
+/* ===== Table ===== */
+.tableWrap {
+  overflow-x: auto;
+  border-top: 1px solid #eef2f7;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+}
+
+/* 기본 th/td는 상세행에서만 의미 있음(요약행은 gridRow에서 별도 처리) */
+.table th,
+.table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #eef2f7;
+  font-size: 13px;
+  color: #111827;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.empty {
+  padding: 18px;
+  text-align: center;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+/* =========================
+   ✅ 핵심: 요약행 5칸 “고정폭 + 중앙 배치”
+   - 화면이 넓어져도 칸이 늘어나지 않음(공백 폭발 방지)
+   - 다른 사이트(관리자 리스트)처럼 컴팩트하게 유지
+   ========================= */
+.gridRow {
+  display: grid;
+
+  /* 5개를 고정폭으로 잡습니다.
+     사용자 칸이 너무 넓어지지 않게 “딱” 제한 */
+  grid-template-columns: 110px 110px 420px 160px 180px;
+
+  /* 칸과 칸 사이도 일정하게 */
+  column-gap: 14px;
+
+  /* 행 높이/정렬 */
+  align-items: center;
+
+  /* ✅ 남는 공간은 양쪽에 버리고, 그리드 자체를 가운데로 */
+  width: max-content;
+  margin: 0 auto;
+}
+
+.thCell,
+.tdCell {
+  min-width: 0;
+  display: flex;
+  align-items: center; /* 위아래 중앙 */
+  height: 52px;       /* 행 높이를 고정해서 깔끔하게 */
+  box-sizing: border-box;
+}
+
+.thCell {
+  background: #f9fafb;
+  font-size: 12px;
+  font-weight: 800;
+  color: #374151;
+  white-space: nowrap;
+  border-bottom: 1px solid #eef2f7;
+  padding: 10px 12px;
+}
+
+.tdCell {
+  border-bottom: 1px solid #eef2f7;
+  padding: 10px 12px;
+}
+
+.thCenter {
+  justify-content: center;
+}
+
+.thRight {
+  justify-content: flex-end;
+}
+
+.centerCell {
+  justify-content: center;
+}
+
+.rightCell {
+  justify-content: flex-end;
+}
+
+.summaryRow {
+  background: #ffffff;
+}
+
+/* 값 강조 */
+.idValue {
+  font-size: 15px;
+  font-weight: 900;
+  color: #111827;
+  white-space: nowrap;
+}
+
+/* 사용자: 사용자ID + 이메일을 한 셀 안에서 컴팩트하게 */
+.userCell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.userIdValue {
+  font-size: 14px;
+  font-weight: 900;
+  color: #111827;
+  white-space: nowrap;
+}
+
+/* 이메일은 길면 말줄임 */
+.userEmail {
+  font-size: 12px;
+  color: #6b7280;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 상태 배지 */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 26px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  border: 1px solid #e5e7eb;
+  white-space: nowrap;
+}
+
+.badgeStatus {
+  background: #eef2ff;
+  border-color: #e0e7ff;
+  color: #1e3a8a;
+}
+
+/* 작업 버튼은 오른쪽에 딱 붙게 */
+.actionRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ===== Detail ===== */
+.detailRow {
+  background: #fbfcff;
+}
+
+.detailCell {
+  padding: 14px 12px;
+}
+
+.detailGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.detailBlock {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #ffffff;
+  padding: 12px;
+}
+
+.blockTitle {
+  font-size: 12px;
+  font-weight: 900;
+  color: #111827;
+  margin-bottom: 8px;
+}
+
+.blockBody {
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.5;
+  font-size: 13px;
+  color: #111827;
+}
+
+.metaText {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #6b7280;
+  word-break: break-all;
+}
+
+.answerPreview {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 10px;
+  background: #f9fafb;
+}
+
+.answerPreviewBody {
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.5;
+  font-size: 13px;
+  color: #111827;
+}
+
+.answerEmpty {
+  font-size: 12px;
+  color: #6b7280;
+  padding: 8px 0;
+}
+
+.answerEditTitle {
+  margin-top: 10px;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 900;
+  color: #111827;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 110px;
+  resize: vertical;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  outline: none;
+  box-sizing: border-box;
+  background: #ffffff;
+}
+
+.textarea:focus {
+  border-color: #9ca3af;
+}
+
+.detailButtons {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 1200px) {
+  .filtersGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .filterButtons {
+    justify-content: flex-start;
+  }
+
+  .detailGrid {
+    grid-template-columns: 1fr;
+  }
+
+  /* 화면이 줄면 사용자 칸 폭을 줄이고, 전체는 가로 스크롤로 안전하게 */
+  .gridRow {
+    grid-template-columns: 100px 100px 340px 150px 170px;
+  }
+}
+
+@media (max-width: 720px) {
+  .filtersGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gridRow {
+    grid-template-columns: 90px 90px 300px 140px 160px;
+  }
+}

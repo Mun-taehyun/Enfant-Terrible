@@ -1,0 +1,182 @@
+/* 1. 전체 컨테이너 (1440px 와이드 레이아웃) */
+.user-my-page-component {
+    max-width: 1440px;
+    margin: 40px auto;
+    padding: 0 30px;
+    font-family: 'Pretendard', sans-serif;
+    color: #333;
+    background-color: #fcfcfc;
+    box-sizing: border-box;
+}
+
+/* 2. 상단 유저 정보 섹션 */
+.user-my-page-user-info-container {
+    background: #ffffff;
+    padding: 40px 50px;
+    border-radius: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    margin-bottom: 50px;
+}
+
+.user-my-page-user-info-welcome {
+    font-size: 2rem;
+    font-weight: 800;
+}
+
+.user-my-page-user-info-update {
+    font-size: 1rem;
+    color: #888;
+    text-decoration: underline;
+    cursor: pointer;
+    margin-top: 8px;
+}
+
+.user-my-page-user-point {
+    background: #fff9db;
+    color: #f08c00;
+    padding: 16px 35px;
+    border-radius: 60px;
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+/* 3. 펫 관리 영역 (스크롤 + 버튼 중앙 정렬) */
+.user-my-page-user-pet-container {
+    position: relative;
+    width: 100%;
+    margin-bottom: 70px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* 실제 가로 스크롤 영역 - 스냅 기능 추가로 쫀득한 손맛 구현 */
+.pet-list-scroll-area {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 20px; /* 고정 간격 */
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    width: 100%;
+    padding: 20px 5px;
+    scroll-snap-type: x mandatory; /* 스냅 활성화 */
+    
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.pet-list-scroll-area::-webkit-scrollbar {
+    display: none;
+}
+
+/* 개별 펫 카드 - 너비 고정 (320px) */
+.pet-card {
+    width: 320px;
+    min-width: 320px;
+    flex-shrink: 0;
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f0f0f0;
+    transition: transform 0.3s ease;
+    scroll-snap-align: start; /* 스크롤 시 카드가 시작 지점에 착 붙음 */
+    box-sizing: border-box;
+}
+.pet-card:hover { transform: translateY(-5px); }
+
+/* 스크롤 화살표 버튼 */
+.scroll-btn {
+    position: absolute;
+    top: 35%;
+    transform: translateY(-50%);
+    z-index: 10;
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    cursor: pointer;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+.scroll-btn:hover { background-color: #f8f9fa; }
+.scroll-btn.left { left: -25px; }
+.scroll-btn.right { right: -25px; }
+
+/* ★ 펫 등록 버튼 (중앙 하단) */
+.user-my-page-user-pet-register-button {
+    margin-top: 30px;
+    padding: 15px 60px;
+    background-color: #222;
+    color: #fff;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+.user-my-page-user-pet-register-button:hover {
+    background-color: #444;
+    transform: scale(1.05);
+}
+
+/* 4. 활동 내역 섹션 */
+.user-my-page-user-order-container {
+    display: flex;
+    flex-direction: column;
+    gap: 35px;
+}
+
+.user-my-page-user-order-box, 
+.user-my-page-user-review-box, 
+.user-my-page-user-product-inquiry-box {
+    background: white;
+    padding: 50px;
+    border-radius: 28px;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.03);
+}
+
+.user-my-page-user-order-title,
+.user-my-page-user-review-title,
+.user-my-page-user-product-inquiry-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #f8f9fa;
+    color: #111;
+}
+
+/* 5. 기타 제어 섹션 */
+.user-my-page-user-other-container {
+    margin-top: 60px;
+    padding-bottom: 100px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.user-my-page-user-delete {
+    color: #ff6b6b;
+    font-size: 1rem;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+.user-my-page-user-delete:hover { opacity: 1; text-decoration: underline; }
+
+.error-pet-message {
+    width: 100%;
+    text-align: center;
+    padding: 50px 0;
+    color: #999;
+    background: #f9f9f9;
+    border-radius: 20px;
+}

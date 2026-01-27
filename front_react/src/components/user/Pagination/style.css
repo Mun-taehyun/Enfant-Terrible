@@ -1,0 +1,87 @@
+/* 전체 컨테이너 */
+#pagination-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 40px 0;
+    user-select: none; /* 드래그 방지 */
+}
+
+/* 이전/다음 버튼 박스 */
+.pagination-change-link-box {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #555;
+}
+
+.pagination-change-link-box:hover {
+    color: #007bff; /* 포인트 컬러 */
+}
+
+.pagination-change-link-text {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* 구분선 (|) */
+.pagination-divider {
+    color: #ddd;
+    font-size: 12px;
+    margin: 0 4px;
+}
+
+/* 일반 숫자 텍스트 */
+.pagination-text {
+    font-size: 14px;
+    color: #888;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.pagination-text:hover {
+    background-color: #f0f4f8;
+    color: #333;
+}
+
+/* 활성화된 숫자 (현재 페이지) */
+.pagination-text-active {
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    background-color: #007bff;
+    padding: 4px 10px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+}
+
+/* 아이콘 박스 및 아이콘 */
+.icon-box-small {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+}
+
+.icon {
+    width: 12px;
+    height: 12px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    opacity: 0.6;
+}
+
+/* 아이콘 이미지 (예시: CSS 삼각형이나 이미지 경로로 교체 가능) */
+.expend-left-icon {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M15 19l-7-7 7-7' /%3E%3C/svg%3E");
+}
+
+.expend-right-icon {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 5l7 7-7 7' /%3E%3C/svg%3E");
+}

@@ -1,0 +1,150 @@
+.order-card-container {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* 헤더: 날짜와 주문번호 */
+.order-header-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 16px;
+}
+
+.order-date-text {
+  font-size: 16px;
+  font-weight: 700;
+  color: #333;
+}
+
+.order-code-text {
+  font-size: 13px;
+  color: #888;
+}
+
+/* 메인 컨텐츠 레이아웃 */
+.order-main-content {
+  display: flex;
+  gap: 16px;
+}
+
+/* 썸네일 이미지 */
+.product-image-area .thumb-img {
+  width: 90px;
+  height: 90px;
+  border-radius: 8px;
+  object-fit: cover;
+  background-color: #f8f8f8;
+}
+
+/* 상세 정보 영역 */
+.order-detail-area {
+  flex: 1; /* 남은 공간 차지 */
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* 상태 및 타임라인 */
+.status-timeline-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.status-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #2f80ed; /* 기본 포인트 컬러 */
+}
+
+/* 상태별 색상 커스텀 (item.status.toLowerCase() 대응) */
+.status-label.shipped { color: #27ae60; }
+.status-label.delivered { color: #333; }
+.status-label.canceled { color: #eb5757; }
+
+.timeline-date {
+  font-size: 13px;
+  color: #666;
+}
+
+.product-name-text {
+  font-size: 15px;
+  font-weight: 500;
+  color: #222;
+  line-height: 1.4;
+}
+
+.total-amount-text {
+  font-size: 16px;
+  font-weight: 700;
+  color: #000;
+}
+
+.tracking-number-text {
+  font-size: 12px;
+  color: #999;
+  margin-top: 4px;
+}
+
+/* 버튼 액션 영역 */
+.action-button-area {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 100px;
+}
+
+.btn-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 12px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid #ddd;
+}
+
+.btn-item.secondary {
+  background-color: #fff;
+  color: #555;
+}
+
+.btn-item.primary {
+  background-color: #fff;
+  border-color: #2f80ed;
+  color: #2f80ed;
+}
+
+.btn-item:hover {
+  background-color: #f9f9f9;
+}
+
+.btn-item.primary:hover {
+  background-color: #f0f7ff;
+}
+
+/* 반응형: 모바일에서는 버튼을 아래로 */
+@media (max-width: 500px) {
+  .order-main-content {
+    flex-direction: column;
+  }
+  .action-button-area {
+    flex-direction: row;
+    margin-top: 12px;
+  }
+  .btn-item {
+    flex: 1;
+  }
+}

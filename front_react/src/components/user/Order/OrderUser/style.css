@@ -1,0 +1,52 @@
+/* 섹션 컨테이너 */
+.order-receiver {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 24px;
+  background-color: #fff;
+  border-radius: 12px;
+  border: 1px solid #eee; /* 은은한 외곽선 */
+}
+
+/* 섹션 타이틀 */
+.order-section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1.5px solid #333; /* 타이틀 아래 강조선 */
+}
+
+/* 각 정보 행 (Row) */
+.receiver-row {
+  display: flex;
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.receiver-row:last-child {
+  margin-bottom: 0;
+}
+
+/* 항목 레이블 (수령인, 연락처 등) */
+.label {
+  width: 80px; /* 고정 너비로 정렬 유지 */
+  font-size: 14px;
+  color: #888;
+  flex-shrink: 0; /* 너비 유지 */
+}
+
+/* 실제 데이터 값 */
+.value {
+  font-size: 15px;
+  color: #333;
+  font-weight: 500;
+  word-break: keep-all; /* 주소가 어색하게 끊기지 않게 함 */
+  flex: 1;
+}
+
+/* 주소 데이터는 정보가 길 수 있으므로 줄간격 조정 */
+.receiver-row:has(.value) .value {
+  color: #222;
+}

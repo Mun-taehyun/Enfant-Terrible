@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.enfantTerrible.enfantTerrible.mapper.admin.post.AdminPostMapper">
+
+  <sql id="adminPostWhere">
+    WHERE 1=1
+
+    <if test="req.postType != null and req.postType != ''">
+      AND p.post_type = #{req.postType}
+    </if>
+
+    <if test="req.userId != null">
+      AND p.user_id = #{req.userId}
+    </if>
+
+    <if test="req.keyword != null and req.keyword != ''">
+      AND p.title LIKE CONCAT('%', #{req.keyword}, '%')
+    </if>
+
+    <if test="req.createdFrom != null">
+      AND p.created_at &gt;= #{req.createdFrom}
+    </if>
+
+    <if test="req.createdTo != null">
+      AND p.created_at &lt;= #{req.createdTo}
+    </if>
+
+    AND p.deleted_at IS NULL
+  </sql>
+
+  <select id="findPosts" resultType="com.enfantTerrible.enfantTerrible.dto.admin.post.AdminPostListResponse">
+    SELECT
+      p.post_id,
+      p.user_id,
+      p.post_type,
+      p.title,
+      p.created_at,
+      p.updated_at
+    FROM et_post p
+    <include refid="adminPostWhere" />
+    ORDER BY
+    <choose>
+      <when test="req.sortBy == 'CREATED_AT'">p.created_at</when>
+      <when test="req.sortBy == 'UPDATED_AT'">p.updated_at</when>
+      <otherwise>p.post_id</otherwise>
+    </choose>
+    <choose>
+      <when test="req.direction == 'ASC'">ASC</when>
+      <otherwise>DESC</otherwise>
+    </choose>
+    LIMIT #{req.size} OFFSET #{req.offset}
+  </select>
+
+  <select id="countPosts" resultType="int">
+    SELECT COUNT(*)
+    FROM et_post p
+    <include refid="adminPostWhere" />
+  </select>
+
+  <select id="findById" resultType="com.enfantTerrible.enfantTerrible.dto.admin.post.AdminPostDetailResponse">
+    SELECT
+      p.post_id,
+      p.user_id,
+      p.post_type,
+      p.ref_type,
+      p.ref_id,
+      p.title,
+      p.content,
+      p.created_at,
+      p.updated_at,
+      p.deleted_at
+    FROM et_post p
+    WHERE p.post_id = #{postId}
+  </select>
+
+  <insert id="insert">
+    INSERT INTO et_post (
+      user_id,
+      post_type,
+      ref_type,
+      ref_id,
+      title,
+      content
+    ) VALUES (
+      #{userId},
+      #{postType},
+      #{refType},
+      #{refId},
+      #{title},
+      #{content}
+    )
+  </insert>
+
+  <select id="findLastInsertId" resultType="long">
+    SELECT LAST_INSERT_ID()
+  </select>
+
+  <update id="update">
+    UPDATE et_post
+    SET
+      post_type = #{postType},
+      ref_type = #{refType},
+      ref_id = #{refId},
+      title = #{title},
+      content = #{content}
+    WHERE post_id = #{postId}
+      AND deleted_at IS NULL
+  </update>
+
+  <update id="softDelete">
+    UPDATE et_post
+    SET deleted_at = NOW()
+    WHERE post_id = #{postId}
+      AND deleted_at IS NULL
+  </update>
+
+</mapper>

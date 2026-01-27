@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.enfantTerrible.enfantTerrible.mapper.product.ProductSkuQueryMapper">
+
+  <!--
+    옵션 조합과 정확히 일치하는 SKU 찾기
+    - 1단계: 옵션 조합이 정확히 일치하는 sku_id 도출
+    - 2단계: 해당 sku_id의 SKU 정보 단건 조회
+  -->
+  <select id="findSkuByExactOptionMatch" resultType="ProductSkuRow">
+    SELECT
+      s.sku_id,
+      s.product_id,
+      s.price,
+      s.stock,
+      s.status
+    FROM et_product_sku s
+    WHERE s.sku_id = (
+      SELECT so.sku_id
+      FROM et_product_sku_option so
+      JOIN et_product_sku s2 ON s2.sku_id = so.sku_id
+      WHERE s2.product_id = #{productId}
+        AND s2.deleted_at IS NULL
+        AND so.option_value_id IN
+        <foreach collection="optionValueIds" item="id" open="(" close=")" separator=",">
+          #{id}
+        </foreach>
+      GROUP BY so.sku_id
+      HAVING COUNT(DISTINCT so.option_value_id) = #{optionCount}
+    )
+  </select>
+
+  <select id="findDefaultSkuByProductId" resultType="ProductSkuRow">
+    SELECT
+      s.sku_id,
+      s.product_id,
+      s.price,
+      s.stock,
+      s.status
+    FROM et_product_sku s
+    LEFT JOIN et_product_sku_option so ON so.sku_id = s.sku_id
+    WHERE s.product_id = #{productId}
+      AND s.deleted_at IS NULL
+    GROUP BY s.sku_id
+    HAVING COUNT(so.option_value_id) = 0
+    ORDER BY s.sku_id ASC
+    LIMIT 1
+  </select>
+
+  <!-- skuId 직접 조회 (옵션 없는 SKU / 내부용) -->
+  <select id="findById" resultType="ProductSkuRow">
+    SELECT
+      sku_id,
+      product_id,
+      price,
+      stock,
+      status
+    FROM et_product_sku
+    WHERE sku_id = #{skuId}
+      AND deleted_at IS NULL
+  </select>
+
+</mapper>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.enfantTerrible.enfantTerrible.mapper.post.PostMapper">
+
+  <select id="findPosts" resultType="com.enfantTerrible.enfantTerrible.dto.post.PostRow">
+    SELECT
+      post_id,
+      user_id,
+      post_type,
+      ref_type,
+      ref_id,
+      title,
+      content,
+      created_at,
+      updated_at,
+      deleted_at
+    FROM et_post
+    WHERE deleted_at IS NULL
+
+    <if test="postType != null and postType != ''">
+      AND post_type = #{postType}
+    </if>
+
+    ORDER BY post_id DESC
+    LIMIT #{size} OFFSET #{offset}
+  </select>
+
+  <select id="findById" resultType="com.enfantTerrible.enfantTerrible.dto.post.PostRow">
+    SELECT
+      post_id,
+      user_id,
+      post_type,
+      ref_type,
+      ref_id,
+      title,
+      content,
+      created_at,
+      updated_at,
+      deleted_at
+    FROM et_post
+    WHERE post_id = #{postId}
+  </select>
+
+</mapper>

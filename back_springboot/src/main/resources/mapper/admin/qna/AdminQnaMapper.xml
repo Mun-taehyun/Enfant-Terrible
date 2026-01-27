@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.enfantTerrible.enfantTerrible.mapper.admin.qna.AdminQnaMapper">
+
+  <sql id="adminQnaRoomWhere">
+    WHERE 1=1
+
+    <if test="req.userId != null">
+      AND r.user_id = #{req.userId}
+    </if>
+  </sql>
+
+  <select id="findRooms" resultType="com.enfantTerrible.enfantTerrible.dto.admin.qna.AdminQnaRoomListResponse">
+    SELECT
+      r.room_id,
+      r.user_id,
+      u.email AS user_email,
+      r.status,
+      r.last_message_at,
+      (
+        SELECT COUNT(*)
+        FROM et_qna_message m
+        WHERE m.room_id = r.room_id
+          AND m.sender = 'USER'
+          AND m.message_id &gt; r.admin_last_read_message_id
+      ) AS unread
+    FROM et_qna_room r
+    INNER JOIN et_user u ON u.user_id = r.user_id
+    <include refid="adminQnaRoomWhere" />
+    ORDER BY
+    <choose>
+      <when test="req.sortBy == 'CREATED_AT'">r.created_at</when>
+      <when test="req.sortBy == 'ROOM_ID'">r.room_id</when>
+      <otherwise>COALESCE(r.last_message_at, r.created_at)</otherwise>
+    </choose>
+    <choose>
+      <when test="req.direction == 'ASC'">ASC</when>
+      <otherwise>DESC</otherwise>
+    </choose>
+    , r.room_id DESC
+    LIMIT #{req.size} OFFSET #{req.offset}
+  </select>
+
+  <select id="countRooms" resultType="int">
+    SELECT COUNT(*)
+    FROM et_qna_room r
+    <include refid="adminQnaRoomWhere" />
+  </select>
+
+</mapper>

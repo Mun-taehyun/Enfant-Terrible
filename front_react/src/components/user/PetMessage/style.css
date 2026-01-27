@@ -1,0 +1,110 @@
+/* 배경 흐리게 & 어둡게 */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; 
+  width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex; justify-content: center; align-items: center;
+  z-index: 9999;
+}
+
+/* 중앙 화이트 카드 - 너비 확장 버전 */
+.modal-card {
+  width: 400px; /* 기존 310px에서 400px로 확장 */
+  background: #ffffff;
+  border-radius: 28px; /* 너비가 커진 만큼 모서리 곡률도 살짝 증가 */
+  padding: 32px; /* 내부 여백을 늘려 더 여유로운 느낌 */
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+  box-sizing: border-box;
+  animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+}
+
+@keyframes popUp {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* 상단 영역 */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px; /* 여백 증가 */
+  width: 100%;
+}
+
+.app-info {
+  display: flex; 
+  align-items: center; 
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.app-info .icon {
+  font-size: 18px; /* 아이콘 살짝 크게 */
+}
+
+.app-info .name {
+  font-size: 14px; 
+  font-weight: 600; 
+  color: #888;
+  white-space: nowrap;
+}
+
+.time-text { 
+  font-size: 13px; 
+  color: #ccc; 
+  white-space: nowrap;
+}
+
+/* 텍스트 컨텐츠 */
+.content-area .title {
+  font-size: 24px; /* 타이틀 크기 확장 */
+  font-weight: 800; 
+  color: #111;
+  margin-bottom: 12px; 
+  letter-spacing: -0.8px;
+}
+
+.content-area .desc {
+  font-size: 16px; /* 본문 크기 확장 */
+  line-height: 1.6;
+  color: #444;
+  word-break: keep-all;
+}
+
+/* 버튼 배치 */
+.button-group {
+  display: flex; 
+  gap: 12px; 
+  margin-top: 32px;
+}
+
+.btn {
+  flex: 1; 
+  height: 54px; /* 버튼 높이 확장 */
+  display: flex; 
+  justify-content: center; 
+  align-items: center;
+  border-radius: 16px; 
+  font-size: 16px; /* 버튼 텍스트 확장 */
+  font-weight: 700;
+  cursor: pointer; 
+  transition: 0.2s;
+  white-space: nowrap;
+}
+
+.btn-later { background: #f4f4f4; color: #999; }
+.btn-go { background: #222; color: #fff; }
+
+.btn:active { transform: scale(0.97); }
+
+/* 모바일 대응 (화면이 400px보다 작아질 경우) */
+@media (max-width: 440px) {
+  .modal-card {
+    width: 90%;
+    min-width: 300px;
+    padding: 24px;
+  }
+}

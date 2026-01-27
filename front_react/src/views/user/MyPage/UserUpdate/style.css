@@ -1,0 +1,80 @@
+/* 전체 배경 */
+.pet-edit-page {
+  min-height: 100vh;
+  background-color: #fdf7f2;
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+
+  padding: 64px 20px;
+}
+
+/* 메인 카드 */
+.pet-edit-card {
+  width: 100%;
+  max-width: 720px;
+
+  background-color: #ffffff;
+  border-radius: 18px;
+
+  padding: 40px 36px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
+}
+
+/* 헤더 */
+.pet-edit-header {
+  margin-bottom: 32px;
+}
+
+.pet-edit-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #2f2a28;
+  margin-bottom: 6px;
+}
+
+.pet-edit-subtitle {
+  font-size: 14px;
+  color: #8b817c;
+}
+
+/* 탭 */
+.pet-edit-tab {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.pet-edit-tab-item {
+  flex: 1;
+  text-align: center;
+
+  padding: 12px 0;
+  border-radius: 14px;
+
+  background-color: #faf5f1;
+  color: #7a6f6a;
+  font-size: 14px;
+  font-weight: 500;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pet-edit-tab-item:hover {
+  background-color: #f2e6dd;
+}
+
+.pet-edit-tab-item.active {
+  background-color: #ffb26b;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* 콘텐츠 영역 */
+.pet-edit-content {
+  background-color: #fffaf6;
+  border-radius: 16px;
+  padding: 32px;
+}

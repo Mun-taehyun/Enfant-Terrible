@@ -1,0 +1,81 @@
+/* 전체 페이지 */
+.point-history-page {
+  width: 100%;
+  padding: 24px 16px;
+  box-sizing: border-box;
+}
+
+/* 타이틀 */
+.point-history-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111;
+  margin-bottom: 16px;
+}
+
+/* 리스트 영역 */
+.point-history-list {
+  border-top: 1px solid #eaeaea;
+}
+
+/* 내역 없음 */
+.point-history-empty {
+  padding: 48px 0;
+  text-align: center;
+  font-size: 14px;
+  color: #999;
+}
+
+/* ===== 한 줄 아이템 ===== */
+
+.point-history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 4px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* 좌측 정보 */
+.point-history-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* 사유 + 타입 */
+.point-history-reason {
+  font-size: 14px;
+  font-weight: 500;
+  color: #111;
+  line-height: 1.3;
+}
+
+.point-history-type {
+  font-size: 12px;
+  font-weight: 400;
+  color: #888;
+}
+
+/* 날짜 */
+.point-history-date {
+  font-size: 12px;
+  color: #aaa;
+}
+
+/* 우측 포인트 */
+.point-history-amount {
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* 적립 */
+.point-history-amount.plus {
+  color: #2f8f2f;
+}
+
+/* 사용 / 차감 */
+.point-history-amount.minus {
+  color: #d64545;
+}

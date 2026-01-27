@@ -1,0 +1,131 @@
+
+
+/* 1. 최외곽 뷰포트: 전체 카테고리의 기준점 */
+.category-view-box {
+    position: relative;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    height: 60px;
+    background: #fff;
+    z-index: 5000; 
+}
+
+/* 2. 대분류 슬라이드 레일 통로 */
+.category-large-control-box {
+    width: 100%;
+    height: 100%;
+    /* 📌 세로로 소분류가 나와야 하므로 hidden을 풀고 보이게 설정 */
+    overflow: visible !important; 
+    position: relative;
+}
+
+.category-main-box {
+    display: flex;
+    width: max-content;
+    height: 100%;
+    transition: transform 0.5s cubic-bezier(0.25, 1, 0.2, 1);
+    position: relative;
+}
+
+/* 3. 대분류 기둥: 소분류가 세로로 정렬될 기준점 */
+.category-large-input-box {
+    flex: 0 0 140px; 
+    display: flex;
+    flex-direction: column; /* 📌 세로 정렬 구조로 변경 */
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    /* 📌 소분류가 해당 대분류 바로 아래에 뜨려면 relative여야 함 */
+    position: relative !important; 
+}
+
+.category-large-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: #333;
+    white-space: nowrap;
+    transition: color 0.2s;
+}
+
+/* 4. 소분류 판넬: 세로형 리스트 디자인 */
+.category-small-box {
+    display: none; /* 호버 전까지 숨김 */
+    position: absolute !important; 
+    
+    /* 📌 대분류 바로 아래 중앙 정렬 */
+    top: 60px !important; 
+    left: 50% !important;
+    transform: translateX(-50%) !important; 
+    
+    min-width: 160px; /* 세로형일 때 글자가 안 겹치도록 너비 확보 */
+    background: #ffffff !important;
+    border: 1px solid #f0f0f0 !important;
+    border-bottom: 3px solid #ff8e0b !important; /* 시그니처 오렌지 */
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+    
+    z-index: 9999 !important;
+    padding: 10px 0 !important;
+}
+
+/* 5. 소분류 내부 아이템: 세로 리스트 정렬 */
+.category-small-input-box {
+    display: flex;
+    flex-direction: column; /* 📌 가로 gap 대신 세로 나열 */
+    width: 100%;
+    margin: 0 auto;
+    padding: 0;
+}
+
+.category-small-name {
+    padding: 12px 20px; /* 클릭 영역 확보 */
+    font-size: 14px;
+    color: #666;
+    white-space: nowrap;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.category-small-name:hover {
+    background-color: #fff9f2; /* 연한 오렌지 배경 */
+    color: #ff8e0b;
+    font-weight: 700;
+}
+
+/* 6. 호버 및 액션 로직 */
+.category-large-input-box:hover .category-small-box {
+    display: block !important;
+}
+
+.category-large-input-box:hover .category-large-name {
+    color: #ff8e0b;
+}
+
+/* 7. 네비게이션 버튼: 글자 가리지 않게 영역 밖으로 밀기 */
+.category-large-left-box,
+.category-large-right-box {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 32px;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 50%;
+    z-index: 6000;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.category-large-left-box { left: -45px; }
+.category-large-right-box { right: -45px; }
+
+.arrow {
+    color: #ff8e0b;
+    font-weight: bold;
+}

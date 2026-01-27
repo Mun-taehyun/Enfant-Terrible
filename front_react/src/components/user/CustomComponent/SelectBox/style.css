@@ -1,0 +1,46 @@
+.chip-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 4px 0;
+}
+
+.chip-item {
+    /* 기본 스타일: 깨끗하고 부드럽게 */
+    padding: 10px 20px;
+    border-radius: 12px; /* 캡슐형보다 조금 더 모던한 느낌 */
+    border: 1.5px solid #F2F2F7;
+    background: #F2F2F7;
+    color: #8E8E93;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 마우스를 올렸을 때 (데스크탑 대응) */
+.chip-item:hover:not(.active) {
+    background: #E5E5EA;
+    border-color: #E5E5EA;
+}
+
+/* 선택되었을 때: 앙팡테리블의 블랙 포인트 */
+.chip-item.active {
+    background: #1C1C1E;
+    color: #FFFFFF;
+    border-color: #1C1C1E;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+}
+
+/* 안내 문구 스타일 */
+.chip-placeholder {
+    width: 100%;
+    padding: 20px;
+    text-align: center;
+    font-size: 14px;
+    color: #AEAEB2;
+    background: #F9F9F9;
+    border: 1px dashed #D1D1D6;
+    border-radius: 12px;
+}
