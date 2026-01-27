@@ -10,7 +10,7 @@ import { unwrapOrThrow } from '../response/login.response';
 
 export const adminSignIn = async (payload: AdminLoginRequest): Promise<AdminLoginResponse> => {
   const { data } = await mainAxios.post<ApiResponse<AdminLoginResponse>>(
-    '/api/admin/auth/sign-in',
+    '/api/admin/login',
     payload
   );
 
