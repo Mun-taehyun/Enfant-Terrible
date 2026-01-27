@@ -5,6 +5,8 @@ import ProductContent from "../ProductContent";
 import ReviewCard from "../ProductReview";
 import { useReview } from "@/hooks/user/review/use-review.hook";
 import Pagination from "@/components/user/Pagination";
+import InquiryBox from "@/components/user/Inquiry";
+import { inquiryQueries } from "@/querys/user/queryhooks/inquiry.query";
 
 
 
@@ -17,7 +19,9 @@ export default function ProductDetail() {
 
     //커스텀 훅: 제품 관련 이벤트 처리 
     const {
-            productDetail, 
+            productDetail,
+            searchParams,
+            product, 
             resolvedSku, 
             isResolving, 
             selectedOptions,  
@@ -28,12 +32,14 @@ export default function ProductDetail() {
 
 
     //상태 : 탭에 따른 뷰 변화
-    const [activeTab, setActiveTab] = useState<'detail' | 'review' | 'qna' | 'delivery'>('detail');
+    const [activeTab, setActiveTab] = useState<'detail' | 'review' | 'inquiry' | 'delivery'>('detail');
     //상태 : 별점 값 저장 
     const [rating, setRating] = useState("5");
 
     //커스텀 훅 : 리뷰 데이터 호출
     const {reviewData } = useReview();
+    //서버상태 : 문의 
+    const {data : inquiryData} = inquiryQueries.useGetInquiries(product, Number(searchParams.get("page")), 5); 
 
 
     if(!productDetail) return;
@@ -113,7 +119,7 @@ export default function ProductDetail() {
                     <div
                         key={tab.key}
                         className={`product-tab-item ${activeTab === tab.key ? 'active' : ''}`}
-                        onClick={() => setActiveTab(tab.key as 'detail' | 'review' | 'qna' | 'delivery')}
+                        onClick={() => setActiveTab(tab.key as 'detail' | 'review' | 'inquiry' | 'delivery')}
                     >
                         {tab.label}
                     </div>
@@ -152,6 +158,10 @@ export default function ProductDetail() {
                             <Pagination totalCount={reviewData?.reviewList.length} />
                         </div>
                     </div>
+                )}
+                {activeTab === 'inquiry' && ( //문의데이터가 있을 경우에 ... 
+                    inquiryData ? inquiryData.inquiryList.map( (item) => (<InquiryBox item={item} />)):
+                    <div> 문의 내역이 존재하지 않습니다. </div>
                 )}
             </div>
         </div>

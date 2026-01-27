@@ -3,8 +3,10 @@ import { usePagination } from "@/hooks/user/uiControl/use-pagination.hook";
 import './style.css';
 
 
+
 interface Props {
     totalCount : number | undefined;
+    onPageChange?: (page : number) => void;
 }
 
 

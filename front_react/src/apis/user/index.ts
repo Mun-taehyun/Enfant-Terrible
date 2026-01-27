@@ -30,6 +30,7 @@ import OrderCreateResponseDto from "./response/order/order-create-response.dto";
 import OrderFromCartRequestDto from "./request/order/order-from-cart-request.dto";
 import { MyOrderCancelResponseDto, MyOrderDetailResponseDto, MyOrderListItemResponseDto, OrderPrepareResponseDto } from "./response/order";
 import ProductInquiryResponseDto from "./response/inquiry/product-inquiry-response.dto";
+import ProductInquiryRequestDto from "./request/inquiry/product-inquiry-request.dto";
 
 
 
@@ -352,8 +353,8 @@ const DELETE_PRODUCT_INQUIRIES_URL = (inquiryId: number) => `/inquiries/${inquir
 export const getProductInquiriesRequest = (productId:number, page:number, size:number) : Promise<ProductInquiryResponseDto> => {
     return apiClient.get(GET_PRODUCT_INQUIRIES_URL(productId,page,size));}
 
-export const postProductInquiriesRequest = (productId:number) : Promise<ProductInquiryResponseDto> => {
-    return apiClient.post(POST_PRODUCT_INQUIRIES_URL(productId))}
+export const postProductInquiriesRequest = (productId:number , requestBody : ProductInquiryRequestDto) : Promise<ProductInquiryResponseDto> => {
+    return apiClient.post(POST_PRODUCT_INQUIRIES_URL(productId), requestBody)}
 
 export const deleteProductInquiriesRequest = (inquiryId:number) => {
     return apiClient.delete(DELETE_PRODUCT_INQUIRIES_URL(inquiryId));}

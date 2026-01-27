@@ -2,11 +2,12 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { inquiryKeys } from "../keys";
 import { queryClient } from "../queryClient";
 import { deleteProductInquiriesRequest, getProductInquiriesRequest, postProductInquiriesRequest } from "@/apis/user";
+import ProductInquiryRequestDto from "@/apis/user/request/inquiry/product-inquiry-request.dto";
 
 
 
 
-export const useInquiryQueries = {
+export const inquiryQueries = {
     // 문의 조회
     useGetInquiries: (productId: number, page: number, size: number) => {
         return useQuery({
@@ -20,7 +21,7 @@ export const useInquiryQueries = {
     // 문의 등록
     usePostInquiry: (productId: number) => {
         return useMutation({
-            mutationFn: () => postProductInquiriesRequest(productId),
+            mutationFn: (data : ProductInquiryRequestDto) => postProductInquiriesRequest(productId, data),
             onSuccess: () => {
                 // 등록 성공 시 목록 새로고침
                 queryClient.invalidateQueries({ queryKey: inquiryKeys.lists(productId) });

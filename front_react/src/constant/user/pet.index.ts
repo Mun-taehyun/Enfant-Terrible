@@ -8,14 +8,14 @@ export const BREED_DATA: Record<string, string[]> = {
         '뱅갈', '페르시안', '노르웨이 숲', '스코티쉬 폴드', '메인쿤'
     ],
     '기타': [
-        '햄스터', '토끼', '기니피그', '고슴도치', '패럿', '슈가글라이더', '거북이', '도마뱀'
+        '햄스터', '토끼', '새', '물고기', '파충류', '기타'
     ]
 };
 //종에 대응하는 모든 품종
 
 export const PET_TYPES = ['강아지', '고양이', '기타'];
 //펫 타입
-export const GENDER_TYPES = ['M', 'F'];
+export const GENDER_TYPES = ['수컷', '암컷', '미확인'];
 //펫 성별 타입
 export const NEUTERED_TYPES = [
     { label: '했어요', value: true },
