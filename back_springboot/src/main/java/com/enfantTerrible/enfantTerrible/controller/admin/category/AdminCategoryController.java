@@ -9,8 +9,6 @@ import com.enfantTerrible.enfantTerrible.dto.admin.category.AdminCategoryCreateR
 import com.enfantTerrible.enfantTerrible.dto.admin.category.AdminCategoryResponse;
 import com.enfantTerrible.enfantTerrible.dto.admin.category.AdminCategoryUpdateRequest;
 import com.enfantTerrible.enfantTerrible.service.admin.category.AdminCategoryService;
-
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -34,7 +32,7 @@ public class AdminCategoryController {
    */
   @PostMapping
   public ApiResponse<Void> createCategory(
-      @Valid @RequestBody AdminCategoryCreateRequest req
+      @RequestBody AdminCategoryCreateRequest req
   ) {
     adminCategoryService.createCategory(req);
     return ApiResponse.successMessage("카테고리 생성 성공");
@@ -47,7 +45,7 @@ public class AdminCategoryController {
   @PatchMapping("/{categoryId}")
   public ApiResponse<Void> updateCategory(
       @PathVariable Long categoryId,
-      @Valid @RequestBody AdminCategoryUpdateRequest req
+      @RequestBody AdminCategoryUpdateRequest req
   ) {
     // path 변수 우선
     req.setCategoryId(categoryId);

@@ -17,8 +17,6 @@ import com.enfantTerrible.enfantTerrible.dto.point.PointHistoryResponse;
 import com.enfantTerrible.enfantTerrible.exception.BusinessException;
 import com.enfantTerrible.enfantTerrible.security.CustomUserPrincipal;
 import com.enfantTerrible.enfantTerrible.service.point.PointService;
-
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -61,7 +59,7 @@ public class PointController {
   @PostMapping("/me/earn")
   public ApiResponse<Void> earn(
       @AuthenticationPrincipal CustomUserPrincipal principal,
-      @Valid @RequestBody PointChangeRequest req
+      @RequestBody PointChangeRequest req
   ) {
     if (principal == null) {
       throw new BusinessException("로그인이 필요합니다.");
@@ -74,7 +72,7 @@ public class PointController {
   @PostMapping("/me/use")
   public ApiResponse<Void> use(
       @AuthenticationPrincipal CustomUserPrincipal principal,
-      @Valid @RequestBody PointChangeRequest req
+      @RequestBody PointChangeRequest req
   ) {
     if (principal == null) {
       throw new BusinessException("로그인이 필요합니다.");

@@ -5,8 +5,6 @@ import org.springframework.web.bind.annotation.*;
 import com.enfantTerrible.enfantTerrible.common.response.ApiResponse;
 import com.enfantTerrible.enfantTerrible.dto.admin.product.*;
 import com.enfantTerrible.enfantTerrible.service.admin.product.AdminProductOptionService;
-
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -30,7 +28,7 @@ public class AdminProductOptionController {
 
   @PostMapping("/groups")
   public ApiResponse<Void> createGroup(
-      @Valid @RequestBody AdminProductOptionGroupSaveRequest req
+      @RequestBody AdminProductOptionGroupSaveRequest req
   ) {
     optionService.createGroup(req);
     return ApiResponse.successMessage("옵션 그룹 생성 성공");
@@ -39,7 +37,7 @@ public class AdminProductOptionController {
   @PutMapping("/groups/{groupId}")
   public ApiResponse<Void> updateGroup(
       @PathVariable Long groupId,
-      @Valid @RequestBody AdminProductOptionGroupSaveRequest req
+      @RequestBody AdminProductOptionGroupSaveRequest req
   ) {
     optionService.updateGroup(groupId, req);
     return ApiResponse.successMessage("옵션 그룹 수정 성공");
@@ -67,7 +65,7 @@ public class AdminProductOptionController {
 
   @PostMapping("/values")
   public ApiResponse<Void> createValue(
-      @Valid @RequestBody AdminProductOptionValueSaveRequest req
+      @RequestBody AdminProductOptionValueSaveRequest req
   ) {
     optionService.createValue(req);
     return ApiResponse.successMessage("옵션 값 생성 성공");
@@ -76,7 +74,7 @@ public class AdminProductOptionController {
   @PutMapping("/values/{valueId}")
   public ApiResponse<Void> updateValue(
       @PathVariable Long valueId,
-      @Valid @RequestBody AdminProductOptionValueSaveRequest req
+      @RequestBody AdminProductOptionValueSaveRequest req
   ) {
     optionService.updateValue(valueId, req);
     return ApiResponse.successMessage("옵션 값 수정 성공");

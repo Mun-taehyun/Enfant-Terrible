@@ -17,8 +17,6 @@ import com.enfantTerrible.enfantTerrible.dto.admin.inquiry.AdminProductInquiryLi
 import com.enfantTerrible.enfantTerrible.exception.BusinessException;
 import com.enfantTerrible.enfantTerrible.security.CustomUserPrincipal;
 import com.enfantTerrible.enfantTerrible.service.admin.inquiry.AdminProductInquiryService;
-
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -42,7 +40,7 @@ public class AdminProductInquiryController {
   public ApiResponse<Void> answer(
       @AuthenticationPrincipal CustomUserPrincipal principal,
       @PathVariable Long inquiryId,
-      @Valid @RequestBody AdminProductInquiryAnswerRequest req
+      @RequestBody AdminProductInquiryAnswerRequest req
   ) {
     if (principal == null) {
       throw new BusinessException("로그인이 필요합니다.");

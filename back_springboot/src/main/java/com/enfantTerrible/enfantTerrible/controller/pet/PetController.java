@@ -10,8 +10,6 @@ import com.enfantTerrible.enfantTerrible.dto.pet.PetResponse;
 import com.enfantTerrible.enfantTerrible.dto.pet.PetSaveRequest;
 import com.enfantTerrible.enfantTerrible.security.CustomUserPrincipal;
 import com.enfantTerrible.enfantTerrible.service.pet.PetService;
-
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -27,7 +25,7 @@ public class PetController {
   @PostMapping
   public ApiResponse<Long> createPet(
     @AuthenticationPrincipal CustomUserPrincipal principal,
-    @Valid @RequestBody PetSaveRequest request
+    @RequestBody PetSaveRequest request
   ) {
     Long petId = petService.createPet(principal.getUserId(), request);
     return ApiResponse.success(petId, "펫 등록 완료");
@@ -53,7 +51,7 @@ public class PetController {
   public ApiResponse<Void> updatePet(
     @AuthenticationPrincipal CustomUserPrincipal principal,
     @PathVariable Long petId,
-    @Valid @RequestBody PetSaveRequest request
+    @RequestBody PetSaveRequest request
   ) {
     petService.updatePet(principal.getUserId(), petId, request);
     return ApiResponse.successMessage("펫 정보 수정 완료");

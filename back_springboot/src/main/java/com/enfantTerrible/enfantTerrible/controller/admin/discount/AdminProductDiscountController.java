@@ -16,8 +16,6 @@ import com.enfantTerrible.enfantTerrible.common.response.ApiResponse;
 import com.enfantTerrible.enfantTerrible.dto.admin.discount.AdminProductDiscountResponse;
 import com.enfantTerrible.enfantTerrible.dto.admin.discount.AdminProductDiscountSaveRequest;
 import com.enfantTerrible.enfantTerrible.service.admin.discount.AdminProductDiscountService;
-
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -39,7 +37,7 @@ public class AdminProductDiscountController {
 
   @PostMapping
   public ApiResponse<Long> create(
-      @Valid @RequestBody AdminProductDiscountSaveRequest req
+      @RequestBody AdminProductDiscountSaveRequest req
   ) {
     return ApiResponse.success(
         adminProductDiscountService.create(req),
@@ -50,7 +48,7 @@ public class AdminProductDiscountController {
   @PutMapping("/{discountId}")
   public ApiResponse<Void> update(
       @PathVariable Long discountId,
-      @Valid @RequestBody AdminProductDiscountSaveRequest req
+      @RequestBody AdminProductDiscountSaveRequest req
   ) {
     adminProductDiscountService.update(discountId, req);
     return ApiResponse.successMessage("상품 할인 수정 성공");

@@ -12,8 +12,6 @@ import com.enfantTerrible.enfantTerrible.dto.cart.CartItemUpdateRequest;
 import com.enfantTerrible.enfantTerrible.exception.BusinessException;
 import com.enfantTerrible.enfantTerrible.security.CustomUserPrincipal;
 import com.enfantTerrible.enfantTerrible.service.cart.CartService;
-
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -25,7 +23,7 @@ public class CartController {
 
   @PostMapping("/items")
   public ApiResponse<Void> addItem(
-      @Valid @RequestBody CartItemAddRequest req,
+      @RequestBody CartItemAddRequest req,
       @AuthenticationPrincipal CustomUserPrincipal principal
   ) {
     if (principal == null) {
@@ -51,7 +49,7 @@ public class CartController {
   @PutMapping("/items/{cartItemId}")
   public ApiResponse<Void> updateItem(
       @PathVariable Long cartItemId,
-      @Valid @RequestBody CartItemUpdateRequest req,
+      @RequestBody CartItemUpdateRequest req,
       @AuthenticationPrincipal CustomUserPrincipal principal
   ) {
     if (principal == null) {

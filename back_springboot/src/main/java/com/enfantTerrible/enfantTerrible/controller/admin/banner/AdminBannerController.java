@@ -19,8 +19,6 @@ import com.enfantTerrible.enfantTerrible.dto.admin.banner.AdminBannerListRespons
 import com.enfantTerrible.enfantTerrible.dto.admin.banner.AdminBannerSaveRequest;
 import com.enfantTerrible.enfantTerrible.service.admin.banner.AdminBannerService;
 import com.enfantTerrible.enfantTerrible.service.file.LocalFileStorageService;
-
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -53,7 +51,7 @@ public class AdminBannerController {
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ApiResponse<Long> create(
-      @Valid @RequestPart("req") AdminBannerSaveRequest req,
+      @RequestPart("req") AdminBannerSaveRequest req,
       @RequestPart(value = "image", required = false) MultipartFile image
   ) {
     if (image != null && !image.isEmpty()) {
@@ -69,7 +67,7 @@ public class AdminBannerController {
   @PutMapping(value = "/{bannerId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ApiResponse<Void> update(
       @PathVariable Long bannerId,
-      @Valid @RequestPart("req") AdminBannerSaveRequest req,
+      @RequestPart("req") AdminBannerSaveRequest req,
       @RequestPart(value = "image", required = false) MultipartFile image
   ) {
     if (image != null && !image.isEmpty()) {

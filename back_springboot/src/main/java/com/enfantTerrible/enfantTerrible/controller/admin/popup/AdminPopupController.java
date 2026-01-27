@@ -19,8 +19,6 @@ import com.enfantTerrible.enfantTerrible.dto.admin.popup.AdminPopupListResponse;
 import com.enfantTerrible.enfantTerrible.dto.admin.popup.AdminPopupSaveRequest;
 import com.enfantTerrible.enfantTerrible.service.admin.popup.AdminPopupService;
 import com.enfantTerrible.enfantTerrible.service.file.LocalFileStorageService;
-
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -53,7 +51,7 @@ public class AdminPopupController {
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ApiResponse<Long> create(
-      @Valid @RequestPart("req") AdminPopupSaveRequest req,
+      @RequestPart("req") AdminPopupSaveRequest req,
       @RequestPart(value = "image", required = false) MultipartFile image
   ) {
     if (image != null && !image.isEmpty()) {
@@ -69,7 +67,7 @@ public class AdminPopupController {
   @PutMapping(value = "/{popupId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ApiResponse<Void> update(
       @PathVariable Long popupId,
-      @Valid @RequestPart("req") AdminPopupSaveRequest req,
+      @RequestPart("req") AdminPopupSaveRequest req,
       @RequestPart(value = "image", required = false) MultipartFile image
   ) {
     if (image != null && !image.isEmpty()) {

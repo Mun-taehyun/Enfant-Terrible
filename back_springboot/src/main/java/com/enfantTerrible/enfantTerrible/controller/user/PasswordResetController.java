@@ -8,8 +8,6 @@ import com.enfantTerrible.enfantTerrible.dto.auth.EmailVerificationRequest;
 import com.enfantTerrible.enfantTerrible.dto.user.ResetPasswordRequest;
 import com.enfantTerrible.enfantTerrible.service.auth.EmailVerificationService;
 import com.enfantTerrible.enfantTerrible.service.user.UserService;
-
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -25,7 +23,7 @@ public class PasswordResetController {
    */
   @PostMapping("/request")
   public ApiResponse<Void> request(
-    @Valid @RequestBody EmailRequest req
+    @RequestBody EmailRequest req
   ) {
     emailVerificationService.sendPasswordResetVerification(req.getEmail());
     return ApiResponse.successMessage("비밀번호 재설정 인증 메일 발송 완료");
@@ -36,7 +34,7 @@ public class PasswordResetController {
    */
   @PostMapping("/verify")
   public ApiResponse<Void> verify(
-    @Valid @RequestBody EmailVerificationRequest req
+    @RequestBody EmailVerificationRequest req
   ) {
     emailVerificationService.verifyPasswordResetCode(
       req.getEmail(),
@@ -50,7 +48,7 @@ public class PasswordResetController {
    */
   @PutMapping
   public ApiResponse<Void> resetPassword(
-    @Valid @RequestBody ResetPasswordRequest req
+    @RequestBody ResetPasswordRequest req
   ) {
     userService.resetPassword(req);
     return ApiResponse.successMessage("비밀번호 재설정 완료");

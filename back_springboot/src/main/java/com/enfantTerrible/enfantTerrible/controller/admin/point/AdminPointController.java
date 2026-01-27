@@ -14,8 +14,6 @@ import com.enfantTerrible.enfantTerrible.dto.admin.point.AdminPointBalanceRespon
 import com.enfantTerrible.enfantTerrible.dto.admin.point.AdminPointHistoryRequest;
 import com.enfantTerrible.enfantTerrible.dto.admin.point.AdminPointHistoryResponse;
 import com.enfantTerrible.enfantTerrible.service.admin.point.AdminPointService;
-
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -49,7 +47,7 @@ public class AdminPointController {
   @PostMapping("/users/{userId}/adjust")
   public ApiResponse<Void> adjust(
       @PathVariable Long userId,
-      @Valid @RequestBody AdminPointAdjustRequest req
+      @RequestBody AdminPointAdjustRequest req
   ) {
     adminPointService.adjust(userId, req);
     return ApiResponse.successMessage("관리자 포인트 조정 완료");

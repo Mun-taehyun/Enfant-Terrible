@@ -12,8 +12,6 @@ import com.enfantTerrible.enfantTerrible.exception.BusinessException;
 import com.enfantTerrible.enfantTerrible.security.CustomUserPrincipal;
 import com.enfantTerrible.enfantTerrible.service.order.OrderService;
 import com.enfantTerrible.enfantTerrible.mapper.product.ProductSkuQueryMapper;
-
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -27,7 +25,7 @@ public class DirectOrderController {
   @PostMapping("/direct")
   public ApiResponse<OrderCreateResponse> direct(
       @AuthenticationPrincipal CustomUserPrincipal principal,
-      @Valid @RequestBody DirectOrderRequest req
+      @RequestBody DirectOrderRequest req
   ) {
     if (principal == null) {
       throw new BusinessException("로그인이 필요합니다.");

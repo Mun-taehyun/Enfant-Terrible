@@ -11,8 +11,6 @@ import com.enfantTerrible.enfantTerrible.dto.user.UpdateProfileRequest;
 import com.enfantTerrible.enfantTerrible.dto.user.UserResponse;
 import com.enfantTerrible.enfantTerrible.security.CustomUserPrincipal;
 import com.enfantTerrible.enfantTerrible.service.user.UserService;
-
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -27,7 +25,7 @@ public class UserController {
    */
   @PostMapping("/signup")
   public ApiResponse<UserResponse> signup(
-    @Valid @RequestBody SignupRequest req
+    @RequestBody SignupRequest req
   ) {
     UserResponse result = userService.signup(req);
     return ApiResponse.success(result, "회원가입 완료");
@@ -50,7 +48,7 @@ public class UserController {
   @PutMapping("/me")
   public ApiResponse<UserResponse> updateProfile(
     @AuthenticationPrincipal CustomUserPrincipal principal,
-    @Valid @RequestBody UpdateProfileRequest req
+    @RequestBody UpdateProfileRequest req
   ) {
     UserResponse result =
       userService.updateProfile(principal.getUserId(), req);
@@ -64,7 +62,7 @@ public class UserController {
   @PutMapping("/me/password")
   public ApiResponse<Void> changePassword(
     @AuthenticationPrincipal CustomUserPrincipal principal,
-    @Valid @RequestBody ChangePasswordRequest req
+    @RequestBody ChangePasswordRequest req
   ) {
     userService.changePassword(principal.getUserId(), req);
     return ApiResponse.successMessage("비밀번호 변경 완료");
@@ -87,7 +85,7 @@ public class UserController {
   @PostMapping("/me/profile/complete")
   public ApiResponse<Void> completeProfile(
     @AuthenticationPrincipal CustomUserPrincipal principal,
-    @Valid @RequestBody CompleteProfileRequest req
+    @RequestBody CompleteProfileRequest req
   ) {
     userService.completeProfile(principal.getUserId(), req);
     return ApiResponse.successMessage("추가 정보 입력 완료");

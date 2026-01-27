@@ -14,8 +14,6 @@ import com.enfantTerrible.enfantTerrible.dto.payment.PaymentConfirmResponse;
 import com.enfantTerrible.enfantTerrible.exception.BusinessException;
 import com.enfantTerrible.enfantTerrible.security.CustomUserPrincipal;
 import com.enfantTerrible.enfantTerrible.service.payment.PaymentService;
-
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -28,7 +26,7 @@ public class PaymentController {
   @PostMapping("/confirm")
   public ApiResponse<PaymentConfirmResponse> confirm(
       @AuthenticationPrincipal CustomUserPrincipal principal,
-      @Valid @RequestBody PaymentConfirmRequest req
+      @RequestBody PaymentConfirmRequest req
   ) {
     if (principal == null) {
       throw new BusinessException("로그인이 필요합니다.");
@@ -43,7 +41,7 @@ public class PaymentController {
   @PostMapping("/cancel")
   public ApiResponse<PaymentCancelResponse> cancel(
       @AuthenticationPrincipal CustomUserPrincipal principal,
-      @Valid @RequestBody PaymentCancelRequest req
+      @RequestBody PaymentCancelRequest req
   ) {
     if (principal == null) {
       throw new BusinessException("로그인이 필요합니다.");

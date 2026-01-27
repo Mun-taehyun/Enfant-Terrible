@@ -6,8 +6,6 @@ import com.enfantTerrible.enfantTerrible.common.response.ApiResponse;
 import com.enfantTerrible.enfantTerrible.common.response.AdminPageResponse;
 import com.enfantTerrible.enfantTerrible.dto.admin.product.*;
 import com.enfantTerrible.enfantTerrible.service.admin.product.AdminProductService;
-
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -39,7 +37,7 @@ public class AdminProductController {
 
   @PostMapping
   public ApiResponse<Void> create(
-      @Valid @RequestBody AdminProductSaveRequest req
+      @RequestBody AdminProductSaveRequest req
   ) {
     productService.create(req);
     return ApiResponse.successMessage("상품 등록 성공");
@@ -48,7 +46,7 @@ public class AdminProductController {
   @PutMapping("/{productId}")
   public ApiResponse<Void> update(
       @PathVariable Long productId,
-      @Valid @RequestBody AdminProductSaveRequest req
+      @RequestBody AdminProductSaveRequest req
   ) {
     productService.update(productId, req);
     return ApiResponse.successMessage("상품 수정 성공");

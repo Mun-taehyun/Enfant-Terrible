@@ -9,8 +9,6 @@ import com.enfantTerrible.enfantTerrible.dto.admin.user.AdminUserListResponse;
 import com.enfantTerrible.enfantTerrible.dto.admin.user.AdminUserSearchRequest;
 import com.enfantTerrible.enfantTerrible.dto.admin.user.AdminUserStatusUpdateRequest;
 import com.enfantTerrible.enfantTerrible.service.admin.user.AdminUserService;
-
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -52,7 +50,7 @@ public class AdminUserController {
   @PatchMapping("/{userId}/status")
   public ApiResponse<Void> updateUserStatus(
     @PathVariable Long userId,
-    @Valid @RequestBody AdminUserStatusUpdateRequest req
+    @RequestBody AdminUserStatusUpdateRequest req
   ) {
     adminUserService.updateUserStatus(userId, req.getStatus());
     return ApiResponse.successMessage("사용자 상태 변경 완료");

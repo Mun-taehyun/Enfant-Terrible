@@ -14,8 +14,6 @@ import com.enfantTerrible.enfantTerrible.dto.admin.payment.AdminPaymentDetailRes
 import com.enfantTerrible.enfantTerrible.dto.admin.payment.AdminPaymentListRequest;
 import com.enfantTerrible.enfantTerrible.dto.admin.payment.AdminPaymentListResponse;
 import com.enfantTerrible.enfantTerrible.service.admin.payment.AdminPaymentService;
-
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -48,7 +46,7 @@ public class AdminPaymentController {
   @PostMapping("/{paymentId}/cancel")
   public ApiResponse<Void> cancel(
       @PathVariable Long paymentId,
-      @Valid @RequestBody AdminPaymentCancelRequest req
+      @RequestBody AdminPaymentCancelRequest req
   ) {
     adminPaymentService.cancelPayment(paymentId, req);
     return ApiResponse.successMessage("관리자 환불 처리 완료");

@@ -8,8 +8,6 @@ import com.enfantTerrible.enfantTerrible.dto.admin.product.AdminSkuListRequest;
 import com.enfantTerrible.enfantTerrible.dto.admin.product.AdminSkuResponse;
 import com.enfantTerrible.enfantTerrible.dto.admin.product.AdminSkuSaveRequest;
 import com.enfantTerrible.enfantTerrible.service.admin.product.AdminProductSkuService;
-
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -42,7 +40,7 @@ public class AdminProductSkuController {
   @PutMapping("/{skuId}")
   public ApiResponse<Void> update(
       @PathVariable Long skuId,
-      @Valid @RequestBody AdminSkuSaveRequest req
+      @RequestBody AdminSkuSaveRequest req
   ) {
     skuService.update(skuId, req);
     return ApiResponse.successMessage("SKU 수정 성공");

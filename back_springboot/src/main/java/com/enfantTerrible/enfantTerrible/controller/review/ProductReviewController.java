@@ -23,8 +23,6 @@ import com.enfantTerrible.enfantTerrible.exception.BusinessException;
 import com.enfantTerrible.enfantTerrible.security.CustomUserPrincipal;
 import com.enfantTerrible.enfantTerrible.service.file.LocalFileStorageService;
 import com.enfantTerrible.enfantTerrible.service.review.ProductReviewService;
-
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -51,7 +49,7 @@ public class ProductReviewController {
   public ApiResponse<ProductReviewResponse> create(
       @AuthenticationPrincipal CustomUserPrincipal principal,
       @PathVariable Long productId,
-      @Valid @RequestPart("req") ProductReviewCreateRequest req,
+      @RequestPart("req") ProductReviewCreateRequest req,
       @RequestPart(value = "images", required = false) List<MultipartFile> images
   ) {
     if (principal == null) {
@@ -76,7 +74,7 @@ public class ProductReviewController {
   public ApiResponse<ProductReviewResponse> update(
       @AuthenticationPrincipal CustomUserPrincipal principal,
       @PathVariable Long reviewId,
-      @Valid @RequestPart("req") ProductReviewUpdateRequest req,
+      @RequestPart("req") ProductReviewUpdateRequest req,
       @RequestPart(value = "images", required = false) List<MultipartFile> images
   ) {
     if (principal == null) {

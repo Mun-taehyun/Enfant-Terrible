@@ -19,8 +19,6 @@ import com.enfantTerrible.enfantTerrible.service.cart.CartService;
 import com.enfantTerrible.enfantTerrible.service.order.OrderService;
 import com.enfantTerrible.enfantTerrible.service.order.OrderPrepareService;
 import com.enfantTerrible.enfantTerrible.service.order.MyOrderService;
-
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -115,7 +113,7 @@ public class OrderController {
   @PostMapping("/from-cart")
   public ApiResponse<OrderCreateResponse> fromCart(
       @AuthenticationPrincipal CustomUserPrincipal principal,
-      @Valid @RequestBody OrderFromCartRequest req
+      @RequestBody OrderFromCartRequest req
   ) {
     if (principal == null) {
       throw new BusinessException("로그인이 필요합니다.");

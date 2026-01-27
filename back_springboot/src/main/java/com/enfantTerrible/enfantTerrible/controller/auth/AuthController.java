@@ -6,8 +6,6 @@ import com.enfantTerrible.enfantTerrible.common.response.ApiResponse;
 import com.enfantTerrible.enfantTerrible.dto.auth.LoginRequest;
 import com.enfantTerrible.enfantTerrible.dto.auth.LoginResponse;
 import com.enfantTerrible.enfantTerrible.service.auth.AuthService;
-
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -19,7 +17,7 @@ public class AuthController {
 
   @PostMapping("/login")
   public ApiResponse<LoginResponse> login(
-    @Valid @RequestBody LoginRequest req
+    @RequestBody LoginRequest req
   ) {
     return ApiResponse.success(
       authService.login(req),

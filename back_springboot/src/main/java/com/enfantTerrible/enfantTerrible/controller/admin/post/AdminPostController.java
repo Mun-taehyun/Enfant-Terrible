@@ -24,8 +24,6 @@ import com.enfantTerrible.enfantTerrible.exception.BusinessException;
 import com.enfantTerrible.enfantTerrible.security.CustomUserPrincipal;
 import com.enfantTerrible.enfantTerrible.service.admin.post.AdminPostService;
 import com.enfantTerrible.enfantTerrible.service.file.LocalFileStorageService;
-
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -59,7 +57,7 @@ public class AdminPostController {
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ApiResponse<Long> create(
       @AuthenticationPrincipal CustomUserPrincipal principal,
-      @Valid @RequestPart("req") AdminPostSaveRequest req,
+      @RequestPart("req") AdminPostSaveRequest req,
       @RequestPart(value = "files", required = false) List<MultipartFile> files
   ) {
     if (principal == null) {
@@ -83,7 +81,7 @@ public class AdminPostController {
   @PutMapping(value = "/{postId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ApiResponse<Void> update(
       @PathVariable Long postId,
-      @Valid @RequestPart("req") AdminPostSaveRequest req,
+      @RequestPart("req") AdminPostSaveRequest req,
       @RequestPart(value = "files", required = false) List<MultipartFile> files
   ) {
     if (files != null) {

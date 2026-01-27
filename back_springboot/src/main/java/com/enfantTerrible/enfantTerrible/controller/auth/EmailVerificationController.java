@@ -6,8 +6,6 @@ import com.enfantTerrible.enfantTerrible.common.response.ApiResponse;
 import com.enfantTerrible.enfantTerrible.dto.auth.EmailRequest;
 import com.enfantTerrible.enfantTerrible.dto.auth.EmailVerificationRequest;
 import com.enfantTerrible.enfantTerrible.service.auth.EmailVerificationService;
-
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -22,7 +20,7 @@ public class EmailVerificationController {
    */
   @PostMapping("/signup")
   public ApiResponse<Void> sendSignupVerification(
-    @Valid @RequestBody EmailRequest req
+    @RequestBody EmailRequest req
   ) {
     emailVerificationService.sendSignupVerification(req.getEmail());
     return ApiResponse.successMessage("이메일 인증 코드 발송 완료");
@@ -33,7 +31,7 @@ public class EmailVerificationController {
    */
   @PostMapping("/verify")
   public ApiResponse<Void> verifySignupEmail(
-    @Valid @RequestBody EmailVerificationRequest req
+    @RequestBody EmailVerificationRequest req
   ) {
     emailVerificationService.verifySignupEmail(
       req.getEmail(),

@@ -22,8 +22,6 @@ import com.enfantTerrible.enfantTerrible.exception.BusinessException;
 import com.enfantTerrible.enfantTerrible.security.CustomUserPrincipal;
 import com.enfantTerrible.enfantTerrible.service.file.LocalFileStorageService;
 import com.enfantTerrible.enfantTerrible.service.inquiry.ProductInquiryService;
-
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -54,7 +52,7 @@ public class ProductInquiryController {
   public ApiResponse<ProductInquiryResponse> create(
       @AuthenticationPrincipal CustomUserPrincipal principal,
       @PathVariable Long productId,
-      @Valid @RequestPart("req") ProductInquiryCreateRequest req,
+      @RequestPart("req") ProductInquiryCreateRequest req,
       @RequestPart(value = "images", required = false) List<MultipartFile> images
   ) {
     if (principal == null) {
