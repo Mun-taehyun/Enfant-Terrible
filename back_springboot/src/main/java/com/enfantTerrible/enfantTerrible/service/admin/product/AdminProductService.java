@@ -6,8 +6,11 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.enfantTerrible.enfantTerrible.common.enums.FileRefType;
+import com.enfantTerrible.enfantTerrible.common.enums.FileRole;
 import com.enfantTerrible.enfantTerrible.common.response.AdminPageResponse;
 import com.enfantTerrible.enfantTerrible.dto.admin.product.*;
+import com.enfantTerrible.enfantTerrible.dto.file.FileRow;
 import com.enfantTerrible.enfantTerrible.exception.BusinessException;
 import com.enfantTerrible.enfantTerrible.mapper.admin.product.AdminProductMapper;
 import com.enfantTerrible.enfantTerrible.mapper.admin.product.AdminProductSkuMapper;
@@ -102,6 +105,31 @@ public class AdminProductService {
   public void delete(Long productId) {
     productMapper.softDelete(productId);
     fileCommandService.deleteByRef(REF_PRODUCT, productId);
+  }
+
+  @Transactional
+  public void replaceThumbnail(Long productId, String thumbnailUrl) {
+    if (productId == null) {
+      throw new BusinessException("상품 ID가 비어있습니다.");
+    }
+    if (thumbnailUrl == null || thumbnailUrl.isBlank()) {
+      throw new BusinessException("썸네일 URL이 비어있습니다.");
+    }
+
+    fileCommandService.deleteByRef(REF_PRODUCT, productId);
+
+    FileRow file = new FileRow();
+    file.setRefType(FileRefType.PRODUCT);
+    file.setRefId(productId);
+    file.setFileRole(FileRole.THUMBNAIL);
+
+    file.setFileUrl(thumbnailUrl);
+    file.setOriginalName(thumbnailUrl);
+    file.setStoredName(thumbnailUrl);
+    file.setFileType("URL");
+    file.setFilePath("");
+
+    fileCommandService.save(file);
   }
 
   private AdminProductResponse toResponse(AdminProductRow row) {

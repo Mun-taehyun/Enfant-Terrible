@@ -4,7 +4,6 @@ import { mainAxios } from "@/apis/admin/main_axios";
 import type {
   AdminPopupId,
   AdminPopupListParams,
-  AdminPopupSaveRequest,
 } from "@/types/admin/popup";
 
 import type {
@@ -33,12 +32,12 @@ export async function apiAdminPopupDetail(popupId: AdminPopupId) {
   return unwrapOrThrow(data);
 }
 
-export async function apiAdminPopupCreate(body: AdminPopupSaveRequest) {
+export async function apiAdminPopupCreate(body: FormData) {
   const { data } = await mainAxios.post<CreatePopupResponse>("/api/admin/popups", body);
   return unwrapOrThrow(data); // popupId
 }
 
-export async function apiAdminPopupUpdate(popupId: AdminPopupId, body: AdminPopupSaveRequest) {
+export async function apiAdminPopupUpdate(popupId: AdminPopupId, body: FormData) {
   const { data } = await mainAxios.put<UpdatePopupResponse>(`/api/admin/popups/${popupId}`, body);
   return unwrapOrThrow(data);
 }

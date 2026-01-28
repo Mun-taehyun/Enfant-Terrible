@@ -7,7 +7,6 @@ import type {
   AdminPostDetail,
   AdminPostListItem,
   AdminPostListRequest,
-  AdminPostSaveRequest,
 } from "@/types/admin/post";
 
 /**
@@ -35,7 +34,7 @@ export async function getAdminPostDetail(
 }
 
 export async function createAdminPost(
-  body: AdminPostSaveRequest
+  body: FormData
 ): Promise<ApiResponse<number>> {
   const res = await mainAxios.post<ApiResponse<number>>("/api/admin/posts", body);
   return res.data;
@@ -43,7 +42,7 @@ export async function createAdminPost(
 
 export async function updateAdminPost(
   postId: AdminPostId,
-  body: AdminPostSaveRequest
+  body: FormData
 ): Promise<ApiResponse<null>> {
   // mock 스펙이 PUT 이므로 PUT 유지
   const res = await mainAxios.put<ApiResponse<null>>(`/api/admin/posts/${postId}`, body);

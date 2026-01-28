@@ -1,11 +1,14 @@
 package com.enfantTerrible.enfantTerrible.controller.admin.product;
 
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.enfantTerrible.enfantTerrible.common.response.ApiResponse;
 import com.enfantTerrible.enfantTerrible.common.response.AdminPageResponse;
 import com.enfantTerrible.enfantTerrible.dto.admin.product.*;
 import com.enfantTerrible.enfantTerrible.service.admin.product.AdminProductService;
+import com.enfantTerrible.enfantTerrible.service.file.LocalFileStorageService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -14,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 public class AdminProductController {
 
   private final AdminProductService productService;
+  private final LocalFileStorageService localFileStorageService;
 
   @GetMapping
   public ApiResponse<AdminPageResponse<AdminProductResponse>> list(
@@ -35,20 +39,38 @@ public class AdminProductController {
     );
   }
 
-  @PostMapping
+  @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ApiResponse<Void> create(
-      @RequestBody AdminProductSaveRequest req
+      @RequestPart("req") AdminProductSaveRequest req,
+      @RequestPart(value = "image", required = false) MultipartFile image
   ) {
+    String thumbnailUrl = null;
+    if (image != null && !image.isEmpty()) {
+      thumbnailUrl = localFileStorageService.save(image, "products");
+    }
+
     productService.create(req);
+    if (thumbnailUrl != null && req.getProductId() != null) {
+      productService.replaceThumbnail(req.getProductId(), thumbnailUrl);
+    }
     return ApiResponse.successMessage("상품 등록 성공");
   }
 
-  @PutMapping("/{productId}")
+  @PutMapping(value = "/{productId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ApiResponse<Void> update(
       @PathVariable Long productId,
-      @RequestBody AdminProductSaveRequest req
+      @RequestPart("req") AdminProductSaveRequest req,
+      @RequestPart(value = "image", required = false) MultipartFile image
   ) {
+    String thumbnailUrl = null;
+    if (image != null && !image.isEmpty()) {
+      thumbnailUrl = localFileStorageService.save(image, "products");
+    }
+
     productService.update(productId, req);
+    if (thumbnailUrl != null) {
+      productService.replaceThumbnail(productId, thumbnailUrl);
+    }
     return ApiResponse.successMessage("상품 수정 성공");
   }
 

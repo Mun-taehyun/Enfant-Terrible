@@ -13,7 +13,6 @@ import type {
   AdminPopupId,
   AdminPopupListItem,
   AdminPopupListParams,
-  AdminPopupSaveRequest,
 } from "@/types/admin/popup";
 
 import {
@@ -52,7 +51,7 @@ export function useAdminPopupDetailQuery(popupId: AdminPopupId | null) {
 
 export function useAdminPopupCreateMutation() {
   const qc = useQueryClient();
-  return useMutation<number, Error, AdminPopupSaveRequest>({
+  return useMutation<number, Error, FormData>({
     mutationFn: (body) => apiAdminPopupCreate(body),
     onSuccess: () => qc.invalidateQueries({ queryKey: adminPopupKeys.all }),
   });
@@ -60,7 +59,7 @@ export function useAdminPopupCreateMutation() {
 
 export function useAdminPopupUpdateMutation() {
   const qc = useQueryClient();
-  return useMutation<null, Error, { popupId: AdminPopupId; body: AdminPopupSaveRequest }>({
+  return useMutation<null, Error, { popupId: AdminPopupId; body: FormData }>({
     mutationFn: (args) => apiAdminPopupUpdate(args.popupId, args.body),
     onSuccess: (_data, vars) => {
       qc.invalidateQueries({ queryKey: adminPopupKeys.all });

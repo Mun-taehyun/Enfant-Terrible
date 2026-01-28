@@ -122,6 +122,7 @@ export default function PostsView() {
   const handleNewMode = () => {
     setSelectedPostId(null);
     setEditorPostType("");
+    setSelectedFiles([]);
   };
 
   const buildSaveBodyFromRefs = (): AdminPostSaveRequest | null => {
@@ -162,12 +163,25 @@ export default function PostsView() {
     };
   };
 
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+
+  function buildFormData(body: AdminPostSaveRequest): FormData {
+    const fd = new FormData();
+    fd.append("req", new Blob([JSON.stringify(body)], { type: "application/json" }));
+    selectedFiles.forEach((f) => {
+      fd.append("files", f);
+    });
+    return fd;
+  }
+
   const handleSubmit = async () => {
     const body = buildSaveBodyFromRefs();
     if (!body) return;
 
+    const formData = buildFormData(body);
+
     if (mode === "create") {
-      await mutations.create(body);
+      await mutations.create(formData);
       alert("게시글 생성 성공");
       handleNewMode();
       return;
@@ -186,7 +200,7 @@ export default function PostsView() {
       return;
     }
 
-    await mutations.update(selectedPostId, body);
+    await mutations.update(selectedPostId, formData);
     alert("게시글 수정 성공");
     refetch();
     detail.refetch();
@@ -516,6 +530,19 @@ export default function PostsView() {
                     mode === "update" ? detail.data?.content ?? "" : ""
                   }
                   placeholder="내용을 입력하세요"
+                />
+              </label>
+
+              <label className={styles.fLabelWide}>
+                첨부파일 (선택)
+                <input
+                  className={styles.input}
+                  type="file"
+                  multiple
+                  onChange={(e) => {
+                    const files = e.target.files ? Array.from(e.target.files) : [];
+                    setSelectedFiles(files);
+                  }}
                 />
               </label>
             </div>

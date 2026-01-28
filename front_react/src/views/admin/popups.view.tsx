@@ -81,6 +81,8 @@ export default function PopupsView() {
   const updateM = useAdminPopupUpdate();
   const deleteM = useAdminPopupDelete();
 
+  const [imageFile, setImageFile] = useState<File | null>(null);
+
   // ✅ useEffect로 폼 복사하지 않고, 초기값 + draft(사용자 변경분) 방식
   const [draft, setDraft] = useState<Partial<AdminPopupSaveRequest>>({});
 
@@ -130,6 +132,7 @@ export default function PopupsView() {
   function closeModal() {
     setOpen(false);
     resetToCreate();
+    setImageFile(null);
   }
 
   function onChange<K extends keyof AdminPopupSaveRequest>(
@@ -140,37 +143,33 @@ export default function PopupsView() {
   }
 
   async function onSubmit() {
-// 1. FormData 인스턴스 생성
-  const formData = new FormData();
+    const req: AdminPopupSaveRequest = {
+      ...form,
+      title: (form.title || "").trim(),
+      content: (form.content || "").trim() || undefined,
+      linkUrl: (form.linkUrl || "").trim() || undefined,
+      position: (form.position || "").trim() || undefined,
+      width: form.width,
+      height: form.height,
+      isActive: form.isActive,
+      startAt: form.startAt,
+      endAt: form.endAt,
+    };
 
-  // 2. 데이터 담기 (필수 및 선택 값들)
-  formData.append("title", (form.title || "").trim());
-  if (form.content) formData.append("content", form.content.trim());
-  if (form.linkUrl) formData.append("linkUrl", form.linkUrl.trim());
-  if (form.position) formData.append("position", form.position.trim());
-  if (form.imageUrl) formData.append("imageUrl", form.imageUrl.trim());
-  
-  // 숫자는 문자열로 변환되어 전달됩니다 (서버에서 숫자로 받음)
-  if (form.width) formData.append("width", String(form.width));
-  if (form.height) formData.append("height", String(form.height));
-  
-  // 불리언 값 전송
-  formData.append("isActive", String(form.isActive ?? true));
-
-  // 날짜 데이터
-  if (form.startAt) formData.append("startAt", form.startAt);
-  if (form.endAt) formData.append("endAt", form.endAt);
-
-  const bodyForMutation = formData as unknown as AdminPopupSaveRequest;
+    const formData = new FormData();
+    formData.append("req", new Blob([JSON.stringify(req)], { type: "application/json" }));
+    if (imageFile) {
+      formData.append("image", imageFile);
+    }
 
     if (mode === "CREATE") {
-      await createM.mutateAsync(bodyForMutation);
+      await createM.mutateAsync(formData);
       closeModal();
       return;
     }
 
     if (mode === "EDIT" && editingId != null) {
-      await updateM.mutateAsync({ popupId: editingId, body: bodyForMutation });
+      await updateM.mutateAsync({ popupId: editingId, body: formData });
       closeModal();
       return;
     }
@@ -435,11 +434,15 @@ export default function PopupsView() {
               </div>
 
               <div className={styles.formItemWide}>
-                <label className={styles.label}>이미지 URL</label>
+                <label className={styles.label}>이미지 파일</label>
                 <input
                   className={styles.input}
-                  value={form.imageUrl || ""}
-                  onChange={(e) => onChange("imageUrl", e.target.value)}
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const f = e.target.files && e.target.files[0] ? e.target.files[0] : null;
+                    setImageFile(f);
+                  }}
                 />
               </div>
 

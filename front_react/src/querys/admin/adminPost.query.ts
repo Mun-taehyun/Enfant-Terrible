@@ -1,5 +1,5 @@
 // src/querys/admin/adminPost.query.ts
-import type { AdminPostId, AdminPostListRequest, AdminPostSaveRequest } from "@/types/admin/post";
+import type { AdminPostId, AdminPostListRequest } from "@/types/admin/post";
 import {
   getAdminPosts,
   getAdminPostDetail,
@@ -12,8 +12,8 @@ import {
 export const adminPostQuery = {
   list: (params: AdminPostListRequest) => getAdminPosts(params),
   detail: (postId: AdminPostId) => getAdminPostDetail(postId),
-  create: (body: AdminPostSaveRequest) => createAdminPost(body),
-  update: (postId: AdminPostId, body: AdminPostSaveRequest) => updateAdminPost(postId, body),
+  create: (body: FormData) => createAdminPost(body),
+  update: (postId: AdminPostId, body: FormData) => updateAdminPost(postId, body),
   remove: (postId: AdminPostId) => deleteAdminPost(postId),
 };
 

@@ -13,7 +13,6 @@ import type {
   AdminBannerId,
   AdminBannerListItem,
   AdminBannerListParams,
-  AdminBannerSaveRequest,
 } from "@/types/admin/banner";
 
 import {
@@ -48,7 +47,7 @@ export function useAdminBannerDetailQuery(bannerId: AdminBannerId | null) {
 
 export function useAdminBannerCreateMutation() {
   const qc = useQueryClient();
-  return useMutation<number, Error, AdminBannerSaveRequest>({
+  return useMutation<number, Error, FormData>({
     mutationFn: (body) => apiAdminBannerCreate(body),
     onSuccess: () => qc.invalidateQueries({ queryKey: adminBannerKeys.all }),
   });
@@ -56,7 +55,7 @@ export function useAdminBannerCreateMutation() {
 
 export function useAdminBannerUpdateMutation() {
   const qc = useQueryClient();
-  return useMutation<null, Error, { bannerId: AdminBannerId; body: AdminBannerSaveRequest }>({
+  return useMutation<null, Error, { bannerId: AdminBannerId; body: FormData }>({
     mutationFn: (args) => apiAdminBannerUpdate(args.bannerId, args.body),
     onSuccess: (_data, vars) => {
       qc.invalidateQueries({ queryKey: adminBannerKeys.all });

@@ -8,7 +8,6 @@ import type {
   AdminPostDetail,
   AdminPostListItem,
   AdminPostListRequest,
-  AdminPostSaveRequest,
 } from "@/types/admin/post";
 
 /* =========================
@@ -326,8 +325,8 @@ export function useAdminPostMutations(onChanged?: () => void) {
     [onChanged]
   );
 
-  const create = useCallback((body: AdminPostSaveRequest) => run(() => adminPostQuery.create(body)), [run]);
-  const update = useCallback((id: AdminPostId, body: AdminPostSaveRequest) => run(() => adminPostQuery.update(id, body)), [run]);
+  const create = useCallback((body: FormData) => run(() => adminPostQuery.create(body)), [run]);
+  const update = useCallback((id: AdminPostId, body: FormData) => run(() => adminPostQuery.update(id, body)), [run]);
   const remove = useCallback((id: AdminPostId) => run(() => adminPostQuery.remove(id)), [run]);
 
   return { loading, errorMsg, create, update, remove };
