@@ -1,0 +1,104 @@
+/* 1. 전체 헤더 컨테이너: 화면 전체 너비를 쓰되 자식들을 중앙으로 모음 */
+#header-container {
+    width: 100%;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* 핵심: 모든 자식 요소를 가로축 중앙 정렬 */
+    position: sticky;
+    top: 0;
+    z-index: 9999;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+/* 2. 메인 상단바: 1440px 고정 및 좌우 여백 자동(중앙) */
+.header-main-box {
+    width: 1440px;      /* 너비 1440 고정 */
+    min-width: 1440px;  /* 줄어들지 않도록 설정 */
+    height: 100px;
+    display: flex;
+    justify-content: space-between; /* 로고 - 검색창 - 버튼 간격 분산 */
+    align-items: center;
+    padding: 0 40px;
+    box-sizing: border-box;
+    margin: 0 auto;    /* 중앙 정렬 보완 */
+}
+
+/* 3. 로고 박스: 너비를 고정해서 검색창이 나타나도 위치를 유지 */
+.header-main-logo-box {
+    flex: 0 0 250px; /* 로고 영역 너비 고정 */
+    display: flex;
+    align-items: center;
+}
+
+.header-logo-content {
+    font-size: 30px;
+    font-weight: 900;
+    color: #ff8e0b;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+/* 4. 검색창 영역: 중앙에 위치하도록 설정 */
+.header-search-input-box {
+    flex: 0 0 600px; /* 검색창 전체 너비 고정 */
+    height: 50px;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* 검색 인풋 스타일 */
+.header-search-input {
+    width: 100%;
+    height: 100%;
+    background-color: #f8f8f8;
+    border: 2px solid transparent;
+    border-radius: 25px;
+    padding: 0 80px 0 25px; /* 우측 버튼 자리 확보 */
+    font-size: 16px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.header-search-input:focus {
+    background-color: #fff;
+    border-color: #ff8e0b;
+}
+
+/* 검색 버튼(인풋 안쪽 우측 고정) */
+.header-search-input-box .search-action-button {
+    position: absolute;
+    right: 10px;
+    background-color: #ff8e0b;
+    color: white;
+    border-radius: 20px;
+    padding: 6px 15px;
+}
+
+/* 5. 우측 버튼 그룹: 너비를 고정해서 로고와 대칭을 맞춤 */
+.header-main-button-box {
+    flex: 0 0 350px; /* 오른쪽 메뉴 영역 너비 고정 */
+    display: flex;
+    justify-content: flex-end;
+    gap: 20px;
+}
+
+.header-main-button-box div {
+    font-size: 14px;
+    font-weight: 600;
+    color: #555;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+/* 6. 하단 카테고리 바 */
+.header-main-category-box {
+    width: 1440px;
+    min-width: 1440px;
+    background-color: #fff;
+    border-top: 1px solid #f5f5f5;
+    margin: 0 auto;
+    padding: 10px 40px;
+    box-sizing: border-box;
+}

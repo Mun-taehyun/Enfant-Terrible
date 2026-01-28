@@ -1,0 +1,89 @@
+
+/* 1. 리뷰 카드 전체 컨테이너 */
+.review-card-container {
+  max-width: 600px;
+  margin: 16px auto;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 16px; /* 더 둥글게 해서 귀여운 느낌 */
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  font-family: 'Pretendard', sans-serif;
+}
+
+/* 2. 헤더: 유저 정보 및 시간 */
+.review-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.review-user-name {
+  font-weight: 700;
+  color: #444;
+}
+
+.review-divider {
+  margin: 0 8px;
+  color: #ddd;
+}
+
+.review-time {
+  color: #999;
+  font-size: 13px;
+}
+
+/* 3. 별점: 펫 쇼핑몰의 따뜻한 옐로우/오렌지 컬러 */
+.review-rating-bar {
+  margin-bottom: 12px;
+  letter-spacing: -1px; /* 별 사이 간격 조절 */
+}
+
+.stars-active {
+  color: #ffb800; /* 맛있는 간식 같은 딥 옐로우 */
+  font-size: 18px;
+}
+
+.stars-inactive {
+  color: #eee;
+  font-size: 18px;
+}
+
+/* 4. 본문: 가독성 높은 폰트 설정 */
+.review-body {
+  margin-bottom: 12px;
+}
+
+.review-text {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #555;
+  margin: 0;
+  word-break: break-all;
+  white-space: pre-wrap; /* 줄바꿈 유지 */
+}
+
+/* 5. 푸터: 수정됨 태그 */
+.review-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.review-edited-tag {
+  font-size: 12px;
+  color: #bbb;
+  background-color: #f9f9f9;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+/* 호버 시 살짝 떠오르는 효과 */
+.review-card-container:hover {
+  border-color: #ffecd2; /* 펫 쇼핑몰 포인트 컬러로 살짝 변경 */
+  transform: translateY(-2px);
+  transition: all 0.2s ease-in-out;
+}
+
+
+

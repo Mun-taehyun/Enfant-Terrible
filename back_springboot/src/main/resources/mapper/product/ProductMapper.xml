@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.enfantTerrible.enfantTerrible.mapper.product.ProductMapper">
+
+  <!-- ===========================
+       사용자 상품 목록 조회
+       - 1안: base_price = 최저 SKU 가격 캐시
+       - GROUP BY 제거 (ONLY_FULL_GROUP_BY 리스크 제거)
+       =========================== -->
+  <select id="findProducts" resultType="ProductRow">
+    SELECT
+      p.product_id,
+      p.category_id,
+      c.name AS category_name,
+      p.name,
+      p.description,
+      p.base_price AS min_sku_price,
+      p.average_rating,
+      p.review_count,
+      p.status,
+      p.created_at
+    FROM et_product p
+    JOIN et_category c ON c.category_id = p.category_id
+
+    <if test="orderBy == 'BEST_SELLING'">
+      LEFT JOIN (
+        SELECT
+          s.product_id,
+          COALESCE(SUM(oi.quantity - oi.cancelled_quantity), 0) AS sold_qty
+        FROM et_order_item oi
+        JOIN et_order o ON o.order_id = oi.order_id
+        JOIN et_product_sku s ON s.sku_id = oi.sku_id
+        WHERE o.order_status IN ('PAID', 'PARTIALLY_CANCELLED', 'SHIPPING', 'DELIVERED')
+        GROUP BY s.product_id
+      ) sales ON sales.product_id = p.product_id
+    </if>
+
+    WHERE p.deleted_at IS NULL
+      AND p.status IN ('ON_SALE', 'SOLD_OUT')
+
+    <if test="categoryId != null">
+      AND p.category_id = #{categoryId}
+    </if>
+
+    <if test="keyword != null and keyword != ''">
+      AND p.name LIKE CONCAT('%', #{keyword}, '%')
+    </if>
+
+    <if test="minPrice != null">
+      AND p.base_price &gt;= #{minPrice}
+    </if>
+
+    <if test="maxPrice != null">
+      AND p.base_price &lt;= #{maxPrice}
+    </if>
+
+    <if test="minRating != null">
+      AND p.average_rating &gt;= #{minRating}
+    </if>
+
+    <if test="hasDiscount != null and hasDiscount">
+      AND EXISTS (
+        SELECT 1
+        FROM et_product_discount d
+        WHERE d.product_id = p.product_id
+          AND (d.start_at IS NULL OR d.start_at &lt;= NOW())
+          AND (d.end_at IS NULL OR d.end_at &gt;= NOW())
+      )
+    </if>
+
+    ORDER BY
+    <choose>
+      <when test="orderBy == 'RECENT'">p.created_at DESC, p.product_id DESC</when>
+      <when test="orderBy == 'BEST_SELLING'">COALESCE(sales.sold_qty, 0) DESC, p.product_id DESC</when>
+      <when test="orderBy == 'PRICE_ASC'">p.base_price ASC</when>
+      <when test="orderBy == 'PRICE_DESC'">p.base_price DESC</when>
+      <when test="orderBy == 'RATING_DESC'">p.average_rating DESC, p.product_id DESC</when>
+      <when test="orderBy == 'REVIEW_COUNT_DESC'">p.review_count DESC, p.product_id DESC</when>
+      <when test="orderBy == 'NAME'">p.name ASC</when>
+      <when test="orderBy == 'CREATED_AT'">p.created_at DESC</when>
+      <otherwise>p.product_id DESC</otherwise>
+    </choose>
+
+    LIMIT #{size} OFFSET #{offset}
+  </select>
+
+  <!-- ===========================
+       사용자 상품 상세 조회 (노출 조건 강제)
+       =========================== -->
+  <select id="findByIdForUser" resultType="ProductRow">
+    SELECT
+      p.product_id,
+      p.category_id,
+      c.name AS category_name,
+      p.name,
+      p.description,
+      p.base_price AS min_sku_price,
+      p.average_rating,
+      p.review_count,
+      p.status,
+      p.created_at
+    FROM et_product p
+    JOIN et_category c ON c.category_id = p.category_id
+    WHERE p.product_id = #{productId}
+      AND p.deleted_at IS NULL
+      AND p.status IN ('ON_SALE', 'SOLD_OUT')
+  </select>
+
+  <select id="findProductsByIds" resultType="ProductRow">
+    SELECT
+      p.product_id,
+      p.category_id,
+      c.name AS category_name,
+      p.name,
+      p.description,
+      p.base_price AS min_sku_price,
+      p.average_rating,
+      p.review_count,
+      p.status,
+      p.created_at
+    FROM et_product p
+    JOIN et_category c ON c.category_id = p.category_id
+    WHERE p.product_id IN
+    <foreach item="id" collection="productIds" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+      AND p.deleted_at IS NULL
+      AND p.status IN ('ON_SALE', 'SOLD_OUT')
+    ORDER BY FIELD(p.product_id,
+    <foreach item="id" collection="productIds" separator=",">
+      #{id}
+    </foreach>
+    )
+  </select>
+
+  <update id="refreshReviewCache">
+    UPDATE et_product p
+    LEFT JOIN (
+      SELECT
+        product_id,
+        COALESCE(AVG(rating), 0) AS avg_rating,
+        COUNT(*) AS cnt
+      FROM et_product_review
+      WHERE deleted_at IS NULL
+      GROUP BY product_id
+    ) r ON r.product_id = p.product_id
+    SET
+      p.average_rating = COALESCE(r.avg_rating, 0),
+      p.review_count = COALESCE(r.cnt, 0)
+    WHERE p.product_id = #{productId}
+  </update>
+
+  <!-- ===========================
+       SKU + 옵션
+       - LEFT JOIN: 옵션 없는 SKU도 포함
+       - ORDER BY: optionValueIds 순서 안정화
+       =========================== -->
+  <select id="findSkusWithOptions" resultType="ProductSkuOptionRow">
+    SELECT
+      s.sku_id,
+      s.price,
+      s.stock,
+      s.status,
+      so.option_value_id
+    FROM et_product_sku s
+    LEFT JOIN et_product_sku_option so
+      ON so.sku_id = s.sku_id
+    WHERE s.product_id = #{productId}
+      AND s.deleted_at IS NULL
+    ORDER BY s.sku_id ASC, so.option_value_id ASC
+  </select>
+
+</mapper>

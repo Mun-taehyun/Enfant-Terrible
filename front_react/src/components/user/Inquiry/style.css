@@ -1,0 +1,157 @@
+/* 컨테이너 및 기본 설정 */
+.inquiry-item-container {
+  width: 100%;
+  border-bottom: 1px solid #eee;
+  background-color: #fff;
+  font-family: 'Pretendard', sans-serif;
+}
+
+/* 헤더 영역 */
+.inquiry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.inquiry-header:hover {
+  background-color: #f9f9f9;
+}
+
+/* 권한 없을 때 (비밀글) */
+.inquiry-header.no-permission {
+  cursor: default;
+  color: #bbb;
+}
+
+.inquiry-header.no-permission:hover {
+  background-color: transparent;
+}
+
+/* 헤더 왼쪽: 아이콘 + 제목 + 태그 */
+.inquiry-left-box {
+  flex: 1;
+}
+
+.inquiry-summary-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon-private {
+  font-size: 14px;
+  color: #999;
+}
+
+.summary-text {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  margin-right: 10px;
+}
+
+.no-permission .summary-text {
+  color: #bbb;
+}
+
+.answer-complete-tag {
+  background-color: #e3f2fd;
+  color: #1976d2;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+/* 헤더 오른쪽: 작성자 + 날짜 */
+.inquiry-right-box {
+  display: flex;
+  gap: 15px;
+  font-size: 14px;
+  color: #888;
+}
+
+.user-info {
+  font-weight: 400;
+}
+
+/* 본문 영역 (펼쳐졌을 때) */
+.inquiry-body-content {
+  padding: 24px;
+  background-color: #fbfbfb;
+  border-top: 1px solid #f0f0f0;
+}
+
+/* 질문 내용 */
+.question-wrapper {
+  margin-bottom: 24px;
+}
+
+.question-text {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #444;
+  white-space: pre-wrap;
+}
+
+/* 이미지 그리드 */
+.image-grid {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  overflow-x: auto;
+}
+
+.img-box img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+
+/* 관리자 답변 영역 */
+.answer-wrapper {
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.answer-top {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #f5f5f5;
+  padding-bottom: 8px;
+}
+
+.admin-label {
+  font-weight: 700;
+  font-size: 14px;
+  color: #333;
+  display: flex;
+  align-items: center;
+}
+
+.admin-label::before {
+  content: 'A.';
+  color: #1976d2;
+  margin-right: 5px;
+  font-size: 16px;
+}
+
+.answer-date {
+  font-size: 12px;
+  color: #999;
+}
+
+.answer-text {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #555;
+  white-space: pre-wrap;
+}

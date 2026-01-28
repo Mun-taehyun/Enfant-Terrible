@@ -1,0 +1,62 @@
+/* 사이드바 전체 컨테이너 */
+.filter-sidebar {
+    width: 288px;
+    background-color: #ffffff;
+    border: 1px solid #f0f0f0;
+    border-radius: 12px;
+    overflow: hidden;
+    font-family: 'Pretendard', sans-serif; /* 깔끔한 폰트 권장 */
+}
+
+/* 타이틀 부분 */
+.filter-title {
+    padding: 20px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #333;
+    border-bottom: 1px solid #f9f9f9;
+}
+
+/* 대분류 아이템 */
+.main-item {
+    padding: 14px 20px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #444;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.2s ease;
+}
+
+.main-item:hover {
+    background-color: #fff9f5; /* 펫 쇼핑몰 느낌의 부드러운 오렌지/베이지 계열 */
+    color: #ff7e36;
+}
+
+/* 소분류 그룹 (애니메이션 효과를 주면 더 고급짐) */
+.sub-group {
+    background-color: #fcfcfc;
+    padding: 8px 0;
+}
+
+/* 소분류 아이템 */
+.sub-item, .flat-item {
+    padding: 10px 20px 10px 35px; /* 대분류보다 안으로 들여쓰기 */
+    font-size: 14px;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.sub-item:hover, .flat-item:hover {
+    color: #ff7e36;
+    font-weight: 600;
+}
+
+/* 검색 없이 바로 노출되는 소분류 (flat-item) */
+.flat-item {
+    padding: 12px 20px;
+    border-bottom: 1px solid #fbfbfb;
+}

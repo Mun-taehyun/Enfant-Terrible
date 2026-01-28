@@ -1,0 +1,57 @@
+/* src/views/admin/product/productsDetailView.module.css */
+.wrap { padding: 12px; background: #fff; }
+.topBar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+.topTitle { font-size: 14px; font-weight: 700; }
+.closeBtn { padding: 6px 10px; border: 1px solid #ddd; background: #fff; border-radius: 8px; cursor: pointer; }
+
+.tabs { display: flex; gap: 8px; margin: 12px 0; }
+.tabBtn { padding: 8px 10px; border: 1px solid #ddd; background: #fff; border-radius: 10px; cursor: pointer; font-size: 13px; }
+.active { border-color: #111; }
+
+.section { padding: 10px 0; }
+
+.formGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.label { display: flex; flex-direction: column; gap: 6px; font-size: 12px; }
+.input { padding: 8px; border: 1px solid #ddd; border-radius: 8px; }
+.select { padding: 8px; border: 1px solid #ddd; border-radius: 8px; }
+.inputSmall { padding: 8px; border: 1px solid #ddd; border-radius: 8px; width: 110px; }
+
+.actions { display: flex; gap: 8px; margin-top: 10px; }
+.actionsTd { white-space: nowrap; }
+
+.primaryBtn { padding: 8px 10px; border: 1px solid #111; background: #111; color: #fff; border-radius: 8px; cursor: pointer; }
+.secondaryBtn { padding: 8px 10px; border: 1px solid #ddd; background: #fff; border-radius: 8px; cursor: pointer; }
+.smallBtn { padding: 6px 8px; border: 1px solid #ddd; background: #fff; border-radius: 8px; cursor: pointer; }
+.dangerBtn { padding: 8px 10px; border: 1px solid #f2c2c2; background: #fff3f3; color: #9a1b1b; border-radius: 8px; cursor: pointer; }
+
+.row { display: flex; gap: 10px; align-items: end; flex-wrap: wrap; margin-bottom: 10px; }
+
+.tableWrap { border: 1px solid #eee; border-radius: 10px; overflow: hidden; }
+.table { width: 100%; border-collapse: collapse; }
+.table th, .table td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; font-size: 13px; }
+.table th { background: #fafafa; font-weight: 700; }
+
+.pager { display: flex; align-items: center; gap: 10px; justify-content: center; margin-top: 12px; }
+.pageText { font-size: 13px; color: #333; }
+
+.errorBox { margin: 8px 0; padding: 10px; border: 1px solid #f2c2c2; background: #fff3f3; border-radius: 10px; color: #9a1b1b; }
+.loading { padding: 14px; }
+.empty { padding: 14px; color: #666; }
+
+.optionGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.card { border: 1px solid #eee; border-radius: 12px; overflow: hidden; }
+.cardHeader { display: flex; align-items: baseline; justify-content: space-between; padding: 10px; background: #fafafa; border-bottom: 1px solid #eee; }
+.cardTitle { font-weight: 700; font-size: 13px; }
+.cardHint { font-size: 12px; color: #666; }
+
+.formRow { display: flex; gap: 8px; padding: 10px; border-bottom: 1px solid #eee; flex-wrap: wrap; }
+.list { padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+
+.item { display: flex; gap: 10px; justify-content: space-between; border: 1px solid #eee; border-radius: 10px; padding: 10px; }
+.activeItem { border-color: #111; }
+.itemMain { all: unset; cursor: pointer; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.itemMainStatic { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.itemTitle { font-weight: 700; font-size: 13px; }
+.itemSub { font-size: 12px; color: #666; }
+
+.itemActions { display: flex; gap: 6px; align-items: center; white-space: nowrap; }

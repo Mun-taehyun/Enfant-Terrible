@@ -1,0 +1,60 @@
+/* 컨테이너 */
+.payment-method {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 24px;
+  background-color: #fff;
+  border-radius: 12px;
+}
+
+/* 타이틀 */
+.payment-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 16px;
+}
+
+/* 선택 리스트 (그리드 레이아웃) */
+.payment-method-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2열 배치 (3열 원하면 repeat(3, 1fr)) */
+  gap: 10px;
+}
+
+/* 개별 아이템 (버튼 스타일) */
+.payment-method-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 52px;
+  border: 1.5px solid #eee;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: #fff;
+}
+
+/* 마우스 호버 효과 (PC) */
+.payment-method-item:hover {
+  border-color: #ccc;
+  background-color: #fafafa;
+}
+
+/* ✨ 선택된 상태 (Active) */
+.payment-method-item.active {
+  border-color: #333; /* 검정색 강조 */
+  background-color: #333;
+  color: #fff;
+  font-weight: 600;
+}
+
+/* 모바일 대응 (화면이 작아지면 1열로 변경하고 싶을 때) */
+@media (max-width: 400px) {
+  .payment-method-list {
+    grid-template-columns: 1fr;
+  }
+}

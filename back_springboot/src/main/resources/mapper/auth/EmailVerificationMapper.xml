@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.enfantTerrible.enfantTerrible.mapper.auth.EmailVerificationMapper">
+
+  <!-- 인증 요청 저장 -->
+  <insert id="insert" useGeneratedKeys="true" keyProperty="emailVerificationId">
+    INSERT INTO et_email_verification (
+      email,
+      verification_code,
+      purpose,
+      expires_at,
+      verified_at
+    ) VALUES (
+      #{email},
+      #{verificationCode},
+      #{purpose},
+      #{expiresAt},
+      NULL
+    )
+  </insert>
+
+  <!-- 재발급 대비: 기존 미인증/미만료 건 무효화 -->
+  <update id="invalidate">
+    UPDATE et_email_verification
+    SET expires_at = NOW()
+    WHERE email = #{email}
+      AND purpose = #{purpose}
+      AND verified_at IS NULL
+      AND expires_at &gt; NOW()
+  </update>
+
+  <!-- 유효한 인증코드 조회 (미인증 + 미만료) -->
+  <select id="findValid" resultType="EmailVerificationRow">
+    SELECT
+      email_verification_id,
+      email,
+      verification_code,
+      purpose,
+      created_at,
+      expires_at,
+      verified_at
+    FROM et_email_verification
+    WHERE email = #{email}
+      AND verification_code = #{verificationCode}
+      AND purpose = #{purpose}
+      AND verified_at IS NULL
+      AND expires_at &gt; NOW()
+    ORDER BY created_at DESC
+    LIMIT 1
+  </select>
+
+  <!-- 인증 완료 처리 (여기도 조건 걸어두는 게 안전) -->
+  <update id="markVerified">
+    UPDATE et_email_verification
+    SET verified_at = NOW()
+    WHERE email_verification_id = #{emailVerificationId}
+      AND verified_at IS NULL
+      AND expires_at &gt; NOW()
+  </update>
+
+  <!-- 회원가입 직전: 인증 완료 여부 확인 -->
+  <select id="countVerified" resultType="int">
+    SELECT COUNT(*)
+    FROM et_email_verification
+    WHERE email = #{email}
+      AND purpose = #{purpose}
+      AND verified_at IS NOT NULL
+      AND expires_at &gt; NOW()
+  </select>
+
+</mapper>

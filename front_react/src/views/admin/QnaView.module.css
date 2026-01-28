@@ -1,0 +1,294 @@
+/* src/views/admin/QnaView.module.css */
+
+/* ===== Base ===== */
+.wrap {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: #f6f7fb;
+  min-height: calc(100vh - 60px);
+  color: #111827;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+}
+
+.muted {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.muted a {
+  color: #374151;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.muted a:hover {
+  text-decoration: underline;
+}
+
+/* ===== Top Controls ===== */
+.ctrlBar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(17, 24, 39, 0.06);
+}
+
+.ctrlItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid #f0f2f5;
+  background: #fafafa;
+  border-radius: 10px;
+}
+
+.ctrlLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: #6b7280;
+}
+
+.ctrlValue {
+  font-size: 13px;
+  font-weight: 800;
+  color: #111827;
+  padding: 2px 8px;
+  background: #eef2ff;
+  border: 1px solid #e0e7ff;
+  border-radius: 999px;
+}
+
+.ctrlInput {
+  width: 80px;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #ffffff;
+  outline: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.ctrlInput:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.16);
+}
+
+/* ===== Buttons ===== */
+.button {
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  color: #111827;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.06s ease, box-shadow 0.12s ease, background 0.12s ease;
+}
+
+.button:hover {
+  background: #f9fafb;
+  box-shadow: 0 8px 18px rgba(17, 24, 39, 0.08);
+}
+
+.button:active {
+  transform: translateY(1px);
+}
+
+.button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.buttonPrimary {
+  border-color: #4f46e5;
+  background: linear-gradient(180deg, #4f46e5 0%, #4338ca 100%);
+  color: #ffffff;
+}
+
+.buttonPrimary:hover {
+  background: linear-gradient(180deg, #4338ca 0%, #3730a3 100%);
+}
+
+/* ===== Errors ===== */
+.error {
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #fecaca;
+  background: #fff1f2;
+  color: #991b1b;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* ===== Chat Area ===== */
+.chatBox {
+  flex: 1;
+  min-height: 520px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 14px;
+  overflow: auto;
+  box-shadow: 0 8px 24px rgba(17, 24, 39, 0.08);
+}
+
+/* scroll */
+.chatBox::-webkit-scrollbar {
+  width: 10px;
+}
+.chatBox::-webkit-scrollbar-thumb {
+  background: #e5e7eb;
+  border-radius: 999px;
+  border: 2px solid #ffffff;
+}
+.chatBox::-webkit-scrollbar-thumb:hover {
+  background: #d1d5db;
+}
+
+.chatRow {
+  display: flex;
+  justify-content: flex-start;
+  margin: 10px 0;
+}
+
+.chatRowMine {
+  justify-content: flex-end;
+}
+
+/* Bubble */
+.bubble {
+  max-width: 72%;
+  border-radius: 14px;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  background: #fafafa;
+}
+
+.bubbleMine {
+  border-color: #c7d2fe;
+  background: #eef2ff;
+}
+
+.bubbleOther {
+  border-color: #e5e7eb;
+  background: #f9fafb;
+}
+
+.bubbleMeta {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.bubbleSender {
+  font-size: 12px;
+  font-weight: 900;
+  color: #111827;
+}
+
+.bubbleTime {
+  margin-left: auto;
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.bubbleText {
+  font-size: 14px;
+  line-height: 1.55;
+  color: #111827;
+  font-weight: 600;
+  word-break: break-word;
+}
+
+/* ===== Input Bar ===== */
+.chatInputBar {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  padding: 12px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  box-shadow: 0 10px 28px rgba(17, 24, 39, 0.08);
+}
+
+.chatInput {
+  flex: 1;
+  resize: none;
+  min-height: 44px;
+  max-height: 140px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 10px 12px;
+  outline: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  background: #ffffff;
+}
+
+.chatInput:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.16);
+}
+
+/* ===== Optional: grid/table (다른 화면에서 쓰는 경우 대비) ===== */
+.grid {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(17, 24, 39, 0.08);
+}
+
+.grid thead th {
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 12px 10px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 900;
+  color: #374151;
+}
+
+.grid tbody td {
+  border-bottom: 1px solid #f1f5f9;
+  padding: 12px 10px;
+  font-size: 13px;
+  color: #111827;
+  font-weight: 600;
+}
+
+.grid tbody tr:hover td {
+  background: #fafafa;
+}

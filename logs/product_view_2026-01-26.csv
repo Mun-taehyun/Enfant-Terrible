@@ -1,0 +1,2 @@
+timestamp,productId,userId,sessionId,clientIp,userAgent
+2026-01-26T16:40:23,2,,,0:0:0:0:0:0:0:1,PostmanRuntime/7.51.0

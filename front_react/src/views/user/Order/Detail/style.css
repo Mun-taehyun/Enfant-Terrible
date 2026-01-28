@@ -1,0 +1,180 @@
+/* 기본 컨테이너 - 배경색을 약간 미색으로 잡아 포근한 느낌 */
+.order-detail-container {
+  padding: 40px 20px;
+  max-width: 700px;
+  margin: 0 auto;
+  font-family: 'Pretendard', sans-serif;
+  background-color: #fff;
+}
+
+/* 상단 헤더 - 강아지 발바닥 같은 귀여운 포인트 */
+.detail-header {
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.header-title {
+  font-size: 26px;
+  font-weight: 900;
+  color: #333;
+  margin-bottom: 12px;
+  position: relative;
+  display: inline-block;
+}
+
+/* 제목 아래 노란색 밑줄 포인트 (펫 쇼핑몰 감성) */
+.header-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 8px;
+  background: #ffec99;
+  z-index: -1;
+  border-radius: 4px;
+}
+
+.header-meta {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  color: #888;
+  font-size: 14px;
+}
+
+/* 섹션 공통 - 둥글둥글한 느낌 */
+.detail-section {
+  background: #fdfdfd;
+  border: 1px solid #f1f1f1;
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 20px;
+  color: #444;
+  display: flex;
+  align-items: center;
+}
+
+/* 상품 카드 - 펫 간식/용품이 돋보이도록 */
+.product-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: #fff;
+  border-radius: 15px;
+  margin-bottom: 12px;
+  border: 1px solid #f8f8f8;
+}
+
+.product-name {
+  font-weight: 700;
+  font-size: 16px;
+  color: #333;
+}
+
+.product-option {
+  font-size: 13px;
+  color: #ff9f43; /* 앙팡 시그니처 오렌지 */
+  margin-top: 4px;
+}
+
+.current-price {
+  font-weight: 800;
+  font-size: 17px;
+  color: #222;
+}
+
+/* 상태 배지 - 둥근 캡슐 형태 */
+.status-text {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  background: #fff5eb;
+  color: #ff9f43;
+  border-radius: 50px;
+  margin-top: 6px;
+}
+
+/* 배송지/결제 정보 그리드 */
+.info-row {
+  display: flex;
+  margin-bottom: 12px;
+}
+
+.info-label {
+  width: 100px;
+  font-size: 14px;
+  color: #999;
+  font-weight: 600;
+}
+
+.info-value {
+  flex: 1;
+  font-size: 15px;
+  color: #444;
+  line-height: 1.4;
+}
+
+/* 결제 정보 박스 - 좀 더 강조 */
+.payment-box {
+  padding: 10px 5px;
+}
+
+.payment-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  color: #666;
+}
+
+.payment-row.total {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 2px dashed #eee;
+}
+
+.total-label {
+  font-weight: 800;
+  font-size: 18px;
+  color: #222;
+}
+
+.total-value {
+  font-weight: 900;
+  font-size: 22px;
+  color: #ff9f43;
+}
+
+/* 하단 버튼 - 둥글고 큼직하게 */
+.bottom-actions {
+  margin-top: 40px;
+}
+
+.back-button {
+  width: 100%;
+  height: 60px;
+  background: #333;
+  color: #fff;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.back-button:hover {
+  transform: translateY(-2px);
+  background: #444;
+}

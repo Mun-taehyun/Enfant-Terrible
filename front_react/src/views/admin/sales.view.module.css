@@ -1,0 +1,123 @@
+/* src/views/admin/sales.view.module.css */
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 8px 12px;
+  border: 1px solid #d0d0d0;
+  background: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.range {
+  display: flex;
+  gap: 10px;
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #444;
+}
+
+.input {
+  padding: 7px 10px;
+  border: 1px solid #d0d0d0;
+  border-radius: 8px;
+}
+
+.state {
+  padding: 12px;
+  border: 1px solid #eee;
+  border-radius: 10px;
+}
+
+.error {
+  padding: 12px;
+  border: 1px solid #ffcccc;
+  background: #fff6f6;
+  border-radius: 10px;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.card {
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 14px;
+  background: #fff;
+}
+
+.cardLabel {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+.cardValue {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.tableBox {
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 14px;
+  background: #fff;
+}
+
+.subTitle {
+  margin: 0 0 10px 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 10px;
+  border-top: 1px solid #eee;
+  text-align: left;
+  font-size: 13px;
+}
+
+.empty {
+  text-align: center;
+  color: #666;
+  padding: 16px;
+}

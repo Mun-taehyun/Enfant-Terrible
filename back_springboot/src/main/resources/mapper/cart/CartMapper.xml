@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.enfantTerrible.enfantTerrible.mapper.cart.CartMapper">
+
+  <select id="findCartIdByUserId" resultType="long">
+    SELECT cart_id
+    FROM et_cart
+    WHERE user_id = #{userId}
+  </select>
+
+  <insert id="insertCart">
+    INSERT INTO et_cart (user_id)
+    VALUES (#{userId})
+  </insert>
+
+  <select id="findSkuForCart" resultType="CartSkuRow">
+    SELECT
+      s.sku_id,
+      s.product_id,
+      s.price,
+      s.stock,
+      s.status AS sku_status
+    FROM et_product_sku s
+    WHERE s.sku_id = #{skuId}
+      AND s.deleted_at IS NULL
+  </select>
+
+  <select id="findCartItemByCartIdAndSkuId" resultType="CartItemExistRow">
+    SELECT
+      cart_item_id,
+      quantity
+    FROM et_cart_item
+    WHERE cart_id = #{cartId}
+      AND sku_id = #{skuId}
+  </select>
+
+  <insert id="insertCartItem">
+    INSERT INTO et_cart_item (
+      cart_id,
+      sku_id,
+      quantity
+    ) VALUES (
+      #{cartId},
+      #{skuId},
+      #{quantity}
+    )
+  </insert>
+
+  <update id="updateCartItemQuantity">
+    UPDATE et_cart_item
+    SET quantity = #{quantity}
+    WHERE cart_item_id = #{cartItemId}
+  </update>
+
+  <update id="increaseCartItemQuantity">
+    UPDATE et_cart_item
+    SET quantity = quantity + #{delta}
+    WHERE cart_item_id = #{cartItemId}
+  </update>
+
+  <delete id="deleteCartItem">
+    DELETE FROM et_cart_item
+    WHERE cart_id = #{cartId}
+      AND cart_item_id = #{cartItemId}
+  </delete>
+
+  <delete id="deleteAllCartItems">
+    DELETE FROM et_cart_item
+    WHERE cart_id = #{cartId}
+  </delete>
+
+  <select id="findCartItems" resultType="CartItemRow">
+    SELECT
+      ci.cart_item_id,
+      ci.sku_id,
+      ci.quantity,
+      s.product_id,
+      p.name AS product_name,
+      s.price,
+      s.stock,
+      s.status AS sku_status
+    FROM et_cart_item ci
+    JOIN et_product_sku s ON s.sku_id = ci.sku_id
+    JOIN et_product p ON p.product_id = s.product_id
+    WHERE ci.cart_id = #{cartId}
+      AND s.deleted_at IS NULL
+      AND p.deleted_at IS NULL
+    ORDER BY ci.cart_item_id DESC
+  </select>
+
+</mapper>

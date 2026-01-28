@@ -1,0 +1,30 @@
+/* src/views/admin/product/productsView.module.css */
+.wrap { padding: 16px; }
+.header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.title { font-size: 18px; font-weight: 700; }
+
+.filters { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; align-items: end; }
+.label { display: flex; flex-direction: column; gap: 6px; font-size: 12px; }
+.labelSmall { display: flex; flex-direction: column; gap: 6px; width: 90px; font-size: 12px; }
+
+.input { padding: 8px; border: 1px solid #ddd; border-radius: 8px; }
+.select { padding: 8px; border: 1px solid #ddd; border-radius: 8px; }
+
+.secondaryBtn { padding: 8px 10px; border: 1px solid #ddd; background: #fff; border-radius: 8px; cursor: pointer; }
+.smallBtn { padding: 6px 8px; border: 1px solid #ddd; background: #fff; border-radius: 8px; cursor: pointer; }
+
+.tableWrap { border: 1px solid #eee; border-radius: 10px; overflow: hidden; }
+.table { width: 100%; border-collapse: collapse; }
+.table th, .table td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; font-size: 13px; }
+.table th { background: #fafafa; font-weight: 700; }
+.empty { text-align: center; padding: 24px; color: #666; }
+
+.actions { display: flex; gap: 8px; }
+.loading { padding: 18px; }
+
+.pager { display: flex; align-items: center; gap: 10px; justify-content: center; margin-top: 12px; }
+.pageText { font-size: 13px; color: #333; }
+
+.errorBox { margin-top: 8px; padding: 10px; border: 1px solid #f2c2c2; background: #fff3f3; border-radius: 10px; color: #9a1b1b; }
+
+.detailPanel { margin-top: 14px; border: 1px solid #eee; border-radius: 12px; overflow: hidden; }

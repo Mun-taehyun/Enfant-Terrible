@@ -1,0 +1,257 @@
+/* src/views/admin/popups.view.module.css */
+
+/* 전체 요소에 박스 모델 규격 적용 (패딩이 너비를 잡아먹지 않게 함) */
+.wrap, .wrap * {
+  box-sizing: border-box;
+}
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  width: 100%;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* 필터 영역 */
+.filters {
+  display: grid;
+  grid-template-columns: 1fr 180px 120px auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.filterItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.label {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.input,
+.select,
+.textarea {
+  width: 100%;
+  max-width: 100%;
+  border: 1px solid rgba(0,0,0,0.15);
+  border-radius: 8px;
+  padding: 10px 12px;
+  outline: none;
+  background: #fff;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.meta {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+/* 테이블 영역 수정 */
+.tableWrap {
+  border: 1px solid rgba(0,0,0,0.12);
+  border-radius: 10px;
+  overflow-x: auto; /* 테이블이 너무 길어지면 내부 스크롤 발생시켜 잘림 방지 */
+  background: #fff;
+  width: 100%;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  /* fixed를 제거하거나 비율을 조정하여 버튼이 안 잘리게 함 */
+  min-width: 800px; 
+}
+
+.table th,
+.table td {
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+  padding: 12px;
+  font-size: 13px;
+  text-align: left;
+  vertical-align: middle; /* 상단 정렬보다 중앙 정렬이 깔끔함 */
+}
+
+.table th {
+  background: rgba(0,0,0,0.03);
+  font-weight: 700;
+}
+
+/* 특정 열의 너비 및 텍스트 처리 */
+.tdTitle {
+  font-weight: 600;
+  /* 제목 열은 남는 공간을 다 쓰도록 설정 */
+}
+
+.tdLink {
+  word-break: break-all;
+  max-width: 200px;
+}
+
+.tdPeriod {
+  white-space: nowrap;
+  width: 180px;
+}
+
+/* 버튼 열: 절대 잘리지 않도록 너비를 충분히 확보 */
+.tdActions {
+  display: flex;
+  gap: 6px;
+  white-space: nowrap;
+  width: 140px; /* 버튼 2개가 들어갈 충분한 고정 너비 */
+  justify-content: flex-start;
+}
+
+.empty {
+  text-align: center;
+  padding: 40px 12px;
+  opacity: 0.7;
+}
+
+/* 페이지네이션 */
+.pager {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0;
+}
+
+.pageInfo {
+  font-size: 13px;
+  min-width: 80px;
+  text-align: center;
+  opacity: 0.85;
+}
+
+/* 버튼 스타일 */
+.primaryBtn,
+.grayBtn,
+.dangerBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  padding: 8px 12px;
+  border: 1px solid rgba(0,0,0,0.12);
+  background: #fff;
+  cursor: pointer;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.primaryBtn {
+  background: #222;
+  color: #fff;
+  font-weight: 600;
+}
+
+.grayBtn {
+  background: #f8f8f8;
+}
+
+.dangerBtn {
+  color: #d32f2f;
+  border-color: rgba(211, 47, 47, 0.2);
+}
+
+.primaryBtn:disabled,
+.grayBtn:disabled,
+.dangerBtn:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+/* 모달 섹션 */
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  z-index: 1000;
+}
+
+.modal {
+  width: 860px;
+  max-width: 100%;
+  max-height: 90vh;
+  background: #fff;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+
+.modalTitle {
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.formItem, .formItemWide {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.formItemWide {
+  grid-column: 1 / -1;
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 20px;
+  border-top: 1px solid rgba(0,0,0,0.08);
+  background: rgba(0,0,0,0.02);
+}

@@ -1,0 +1,37 @@
+.pet-form-group {
+    margin-bottom: 24px;
+}
+
+/* 성별과 중성화를 가로로 나란히 배치하고 싶을 때 */
+.pet-form-group-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.auth-card-subtitle {
+    font-size: 14px;
+    color: #8E8E93;
+    margin-top: 4px;
+    margin-bottom: 20px;
+}
+
+/* 전체적인 폼 컨테이너 부드러운 애니메이션 */
+.auth-card-box {
+    animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.auth-card-box {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); /* 은은한 그림자 */
+    max-width: 450px;
+    margin: 40px auto;
+}

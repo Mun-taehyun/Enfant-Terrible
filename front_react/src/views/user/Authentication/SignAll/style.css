@@ -1,0 +1,204 @@
+
+/* 1. 전체 배경: 살짝 따스한 톤의 라이트 그레이 */
+#auth-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #fcfcfc;
+  padding: 40px;
+}
+
+/* 2. 메인 컨테이너: 쥬뵨트론과 카드를 감싸는 박스 */
+.auth-container {
+  display: flex;
+  width: 100%;
+  max-width: 1000px;
+  background: #ffffff;
+  border-radius: 30px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+}
+
+/* 3. 왼쪽 쥬뵨트론 섹션: 브랜드 홍보 영역 */
+.auth-jumbotron-box {
+  flex: 1;
+  background: linear-gradient(135deg, #ff9f43 0%, #ff6b6b 100%); /* 펫 쇼핑몰의 활기찬 에너지 */
+  padding: 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: #ffffff;
+}
+
+/* 로고 스타일 */
+.auth-logo-icon {
+  font-size: 28px;
+  font-weight: 900;
+  margin-bottom: 40px;
+  letter-spacing: -1px;
+  background: rgba(255, 255, 255, 0.2);
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 12px;
+}
+
+.auth-jumbotron-text-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.auth-jumbotron-text {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.4;
+  word-break: keep-all;
+}
+
+/* 4. 오른쪽 카드 영역 (SignInCard, SignUpCard 등이 들어가는 곳) */
+/* 카드 컴포넌트들이 이 클래스를 가지고 있다고 가정 */
+.auth-card, .SignInCard, .SignUpCard {
+  flex: 1;
+  padding: 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: #fff;
+}
+
+/* 모바일 대응: 세로 배치 */
+@media (max-width: 850px) {
+  #auth-wrapper {
+    padding: 20px;
+  }
+  
+  .auth-container {
+    flex-direction: column;
+    max-width: 450px;
+  }
+  
+  .auth-jumbotron-box {
+    padding: 40px;
+    text-align: center;
+  }
+  
+  .auth-logo-icon {
+    margin: 0 auto 20px;
+  }
+  
+  .auth-jumbotron-text {
+    font-size: 24px;
+  }
+
+  .auth-card, .SignInCard, .SignUpCard {
+    padding: 40px 30px;
+  }
+} /*메인 컴포넌트*/
+
+
+/* 1. 카드 헤더 및 페이지 표시 */
+.auth-card-title-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 24px;
+}
+
+.auth-card-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #333;
+}
+
+.auth-card-page {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ff9f43; /* 포인트 컬러로 현재 단계 강조 */
+  background-color: #fff5eb;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+/* 2. 이메일 입력 + 인증 버튼 레이아웃 */
+.auth-email-box {
+  display: flex;
+  align-items: flex-end; /* 인풋 라벨 높이 때문에 하단 정렬 */
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+/* 이메일 박스 내의 인풋박스 너비 조정 */
+.auth-email-box > div:first-child {
+  flex: 1;
+}
+
+/* 인증/전송 버튼 스타일 */
+.email-mail-button-click {
+  height: 50px; /* 인풋 높이와 통일 */
+  padding: 0 16px;
+  background-color: #f8f8f8;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  color: #666;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 0px; /* 인풋 에러 메시지 공간 고려 */
+}
+
+.email-mail-button-click:hover {
+  background-color: #ff9f43;
+  color: #fff;
+  border-color: #ff9f43;
+}
+
+/* 3. 에러 메시지 영역 */
+.auth-sign-in-error-box {
+  background-color: #fff1f0;
+  border: 1px solid #ffa39e;
+  border-radius: 12px;
+  padding: 14px;
+  margin: 20px 0;
+}
+
+.auth-sign-in-error-message {
+  color: #ff4d4f;
+  font-size: 13px;
+  text-align: center;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+/* 4. 하단 버튼 영역 */
+.auth-card-bottom {
+  margin-top: 10px;
+}
+
+.black-large-full-button {
+  width: 100%;
+  height: 56px;
+  background-color: #333;
+  color: #fff;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.black-large-full-button:hover {
+  background-color: #000;
+  transform: translateY(-2px);
+}
+
+/*회원 로그인 비번찾기 공통 css*/
+
+
+
+
