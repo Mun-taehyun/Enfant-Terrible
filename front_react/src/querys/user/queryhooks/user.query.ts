@@ -1,5 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { queryClient } from '../queryClient';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { userKey } from '../keys';
 
 import {
@@ -38,7 +37,7 @@ export const userQueries = {
         return useQuery({
         queryKey: userKey.pets(),
         queryFn: petSeleteRequest,
-        select: (data) => data.petList,
+        select: (data) => ({ petList: Array.isArray(data) ? data : [] })
         });
     },
 
@@ -53,6 +52,7 @@ export const userQueries = {
 
     //소셜회원가입 C(추가) 쿼리 
     useOauthAddInformation() {
+        const queryClient = useQueryClient();
         return useMutation({
             mutationFn: oauthAddInformationRequest,
             onSuccess: () => {
@@ -69,6 +69,7 @@ export const userQueries = {
 
     // 유저 수정, 삭제
     useUserUpdate() {
+        const queryClient = useQueryClient();
         return useMutation({
             mutationFn: userUpdateRequest,
             onSuccess: () => {queryClient.invalidateQueries({queryKey: userKey.me()});}
@@ -76,6 +77,7 @@ export const userQueries = {
     },
 
     useUserDelete() {
+        const queryClient = useQueryClient();
         return useMutation({
             mutationFn: userDeleteRequest,
             onSuccess: () => {queryClient.removeQueries({queryKey: userKey.me()});}
@@ -85,6 +87,7 @@ export const userQueries = {
 // ===============================펫 정보 변경 CUD ========================
     //사용할 펫정보 등록 
     usePetAdd() {
+        const queryClient = useQueryClient();
         return useMutation({
             mutationFn: petAddInsertRequest,
             onSuccess: () => {queryClient.invalidateQueries({queryKey: userKey.pets()});}
@@ -93,6 +96,7 @@ export const userQueries = {
 
     //사용할 펫 정보 수정 =======================
     usePetUpdate() { 
+        const queryClient = useQueryClient();
         return useMutation({
             mutationFn: petUpdateRequest,
             onSuccess: () => {queryClient.invalidateQueries({queryKey: userKey.pets()}); }
@@ -100,12 +104,16 @@ export const userQueries = {
     },
 
     //사용할 펫정보 삭제 ==================
+    
     usePetDelete() {
+        const queryClient = useQueryClient();
+
+
         return useMutation({
         mutationFn: petDeleteRequest,
             onSuccess: (_data,petId) => {
                 queryClient.removeQueries({ queryKey: userKey.petIds(petId) });
-                queryClient.invalidateQueries({queryKey: userKey.pets()});
+                queryClient.invalidateQueries({queryKey: userKey.pets(), exact : false });
             }
         });
     }

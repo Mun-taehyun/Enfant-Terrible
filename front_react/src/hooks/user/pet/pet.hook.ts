@@ -1,18 +1,18 @@
 import { USER_PATH } from "@/constant/user/route.index";
 import { userQueries } from "@/querys/user/queryhooks";
 import { useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate} from "react-router-dom";
 
 export const usePet = () => {
-
-    //url상태 : petId 인식
-    const {petId} = useParams();
 
     //참조 : 펫 카드 스크롤을 위한 DOM 참조 
     const scrollRef = useRef<HTMLDivElement>(null);
 
     //상태 : 
     const [showLeftBtn, setShowLeftBtn] = useState(false);
+
+    //함수 : 네비
+    const navigate = useNavigate();
 
     const handleScroll = () => {
         if (scrollRef.current) {
@@ -85,15 +85,14 @@ export const usePet = () => {
                 activityLevel: formData.activityLevel , weight: formData.weight
             },
             {
-                onSuccess: () => {USER_PATH()},
+                onSuccess: () => {console.log('여기까진 옴'); navigate(USER_PATH())},
                 onError: (error : Error) => { alert(error.message); return; }
             }
         ) 
     };
 
     //이벤트핸들러 : 펫 정보 수정 이벤트 처리 
-    const onPetUpdateHandler = () => {
-        if (!petUpdate) return;
+    const onPetUpdateHandler = (petId : number) => {
         if (!petId) return;
         petUpdate( //펫수정은 따로 유효처리를 할 필요가 없다. 값만 잘 들어가면 된다.
             { //인자가 여러개일 경우 인지.. 
@@ -111,10 +110,10 @@ export const usePet = () => {
             }
         ) 
     };
+
     //이벤트핸들러 : 펫 정보 삭제 이벤트 처리 
-    const onPetDeleteHandler = () => {
-        if (!petDelete) return;
-        if (!petId) return;
+    const onPetDeleteHandler = (petId : number) => {    
+        if (!petId) return console.log("펫삭제버튼");
         petDelete( //펫수정은 따로 유효처리를 할 필요가 없다. 값만 잘 들어가면 된다.
             Number(petId),
             {

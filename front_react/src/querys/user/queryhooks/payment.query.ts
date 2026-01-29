@@ -1,6 +1,5 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { cartKeys, orderKeys, paymentKeys, pointKeys } from "../keys/key";
-import { queryClient } from "../queryClient";
 import { PaymentCancelRequestDto, PaymentConfirmRequestDto } from "@/apis/user/request/payment";
 import { postPaymentsCancelRequest, postPaymentsConfirmRequest } from "@/apis/user";
 
@@ -13,6 +12,7 @@ export const paymentQueries = {
 
     //쿼리 : 결제 시도
     usePostPaymentConfirm() {
+        const queryClient = useQueryClient();
         return useMutation({
             mutationFn: (body: PaymentConfirmRequestDto) => postPaymentsConfirmRequest(body),
             onSuccess: () => {
@@ -33,6 +33,7 @@ export const paymentQueries = {
 
     //쿼리 : 결제 취소
     usePostPaymentCancel() {
+        const queryClient = useQueryClient();
         return useMutation({
             mutationFn: (body: PaymentCancelRequestDto) => postPaymentsCancelRequest(body),
             onSuccess: () => {

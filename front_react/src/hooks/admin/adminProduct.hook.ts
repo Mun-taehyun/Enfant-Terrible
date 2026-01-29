@@ -3,7 +3,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import type {
   AdminProductListParams,
-  AdminProductSavePayload,
   AdminSkuListParams,
   AdminSkuSavePayload,
   AdminOptionGroupSavePayload,
@@ -44,7 +43,7 @@ export function useAdminProductDetail(productId: number) {
 export function useAdminProductCreate() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (payload: AdminProductSavePayload) => createAdminProduct(payload),
+    mutationFn: (payload: FormData) => createAdminProduct(payload),
     onSuccess: async () => {
       await qc.invalidateQueries({ queryKey: adminProductKeys.root });
     },
@@ -54,7 +53,7 @@ export function useAdminProductCreate() {
 export function useAdminProductUpdate() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (vars: { productId: number; payload: AdminProductSavePayload }) =>
+    mutationFn: (vars: { productId: number; payload: FormData }) =>
       updateAdminProduct(vars.productId, vars.payload),
     onSuccess: async () => {
       await qc.invalidateQueries({ queryKey: adminProductKeys.root });

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import BannerItemView from '../BannerItem';
 import { BannerItem } from '@/types/user/interface';
+import './style.css';
 
 interface BannerSliderProps {
     banners: BannerItem[];
@@ -18,8 +19,6 @@ export default function BannerMain({ banners }: BannerSliderProps) {
         setCurrentIndex(prev => (prev === total - 1 ? 0 : prev + 1));
     };
 
-    if (total === 0) return null;
-
     return (
         <div className="banner-container">
             <button className="banner-nav prev" onClick={handlePrev}>
@@ -27,14 +26,18 @@ export default function BannerMain({ banners }: BannerSliderProps) {
             </button>
 
             <div className="banner-wrapper">
-                <div
-                    className="banner-track"
-                    style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-                >
-                    {banners.map(banner => (
-                        <BannerItemView key={banner.bannerId} banner={banner} />
-                    ))}
-                </div>
+                {total === 0 ?
+                    <div className='banner-trank'> 배너 x </div>
+                :
+                    <div
+                        className="banner-track"
+                        style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+                    >
+                        {banners.map(banner => (
+                            <BannerItemView key={banner.bannerId} banner={banner} />
+                        ))}
+                    </div>
+                }
             </div>
 
             <button className="banner-nav next" onClick={handleNext}>

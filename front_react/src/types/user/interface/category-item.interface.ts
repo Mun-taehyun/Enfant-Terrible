@@ -8,7 +8,7 @@ export default interface CategoryItem {
     sortOrder : number; 
     status : string;
 
-    child : CategoryChildItem[];
+    children : CategoryChildItem[];
     //자식 요소들 배열 
 }
 

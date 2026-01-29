@@ -61,7 +61,8 @@ export default function Authentication() {
                                   onkeyDown={(event) => onKeyDown(event, 'password')}/>
                         <InputBox ref={refForms.password} label='패스워드' type={formChange.passwordType} placeholder='비밀번호를 입력해주세요.' 
                                   error={false} name='password' value={formData.password} onChange={onInputChange} 
-                                  icon={formChange.passwordIcon} onButtonClick={() => togglePasswordType('pw')} 
+                                  icon={formChange.passwordIcon} onButtonClick={() => togglePasswordType('pw')}
+                                  buttonName='보기'  
                                   onkeyDown={(event) => onKeyDown(event, undefined , onSignInButtonClickHandler )}/>
                     </div>
                     <div className='auth-card-bottom'>
@@ -140,12 +141,14 @@ export default function Authentication() {
                         <InputBox ref={refForms.password} label='비밀번호*' type={formChange.passwordType} placeholder='비밀번호를 입력해주세요.' 
                                   name='password' value={formData.password} onChange={onInputChange} 
                                   error={errors.password.state} message={errors.password.message} 
-                                  icon={formChange.passwordIcon} onButtonClick={() => togglePasswordType('pw')} 
+                                  icon={formChange.passwordIcon} onButtonClick={() => togglePasswordType('pw')}
+                                  buttonName='보기' 
                                   onkeyDown={(event) => onKeyDown(event, 'passwordCheck')}/>
                         <InputBox ref={refForms.passwordCheck} label='비밀번호 확인*' type={formChange.passwordCheckType} placeholder='비밀번호를 다시 입력해주세요.' 
                                   name='passwordCheck' value={formData.passwordCheck} onChange={onInputChange} 
                                   error={errors.passwordCheck.state} message={errors.passwordCheck.message} 
                                   icon={formChange.passwordCheckIcon} onButtonClick={() => togglePasswordType('check')} 
+                                  buttonName='보기' 
                                   onkeyDown={(event) => onKeyDown(event, 'name')}/>
                         <InputBox ref={refForms.name} label='이름*' type='text' placeholder='실명을 입력해주세요.' 
                                   name='name' value={formData.name} onChange={onInputChange} 

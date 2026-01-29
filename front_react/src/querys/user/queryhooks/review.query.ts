@@ -1,7 +1,6 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { productKeys, reviewKeys } from "../keys/key";
 import { deleteProductReviewRequest, getProductReviewRequest, postProductReviewRequest, putProductReviewRequest } from "@/apis/user";
-import { queryClient } from "../queryClient";
 import { ProductReviewUpdateRequestDto } from "@/apis/user/request/review";
 import { ProductReviewItem } from "@/apis/user/request/review/product-review-create-request.dto";
 
@@ -21,6 +20,9 @@ export const reviewQueries = {
 
     //쿼리: 리뷰 생성
     usePostReview(productId: number) {
+        const queryClient = useQueryClient();
+
+
         return useMutation({
             mutationFn: (body: ProductReviewItem) => 
                 postProductReviewRequest(productId, {reviewList: [body]}),
@@ -39,6 +41,7 @@ export const reviewQueries = {
 
     //쿼리: 리뷰 수정
     usePutReview(productId: number) {
+        const queryClient = useQueryClient();
         return useMutation({
             mutationFn: ({ reviewId, body }: { reviewId: number; body: ProductReviewUpdateRequestDto }) => 
                 putProductReviewRequest(reviewId, body),
@@ -50,6 +53,7 @@ export const reviewQueries = {
 
     //쿼리: 리뷰 삭제
     useDeleteReview(productId: number) {
+        const queryClient = useQueryClient();
         return useMutation({
             mutationFn: (reviewId: number) => deleteProductReviewRequest(reviewId),
             onSuccess: () => {

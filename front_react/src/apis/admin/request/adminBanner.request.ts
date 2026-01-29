@@ -2,7 +2,7 @@
 
 import { mainAxios } from "@/apis/admin/main_axios";
 
-import type { AdminBannerId, AdminBannerListParams, AdminBannerSaveRequest } from "@/types/admin/banner";
+import type { AdminBannerId, AdminBannerListParams } from "@/types/admin/banner";
 import type {
   GetBannersResponse,
   GetBannerDetailResponse,
@@ -28,12 +28,12 @@ export async function apiAdminBannerDetail(bannerId: AdminBannerId) {
   return unwrapOrThrow(data);
 }
 
-export async function apiAdminBannerCreate(body: AdminBannerSaveRequest) {
+export async function apiAdminBannerCreate(body: FormData) {
   const { data } = await mainAxios.post<CreateBannerResponse>("/api/admin/banners", body);
   return unwrapOrThrow(data); // bannerId
 }
 
-export async function apiAdminBannerUpdate(bannerId: AdminBannerId, body: AdminBannerSaveRequest) {
+export async function apiAdminBannerUpdate(bannerId: AdminBannerId, body: FormData) {
   const { data } = await mainAxios.put<UpdateBannerResponse>(`/api/admin/banners/${bannerId}`, body);
   return unwrapOrThrow(data);
 }

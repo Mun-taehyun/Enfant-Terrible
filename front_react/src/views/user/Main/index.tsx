@@ -21,7 +21,11 @@ export default function Main() {
     return (
         <div className="main-page">
             <div className="main-banner-container">
-                {bannerData?.bannerList && <BannerMain banners={bannerData?.bannerList} />} 
+                {bannerData?.bannerList ?
+                    <BannerMain banners={bannerData?.bannerList} />
+                    :
+                    <div className="main-banner-exist"> 현재 배너가 존재하지 않습니다. </div>
+                } 
             </div>
             <div className="main-recommend-product-container">
                 {productData?.map((item) => (<ProductCard key={item.productId} product={item} />))}

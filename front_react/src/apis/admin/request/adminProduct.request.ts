@@ -6,7 +6,6 @@ import type {
   AdminProductListParams,
   AdminProductListItem,
   AdminProductDetail,
-  AdminProductSavePayload,
   AdminSkuListParams,
   AdminSkuItem,
   AdminSkuSavePayload,
@@ -40,12 +39,12 @@ export async function getAdminProductDetail(productId: number) {
   return unwrapOrThrow(data);
 }
 
-export async function createAdminProduct(payload: AdminProductSavePayload) {
+export async function createAdminProduct(payload: FormData) {
   const { data } = await mainAxios.post<ApiResponse<null>>("/api/admin/products", payload);
   unwrapOrThrow(data);
 }
 
-export async function updateAdminProduct(productId: number, payload: AdminProductSavePayload) {
+export async function updateAdminProduct(productId: number, payload: FormData) {
   const { data } = await mainAxios.put<ApiResponse<null>>(
     `/api/admin/products/${productId}`,
     payload

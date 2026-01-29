@@ -53,7 +53,6 @@ type ProductFormState = {
   name: string;
   basePrice: string;
   status: string;
-  thumbnailFileId: string;
 };
 
 const PRODUCT_STATUS_OPTIONS = [
@@ -70,14 +69,6 @@ const PRODUCT_STATUS_SET: ReadonlySet<string> = new Set(
 function toNumberOrThrow(v: string, label: string): number {
   const n = Number(v);
   if (!Number.isFinite(n)) throw new Error(`${label}은(는) 숫자여야 합니다.`);
-  return n;
-}
-
-function toOptionalNumber(v: string): number | undefined | null {
-  const s = v.trim();
-  if (!s) return undefined;
-  const n = Number(s);
-  if (!Number.isFinite(n)) return null;
   return n;
 }
 
@@ -113,8 +104,9 @@ export default function ProductDetailView({ productId, onClose }: Props) {
     name: "",
     basePrice: "",
     status: "",
-    thumbnailFileId: "",
   });
+
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
 
   useEffect(() => {
     const p = detailQ.data;
@@ -125,23 +117,19 @@ export default function ProductDetailView({ productId, onClose }: Props) {
       name: p.name ?? "",
       basePrice: String(p.basePrice ?? ""),
       status: String(p.status ?? ""),
-      thumbnailFileId: "",
     });
+    setThumbnailFile(null);
   }, [detailQ.data]);
 
   async function onSaveProduct() {
     setUiError("");
     try {
-      const thumb = toOptionalNumber(form.thumbnailFileId);
-      if (thumb === null) throw new Error("썸네일 파일 ID는 숫자여야 합니다.");
-
       const payload: AdminProductSavePayload = {
         productCode: form.productCode.trim(),
         categoryId: toNumberOrThrow(form.categoryId, "카테고리 ID"),
         name: form.name.trim(),
         basePrice: toNumberOrThrow(form.basePrice, "기본가"),
         status: form.status.trim(),
-        thumbnailFileId: thumb,
       };
 
       if (!payload.productCode) throw new Error("상품코드는 필수입니다.");
@@ -153,7 +141,13 @@ export default function ProductDetailView({ productId, onClose }: Props) {
         throw new Error(`유효하지 않은 상품 상태입니다: ${payload.status}`);
       }
 
-      await updateMut.mutateAsync({ productId, payload });
+      const formData = new FormData();
+      formData.append("req", new Blob([JSON.stringify(payload)], { type: "application/json" }));
+      if (thumbnailFile) {
+        formData.append("image", thumbnailFile);
+      }
+
+      await updateMut.mutateAsync({ productId, payload: formData });
     } catch (e) {
       setUiError(e instanceof Error ? e.message : "저장 중 오류가 발생했습니다.");
     }
@@ -567,13 +561,15 @@ export default function ProductDetailView({ productId, onClose }: Props) {
                 </label>
 
                 <label className={styles.label}>
-                  썸네일 파일 ID (선택)
+                  썸네일 파일 (선택)
                   <input
                     className={styles.input}
-                    value={form.thumbnailFileId}
-                    onChange={(e) =>
-                      setForm((p) => ({ ...p, thumbnailFileId: e.target.value }))
-                    }
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const f = e.target.files && e.target.files[0] ? e.target.files[0] : null;
+                      setThumbnailFile(f);
+                    }}
                   />
                 </label>
               </div>

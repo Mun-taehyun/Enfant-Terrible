@@ -78,6 +78,8 @@ export default function BannersView() {
   const updateM = useAdminBannerUpdate();
   const deleteM = useAdminBannerDelete();
 
+  const [imageFile, setImageFile] = useState<File | null>(null);
+
   // ✅ initial + draft
   const [draft, setDraft] = useState<Partial<AdminBannerSaveRequest>>({});
 
@@ -123,6 +125,7 @@ export default function BannersView() {
   function closeModal() {
     setOpen(false);
     resetToCreate();
+    setImageFile(null);
   }
 
   function onChange<K extends keyof AdminBannerSaveRequest>(key: K, value: AdminBannerSaveRequest[K]) {
@@ -130,25 +133,30 @@ export default function BannersView() {
   }
 
   async function onSubmit() {
-    const body: AdminBannerSaveRequest = {
+    const req: AdminBannerSaveRequest = {
       ...form,
       title: (form.title || "").trim(),
       linkUrl: (form.linkUrl || "").trim() || undefined,
-      imageUrl: (form.imageUrl || "").trim() || undefined,
       sortOrder: form.sortOrder,
       isActive: form.isActive,
       startAt: form.startAt,
       endAt: form.endAt,
     };
 
+    const formData = new FormData();
+    formData.append("req", new Blob([JSON.stringify(req)], { type: "application/json" }));
+    if (imageFile) {
+      formData.append("image", imageFile);
+    }
+
     if (mode === "CREATE") {
-      await createM.mutateAsync(body);
+      await createM.mutateAsync(formData);
       closeModal();
       return;
     }
 
     if (mode === "EDIT" && editingId != null) {
-      await updateM.mutateAsync({ bannerId: editingId, body });
+      await updateM.mutateAsync({ bannerId: editingId, body: formData });
       closeModal();
       return;
     }
@@ -386,12 +394,15 @@ export default function BannersView() {
               </div>
 
               <div className={styles.formItemWide}>
-                <label className={styles.label}>이미지 URL (요청 전용)</label>
+                <label className={styles.label}>이미지 파일</label>
                 <input
                   className={styles.input}
-                  value={form.imageUrl || ""}
-                  onChange={(e) => onChange("imageUrl", e.target.value)}
-                  placeholder="응답 DTO에 없어서 수정 시 자동 채움 불가"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const f = e.target.files && e.target.files[0] ? e.target.files[0] : null;
+                    setImageFile(f);
+                  }}
                 />
               </div>
             </div>

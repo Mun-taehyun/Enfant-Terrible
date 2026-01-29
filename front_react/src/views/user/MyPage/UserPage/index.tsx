@@ -13,6 +13,7 @@ import { inquiryQueries } from "@/querys/user/queryhooks/inquiry.query";
 import InquiryBox from "@/components/user/Inquiry";
 import { useLoginUserStore } from "@/stores/user";
 import { useState } from "react";
+import { Pet } from "@/types/user/interface";
 
 
 //컴포넌트 : 유저 마이페이지 
@@ -131,7 +132,7 @@ export default function UserPage() {
                     <div className="user-my-page-user-info-welcome">{myInfo.name}님 반갑습니다</div>
                     <div className="user-my-page-user-info-update" onClick={onUserUpdatePageButtonHandler}>{'회원정보 수정'}</div>
                 </div>
-                <div className="user-my-page-user-point" onClick={onPointPageButtonHandler}>{pointData?.balance}</div>          
+                <div className="user-my-page-user-point" onClick={onPointPageButtonHandler}>{pointData?.balance} 원 보유 포인트 내역보기 </div>          
             </div>
             <div className="user-my-page-user-pet-container">
                 {/* 별도로 구현된 스크롤 버튼 */}
@@ -145,8 +146,8 @@ export default function UserPage() {
                     ref={scrollRef} 
                     onScroll={handleScroll}
                 >
-                    {!isError && petData !== undefined ? (
-                        petData.map((item) => <PetCard key={item.petId} pet={item} />)
+                    {!isError && petData && petData.petList ? (
+                        petData.petList.map((item : Pet) => <PetCard key={item.petId} pet={item} />)
                     ) : (
                         <div className="error-pet-message"> 펫정보를 불러오기 실패했습니다. 펫을 등록해주세요. </div>
                     )}

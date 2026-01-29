@@ -10,7 +10,7 @@ interface Props {
 export default function PetCard({ pet }: Props) {
 
     //속성 : 펫 속성 가져오기 
-    const {name,species,breed,age,gender,isNeutered,activityLevel,weight} = pet;
+    const {petId,name,species,breed,age,gender,isNeutered,activityLevel,weight} = pet;
 
     //함수 : 펫 정보에서 쓰일 함수 불러오기
     const {
@@ -67,8 +67,8 @@ export default function PetCard({ pet }: Props) {
             </div>
 
             <div className="pet-card-actions">
-                <button className="btn-edit" type="button" onClick={onPetUpdateHandler}>수정</button>
-                <button className="btn-delete" type="button" onClick={onPetDeleteHandler}>삭제</button>
+                <button className="btn-edit" type="button" onClick={() => onPetUpdateHandler(petId)}>수정</button>
+                <button className="btn-delete" type="button" onClick={() =>onPetDeleteHandler(petId)}>삭제</button>
             </div>
         </div>
     );

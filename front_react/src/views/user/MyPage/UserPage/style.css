@@ -41,6 +41,8 @@
     border-radius: 60px;
     font-weight: 700;
     font-size: 1.2rem;
+
+    cursor: pointer;
 }
 
 /* 3. 펫 관리 영역 (스크롤 + 버튼 중앙 정렬) */

@@ -49,7 +49,7 @@ export default function CategoryItemList(){
                         <h3 className="category-large-name">{item.name}</h3>
                         <div className="category-small-box">
                             <div className="category-small-input-box">
-                                {item.child.map((sub : CategoryChildItem) => (
+                                {item.children.map((sub : CategoryChildItem) => (
                                     <span key={sub.categoryId} className="category-small-name" onClick={() => HeaderCategoryEventHandler('sub.categoryId')}>{sub.name}</span>
                                 ))}
                             </div>

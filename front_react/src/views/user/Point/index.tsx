@@ -2,6 +2,7 @@ import Pagination from "@/components/user/Pagination";
 import PointHistoryItem from "@/components/user/PointCard";
 import { useProduct } from "@/hooks/user/product/use-product.hook";
 import { pointQueries } from "@/querys/user/queryhooks";
+import './style.css';
 
 
 export default function PointHistoryPage() {

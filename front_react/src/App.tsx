@@ -93,8 +93,8 @@ function App() {
           <Route path={POST_PATH() + "/" +POST_DETAIL_PATH(':postId')} element={<PostDetailPage/>} />
         </Route>
         <Route path={ORDER_PATH()} >
-          <Route path={ORDER_PATH + "/" + ORDER_DETAIL_PATH(':orderId')} element={<OrderDetailView/>} />
-          <Route path={ORDER_PATH + "/" + ORDER_PAYLOAD_PATH()} element={<OrderPreparePage/>} />                          
+          <Route path={ORDER_PATH() + "/" + ORDER_DETAIL_PATH(':orderId')} element={<OrderDetailView/>} />
+          <Route path={ORDER_PATH() + "/" + ORDER_PAYLOAD_PATH()} element={<OrderPreparePage/>} />                          
         </Route>
         <Route path={CART_PATH()} element={<Cart/>}/>
         <Route path={POINT_PATH()} element={<PointHistoryPage/>}/>
