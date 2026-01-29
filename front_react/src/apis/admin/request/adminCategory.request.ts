@@ -9,7 +9,7 @@ import type {
 } from "@/types/admin/category";
 import type { ApiResponse } from "@/types/admin/api";
 
-const BASE = "/api/admin/categories";
+const BASE = "/admin/categories";
 
 function unwrap<T>(res: ApiResponse<T>): T {
   return res.data;

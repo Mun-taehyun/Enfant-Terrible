@@ -18,7 +18,7 @@ function unwrapOrThrow<T>(res: ApiResponse<T>): T {
 
 export async function getAdminUsers(params: AdminUserSearchRequest) {
   const { data } = await mainAxios.get<ApiResponse<AdminPageResponse<AdminUserListItem>>>(
-    "/api/admin/users",
+    "/admin/users",
     { params }
   );
   return unwrapOrThrow(data);
@@ -26,7 +26,7 @@ export async function getAdminUsers(params: AdminUserSearchRequest) {
 
 export async function getAdminUserDetail(userId: AdminUserId) {
   const { data } = await mainAxios.get<ApiResponse<AdminUserDetail>>(
-    `/api/admin/users/${userId}`
+    `/admin/users/${userId}`
   );
   return unwrapOrThrow(data);
 }
@@ -36,7 +36,7 @@ export async function patchAdminUserStatus(
   body: AdminUserStatusUpdateRequest
 ) {
   const { data } = await mainAxios.patch<ApiResponse<null>>(
-    `/api/admin/users/${userId}/status`,
+    `/admin/users/${userId}/status`,
     body
   );
   unwrapOrThrow(data);

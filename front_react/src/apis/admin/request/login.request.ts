@@ -10,7 +10,7 @@ export const adminSignIn = async (
   payload: AdminLoginRequest
 ): Promise<AdminLoginResponse> => {
   const { data } = await mainAxios.post<ApiResponse<AdminLoginResponse>>(
-    "/api/auth/login",
+    "/auth/login",
     payload
   );
 

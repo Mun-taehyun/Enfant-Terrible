@@ -18,17 +18,17 @@ function unwrapOrThrow<T>(res: ApiResponse<T>): T {
 }
 
 export async function getAdminOrders(params: AdminOrderListParams): Promise<AdminOrderListPage> {
-  const { data } = await mainAxios.get<ApiResponse<AdminOrderListPage>>("/api/admin/orders", { params });
+  const { data } = await mainAxios.get<ApiResponse<AdminOrderListPage>>("/admin/orders", { params });
   return unwrapOrThrow(data);
 }
 
 export async function getAdminOrderDetail(orderId: number): Promise<AdminOrderDetail> {
-  const { data } = await mainAxios.get<ApiResponse<AdminOrderDetail>>(`/api/admin/orders/${orderId}`);
+  const { data } = await mainAxios.get<ApiResponse<AdminOrderDetail>>(`/admin/orders/${orderId}`);
   return unwrapOrThrow(data);
 }
 
 export async function patchAdminOrderStatus(orderId: number, body: AdminOrderStatusUpdatePayload): Promise<void> {
-  const { data } = await mainAxios.patch<ApiResponse<null>>(`/api/admin/orders/${orderId}/status`, body);
+  const { data } = await mainAxios.patch<ApiResponse<null>>(`/admin/orders/${orderId}/status`, body);
   unwrapOrThrow(data);
 }
 
@@ -41,7 +41,7 @@ export async function patchAdminOrderShippingStart(
   orderId: number,
   body: AdminOrderShippingStartPayload
 ): Promise<void> {
-  const { data } = await mainAxios.patch<ApiResponse<null>>(`/api/admin/orders/${orderId}/shipping`, body);
+  const { data } = await mainAxios.patch<ApiResponse<null>>(`/admin/orders/${orderId}/shipping`, body);
   unwrapOrThrow(data);
 }
 
@@ -51,7 +51,7 @@ export async function patchAdminOrderShippingStart(
  *   응답은 ApiResponse<null>로 받아서 성공만 확인하면 됩니다.
  */
 export async function postAdminOrderCancelItems(orderId: number, body: AdminOrderCancelPayload): Promise<void> {
-  const { data } = await mainAxios.post<ApiResponse<null>>(`/api/admin/orders/${orderId}/items/cancel`, body);
+  const { data } = await mainAxios.post<ApiResponse<null>>(`/admin/orders/${orderId}/items/cancel`, body);
   unwrapOrThrow(data);
 }
 

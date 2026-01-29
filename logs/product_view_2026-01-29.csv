@@ -1,0 +1,5 @@
+timestamp,productId,userId,sessionId,clientIp,userAgent
+2026-01-29T18:31:20,4,,,0:0:0:0:0:0:0:1,Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML  like Gecko) Chrome/144.0.0.0 Safari/537.36
+2026-01-29T18:33:05,4,,,0:0:0:0:0:0:0:1,Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML  like Gecko) Chrome/144.0.0.0 Safari/537.36
+2026-01-29T18:34:03,4,,,0:0:0:0:0:0:0:1,Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML  like Gecko) Chrome/144.0.0.0 Safari/537.36
+2026-01-29T18:35:43,4,,,0:0:0:0:0:0:0:1,Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML  like Gecko) Chrome/144.0.0.0 Safari/537.36

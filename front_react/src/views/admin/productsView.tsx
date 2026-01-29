@@ -5,6 +5,8 @@ import styles from "./productsView.module.css";
 import type { AdminProductListParams } from "@/types/admin/product";
 import { useAdminProductCreate, useAdminProducts } from "@/hooks/admin/adminProduct.hook";
 import ProductDetailView from "@/views/admin/productsDetailView";
+import { useAdminCategoryTree } from "@/querys/admin/adminCategories.query";
+import type { AdminCategory } from "@/types/admin/category";
 
 const PRODUCT_STATUS_OPTIONS = [
   { value: "ON_SALE", label: "판매중" },
@@ -47,6 +49,48 @@ export default function ProductsView() {
 
   const [createThumbnailFile, setCreateThumbnailFile] = useState<File | null>(null);
 
+  const categoryTreeQ = useAdminCategoryTree();
+
+  const leafCategories = useMemo(() => {
+    const raw = (categoryTreeQ.data ?? []) as unknown as Array<
+      AdminCategory & { isActive?: "Y" | "N" | boolean | null | undefined }
+    >;
+
+    const isActive = (c: (typeof raw)[number]) => {
+      if (typeof c.isActive === "string") return c.isActive === "Y";
+      if (typeof c.isActive === "boolean") return c.isActive;
+      return c.status === "ACTIVE";
+    };
+
+    // 1) 트리로 내려오는 경우(실제 children이 채워짐)
+    const hasAnyChildren = raw.some((n) => (n.children?.length ?? 0) > 0);
+    if (hasAnyChildren) {
+      const out: AdminCategory[] = [];
+      const walk = (nodes: (typeof raw)) => {
+        for (const n of nodes) {
+          const children = n.children ?? [];
+          if (children.length === 0) {
+            if (isActive(n)) out.push(n);
+          } else {
+            walk(children as (typeof raw));
+          }
+        }
+      };
+      walk(raw);
+      return out;
+    }
+
+    // 2) 평면으로 내려오는 경우(children 비어있고 parentId만 존재)
+    const hasChild = new Set<number>();
+    for (const n of raw) {
+      if (n.parentId != null) hasChild.add(n.parentId);
+    }
+
+    return raw
+      .filter((n) => !hasChild.has(n.categoryId))
+      .filter((n) => isActive(n));
+  }, [categoryTreeQ.data]);
+
   const params: AdminProductListParams = useMemo(
     () => ({
       page,
@@ -71,7 +115,7 @@ export default function ProductsView() {
     try {
       const req = {
         productCode: createForm.productCode.trim(),
-        categoryId: toNumberOrThrow(createForm.categoryId, "카테고리 ID"),
+        categoryId: toNumberOrThrow(createForm.categoryId, "카테고리"),
         name: createForm.name.trim(),
         basePrice: toNumberOrThrow(createForm.basePrice, "기본가"),
         status: createForm.status.trim(),
@@ -136,14 +180,29 @@ export default function ProductsView() {
             </label>
 
             <label className={styles.label}>
-              카테고리 ID
-              <input
-                className={styles.input}
+              카테고리
+              <select
+                className={styles.select}
                 value={createForm.categoryId}
-                onChange={(e) =>
-                  setCreateForm((p) => ({ ...p, categoryId: e.target.value }))
-                }
-              />
+                onChange={(e) => setCreateForm((p) => ({ ...p, categoryId: e.target.value }))}
+              >
+                <option value="">선택</option>
+                {leafCategories.map((c) => (
+                  <option key={c.categoryId} value={String(c.categoryId)}>
+                    {c.name} (ID: {c.categoryId})
+                  </option>
+                ))}
+              </select>
+              {categoryTreeQ.isLoading ? (
+                <div className={styles.hint}>카테고리 불러오는 중...</div>
+              ) : null}
+              {categoryTreeQ.error ? (
+                <div className={styles.hint}>
+                  {categoryTreeQ.error instanceof Error
+                    ? categoryTreeQ.error.message
+                    : "카테고리를 불러오지 못했습니다."}
+                </div>
+              ) : null}
             </label>
 
             <label className={styles.label}>
@@ -221,12 +280,21 @@ export default function ProductsView() {
       <div className={styles.filters}>
         <label className={styles.label}>
           판매상태
-          <input
-            className={styles.input}
+          <select
+            className={styles.select}
             value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            placeholder="예: ACTIVE / INACTIVE 등(백엔드 enum 기준)"
-          />
+            onChange={(e) => {
+              setStatus(e.target.value);
+              setPage(1);
+            }}
+          >
+            <option value="">전체</option>
+            {PRODUCT_STATUS_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label} ({o.value})
+              </option>
+            ))}
+          </select>
         </label>
 
         <label className={styles.label}>

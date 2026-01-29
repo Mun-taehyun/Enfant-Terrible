@@ -13,11 +13,6 @@ import { useCart } from "../cart/use-cart.hook";
 
 
 
-
-
-
-
-
 //커스텀 훅 : 상품 관련
 export const useProduct = () => {
 
@@ -44,24 +39,23 @@ export const useProduct = () => {
 
     //기본값 설정 page , size(제품 수), 카테고리Id , 검색글자 , 정렬순서  "상품일 경우에.."
     const params = {
-        page: searchParams.get("page") || "1",       
-        size: searchParams.get("size") || "20",       
+        page: searchParams.get("page") || "1",
+        size: searchParams.get("size") || "20",
         sort: searchParams.get("sort") || "RECENT",
-        keyword: searchParams.get("keyword") || "",
-        minPrice: searchParams.get("minPrice") || "0",
-        maxPrice: searchParams.get("maxPrice") || "100000000",
-        minRating: searchParams.get("minRating") || "1",
-        hasDiscount: searchParams.get("hasDiscount") || "false",
-        categoryId: searchParams.get("categoryId") || "",
+        ...(searchParams.get("keyword") ? { keyword: searchParams.get("keyword") as string } : {}),
+        ...(searchParams.get("categoryId") ? { categoryId: searchParams.get("categoryId") as string } : {}),
+        ...(searchParams.get("minPrice") ? { minPrice: searchParams.get("minPrice") as string } : {}),
+        ...(searchParams.get("maxPrice") ? { maxPrice: searchParams.get("maxPrice") as string } : {}),
+        ...(searchParams.get("minRating") ? { minRating: searchParams.get("minRating") as string } : {}),
+        ...(searchParams.get("hasDiscount") ? { hasDiscount: searchParams.get("hasDiscount") as string } : {}),
     }; //sort 의 변수는 최신순 , 가격순(오름차 내림차) , 이름순이 존재 
 
-     //경로 상태 : productId string => number
+    //경로 상태 : productId string => number
     const {productId} = useParams();
     const product = Number(productId);
 
     //서버 상태 : 상세 상품 데이터
     const { data: productDetail } = productQueries.useProductDetail(product);   
-
 
     // 2. 옵션 조합 및 SKU 조회 조건 판단 로직
     const optionGroups = productDetail?.optionGroups || [];
@@ -76,7 +70,6 @@ export const useProduct = () => {
         //마지막 인자로 인해 sku옵션이 완전히 결정이 되었을 경우 요청
     );
 
-
     //이벤트핸들러: 옵션 클릭 이벤트 처리
     const optionClickEventhandle = (groupId: number, valueId: number) => {
         setSelectedOptions(prev => ({ ...prev, [groupId]: valueId }));
@@ -85,7 +78,6 @@ export const useProduct = () => {
     //이벤트핸들러: 더보기 이벤트 처리 
     const toggleDesc = () => setIsDescOpen(prev => !prev);
 
-
     const updateSearchFilter = (newFilters : Partial<GetProductListRequestDto>) => {
         // nextParams 는 page=1&sort=RESENT 와 같은 객체상태 
         const nextParams = new URLSearchParams(searchParams);
@@ -93,8 +85,8 @@ export const useProduct = () => {
         // cateforyId, keyword , sort 가 변하면 page는 1페이지로 이동한다. 
         if (!newFilters.page) nextParams.set("page", "1");
         Object.entries(newFilters).forEach(([key, value]) => {
-            if (value) nextParams.set(key, String(value));  
-            else nextParams.delete(key);   
+            if (value === undefined || value === null || value === "") nextParams.delete(key);
+            else nextParams.set(key, String(value));
         }); // searchParams로 쿼리스트링의 개수를 고정 / 수정 / 삭제를 한다. 
 
         setSearchParams(nextParams); 
@@ -104,9 +96,9 @@ export const useProduct = () => {
     }
 
     //이벤트핸들러 : 상단 카테고리 이동 시 이벤트 처리 
-    const HeaderCategoryEventHandler = (categoryId: string) => {
+    const HeaderCategoryEventHandler = (categoryId: number | string) => {
         updateSearchFilter({
-            categoryId,
+            categoryId: String(categoryId),
             keyword: "", //검색어 리셋 
             page: "1"
         })
@@ -114,8 +106,8 @@ export const useProduct = () => {
 
 
     //이벤트핸들러 : 결과 내 카테고리 이동 (기본 필터 유지 카테고리만 누적변경)
-    const SideCategoryEventHandler = (categoryId: string) => {
-        updateSearchFilter({ categoryId });
+    const SideCategoryEventHandler = (categoryId: number | string) => {
+        updateSearchFilter({ categoryId: String(categoryId) });
     };
 
 

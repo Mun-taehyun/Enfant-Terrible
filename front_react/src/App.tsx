@@ -87,7 +87,7 @@ function App() {
         <Route path={USER_PATH()} element={<UserPage />}/>
         <Route path={USER_PATH() + USER_UPDATE_PATH(':userId')} element={<UserUpdate />} />
         <Route path={PRODUCT_PATH()} element={<ProductFilter />} >
-          <Route path={PRODUCT_PATH() + "/" + PRODUCT_DETAIL_PATH(":productId")} element={<ProductDetail />} />
+          <Route path={PRODUCT_PATH() + PRODUCT_DETAIL_PATH(":productId")} element={<ProductDetail />} />
         </Route>
         <Route path={POST_PATH()} element={<PostList />}> 
           <Route path={POST_PATH() + "/" +POST_DETAIL_PATH(':postId')} element={<PostDetailPage/>} />

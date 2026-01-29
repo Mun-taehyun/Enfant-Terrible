@@ -32,7 +32,7 @@ export const USER_UPDATE_PATH = (userId: number | string) => `/${userId}`;
 
 export const PRODUCT_PATH = () => `/product`; 
 //제품 필터된 정보 페이지 "쿼리스트링 방식은 별도로 적용"
-export const PRODUCT_DETAIL_PATH = (productId: number | string) => `/product/${productId}`;
+export const PRODUCT_DETAIL_PATH = (productId: number | string) => `/${productId}`;
 //제품 상세페이지 
 
 

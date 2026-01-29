@@ -174,7 +174,8 @@ const GET_PRODUCT_RECOMMENDATION_URL = () => `/products/recommendations`;
 //추천 상품 조회 
 
 export const getProductListRequest = async (params : GetProductListRequestDto) : Promise<GetProductListResponseDto> => {
-    return apiClient.get(GET_PRODUCT_LIST_URL() , {params} )};
+    return apiClient.get(GET_PRODUCT_LIST_URL(), {params})
+};
 
 export const getProductDetailRequest = async (productId : number) : Promise<GetProductDetailListResponseDto> => {
     return apiClient.get(GET_PRODUCT_DETAIL_URL(productId))};

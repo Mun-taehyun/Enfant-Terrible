@@ -27,7 +27,7 @@ export async function getAdminProductInquiries(
 ): Promise<AdminPageResponse<AdminProductInquiryListItem>> {
   const res = await mainAxios.get<
     ApiResponse<AdminPageResponse<AdminProductInquiryListItem>>
-  >("/api/admin/product-inquiries", { params });
+  >("/admin/product-inquiries", { params });
   return unwrapOrThrow(res.data);
 }
 
@@ -36,7 +36,7 @@ export async function putAdminProductInquiryAnswer(
   body: AdminProductInquiryAnswerRequest
 ): Promise<void> {
   const res = await mainAxios.put<ApiResponse<null>>(
-    `/api/admin/product-inquiries/${inquiryId}/answer`,
+    `/admin/product-inquiries/${inquiryId}/answer`,
     body
   );
   unwrapOrThrow(res.data);
@@ -46,7 +46,7 @@ export async function deleteAdminProductInquiryAnswer(
   inquiryId: number
 ): Promise<void> {
   const res = await mainAxios.delete<ApiResponse<null>>(
-    `/api/admin/product-inquiries/${inquiryId}/answer`
+    `/admin/product-inquiries/${inquiryId}/answer`
   );
   unwrapOrThrow(res.data);
 }
@@ -55,7 +55,7 @@ export async function deleteAdminProductInquiry(
   inquiryId: number
 ): Promise<void> {
   const res = await mainAxios.delete<ApiResponse<null>>(
-    `/api/admin/product-inquiries/${inquiryId}`
+    `/admin/product-inquiries/${inquiryId}`
   );
   unwrapOrThrow(res.data);
 }

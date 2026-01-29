@@ -17,6 +17,6 @@ function unwrapOrThrow<T>(res: { success: boolean; data: T; message: string }): 
  * Query: paidFrom, paidTo, groupBy(DAY|MONTH)
  */
 export async function getAdminSalesSummary(params: AdminSalesSummaryParams) {
-  const res = await mainAxios.get<GetAdminSalesSummaryResponse>("/api/admin/sales", { params });
+  const res = await mainAxios.get<GetAdminSalesSummaryResponse>("/admin/sales", { params });
   return unwrapOrThrow(res.data);
 }

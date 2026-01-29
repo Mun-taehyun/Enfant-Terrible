@@ -20,7 +20,7 @@ export async function getAdminPosts(
   params: AdminPostListRequest
 ): Promise<ApiResponse<AdminPageResponse<AdminPostListItem>>> {
   const res = await mainAxios.get<ApiResponse<AdminPageResponse<AdminPostListItem>>>(
-    "/api/admin/posts",
+    "/admin/posts",
     { params }
   );
   return res.data;
@@ -29,14 +29,14 @@ export async function getAdminPosts(
 export async function getAdminPostDetail(
   postId: AdminPostId
 ): Promise<ApiResponse<AdminPostDetail>> {
-  const res = await mainAxios.get<ApiResponse<AdminPostDetail>>(`/api/admin/posts/${postId}`);
+  const res = await mainAxios.get<ApiResponse<AdminPostDetail>>(`/admin/posts/${postId}`);
   return res.data;
 }
 
 export async function createAdminPost(
   body: FormData
 ): Promise<ApiResponse<number>> {
-  const res = await mainAxios.post<ApiResponse<number>>("/api/admin/posts", body);
+  const res = await mainAxios.post<ApiResponse<number>>("/admin/posts", body);
   return res.data;
 }
 
@@ -45,13 +45,13 @@ export async function updateAdminPost(
   body: FormData
 ): Promise<ApiResponse<null>> {
   // mock 스펙이 PUT 이므로 PUT 유지
-  const res = await mainAxios.put<ApiResponse<null>>(`/api/admin/posts/${postId}`, body);
+  const res = await mainAxios.put<ApiResponse<null>>(`/admin/posts/${postId}`, body);
   return res.data;
 }
 
 export async function deleteAdminPost(
   postId: AdminPostId
 ): Promise<ApiResponse<null>> {
-  const res = await mainAxios.delete<ApiResponse<null>>(`/api/admin/posts/${postId}`);
+  const res = await mainAxios.delete<ApiResponse<null>>(`/admin/posts/${postId}`);
   return res.data;
 }

@@ -20,14 +20,14 @@ function unwrapOrThrow<T>(res: { success: boolean; data: T; message: string }): 
 export async function getAdminQnaRooms(
   params: AdminQnaRoomsParams
 ): Promise<GetAdminQnaRoomsData> {
-  const { data } = await mainAxios.get<GetAdminQnaRoomsResponse>("/api/admin/qna/rooms", { params });
+  const { data } = await mainAxios.get<GetAdminQnaRoomsResponse>("/admin/qna/rooms", { params });
   return unwrapOrThrow(data);
 }
 
 export async function getAdminQnaMessages(
   params: AdminQnaMessagesParams
 ): Promise<AdminQnaMessageItem[]> {
-  const { data } = await mainAxios.get<GetAdminQnaMessagesResponse>("/api/admin/qna/messages", {
+  const { data } = await mainAxios.get<GetAdminQnaMessagesResponse>("/admin/qna/messages", {
     params,
   });
   return unwrapOrThrow(data);

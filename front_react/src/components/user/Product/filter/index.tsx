@@ -36,16 +36,16 @@ export default function ProductFilterCard () {
             </div>
             <div className="filter-content">
                 {keyword ? 
-                    (categoryList?.menuTree.map((category) => ( //대분류 등장 => 토글로 소분류개방
+                    ((categoryList?.menuTree ?? []).map((category) => ( //대분류 등장 => 토글로 소분류개방
                         <div key={category.categoryId} className="accordion-group">
                         <div className="main-item" onClick={() => toggleAccordion(category.categoryId)}>
-                            {category.name} ({category.child.length})
+                            {category.name} ({(category.child ?? []).length})
                         </div>
                         {activeMainId === category.categoryId && (
                             <div className="sub-group">
                             {
-                            category.child.map((sub : CategoryChildItem) => (
-                                <div key={sub.categoryId} className="sub-item" onClick={() => SideCategoryEventHandler('sub.categoryId')}>
+                            (category.child ?? []).map((sub : CategoryChildItem) => (
+                                <div key={sub.categoryId} className="sub-item" onClick={() => SideCategoryEventHandler(sub.categoryId)}>
                                     {sub.name}
                                 </div>
                             ))}
@@ -55,8 +55,8 @@ export default function ProductFilterCard () {
                     ))
                     ) : (
                     //소분류만 등장
-                    categorySmallList?.childCategories.map((sub : CategoryChildItem) => (
-                        <div key={sub.categoryId} className="flat-item" onClick={() => SideCategoryEventHandler('sub.categoryId')}>
+                    (categorySmallList?.childCategories ?? []).map((sub : CategoryChildItem) => (
+                        <div key={sub.categoryId} className="flat-item" onClick={() => SideCategoryEventHandler(sub.categoryId)}>
                             {sub.name}
                         </div>
                     ))

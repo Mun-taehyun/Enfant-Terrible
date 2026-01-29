@@ -19,26 +19,26 @@ function unwrapOrThrow<T>(res: { success: boolean; message: string; data: T }): 
 }
 
 export async function apiAdminBannerList(params: AdminBannerListParams) {
-  const { data } = await mainAxios.get<GetBannersResponse>("/api/admin/banners", { params });
+  const { data } = await mainAxios.get<GetBannersResponse>("/admin/banners", { params });
   return unwrapOrThrow(data);
 }
 
 export async function apiAdminBannerDetail(bannerId: AdminBannerId) {
-  const { data } = await mainAxios.get<GetBannerDetailResponse>(`/api/admin/banners/${bannerId}`);
+  const { data } = await mainAxios.get<GetBannerDetailResponse>(`/admin/banners/${bannerId}`);
   return unwrapOrThrow(data);
 }
 
 export async function apiAdminBannerCreate(body: FormData) {
-  const { data } = await mainAxios.post<CreateBannerResponse>("/api/admin/banners", body);
+  const { data } = await mainAxios.post<CreateBannerResponse>("/admin/banners", body);
   return unwrapOrThrow(data); // bannerId
 }
 
 export async function apiAdminBannerUpdate(bannerId: AdminBannerId, body: FormData) {
-  const { data } = await mainAxios.put<UpdateBannerResponse>(`/api/admin/banners/${bannerId}`, body);
+  const { data } = await mainAxios.put<UpdateBannerResponse>(`/admin/banners/${bannerId}`, body);
   return unwrapOrThrow(data);
 }
 
 export async function apiAdminBannerDelete(bannerId: AdminBannerId) {
-  const { data } = await mainAxios.delete<DeleteBannerResponse>(`/api/admin/banners/${bannerId}`);
+  const { data } = await mainAxios.delete<DeleteBannerResponse>(`/admin/banners/${bannerId}`);
   return unwrapOrThrow(data);
 }

@@ -23,26 +23,26 @@ function unwrapOrThrow<T>(res: { success: boolean; message: string; data: T }): 
 }
 
 export async function apiAdminPopupList(params: AdminPopupListParams) {
-  const { data } = await mainAxios.get<GetPopupsResponse>("/api/admin/popups", { params });
+  const { data } = await mainAxios.get<GetPopupsResponse>("/admin/popups", { params });
   return unwrapOrThrow(data);
 }
 
 export async function apiAdminPopupDetail(popupId: AdminPopupId) {
-  const { data } = await mainAxios.get<GetPopupDetailResponse>(`/api/admin/popups/${popupId}`);
+  const { data } = await mainAxios.get<GetPopupDetailResponse>(`/admin/popups/${popupId}`);
   return unwrapOrThrow(data);
 }
 
 export async function apiAdminPopupCreate(body: FormData) {
-  const { data } = await mainAxios.post<CreatePopupResponse>("/api/admin/popups", body);
+  const { data } = await mainAxios.post<CreatePopupResponse>("/admin/popups", body);
   return unwrapOrThrow(data); // popupId
 }
 
 export async function apiAdminPopupUpdate(popupId: AdminPopupId, body: FormData) {
-  const { data } = await mainAxios.put<UpdatePopupResponse>(`/api/admin/popups/${popupId}`, body);
+  const { data } = await mainAxios.put<UpdatePopupResponse>(`/admin/popups/${popupId}`, body);
   return unwrapOrThrow(data);
 }
 
 export async function apiAdminPopupDelete(popupId: AdminPopupId) {
-  const { data } = await mainAxios.delete<DeletePopupResponse>(`/api/admin/popups/${popupId}`);
+  const { data } = await mainAxios.delete<DeletePopupResponse>(`/admin/popups/${popupId}`);
   return unwrapOrThrow(data);
 }
