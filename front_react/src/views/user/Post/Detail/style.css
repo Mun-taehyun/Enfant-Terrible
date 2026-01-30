@@ -1,19 +1,36 @@
 /* 전체 레이아웃 컨테이너 */
+/* 1. 메인 컨테이너: 너비와 높이의 해방 */
 .pet-detail-wrapper {
-  max-width: 800px;
-  margin: 60px auto;
-  padding: 40px;
-  background-color: #ffffff;
-  border-radius: 32px;
-  border: 1px solid #f2f2f2;
-  box-shadow: 0 10px 40px rgba(62, 39, 35, 0.05); /* 펫샵 브라운 톤을 섞은 그림자 */
+    width: 100%;
+    max-width: 1000px;      /* 800px에서 확장 (가독성 끝판왕 너비) */
+    min-height: 700px;      /* 옹졸하게 짧아지지 않도록 최소 높이 확보 */
+    margin: 60px auto;
+    padding: 60px 80px;     /* 내부 여백을 넓혀서 정보가 숨 쉬게 함 */
+    background-color: #ffffff;
+    border-radius: 40px;    /* 곡률을 키워 더 고급스럽게 */
+    border: 1px solid #f2f2f2;
+    box-sizing: border-box;
+    box-shadow: 0 20px 60px rgba(62, 39, 35, 0.08); /* 그림자도 더 웅장하게 */
 }
 
-/* 상단 헤더 섹션 */
+/* 1. 헤더 하단: 제목을 확실히 받쳐주는 굵은 선 */
 .pet-detail-header {
-  padding-bottom: 24px;
-  border-bottom: 2px solid #fff9ed; /* 부드러운 치즈색 선 */
-  margin-bottom: 32px;
+    padding-bottom: 30px;
+    margin-bottom: 40px;
+    /* 얇은 회색 대신 펫샵 포인트 컬러를 섞은 굵은 선으로 교체 */
+    border-bottom: 3px solid #fff5d6; 
+    position: relative;
+}
+
+/* 헤더 아래에 아주 얇은 보조선을 하나 더 그어 디테일 추가 */
+.pet-detail-header::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-color: #f1f3f5;
 }
 
 .detail-meta-group {
@@ -45,17 +62,20 @@
   line-height: 1.4;
 }
 
-/* 중단 본문 섹션 */
+/* 2. 본문 영역: 너무 휑하지 않게 좌우 가이드라인 느낌 추가 */
 .pet-detail-content {
-  min-height: 300px;
-  padding: 10px 0;
-  margin-bottom: 48px;
+    min-height: 500px;
+    padding: 20px 10px;
+    margin-bottom: 60px;
+    /* 본문 텍스트가 시작되는 지점에 은은한 좌측 포인트 선 */
+    border-left: 2px solid #fafafa;
+    padding-left: 30px;
 }
 
 .content-inner-text {
-  font-size: 16px;
-  line-height: 1.8; /* 가독성을 위해 줄간격을 넓게 */
-  color: #5d4037;
+    font-size: 18px;        /* 화면이 넓어진 만큼 글자 크기도 키움 */
+    line-height: 2.0;       /* 줄 간격을 더 시원하게 */
+    color: #4e342e;         /* 색감 보정: 조금 더 선명하게 */
 }
 
 .content-line {
@@ -66,13 +86,11 @@
   height: 18px; /* 빈 줄 공백 처리 */
 }
 
-/* 첨부파일 섹션 */
+/* 3. 첨부파일 섹션: 상단에 "여기부터 파일이다"라고 선 긋기 */
 .pet-detail-files {
-  background-color: #fafafa;
-  border-radius: 20px;
-  padding: 24px;
-  margin-bottom: 40px;
-  border: 1px solid #f0f0f0;
+    border-top: 1px solid #eeeeee; /* 상단 구분선 */
+    padding-top: 40px;
+    margin-top: 40px;
 }
 
 .file-header {
@@ -91,16 +109,13 @@
   gap: 8px;
 }
 
+/* 4. 파일 아이템 카드: 테두리를 더 선명하게 */
 .file-item-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background-color: #ffffff;
-  padding: 12px 16px;
-  border-radius: 12px;
-  border: 1px solid #eee;
-  cursor: pointer;
-  transition: all 0.2s ease;
+    border: 1px solid #e9ecef; /* 선명도 상향 */
+    background-color: #ffffff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02); /* 미세한 그림자 */
+
+    cursor: pointer;
 }
 
 .file-item-card:hover {
@@ -126,29 +141,49 @@
   text-decoration: underline;
 }
 
-/* 하단 액션 버튼 영역 */
+/* 1. 하단 버튼 영역: 선을 그어 영역을 분리하고 중앙 정렬 */
 .pet-detail-actions {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
+    margin-top: 80px;      /* 본문과 확실한 거리두기 */
+    padding-top: 40px;
+    border-top: 2px solid #fff9ed; /* 은은한 치즈색 선으로 마감 */
+    display: flex;
+    justify-content: center; /* 버튼을 무조건 중앙으로 */
+    width: 100%;
 }
 
+/* 4. 버튼 영역 */
+/* 2. 목록으로 돌아가기 버튼: 로그인창 급의 존재감 */
 .btn-back-to-list {
-  background-color: #3e2723;
-  color: #ffffff;
-  padding: 14px 48px;
-  border-radius: 30px;
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* 크기 및 가오 */
+    min-width: 240px;
+    padding: 18px 36px;
+    
+    /* 색상: 펫샵의 딥 브라운 활용 */
+    background-color: #3e2723; 
+    color: #ffffff;
+    
+    /* 디자인 디테일 */
+    font-size: 16px;
+    font-weight: 700;
+    border-radius: 50px; /* 완전 둥글게 해서 세련미 추가 */
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(62, 39, 35, 0.2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* 3. 호버 효과: 마우스 올리면 부드럽게 반응 */
 .btn-back-to-list:hover {
-  background-color: #5d4037;
-  transform: translateY(-2px);
+    background-color: #5d4037;
+    transform: translateY(-3px); /* 살짝 떠오르는 느낌 */
+    box-shadow: 0 8px 25px rgba(62, 39, 35, 0.3);
 }
 
+/* 4. 클릭 효과 */
 .btn-back-to-list:active {
-  transform: translateY(0);
+    transform: translateY(-1px);
 }

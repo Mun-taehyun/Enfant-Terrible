@@ -1,33 +1,50 @@
 .layout-container {
   display: flex;
-  width: 1440px;
+  width: 100%;
+  max-width: 1440px;
   margin: 0 auto;
-  min-height: 100vh;
-  box-sizing: border-box;
+  padding: 40px 20px; /* 좌우 여백만 살짝 */
+  gap: 40px;          /* 🚨 핵심: 사이드바와 상품 사이의 간격은 이걸로 조절 */
+  align-items: flex-start; /* 🚨 핵심: 이걸 써야 Sticky가 작동함 */
 }
 
 /* =================================================
    좌측 필터 사이드바 (288px)
 ================================================= */
+/* 2. 사이드바: 멍청한 마진 빼고 고정시키기 */
 .filter-sidebar {
-  width: 288px;
+  width: 280px;
   flex-shrink: 0;
-  padding: 20px;
-  border-right: 1px solid #e5e5e5;
-  box-sizing: border-box;
-
+  
+  /* 불필요한 마진 제거 (보라색 귀신의 원인) */
+  margin: 0 !important; 
+  
+  /* 위치 고정 */
   position: sticky;
-  top: 80px;
-  height: calc(100vh - 80px);
-  overflow-y: auto;
+  top: 100px; /* 헤더보다 살짝 아래에 고정 */
+  
+  /* 디자인 디테일 */
+  background-color: #fffdf9;
+  border: 1px solid #f2eee5;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
 }
 
 /* 필터 타이틀 */
 .filter-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #111;
-  margin-bottom: 16px;
+    font-size: 18px;
+    font-weight: 800;
+    color: #3e2723;            /* 펫샵 메인 브라운 */
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-title::before {
+    content: '🐾';             /* 펫샵 정체성 아이콘 */
+    font-size: 16px;
 }
 
 /* 필터 컨텐츠 */
@@ -47,16 +64,18 @@
 
 /* 대분류 */
 .main-item {
-  padding: 10px 8px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #111;
-  cursor: pointer;
-  border-radius: 4px;
+    padding: 12px 15px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #5d4037;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    margin-bottom: 4px;
 }
 
 .main-item:hover {
-  background-color: #f5f5f5;
+    background-color: #ffcc4d; /* 펫샵 옐로우 포인트 */
+    color: #3e2723;
 }
 
 /* 소분류 그룹 */
@@ -99,20 +118,18 @@
 /* =================================================
    우측 콘텐츠 영역 (1152px)
 ================================================= */
+/* 3. 우측 콘텐츠 영역: 남은 공간 100% 활용 */
 .content-area {
-  width: 1152px;
-  padding: 16px 24px;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
+  flex: 1; 
+  padding: 0; /* 부모가 padding을 가졌으므로 여기는 0 */
 }
 
 /* 상단 (총 상품 수 + 정렬) */
 .content-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+    border-bottom: 2px solid #f8f9fa;
+    padding-bottom: 15px;
+    margin-bottom: 30px;
+    align-items: flex-end; /* 아래쪽 라인 맞춤 */
 }
 
 /* 총 상품 수 */
@@ -124,24 +141,32 @@
 }
 
 .total-count {
-  font-weight: 600;
+    color: #ff4d4f; /* 숫자에 포인트 컬러 */
+    font-weight: 800;
+    margin-left: 4px;
 }
-
 /* 정렬 */
 .sort-group {
-  display: flex;
-  gap: 12px;
+    background: #f8f9fa;
+    padding: 4px;
+    border-radius: 10px;
+    display: flex;
+    gap: 2px;
 }
 
 .sort-item {
-  cursor: pointer;
-  font-size: 14px;
-  color: #666;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #999;
+    transition: all 0.2s;
 }
 
 .sort-item.is-active {
-  color: #111;
-  font-weight: 600;
+    background-color: #ffffff;
+    color: #3e2723;
+    font-weight: 700;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
 /* =================================================

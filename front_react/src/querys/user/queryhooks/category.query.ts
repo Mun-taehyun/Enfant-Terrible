@@ -49,6 +49,7 @@ export const categoryQueries = {
             queryKey: categoryKeys.children(parentId!),
             queryFn: () => getCategoryChildrenRequest(parentId!),
             enabled: !!parentId, // parentId가 존재할 때만 API 호출
+            select: (data) => ({ childCategories: Array.isArray(data) ? data : [] }),
         });
     },
 }

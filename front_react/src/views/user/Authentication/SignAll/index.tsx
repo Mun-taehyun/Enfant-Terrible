@@ -165,13 +165,14 @@ export default function Authentication() {
                                   onkeyDown={(event) => onKeyDown(event, 'addressBase')} />
                         <InputBox ref={refForms.zipCode} label='우편 번호*' type='text' placeholder='우편 번호를 입력해주세요.' 
                                   name='zipCode' value={formData.zipCode} onChange={onInputChange} 
-                                  error={errors.zipCode.state} message={errors.zipCode.message}/>
+                                  error={errors.zipCode.state} message={errors.zipCode.message}
+                                  onButtonClick={onAddressButtonClickHandler} buttonName='주소버튼'
+                                  onkeyDown={(event) => onKeyDown(event, 'addressDetail', onAddressButtonClickHandler)}
+                                   />
                         <InputBox ref={refForms.addressBase} label='주소*' type='text' placeholder='우편번호 찾기' 
                                   name='addressBase' value={formData.addressBase} onChange={onInputChange} 
                                   error={errors.addressBase.state} message={errors.addressBase.message} 
-                                  icon='expend-right-light-icon' onButtonClick={onAddressButtonClickHandler} 
-                                  buttonName='주소버튼'
-                                  onkeyDown={(event) => onKeyDown(event, 'addressDetail', onAddressButtonClickHandler)}/>
+                                  />
                         <InputBox ref={refForms.addressDetail} label='상세 주소*' type='text' placeholder='상세 주소를 입력해주세요.' 
                                   name='addressDetail' value={formData.addressDetail} onChange={onInputChange} 
                                   error={false} onkeyDown={(event) => onKeyDown(event, undefined , onSignUpClick)}/>
@@ -202,7 +203,7 @@ export default function Authentication() {
         //함수 : 인증 함수 처리 
         const {
             page, formData, formChange, errors, refForms, // 페이지변화/데이터 값/데이터변화값/오류처리값/DOM참조 값
-            onInputChange, togglePasswordType,
+            onInputChange, togglePasswordType, resetForm,
             //기입이벤트 /비번,텍스트 타입 이벤트처리 / view이동 시 초기화 
             onKeyDown,
             //키다운이벤트처리 
@@ -217,6 +218,13 @@ export default function Authentication() {
                 refForms.password.current.focus();
             }
         }, [page, refForms.password])
+
+        //이벤트핸들러 : 로그인 링크 클릭 이벤트 처리 
+        const onSignInLinkClickHandler = () => {
+            resetForm(); 
+            setView('sign-in');
+            //폼에 있는 데이터 모든걸 초기화 후 로그인.. 
+        }
 
         //렌더 : 비밀번호 찾기
         return(
@@ -275,6 +283,9 @@ export default function Authentication() {
                         {page === 2 && // 이메일 / 새로운비밀번호 유효성 검증 결과 체크 후 수정완료 
                         <div className='black-large-full-button' onClick={onResetPasswordUpdateClick}>{'비밀번호 변경'}</div>
                         }
+                        <div className='auth-description-box'>
+                            <div className='auth-description'>{'로그인하기'}<span className='auth-description-link' onClick={onSignInLinkClickHandler}>{'로그인'}</span></div>
+                        </div>
                     </div>
                 </div>
             </div>

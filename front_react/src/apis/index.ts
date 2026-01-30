@@ -15,7 +15,7 @@ const API_DOMAIN = normalizeApiBaseUrl(import.meta.env.VITE_API_BASE_URL);
 
 const apiClient = axios.create({
   baseURL: API_DOMAIN,
-  timeout: 10000,
+  timeout: 30000,
 //baseURL , timeout 
 //baseURL : 
 //timeout : 밀리초를 기준 (10000 = 10초)로 하며 10초가 지나면 서버요청 실패 => error.response

@@ -1,0 +1,14 @@
+
+/* 2. 문제의 컨테이너: 382px 고정을 풀고 1440px로 확장 */
+.main-layout-container {
+    /* 기존의 좁은 width 설정을 덮어씌웁니다 */
+    width: 1440px !important; 
+    min-width: 1440px !important;
+    
+    margin: 0 auto !important; /* 가로 중앙 정렬 */
+    padding: 0 40px;          /* 헤더와 동일한 좌우 여백 */
+    box-sizing: border-box;
+    
+    display: flex;
+    flex-direction: column;
+}

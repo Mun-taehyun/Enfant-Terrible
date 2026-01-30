@@ -1,23 +1,31 @@
-/* 전체 페이지 컨테이너 */
+/* 전체 페이지 컨테이너: 850px 감옥 탈출 */
 .pet-page-container {
-  max-width: 850px;
+  /* 너비를 상품 리스트 가이드라인인 1200px~1250px로 확장 */
+  width: 100%;
+  max-width: 1250px; 
+  
+  /* 로그인창처럼 중앙에 머물게 함 */
   margin: 40px auto;
-  padding: 0 20px;
+  padding: 0 40px; 
+  box-sizing: border-box;
+  
+  /* 폰트 설정 유지 */
   font-family: 'Pretendard', -apple-system, sans-serif;
 }
 
-/* 상단 헤더 영역 */
+/* 2. 상단 헤더 영역: 텍스트 정렬은 왼쪽 유지하되 너비 확보 */
 .pet-page-header {
-  margin-bottom: 32px;
-  padding-bottom: 24px;
-  border-bottom: 2px solid #fff5d6; /* 연한 노란색 구분선 */
+  margin-bottom: 40px;
+  padding-bottom: 30px;
+  border-bottom: 2px solid #fff5d6;
+  width: 100%;
 }
 
 .header-title {
-  font-size: 28px;
+  font-size: 32px;        /* 너비가 넓어진 만큼 폰트도 살짝 키움 */
   font-weight: 800;
-  color: #3e2723; /* 진한 갈색 */
-  margin-bottom: 8px;
+  color: #3e2723;
+  margin-bottom: 12px;
 }
 
 .header-desc {
@@ -26,19 +34,21 @@
   letter-spacing: -0.3px;
 }
 
-/* 리스트 영역 */
+/* 리스트 영역: 부모 너비에 맞춰 100% 펴지기 */
 .pet-item-list {
   display: flex;
   flex-direction: column;
-  gap: 12px; /* 아이템 사이 간격 */
-  margin-bottom: 40px;
+  gap: 12px;
+  width: 100%;
 }
 
-/* 개별 아이템 래퍼 (클릭 영역) */
+/* 4. 개별 아이템: 내부 컨텐츠가 좌우로 벌어지게 설정 */
+/* 개별 아이템: 1250px 안에서 가로로 길게 뻗도록 설정 */
 .post-item-wrapper {
+  width: 100%;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  border-radius: 16px; /* PostItem의 곡률과 맞춤 */
+  border-radius: 16px;
 }
 
 .post-item-wrapper:hover {
@@ -51,12 +61,12 @@
   transform: scale(0.98);
 }
 
-/* 페이지네이션 정렬 영역 */
+
+/* 5. 페이지네이션: 중앙 정렬 유지 */
 .pet-pagination-wrapper {
   display: flex;
   justify-content: center;
-  padding: 20px 0;
-  margin-top: 20px;
+  padding: 40px 0 80px;   /* 하단 여백 넉넉히 */
 }
 
 /* (선택 사항) 데이터가 없을 때 뷰 */

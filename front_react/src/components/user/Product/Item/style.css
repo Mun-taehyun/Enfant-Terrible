@@ -1,42 +1,48 @@
 /* 상품 그리드 레이아웃 */
 .product-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    /* 1440px 공간을 꽉 채우려면 5열보다는 6~7열이 카드가 안 커지고 예뻐요 */
+    grid-template-columns: repeat(6, 1fr); 
     gap: 30px 20px;
-    padding: 20px 0;
+    width: 100%;
+    max-width: 1440px; /* 헤더와 동일하게 맞춤 */
+    margin: 0 auto;
+    
+    /* 핵심: 자식(카드)들이 세로로 늘어나는 걸 방지 */
+    align-items: start; 
 }
 
-/* 개별 카드 컨테이너 */
+/* 1. 개별 상품 카드: 5열 배열을 위해 너비를 고정 */
 .product-card {
+    width: 220px; /* 1200px / 5열 기준 여백 제외 최적 너비 */
     display: flex;
     flex-direction: column;
-    background-color: #fff;
     cursor: pointer;
-    transition: transform 0.2s ease-in-out;
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: transform 0.2s ease;
 }
 
 /* 카드 호버 시 살짝 떠오르는 효과 */
 .product-card:hover {
-    transform: translateY(-4px);
+    transform: translateY(-5px);
 }
 
 /* 이미지 영역 */
 .product-image-container {
+    width: 220px;
+    height: 220px;
     position: relative;
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    background-color: #f4f4f4;
-    border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 12px;
+    overflow: hidden; /* 영역 밖으로 나가는 건 무조건 숨김 */
+    background-color: #f5f5f5;
 }
+
 
 .product-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    display: block;
-    transition: scale 0.3s ease;
 }
 
 .product-card:hover .product-image {
@@ -46,50 +52,60 @@
 /* 할인 배지 */
 .product-badge {
     position: absolute;
-    top: 12px;
-    left: 12px;
-    background-color: #ff4d4f;
+    top: 10px;
+    left: 10px;
+    background-color: #ff6b6b;
     color: #fff;
-    font-size: 13px;
-    font-weight: 700;
     padding: 4px 8px;
-    border-radius: 4px;
-    z-index: 1;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 800;
 }
 
 /* 정보 텍스트 영역 */
 .product-info-container {
+    width: 100%;
+    padding: 12px 8px;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
+    overflow: hidden; /* 하위 텍스트 폭주 방지 */
 }
 
 .product-category {
-    font-size: 12px;
-    color: #8c8c8c;
-    font-weight: 500;
+    font-size: 11px;
+    color: #999;
 }
 
+/* 1. 상품명: 무조건 2줄까지만 보여주고 나머지는 '...' 처리 */
 .product-name {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
-    color: #262626;
     line-height: 1.4;
-    /* 두 줄 이상은 말줄임표 처리 */
+    color: #333;
+    
+    /* 멀티라인 말줄임 핵심 CSS */
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 2; /* 딱 2줄만 허용 */
     -webkit-box-orient: vertical;
     overflow: hidden;
-    min-height: 42px; 
+    text-overflow: ellipsis;
+    
+    height: 40px; /* 이름 길이에 상관없이 높이 고정 (라인 맞추기) */
 }
 
+/* 2. 상품 설명: 무조건 1줄까지만 보여주고 '...' 처리 */
 .product-description {
-    font-size: 13px;
-    color: #595959;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-bottom: 4px;
+    font-size: 12px;
+    color: #888;
+    
+    /* 싱글라인 말줄임 핵심 CSS */
+    white-space: nowrap;      /* 줄바꿈 안 함 */
+    overflow: hidden;         /* 넘치는 건 숨김 */
+    text-overflow: ellipsis;  /* 끝에 ... 붙임 */
+    
+    width: 100%;
 }
 
 /* 가격 영역 */
@@ -97,42 +113,29 @@
     display: flex;
     align-items: baseline;
     gap: 6px;
-    margin-top: 2px;
 }
 
 .display-price {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 800;
-    color: #1a1a1a;
+    color: #111;
 }
 
 .origin-price {
-    font-size: 14px;
-    color: #bfbfbf;
+    font-size: 13px;
+    color: #bbb;
     text-decoration: line-through;
 }
 
-/* 별점 및 리뷰 */
+/* 5. 평점 영역 */
 .product-meta {
     display: flex;
     align-items: center;
-    gap: 2px;
-    margin-top: 6px;
+    gap: 4px;
+    font-size: 12px;
+    color: #666;
 }
 
-.rating-star {
-    color: #ffcd3c;
-    font-size: 14px;
-}
-
-.rating-score {
-    font-size: 13px;
-    font-weight: 600;
-    color: #434343;
-}
-
-.review-count {
-    font-size: 13px;
-    color: #bfbfbf;
-    margin-left: 2px;
-}
+.rating-star { color: #ff9f43; font-size: 12px; }
+.rating-score { font-size: 12px; font-weight: 700; color: #444; }
+.review-count { font-size: 12px; color: #aaa; }

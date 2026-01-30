@@ -1,82 +1,81 @@
 
 
-/* 기본 컨테이너 */
 .post-item-container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.25rem;
-  border-bottom: 1px solid #eef0f3;
-  background-color: #ffffff;
-  transition: background-color 0.2s ease;
-  cursor: pointer;
+    width: 100%;             /* 부모 너비(1250px)를 꽉 채움 */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 2.5rem;  /* 넓어진 만큼 내부 패딩도 살짝 조절 */
+    box-sizing: border-box;
 }
 
 .post-item-container:hover {
-  background-color: #f9fafb;
+    background-color: #f8f9fa;
+    transform: translateX(8px); /* 살짝 오른쪽으로 밀리는 모션 추가 */
 }
 
-/* 공지사항(isNotice)일 때 배경 강조 */
+/* 공지사항(isNotice)일 때 스타일 */
 .post-item-container.notice-row {
-  background-color: #fff9f0; /* 아주 연한 주황빛 */
+    background-color: #fffaf2;
+    border-left: 4px solid #ff4d4f; /* 공지는 왼쪽에 포인트 컬러 바 추가 */
 }
 
 .post-item-container.notice-row:hover {
   background-color: #fff4e5;
 }
 
-/* 왼쪽 정보 섹션 */
+/* 2. 왼쪽 정보 섹션 */
 .post-info-section {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  flex: 1;
-  min-width: 0; /* 텍스트 생략(ellipsis) 작동을 위해 필요 */
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    flex: 1;
+    min-width: 0;
 }
 
-/* 상단 메타 정보 (공지 배지 + 날짜) */
+/* 상단 메타 정보 */
 .post-top-meta {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
 .label-notice {
-  background-color: #ff4d4f;
-  color: #ffffff;
-  font-size: 0.75rem;
-  font-weight: 700;
-  padding: 0.125rem 0.5rem;
-  border-radius: 4px;
-  line-height: 1.4;
+    background-color: #ff4d4f;
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 6px;
+    text-transform: uppercase;
 }
 
 .text-date {
-  font-size: 0.875rem;
-  color: #94a3b8;
+    font-size: 0.85rem;
+    color: #adb5bd;
+    font-weight: 400;
 }
 
-/* 제목 및 본문 요약 */
 .text-title {
-  margin: 0;
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #1e293b;
-  /* 한 줄 생략 처리 */
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #212529;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
+/* 본문 요약 (가로로 길어진 만큼 조금 더 보여줌) */
 .text-preview {
-  margin: 0.25rem 0 0 0;
-  font-size: 0.9375rem;
-  color: #64748b;
-  /* 두 줄 생략 처리 (필요 없으면 한 줄로 변경 가능) */
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+    margin: 0;
+    font-size: 0.95rem;
+    color: #868e96;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 1; /* 깔끔하게 한 줄만 */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 /* 첨부파일 섹션 */
@@ -97,20 +96,21 @@
   font-weight: 500;
 }
 
-/* 오른쪽 화살표 아이콘 */
+/* 3. 오른쪽 화살표 섹션 */
 .post-action-indicator {
-  padding-left: 1rem;
+    padding-left: 2rem;
+    display: flex;
+    align-items: center;
 }
 
 .arrow-icon::after {
-  content: '→'; /* 또는 폰트 어썸, SVG 사용 가능 */
-  font-size: 1.25rem;
-  color: #cbd5e1;
-  transition: color 0.2s ease, transform 0.2s ease;
+    content: '→';
+    font-size: 1.5rem;
+    color: #dee2e6;
+    transition: all 0.3s ease;
 }
 
 .post-item-container:hover .arrow-icon::after {
-  color: #3b82f6;
-  transform: translateX(4px);
-  display: inline-block;
+    color: #ff4d4f; /* 호버 시 포인트 컬러로 변경 */
+    transform: translateX(10px);
 }

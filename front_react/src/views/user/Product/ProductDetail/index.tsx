@@ -44,7 +44,12 @@ export default function ProductDetail() {
 
 
     // 이미지 경로에 서버 주소가 없다면 `${process.env.REACT_APP_API_URL}${imageUrl}` 형태로 수정 필요
-    const fullImageUrl = productDetail?.thumbnailUrl.startsWith('http') ? productDetail?.thumbnailUrl : `http://localhost:8080${productDetail?.thumbnailUrl}`;
+    const fullImageUrl = productDetail?.thumbnailUrl && productDetail?.thumbnailUrl.startsWith('http') 
+        ? productDetail?.thumbnailUrl
+        : productDetail?.thumbnailUrl
+            ? `http://localhost:8080${productDetail?.thumbnailUrl}` 
+            : ""; 
+
 
     if(!productDetail) return;
     //렌더 : 제품 상세페이지
@@ -76,7 +81,7 @@ export default function ProductDetail() {
                             <span className="discount-percent">{productDetail.discountValue}%</span>
                             <span className="final-price">
                                 {isResolving ? "확인 중..." : 
-                                 (resolvedSku?.price || productDetail.skus[0].discountedPrice).toLocaleString()}원
+                                 (resolvedSku?.price ?? productDetail?.skus?.[0]?.discountedPrice ?? 0).toLocaleString()}원
                             </span>
                         </div>
                     </div>
@@ -159,7 +164,7 @@ export default function ProductDetail() {
                         )) : "리뷰가 존재하지 않습니다"
                         }
                         <div className="pagination-review">
-                            <Pagination totalCount={reviewData?.reviewList.length} />
+                            <Pagination totalCount={reviewData?.reviewList.length} size={5}/>
                         </div>
                     </div>
                 )}

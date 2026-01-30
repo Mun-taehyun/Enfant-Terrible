@@ -1,6 +1,6 @@
 import './App.css'
 import Popup from '@/components/user/Popup';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import UserContainer from './layouts/user/UserContainer';
 import {AUTH_ADD_INFOMATION_PATH, AUTH_LOGIN_PATH, AUTH_OAUTH_PATH, AUTH_PATH, CART_PATH, MAIN_PATH, OAUTH_PATH, ORDER_DETAIL_PATH, ORDER_PATH, ORDER_PAYLOAD_PATH, POINT_PATH, POST_DETAIL_PATH, POST_PATH, PRODUCT_DETAIL_PATH, PRODUCT_PATH, USER_PATH, USER_UPDATE_PATH} from './constant/user/route.index';
 import Main from './views/user/Main';
@@ -44,6 +44,8 @@ function App() {
 
   const popupArray = popupData?.popupList ?? [];
 
+  const {pathname} = useLocation();
+
   
   return (
     //컴포넌트 렌더링 설계
@@ -71,7 +73,7 @@ function App() {
     //      장바구니페이지 /cart        
 
     <>
-    {popupArray.map((item : PopupItem) => (<Popup key={item.popupId} popupItem={item} />))}
+    {pathname === MAIN_PATH() && popupArray.map((item : PopupItem) => (<Popup key={item.popupId} popupItem={item} />))}
 
     <Routes>
       <Route element={<UserContainer/>}>
@@ -87,9 +89,8 @@ function App() {
         <Route path={USER_PATH() + USER_UPDATE_PATH(':userId')} element={<UserUpdate />} />
         <Route path={PRODUCT_PATH()} element={<ProductFilter />} />
         <Route path={PRODUCT_PATH() + PRODUCT_DETAIL_PATH(":productId")} element={<ProductDetail />} />
-        <Route path={POST_PATH()} element={<PostList />}> 
-          <Route path={POST_PATH() + "/" +POST_DETAIL_PATH(':postId')} element={<PostDetailPage/>} />
-        </Route>
+        <Route path={POST_PATH()} element={<PostList />} /> 
+        <Route path={POST_PATH() + POST_DETAIL_PATH(':postId')} element={<PostDetailPage/>} />
         <Route path={ORDER_PATH()} >
           <Route path={ORDER_PATH() + "/" + ORDER_PAYLOAD_PATH()} element={<OrderPreparePage/>} />
           <Route path={ORDER_PATH() + "/" + ORDER_DETAIL_PATH(':orderId')} element={<OrderDetailView/>} />                          

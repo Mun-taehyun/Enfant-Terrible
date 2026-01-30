@@ -2,13 +2,13 @@ import { useProduct } from "../product/use-product.hook";
 
 
 //컴포넌트 : 페이지네이션 (전체 상품 / 리뷰 / 문의 개수 (리스트 길이) , 한 페이지에 필요한 객체 개수)
-export const usePagination = (totalCount: number) => {
+export const usePagination = (totalCount: number , size: number) => {
 
         //커스텀 훅 : 경로변수 , 클릭이벤트 재활용 
         const { params, onPageClickHandler } = useProduct();
 
         const currentPage = Number(params.page) || 1;
-        const size = Number(params.size) || 20;
+        
 
 
         const totalPage = Math.ceil(totalCount / size) || 1; //전체페이지 수 

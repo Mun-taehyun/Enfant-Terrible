@@ -15,6 +15,7 @@ export const reviewQueries = {
             enabled: !!productId,
             placeholderData: (previousData) => previousData,
             //ux개선
+            select: (data) => ({ reviewList: Array.isArray(data) ? data : [] })
         });
     },
 

@@ -23,6 +23,7 @@ export const postQueries = {
             queryKey: postKeys.detail(postId),
             queryFn: () => getPostDetailRequest(postId),
             enabled: typeof postId === 'number' && !isNaN(postId),
+            select: (data) => ({ postList: Array.isArray(data) ? data :(data ? [data] : [])})
         });
     },
 };
