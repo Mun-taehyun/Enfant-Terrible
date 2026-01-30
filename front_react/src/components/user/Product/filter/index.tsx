@@ -39,14 +39,14 @@ export default function ProductFilterCard () {
                     ((categoryList?.menuTree ?? []).map((category) => ( //대분류 등장 => 토글로 소분류개방
                         <div key={category.categoryId} className="accordion-group">
                         <div className="main-item" onClick={() => toggleAccordion(category.categoryId)}>
-                            {category.name} ({(category.child ?? []).length})
+                            {category.name} ({(category.children ?? []).length})
                         </div>
                         {activeMainId === category.categoryId && (
                             <div className="sub-group">
                             {
-                            (category.child ?? []).map((sub : CategoryChildItem) => (
+                            (category.children ?? []).map((sub : CategoryChildItem) => (
                                 <div key={sub.categoryId} className="sub-item" onClick={() => SideCategoryEventHandler(sub.categoryId)}>
-                                    {sub.name}
+                                    {sub.name} ({sub.children.length})
                                 </div>
                             ))}
                             </div>

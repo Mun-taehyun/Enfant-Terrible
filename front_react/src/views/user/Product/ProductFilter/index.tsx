@@ -30,7 +30,7 @@ export default function ProductFilter() {
     //이벤트 처리 
     const onClickProductDetailEventHandler = (product : number) => {
         console.log("상세보기테스트");
-        navigate(PRODUCT_PATH() + "/" + PRODUCT_DETAIL_PATH(product))
+        navigate(PRODUCT_PATH() + PRODUCT_DETAIL_PATH(product))
     }
 
     // 렌더 : 카테고리제품

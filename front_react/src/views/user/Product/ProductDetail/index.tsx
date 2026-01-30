@@ -164,7 +164,7 @@ export default function ProductDetail() {
                         )) : "리뷰가 존재하지 않습니다"
                         }
                         <div className="pagination-review">
-                            <Pagination totalCount={reviewData?.reviewList.length} />
+                            <Pagination totalCount={reviewData?.reviewList.length} size={5}/>
                         </div>
                     </div>
                 )}

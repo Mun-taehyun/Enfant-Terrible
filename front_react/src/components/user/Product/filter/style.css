@@ -1,44 +1,57 @@
-/* 사이드바 전체 컨테이너 */
+/* 사이드바 전체 컨테이너: 위치와 높이 제어 */
 .filter-sidebar {
-    width: 288px;
+    width: 280px;
+    flex-shrink: 0;           /* 상품 리스트에 밀리지 않게 고정 */
     background-color: #ffffff;
-    border: 1px solid #f0f0f0;
-    border-radius: 12px;
+    border: 1px solid #f2f2f2;
+    border-radius: 20px;      /* 좀 더 둥글게 해서 세련미 추가 */
+    
+    /* 🚨 핵심: 상단 헤더만큼 띄우고 화면에 고정 */
+    position: sticky;
+    top: 120px;               /* 헤더 높이에 따라 조절 (딱 붙게) */
+    height: fit-content;      /* 내용만큼만 딱! */
+    
+    margin-right: 30px;       /* 상품 그리드와의 간격 */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
     overflow: hidden;
-    font-family: 'Pretendard', sans-serif; /* 깔끔한 폰트 권장 */
 }
 
-/* 타이틀 부분 */
+/* 타이틀: 펫샵 감성 아이콘 추가 */
 .filter-title {
-    padding: 20px;
-    font-size: 18px;
-    font-weight: 700;
-    color: #333;
-    border-bottom: 1px solid #f9f9f9;
+    padding: 24px 20px;
+    font-size: 17px;
+    font-weight: 800;
+    color: #3e2723;
+    background-color: #fffaf0; /* 아주 연한 치즈색 배경 */
+    border-bottom: 1px solid #f2f2f2;
 }
 
-/* 대분류 아이템 */
+.filter-title::before {
+    content: '🐾';
+    margin-right: 8px;
+}
+
+/* 대분류 아이템: 높이 살짝 줄여서 컴팩트하게 */
 .main-item {
-    padding: 14px 20px;
-    font-size: 15px;
+    padding: 12px 20px;
+    font-size: 14px;
     font-weight: 600;
     color: #444;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: background 0.2s ease;
+    transition: all 0.2s ease;
 }
 
+
 .main-item:hover {
-    background-color: #fff9f5; /* 펫 쇼핑몰 느낌의 부드러운 오렌지/베이지 계열 */
+    background-color: #fff9f5;
     color: #ff7e36;
+    padding-left: 25px; /* 호버 시 살짝 오른쪽으로 이동하는 센스 */
 }
 
 /* 소분류 그룹 (애니메이션 효과를 주면 더 고급짐) */
-.sub-group {
-    background-color: #fcfcfc;
-    padding: 8px 0;
+.sub-item {
+    padding: 8px 20px 8px 40px;
+    font-size: 13px;
+    color: #777;
 }
 
 /* 소분류 아이템 */
@@ -52,7 +65,7 @@
 
 .sub-item:hover, .flat-item:hover {
     color: #ff7e36;
-    font-weight: 600;
+    text-decoration: underline;
 }
 
 /* 검색 없이 바로 노출되는 소분류 (flat-item) */

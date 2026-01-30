@@ -1,34 +1,38 @@
-
-/* 1. 전체 배경: 살짝 따스한 톤의 라이트 그레이 */
+/* 2. 문제의 auth-wrapper: 왼쪽으로 바짝 붙이기 */
 #auth-wrapper {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background-color: #fcfcfc;
-  padding: 40px;
+  width: 100%;
+  max-width: 100%;         /* 너비 제한 풀고 화면 꽉 채우기 */
+  height: 850px;           /* 🚨 높이 제한: 너무 길지 않게 딱 가두기 */
+  margin-left: 0 !important; /* 왼쪽 여백 완전 삭제 */
+  padding-left: 0 !important;
+  
+  /* 디자인 요소는 유지 */
+  background-color: #ffffff;
 }
 
 /* 2. 메인 컨테이너: 쥬뵨트론과 카드를 감싸는 박스 */
+/* 2. 메인 박스: 1100px까지만 커지고 안에서는 flex 유지 */
 .auth-container {
-  display: flex;
-  width: 100%;
-  max-width: 1000px;
-  background: #ffffff;
-  border-radius: 30px;
-  overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+    display: flex;
+    width: 100%;
+    /* 너비를 1200px로 확장하여 헤더 가이드라인에 더 가깝게 설정 */
+    max-width: 1440px; 
+    /* 최소 높이를 확보해서 화면 중앙에서 묵직하게 보이도록 함 */
+    min-height: 900px; 
+    
+    background: #ffffff;
+    border-radius: 40px; /* 크기가 커진 만큼 라운드값도 살짝 올림 */
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.12);
 }
-
 /* 3. 왼쪽 쥬뵨트론 섹션: 브랜드 홍보 영역 */
 .auth-jumbotron-box {
-  flex: 1;
-  background: linear-gradient(135deg, #ff9f43 0%, #ff6b6b 100%); /* 펫 쇼핑몰의 활기찬 에너지 */
-  padding: 60px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  color: #ffffff;
+    flex: 1.2; /* 오른쪽 카드보다 살짝 더 넓게 */
+    padding: 80px 60px; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 /* 로고 스타일 */
@@ -50,21 +54,30 @@
 }
 
 .auth-jumbotron-text {
-  font-size: 32px;
-  font-weight: 700;
-  line-height: 1.4;
-  word-break: keep-all;
+    font-size: 40px; /* 기존 32px -> 40px로 벌크업 */
+    font-weight: 800;
+    line-height: 1.4;
+    word-break: keep-all;
+}
+
+/* 2. 오른쪽 카드 내부의 실제 컨텐츠 박스 */
+.auth-card-box {
+    width: 100%;
+    max-width: 500px; /* 카드가 커져도 입력폼이 무한정 퍼지지 않게 잡아줌 */
+    margin: 0 auto;    /* 카드 내부에서 중앙 정렬 */
+    display: flex;
+    flex-direction: column;
+    gap: 24px;         /* 요소 간의 간격을 일정하게 벌림 */
 }
 
 /* 4. 오른쪽 카드 영역 (SignInCard, SignUpCard 등이 들어가는 곳) */
 /* 카드 컴포넌트들이 이 클래스를 가지고 있다고 가정 */
 .auth-card, .SignInCard, .SignUpCard {
-  flex: 1;
-  padding: 60px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  background-color: #fff;
+    flex: 1;
+    padding: 80px 60px; /* 상하좌우 여백 대폭 확장 */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 /* 모바일 대응: 세로 배치 */
@@ -99,33 +112,33 @@
 
 /* 1. 카드 헤더 및 페이지 표시 */
 .auth-card-title-box {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
 }
 
 .auth-card-title {
-  font-size: 22px;
-  font-weight: 800;
-  color: #333;
+    font-size: 32px; /* 더 크고 시원하게 */
+    font-weight: 800;
+    color: #222;
 }
 
 .auth-card-page {
-  font-size: 14px;
-  font-weight: 600;
-  color: #ff9f43; /* 포인트 컬러로 현재 단계 강조 */
-  background-color: #fff5eb;
-  padding: 4px 12px;
-  border-radius: 20px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #ff6b6b;
+    background: #fff0f0;
+    padding: 6px 14px;
+    border-radius: 20px;
 }
 
 /* 2. 이메일 입력 + 인증 버튼 레이아웃 */
 .auth-email-box {
-  display: flex;
-  align-items: flex-end; /* 인풋 라벨 높이 때문에 하단 정렬 */
-  gap: 8px;
-  margin-bottom: 16px;
+    display: flex;
+    align-items: flex-start; /* 에러 메시지 공간 고려 */
+    gap: 12px;
+    margin-bottom: 20px;
 }
 
 /* 이메일 박스 내의 인풋박스 너비 조정 */
@@ -135,24 +148,24 @@
 
 /* 인증/전송 버튼 스타일 */
 .email-mail-button-click {
-  height: 50px; /* 인풋 높이와 통일 */
-  padding: 0 16px;
-  background-color: #f8f8f8;
-  border: 1px solid #ddd;
-  border-radius: 12px;
-  color: #666;
-  font-size: 13px;
-  font-weight: 600;
-  white-space: nowrap;
-  cursor: pointer;
-  transition: all 0.2s;
-  margin-bottom: 0px; /* 인풋 에러 메시지 공간 고려 */
+    height: 54px; /* 인풋 상자 높이와 맞춤 */
+    padding: 0 20px;
+    background-color: #fff;
+    border: 2px solid #ff9f43;
+    border-radius: 12px;
+    color: #ff9f43;
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    /* 인풋 라벨 높이만큼 아래로 밀기 (CSS 구조에 따라 조정 필요) */
+    margin-top: 24px; 
 }
 
 .email-mail-button-click:hover {
-  background-color: #ff9f43;
-  color: #fff;
-  border-color: #ff9f43;
+    background-color: #ff9f43;
+    color: #fff;
 }
 
 /* 3. 에러 메시지 영역 */
@@ -177,28 +190,48 @@
   margin-top: 10px;
 }
 
+/* 5. 하단 버튼 (다음단계/회원가입) */
 .black-large-full-button {
-  width: 100%;
-  height: 56px;
-  background-color: #333;
-  color: #fff;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s;
+    width: 100%;
+    height: 60px;
+    background: linear-gradient(135deg, #ff9f43 0%, #ff6b6b 100%);
+    color: #ffffff;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 30px;
+    box-shadow: 0 10px 20px rgba(255, 107, 107, 0.2);
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .black-large-full-button:hover {
-  background-color: #000;
-  transform: translateY(-2px);
+    transform: translateY(-2px);
+    box-shadow: 0 15px 30px rgba(255, 107, 107, 0.3);
 }
 
 /*회원 로그인 비번찾기 공통 css*/
 
+.auth-description-box {
+    margin-top: 25px;
+    text-align: center;
+}
+
+.auth-description {
+    color: #8c8c8c;
+    font-size: 14px;
+}
+
+.auth-description-link {
+    color: #ff6b6b;
+    font-weight: 700;
+    text-decoration: underline;
+    margin-left: 8px;
+    cursor: pointer;
+}
 
 
 

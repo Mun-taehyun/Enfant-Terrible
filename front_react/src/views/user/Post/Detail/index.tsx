@@ -4,16 +4,20 @@ import { postQueries } from '@/querys/user/queryhooks';
 
 export default function PostDetailPage() {
   const { postId } = useParams<{ postId: string }>();
+  const numericPostId = Number(postId);
+
   const navigate = useNavigate();
 
   // 1. 리액트 쿼리 호출 (단건 조회용 훅이라 가정)
   // postId가 있을 때만 활성화되도록 enabled 설정
-  const { data : Detailpost, isLoading } = postQueries.useGetPostDetail(Number(postId));
-  const post = Detailpost?.postList.find((item) => item.postId === Number(postId));
+  const { data : Detailpost, isLoading } = postQueries.useGetPostDetail(numericPostId);
+
+  const post = Detailpost ? Detailpost?.postList?.find((item) => Number(item.postId) === numericPostId)
+                :
+                "";
 
   if (isLoading) return <div className="pet-detail-loading">🐾 소식을 읽어오는 중...</div>;
-  if (!post) return <div className="pet-detail-error">게시글을 찾을 수 없습니다.</div>;
-
+  if(!Detailpost) return;
   return (
     <div className="pet-detail-wrapper">
       {/* 상단: 카테고리/날짜/제목 */}

@@ -1,20 +1,54 @@
-/* 섹션 전체를 감싸는 컨테이너 */
-.section-container {
+main {
+    /* 1. 로그인창의 auth-wrapper와 똑같은 메커니즘 */
+    width: 100vw;
+    min-height: 100vh;
+    
+    display: flex;
+    flex-direction: column;   /* 위에서 아래로 쌓이게 */
+    align-items: center;      /* 🚨 가로축 중앙 정렬 (이게 핵심) */
+    justify-content: flex-start; /* 위에서부터 차곡차곡 */
+    
+    /* 2. 배경 및 여백 */
+    background-color: #fcfcfc;
+    padding-top: 160px;       /* 헤더 높이만큼 띄우기 */
+    box-sizing: border-box;
+    overflow-x: hidden;       /* 가로 스크롤 절대 방지 */
+}
+
+/* --- 추천상품 --- 타이틀도 늘어난 너비에 맞춤 */
+.section-title {
+    display: flex;
+    align-items: center;
     width: 100%;
-    max-width: 1440px; /* 헤더와 동일한 최대 너비 */
-    margin: 0 auto;
-    padding: 60px 40px; /* 좌우 여백을 주어 화면에 딱 붙지 않게 함 */
+    max-width: 1350px; /* 그리드와 똑같이 맞춰야 칼대칭 완성 */
+    margin: 80px 0 40px;
+    font-size: 24px;
+    font-weight: 800;
+    justify-content: center;
+}
+
+/* 2. 섹션 컨테이너: 헤더 가이드라인(1440px) 박스 */
+.section-container {
+    display: flex;
+    flex-direction: column;
+    /* 🚨 핵심: 내부 요소들을 중앙으로 모으고 스스로도 중앙 차지 */
+    align-items: center;
+    justify-content: center; 
+    
+    width: 100%;
+    max-width: 1440px; 
+    margin: 0 auto;         /* 좌우 여백 똑같이 나눠갖기 */
+    padding: 60px 40px;
     box-sizing: border-box;
 }
 
-/* 제목: 폰트 두께와 자간 조절만으로도 느낌이 확 삽니다 */
-.section-title {
-    text-align: center;
-    font-size: 28px;
-    font-weight: 800;
-    letter-spacing: -1px; /* 자간을 살짝 좁히면 더 고급스러워요 */
-    margin-bottom: 40px;
-    color: #222;
+.section-title::before,
+.section-title::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #e0e0e0; /* 연한 회색 선 */
+    margin: 0 20px;     /* 글자와 선 사이 간격 */
 }
 
 /* 상품이 없을 때 나오는 메시지 중앙 정렬 */
@@ -26,17 +60,24 @@
     font-size: 16px;
 }
 
-/* 상품 리스트 컨테이너 (2x5 배열) */
-.main-recommend-product-container,
-.main-product-container {
+/* 4. 상품 그리드: 5열 고정 및 중앙 정렬 */
+/* 추천상품 & 전체상품 그리드 공통 */
+.main-product-container,
+.main-recommend-product-container {
     display: grid;
-    grid-template-columns: repeat(5, 1fr); 
-    gap: 30px 20px;
-    /* 헤더 구성 요소들과 라인을 맞추고 싶다면 1200~1400 사이로 조절 */
+    /* 1. 카드의 너비를 220px에서 250px로 늘려 시원하게 배치 */
+    grid-template-columns: repeat(5, 250px); 
+    gap: 40px 25px;
+    
+    /* 2. 전체 너비를 1200px에서 1350px 정도로 확장 */
     width: 100%;
-    max-width: 1200px; 
-    margin: 0 auto; /* 그리드 자체를 중앙으로 */
-    justify-items: center; /* 아이템들을 칸 안에서 중앙 정렬 */
+    max-width: 1350px; 
+    
+    /* 3. 🚨 로그인창처럼 중앙에 박히게 하는 핵심 */
+    margin: 0 auto; 
+    justify-content: center; 
+    
+    padding: 20px 0;
 }
 
 .section-divider {
