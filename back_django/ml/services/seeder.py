@@ -37,11 +37,10 @@ def get_db_engine():
 def seed_recommendations(engine):
     """최종 추천 결과를 DB에 반영"""
     log_dir = Path(settings.BASE_DIR).parent / "logs"
-    # 추천 엔진 결과 파일명 (rebuild_... 스크립트 결과와 매칭)
     csv_path = log_dir / "service_ready_data.csv" 
     
     if not csv_path.exists():
-        print(f"⚠️ {csv_path.name} 파일이 없어 추천 데이터 로드를 건너뜜 (배치 먼저 실행 필요)")
+        print(f"⚠️ {csv_path.name} 파일이 없어 추천 데이터 로드를 건너뜜")
         return
 
     print(f"🤖 AI 추천 데이터를 로드합니다: {csv_path.name}")
@@ -64,6 +63,9 @@ def seed_recommendations(engine):
 def seed_kosmo_operational(truncate_all: bool = False):
     engine = get_db_engine()
     log_dir = Path(settings.BASE_DIR).parent / "logs"
+    
+    # [수정] GitHub 이미지 주소 베이스 (본인 계정 정보 확인)
+    GITHUB_IMG_BASE = "https://raw.githubusercontent.com/Mun-taehyun/Enfant-Terrible/main/back_django/media/product-images/"
 
     with engine.begin() as conn:
         if truncate_all:
@@ -77,24 +79,33 @@ def seed_kosmo_operational(truncate_all: bool = False):
                 except: pass
             conn.execute(text("SET FOREIGN_KEY_CHECKS=1"))
 
-        # 1) 카테고리 삽입 (사료/장난감 등 5종 포함)
+        # 1) 카테고리 삽입
         cat_csv = log_dir / "category_master.csv"
         if cat_csv.exists():
             df_cat = pd.read_csv(cat_csv)
             df_cat.to_sql('et_category', con=conn, if_exists='append', index=False)
             print("📁 카테고리 삽입 완료")
         
-        # 2) 상품 삽입 (장난감/용품 포함 100건 이상)
+        # 2) 상품 삽입 (이미지 주소 전처리 로직 포함)
         prod_csv = log_dir / "product_master.csv"
         if prod_csv.exists():
             df_prod = pd.read_csv(prod_csv)
-            # DB 스키마에 존재하는 컬럼만 선별
+            
+            # [추가] product_code(KOSMO-P-001)에서 숫자(001)를 뽑아 이미지 파일명(product-001.png)과 매칭
+            def map_image_url(row):
+                img_num = row['product_code'].split('-')[-1] # 예: '001'
+                img_url = f"{GITHUB_IMG_BASE}product-{img_num}.png"
+                # DB 스키마에 이미지 컬럼이 없으므로 description 필드 끝에 구분자와 함께 삽입
+                return f"{row['description']} ||IMG_URL||:{img_url}"
+
+            df_prod['description'] = df_prod.apply(map_image_url, axis=1)
+
             prod_cols = ['product_id', 'category_id', 'product_code', 'name', 'status', 'base_price', 'description', 'created_at']
             valid_df = df_prod[[c for c in prod_cols if c in df_prod.columns]]
             valid_df.to_sql('et_product', con=conn, if_exists='append', index=False)
-            print(f"📦 상품 데이터 {len(valid_df)}건 삽입 완료")
+            print(f"📦 상품 데이터 {len(valid_df)}건 (이미지 경로 포함) 삽입 완료")
         
-        # 3) SKU 생성 (주문/결제 기능을 위해 필수)
+        # 3) SKU 생성
         product_rows = conn.execute(text("SELECT product_id, base_price FROM et_product")).fetchall()
         ins_sku = [{"p_id": p[0], "code": f"SKU-{p[0]}-01", "price": int(p[1])} for p in product_rows]
         conn.execute(text("""
@@ -103,7 +114,7 @@ def seed_kosmo_operational(truncate_all: bool = False):
         """), ins_sku)
         print("🔧 상품 SKU 생성 완료")
 
-        # 4) 사용자 생성 (회원 테이블)
+        # 4) 사용자 생성
         users = []
         for i in range(1, 101):
             users.append({
