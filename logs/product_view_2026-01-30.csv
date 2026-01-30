@@ -1,0 +1,7 @@
+timestamp,productId,userId,sessionId,clientIp,userAgent
+2026-01-30T13:41:33,100,,,0:0:0:0:0:0:0:1,Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML  like Gecko) Chrome/144.0.0.0 Safari/537.36
+2026-01-30T13:43:42,100,,,0:0:0:0:0:0:0:1,Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML  like Gecko) Chrome/144.0.0.0 Safari/537.36
+2026-01-30T13:48:01,100,,,0:0:0:0:0:0:0:1,Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML  like Gecko) Chrome/144.0.0.0 Safari/537.36
+2026-01-30T14:53:42,99,,,0:0:0:0:0:0:0:1,Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML  like Gecko) Chrome/144.0.0.0 Safari/537.36
+2026-01-30T14:55:01,100,,,0:0:0:0:0:0:0:1,Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML  like Gecko) Chrome/144.0.0.0 Safari/537.36
+2026-01-30T14:55:03,100,,,0:0:0:0:0:0:0:1,Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML  like Gecko) Chrome/144.0.0.0 Safari/537.36

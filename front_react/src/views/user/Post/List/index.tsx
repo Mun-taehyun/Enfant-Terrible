@@ -7,7 +7,7 @@ import PostComponent from '@/components/user/PostItem';
 
 export default function PostList() {
   // 1. 요청 DTO 상태 (params.postType은 'NOTICE' 고정)
-  const [params, setParams] = useState({
+  const [params] = useState({
     page: 1,
     size: 10,
     postType: 'NOTICE'
@@ -55,7 +55,7 @@ export default function PostList() {
       <div className="pet-pagination-wrapper">
         <Pagination 
             totalCount={postData?.postList.length || 0} // 데이터 개수로 받기
-            onPageChange={(page: number) => {setParams(prev => ({...prev, page:page}))}}
+            size={5}
         />
       </div>
     </div>

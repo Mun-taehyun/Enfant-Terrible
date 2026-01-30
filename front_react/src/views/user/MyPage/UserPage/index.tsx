@@ -208,7 +208,7 @@ export default function UserPage() {
                     )) : "리뷰가 존재하지 않습니다"
                     }
                     <div className="pagination-review">
-                        <Pagination totalCount={reviewData?.reviewList.length} />
+                        <Pagination totalCount={reviewData?.reviewList.length} size={5} />
                     </div>
                 </div>
                 <div className="user-my-page-user-product-inquiry-box">
@@ -222,7 +222,7 @@ export default function UserPage() {
                     <div> 문의 내역이 존재하지 않습니다. </div>
                     }
                     <div className="pagination-review">
-                        <Pagination totalCount={inquiryData?.inquiryList.length} />
+                        <Pagination totalCount={inquiryData?.inquiryList.length} size={5} />
                     </div>
                 </div>
             </div>

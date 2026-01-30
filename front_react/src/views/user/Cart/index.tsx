@@ -3,6 +3,7 @@ import { useCart } from "@/hooks/user/cart/use-cart.hook";
 import { useMemo } from "react";
 import './stlye.css';
 import { CartItem } from "@/apis/user/response/cart/cart-item-response.dto";
+import Pagination from "@/components/user/Pagination";
 
 export const Cart = () => {
 
@@ -52,6 +53,9 @@ export const Cart = () => {
                         onDelete={deleteSelectedEventHandler}
                     />
                 ))}
+            </div>
+            <div className="pagination-wrapper">
+                <Pagination totalCount={items?.length || 0} size={5} />
             </div>
         </div>
 

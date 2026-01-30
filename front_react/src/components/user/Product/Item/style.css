@@ -1,9 +1,10 @@
 /* 상품 그리드 레이아웃 */
 .product-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 30px 20px;
-    padding: 20px 0;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 30px 15px;
+    max-width: 800px; /* 전체 너비를 강제로 줄임 */
+    margin: 0 auto;   /* 중앙 정렬 */
 }
 
 /* 개별 카드 컨테이너 */
@@ -26,9 +27,9 @@
     width: 100%;
     aspect-ratio: 1 / 1;
     background-color: #f4f4f4;
-    border-radius: 12px;
+    border-radius: 8px; /* 반지름도 작게 조정 */
     overflow: hidden;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
 }
 
 .product-image {
@@ -45,16 +46,10 @@
 
 /* 할인 배지 */
 .product-badge {
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    background-color: #ff4d4f;
-    color: #fff;
-    font-size: 13px;
-    font-weight: 700;
-    padding: 4px 8px;
-    border-radius: 4px;
-    z-index: 1;
+    top: 8px;
+    left: 8px;
+    font-size: 10px;
+    padding: 2px 6px;
 }
 
 /* 정보 텍스트 영역 */
@@ -70,26 +65,37 @@
     font-weight: 500;
 }
 
+/* 1. 상품명: 무조건 2줄까지만 보여주고 나머지는 '...' 처리 */
 .product-name {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
     color: #262626;
     line-height: 1.4;
-    /* 두 줄 이상은 말줄임표 처리 */
+    
+    /* 핵심: 2줄 말줄임 설정 */
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 2; /* 보여줄 줄 수 */
     -webkit-box-orient: vertical;
     overflow: hidden;
-    min-height: 42px; 
+    text-overflow: ellipsis;
+    
+    /* 높이를 고정하면 상품명 길이에 상관없이 카드 높이가 일정해짐 */
+    height: 40px; 
+    margin-bottom: 4px;
 }
 
+/* 2. 상품 설명: 무조건 1줄까지만 보여주고 '...' 처리 */
 .product-description {
-    font-size: 13px;
-    color: #595959;
-    white-space: nowrap;
+    font-size: 12px;
+    color: #8c8c8c;
+    
+    /* 핵심: 1줄 말줄임 설정 */
+    display: block; /* box 말고 일반 block */
+    white-space: nowrap; /* 줄바꿈 방지 */
     overflow: hidden;
     text-overflow: ellipsis;
-    margin-bottom: 4px;
+    
+    width: 100%; /* 부모 너비를 따라가게 함 */
 }
 
 /* 가격 영역 */
@@ -122,17 +128,17 @@
 
 .rating-star {
     color: #ffcd3c;
-    font-size: 14px;
+    font-size: 11px;
 }
 
 .rating-score {
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 600;
     color: #434343;
 }
 
 .review-count {
-    font-size: 13px;
+    font-size: 11px;
     color: #bfbfbf;
     margin-left: 2px;
 }

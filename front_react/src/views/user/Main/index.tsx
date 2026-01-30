@@ -75,14 +75,13 @@ export default function Main() {
                 <div className="main-product-container">
                     {productListData && productListData ? (
                         productListData.productList?.map((item: Product) => (<ProductCard key={item.productId} product={item} onClick={() => onClickProductDetailEventHandler(item.productId)}/>)
-                    
                     )) : (
                         <div className="empty-message"> 현재 등록된 상품이 없습니다. </div>
                     )}
                 </div>
             </div>
             <div className="pagination-wrapper">
-                <Pagination totalCount={productListData?.productList.length || 0} />
+                <Pagination totalCount={productListData?.productList.length || 0} size={10}/>
             </div>
             <div className="main-chat-container" onClick={onClickChatButtonClickToggle}>
                 {chatButton ?//채팅방 활성화 비활성화 여부 .. 

@@ -6,11 +6,11 @@ import './style.css';
 
 interface Props {
     totalCount : number | undefined;
-    onPageChange?: (page : number) => void;
+    size : number;
 }
 
 
-export default function Pagination ({totalCount} : Props) {
+export default function Pagination ({totalCount , size} : Props) {
 
 
     //커스텀 훅 : 페이징 처리
@@ -21,7 +21,7 @@ export default function Pagination ({totalCount} : Props) {
     const {
         viewPageList,currentPage,
         onPreviousClickHandler, onNextClickHandler
-    } = usePagination(totalCount ? totalCount : 0); //전체 값 줘야 페이징처리 시작. 
+    } = usePagination(totalCount ? totalCount : 0 , size); //전체 값 줘야 페이징처리 시작. 
     
 
 

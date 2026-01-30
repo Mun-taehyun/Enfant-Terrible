@@ -1,7 +1,10 @@
 /* 섹션 전체를 감싸는 컨테이너 */
 .section-container {
-    padding: 60px 0;
-    border-bottom: 1px solid #f0f0f0; /* 너무 진한 선 대신 연한 선 사용 */
+    width: 100%;
+    max-width: 1440px; /* 헤더와 동일한 최대 너비 */
+    margin: 0 auto;
+    padding: 60px 40px; /* 좌우 여백을 주어 화면에 딱 붙지 않게 함 */
+    box-sizing: border-box;
 }
 
 /* 제목: 폰트 두께와 자간 조절만으로도 느낌이 확 삽니다 */
@@ -28,10 +31,12 @@
 .main-product-container {
     display: grid;
     grid-template-columns: repeat(5, 1fr); 
-    gap: 30px 20px; /* 위아래 간격을 좌우보다 조금 더 넓게 */
-    max-width: 1200px;
-    margin: 0 auto;
-    min-height: 200px; /* 상품이 없어도 최소 높이를 유지해서 휑함을 방지 */
+    gap: 30px 20px;
+    /* 헤더 구성 요소들과 라인을 맞추고 싶다면 1200~1400 사이로 조절 */
+    width: 100%;
+    max-width: 1200px; 
+    margin: 0 auto; /* 그리드 자체를 중앙으로 */
+    justify-items: center; /* 아이템들을 칸 안에서 중앙 정렬 */
 }
 
 .section-divider {
@@ -65,7 +70,15 @@
 }
 
 .main-page {
-  position: relative;
+    position: relative;
+    /* 1. 헤더 높이만큼 위쪽 여백 확보 (중요!) */
+    padding-top: 160px; 
+    
+    /* 2. 전체를 중앙으로 모음 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
 }
 
 /* 채팅 컨테이너 */

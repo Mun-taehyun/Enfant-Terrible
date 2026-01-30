@@ -67,7 +67,7 @@ export default function ProductFilter() {
                     )}
                 </div> 
                 <div className="pagination-wrapper">
-                    <Pagination totalCount={productData?.productList.length || 0} />
+                    <Pagination totalCount={productData?.productList.length || 0} size={20} />
                 </div>
             </div>
         </div>

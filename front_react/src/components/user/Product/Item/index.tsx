@@ -17,8 +17,11 @@ export default function ProductCard({ product , onClick }: Props) {
             discountType, discountValue, discountedPrice, averageRating, reviewCount,productId
     } = product;
 
-    const fullImageUrl = thumbnailUrl.startsWith('http') ? thumbnailUrl : `http://localhost:8080${thumbnailUrl}`;
-
+    const fullImageUrl = thumbnailUrl && thumbnailUrl.startsWith('http') 
+        ? thumbnailUrl 
+        : thumbnailUrl 
+            ? `http://localhost:8080${thumbnailUrl}` 
+            : ""; 
 
     //렌더 : 제품
     return (
