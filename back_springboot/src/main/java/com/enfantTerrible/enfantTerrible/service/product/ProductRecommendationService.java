@@ -1,6 +1,7 @@
 package com.enfantTerrible.enfantTerrible.service.product;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.enfantTerrible.enfantTerrible.dto.product.ProductDiscountRow;
 import com.enfantTerrible.enfantTerrible.dto.product.ProductResponse;
 import com.enfantTerrible.enfantTerrible.dto.product.ProductRow;
+import com.enfantTerrible.enfantTerrible.dto.file.FileRow;
 import com.enfantTerrible.enfantTerrible.mapper.product.ProductDiscountMapper;
 import com.enfantTerrible.enfantTerrible.mapper.product.ProductMapper;
 import com.enfantTerrible.enfantTerrible.mapper.product.ProductRecommendationMapper;
@@ -63,6 +65,18 @@ public class ProductRecommendationService {
     Map<Long, ProductDiscountRow> discountMap = discounts == null ? Map.of()
         : discounts.stream().collect(Collectors.toMap(ProductDiscountRow::getProductId, Function.identity(), (a, b) -> a));
 
+    Map<Long, String> thumbnailUrlMap = new HashMap<>();
+    List<FileRow> thumbnails = fileQueryService.findFirstFilesByRefIds(
+        REF_TYPE_PRODUCT,
+        FILE_ROLE_THUMBNAIL,
+        productIds
+    );
+    for (FileRow f : thumbnails) {
+      if (f != null && f.getRefId() != null) {
+        thumbnailUrlMap.put(f.getRefId(), f.getFileUrl());
+      }
+    }
+
     return productIds.stream()
         .map(rowMap::get)
         .filter(r -> r != null)
@@ -93,13 +107,7 @@ public class ProductRecommendationService {
           res.setAverageRating(r.getAverageRating());
           res.setReviewCount(r.getReviewCount());
 
-          res.setThumbnailUrl(
-              fileQueryService.findFirstFileUrl(
-                  REF_TYPE_PRODUCT,
-                  r.getProductId(),
-                  FILE_ROLE_THUMBNAIL
-              )
-          );
+          res.setThumbnailUrl(thumbnailUrlMap.get(r.getProductId()));
 
           return res;
         })

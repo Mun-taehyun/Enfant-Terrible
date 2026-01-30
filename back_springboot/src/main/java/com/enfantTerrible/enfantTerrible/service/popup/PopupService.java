@@ -1,10 +1,14 @@
 package com.enfantTerrible.enfantTerrible.service.popup;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Collections;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.enfantTerrible.enfantTerrible.dto.file.FileRow;
 import com.enfantTerrible.enfantTerrible.dto.popup.PopupResponse;
 import com.enfantTerrible.enfantTerrible.dto.popup.PopupRow;
 import com.enfantTerrible.enfantTerrible.mapper.popup.PopupMapper;
@@ -24,12 +28,31 @@ public class PopupService {
   private final FileQueryService fileQueryService;
 
   public List<PopupResponse> getActivePopups() {
-    return popupMapper.findActivePopups().stream()
-        .map(this::toResponse)
+    List<PopupRow> rows = popupMapper.findActivePopups();
+
+    if (rows == null || rows.isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    Map<Long, String> imageUrlMap = new HashMap<>();
+    List<Long> popupIds = rows.stream().map(PopupRow::getPopupId).toList();
+    List<FileRow> thumbnails = fileQueryService.findFirstFilesByRefIds(
+        REF_TYPE_POPUP,
+        FILE_ROLE_THUMBNAIL,
+        popupIds
+    );
+    for (FileRow f : thumbnails) {
+      if (f != null && f.getRefId() != null) {
+        imageUrlMap.put(f.getRefId(), f.getFileUrl());
+      }
+    }
+
+    return rows.stream()
+        .map(r -> toResponse(r, imageUrlMap.get(r.getPopupId())))
         .toList();
   }
 
-  private PopupResponse toResponse(PopupRow row) {
+  private PopupResponse toResponse(PopupRow row, String imageUrl) {
     PopupResponse res = new PopupResponse();
     res.setPopupId(row.getPopupId());
     res.setTitle(row.getTitle());
@@ -38,13 +61,7 @@ public class PopupService {
     res.setPosition(row.getPosition());
     res.setWidth(row.getWidth());
     res.setHeight(row.getHeight());
-    res.setImageUrl(
-        fileQueryService.findFirstFileUrl(
-            REF_TYPE_POPUP,
-            row.getPopupId(),
-            FILE_ROLE_THUMBNAIL
-        )
-    );
+    res.setImageUrl(imageUrl);
     return res;
   }
 }

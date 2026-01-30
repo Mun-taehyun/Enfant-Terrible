@@ -29,4 +29,19 @@
     ORDER BY sort_order ASC, option_value_id ASC
   </select>
 
+  <select id="findOptionValuesByGroupIds" resultType="ProductOptionValueRow">
+    SELECT
+      option_value_id,
+      option_group_id,
+      value,
+      sort_order
+    FROM et_product_option_value
+    WHERE option_group_id IN
+    <foreach collection="optionGroupIds" item="id" open="(" close=")" separator=",">
+      #{id}
+    </foreach>
+      AND deleted_at IS NULL
+    ORDER BY option_group_id ASC, sort_order ASC, option_value_id ASC
+  </select>
+
 </mapper>

@@ -192,6 +192,20 @@ public class ProductQueryService {
     List<ProductOptionGroupRow> groupRows =
         productOptionQueryMapper.findOptionGroupsByProductId(productId);
 
+    Map<Long, List<ProductOptionValueRow>> valueRowsByGroupId = new HashMap<>();
+    if (!groupRows.isEmpty()) {
+      List<Long> groupIds = groupRows.stream().map(ProductOptionGroupRow::getOptionGroupId).toList();
+      List<ProductOptionValueRow> allValueRows =
+          productOptionQueryMapper.findOptionValuesByGroupIds(groupIds);
+
+      for (ProductOptionValueRow v : allValueRows) {
+        if (v == null || v.getOptionGroupId() == null) continue;
+        valueRowsByGroupId
+            .computeIfAbsent(v.getOptionGroupId(), k -> new java.util.ArrayList<>())
+            .add(v);
+      }
+    }
+
     res.setOptionGroups(
         groupRows.stream().map(g -> {
           ProductOptionGroupResponse og = new ProductOptionGroupResponse();
@@ -199,7 +213,7 @@ public class ProductQueryService {
           og.setName(g.getName());
 
           List<ProductOptionValueRow> valueRows =
-              productOptionQueryMapper.findOptionValuesByGroupId(g.getOptionGroupId());
+              valueRowsByGroupId.getOrDefault(g.getOptionGroupId(), java.util.Collections.emptyList());
 
           og.setValues(
               valueRows.stream().map(v -> {
