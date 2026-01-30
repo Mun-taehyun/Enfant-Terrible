@@ -1,3 +1,4 @@
+import React, { useEffect } from 'react';
 import './App.css'
 import Popup from '@/components/user/Popup';
 import { Route, Routes, useLocation } from 'react-router-dom';
@@ -35,8 +36,6 @@ import RecommendationsView from './views/admin/RecommendationsView';
 import OrdersView from './views/admin/orders.view';
 import { PopupItem } from './types/user/interface';
 
-
-
 function App() {
 
   //쿼리: 사용 활성화된 광고팝업 캐싱 
@@ -46,32 +45,30 @@ function App() {
 
   const {pathname} = useLocation();
 
-  
+  // 🐾 마우스 포인터를 졸졸 따라다니는 단 하나의 발바닥
+  useEffect(() => {
+    // 1. 발바닥 요소 하나만 미리 생성
+    const paw = document.createElement('div');
+    paw.className = 'follow-paw';
+    document.body.appendChild(paw);
+
+    const handleMouseMove = (e: MouseEvent) => {
+      // 2. 마우스 움직일 때마다 이 하나의 발바닥 위치만 계속 업데이트
+      // 마우스 정중앙보다 약간 옆(+10px)에 두면 커서랑 안 겹치고 귀여워요!
+      paw.style.left = `${e.pageX + 10}px`;
+      paw.style.top = `${e.pageY + 10}px`;
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    
+    // 컴포넌트 사라질 때 발바닥도 같이 삭제
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      paw.remove();
+    };
+  }, []);
+
   return (
-    //컴포넌트 렌더링 설계
-    //      메인 페이지 /         d
-    //      인증 페이지 /auth     d
-    //      로그인/회원/비번바꾸기 페이지 /auth/login       d
-    //      소셜 회원가입 추가 페이지 /auth/oauth           d
-    //      펫정보 추가 페이지 /auth/add-infomation         d
-    //      소셜 리다이렉트 /http://localhost:3000/oauth/callback
-
-    //      유저 마이페이지 /user           d
-    //      유저 수정페이지 /user/:userId     d
-
-    //      제품 필터페이지 /product    ... 쿼리스트링 방식으로 생략해두고 이동   d
-    //      제품 상세페이지 /product/:productId     d
-
-    //      공지 목록페이지 /post       
-    //      공지 상세페이지 /post/:postId       
-
-    //      주문 상세페이지 /order/:orderId     
-    //      결제 준비페이지 /order/payload      
-
-    //      포인트 히스토리페이지 /point      
-
-    //      장바구니페이지 /cart        
-
     <>
     {pathname === MAIN_PATH() && popupArray.map((item : PopupItem) => (<Popup key={item.popupId} popupItem={item} />))}
 
@@ -93,7 +90,7 @@ function App() {
         <Route path={POST_PATH() + POST_DETAIL_PATH(':postId')} element={<PostDetailPage/>} />
         <Route path={ORDER_PATH()} >
           <Route path={ORDER_PATH() + "/" + ORDER_PAYLOAD_PATH()} element={<OrderPreparePage/>} />
-          <Route path={ORDER_PATH() + "/" + ORDER_DETAIL_PATH(':orderId')} element={<OrderDetailView/>} />                          
+          <Route path={ORDER_PATH() + "/" + ORDER_DETAIL_PATH(':orderId')} element={<OrderDetailView/>} />                                          
         </Route>
         <Route path={CART_PATH()} element={<Cart/>}/>
         <Route path={POINT_PATH()} element={<PointHistoryPage/>}/>
@@ -123,15 +120,5 @@ function App() {
     </>
   )
 } 
+
 export default App
-
-
-//리액트 쿼리 useQuery
-// data , error , isLoading , isFetching , isError , refetch , remove 
-// data : 데이터값 받아옴 => axios 성공값 
-// error : 실패 시 값 받아옴 => axios 실패값 
-// isLoading : 캐시값이 없는 상태 => 로딩 여부 
-// isFetching : 데이터를 가져오는 중 여부 
-// isError : 에러 발생여부 
-// refetch : 수동으로 다시 데이터 가져옴
-// remove : 캐시에서 쿼리 제거 

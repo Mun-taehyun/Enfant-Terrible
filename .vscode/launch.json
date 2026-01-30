@@ -1,0 +1,27 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot Run",
+            "request": "launch",
+            "mainClass": "com.enfantTerrible.enfantTerrible.EnfantTerribleApplication",
+            "projectName": "enfantTerrible",
+            "env": {
+                "SPRING_SECURITY_USER_NAME": "admin",
+                "SPRING_SECURITY_USER_PASSWORD": "1234",
+                "JWT_SECRET": "thisIsMySecretKeyForTestingEnfantTerribleProject2026",
+                "MAIL_USERNAME": "test@gmail.com",
+                "MAIL_PASSWORD": "test_password",
+                "FILE_UPLOAD_DIR": "C:/temp",
+                "RECAPTCHA_SECRET_KEY": "dummy",
+                "GOOGLE_CLIENT_ID": "dummy",
+                "GOOGLE_CLIENT_SECRET": "dummy",
+                "NAVER_CLIENT_ID": "dummy",
+                "NAVER_CLIENT_SECRET": "dummy",
+                "OAUTH2_REDIRECT_URI": "http://localhost:8080",
+                "PORTONE_API_SECRET": "dummy"
+            }
+        }
+    ]
+}

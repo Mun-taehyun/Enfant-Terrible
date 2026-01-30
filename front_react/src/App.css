@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+
 .divider {
     border-top: 1px solid gray;
     width: 100%;
@@ -278,3 +280,226 @@ align-items 는 "교차축"정렬  flex 기본값의 교차축이므로 (세로�
 .arrow-right-icon {
     background-image: url(assets/image/arrow-right.png);
 }/*-> 이미지 표시 아이콘*/
+
+
+/* 1. 로고(앙팡테리블)를 귀엽게 디자인 */
+.header-logo-content { 
+    font-family: 'Jua', sans-serif !important;
+    font-size: 36px !important;
+    color: #FF8E0B !important; /* 주황색 */
+    letter-spacing: 1px;
+    text-shadow: 2px 2px 0px #ffffff, 3px 3px 5px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+/* 2. 페이지네이션 버튼 */
+.pagination-text-active {
+    background-color: #FF8E0B !important;
+    border-color: #FF8E0B !important;
+    color: white !important;
+    font-family: 'Jua', sans-serif;
+}
+
+/* 3. 로고 마우스 올렸을 때 효과 */
+.header-logo-content:hover {
+    transform: rotate(-3deg) scale(1.05);
+}
+
+/* 1. 검색창 전체: 겹치는 선을 없애고 두툼한 젤리 느낌 추가 */
+.header-search-input-box {
+    border: none !important; /* 선을 없애고 면으로 승부합니다 */
+    border-radius: 50px !important;
+    background-color: #ffffff;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    /* 아래쪽에 두툼한 그림자를 주어 누르고 싶은 입체감을 줍니다 */
+    box-shadow: 0 4px 0px #FF8E0B, 0 8px 15px rgba(0,0,0,0.05) !important;
+}
+
+/* 2. 마우스 올렸을 때: 푸딩처럼 아래로 살짝 눌리는 느낌 */
+.header-search-input-box:hover {
+    transform: translateY(2px); /* 아래로 살짝 눌림 */
+    box-shadow: 0 2px 0px #FF8E0B, 0 4px 10px rgba(0,0,0,0.08) !important;
+}
+
+/* 3. 클릭 시: 주황색 빛이 은은하게 퍼짐 */
+.header-search-input-box:focus-within {
+    background-color: #fffaf0;
+    box-shadow: 0 0 0 3px rgba(255, 142, 11, 0.3) !important; /* 테두리 대신 빛나는 효과 */
+}
+
+/* 4. 검색 버튼: 발바닥처럼 동글동글하게 */
+.header-search-button {
+    background-color: #FF8E0B !important;
+    border-radius: 50% !important;
+    width: 34px !important;
+    height: 34px !important;
+    margin-right: 5px;
+    box-shadow: 0 2px 0px #e67e22; /* 버튼도 입체감 추가 */
+}
+
+.header-search-button:hover {
+    transform: scale(1.1) rotate(5deg); /* 마우스 올리면 까딱! */
+}
+
+/* 1. 검색창 박스 기본 설정 */
+.header-search-input-box {
+    position: relative;
+    border: 1px solid #eee !important;
+    border-radius: 50px !important;
+    background-color: white;
+    z-index: 1;
+}
+
+/* 2. 클릭 시 선이 그려지는 효과 레이어 */
+.header-search-input-box:focus-within::before {
+    content: "";
+    position: absolute;
+    inset: -2px; /* 테두리 굵기만큼 바깥으로 */
+    border-radius: 52px;
+    padding: 2px; /* 선의 굵기 */
+    
+    /* 주황색 선 설정 */
+    background: #FF8E0B;
+    
+    /* 선이 그려지는 마법의 마스크 설정 */
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    
+    /* 선을 가렸다가 슥- 나타나게 하는 애니메이션 */
+    background-image: conic-gradient(#FF8E0B var(--angle, 0deg), transparent 0deg);
+    animation: draw-circle 0.6s ease-out forwards;
+}
+
+/* 3. 각도(Angle) 변수 설정 (애니메이션 핵심) */
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes draw-circle {
+    from { --angle: 0deg; }
+    to { --angle: 360deg; }
+}
+
+/* 로그인 전체 컨테이너 (클래스명 확인 필요) */
+.login-container {
+    background-color: #fffaf5; /* 아주 연한 복숭아빛 배경 */
+    border-radius: 30px !important;
+    box-shadow: 0 10px 30px rgba(255, 142, 11, 0.05);
+}
+
+/* "앙팡테리블 마켓에 오신 것을 환영합니다" 폰트 통일 */
+.login-welcome-text {
+    font-family: 'Jua', sans-serif !important;
+    color: #333;
+}
+
+/* 로그인 버튼 */
+.login-button {
+    background: linear-gradient(135deg, #FF8E0B, #ff6b6b) !important; /* 상큼한 그라데이션 */
+    border: none !important;
+    border-radius: 50px !important;
+    font-family: 'Jua', sans-serif;
+    font-size: 18px;
+    height: 50px;
+    box-shadow: 0 4px 0px #e67e22; /* 아래쪽 입체감 */
+    transition: all 0.2s ease;
+}
+
+/* 버튼 눌렀을 때 쫀득하게 눌리는 효과 */
+.login-button:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0px #e67e22;
+}
+
+.login-button, .black-large-full-button {
+    position: relative;
+    width: 240px !important;
+    height: 80px !important;
+    margin: 40px auto !important; /* 귀가 나올 공간 확보 */
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    
+    background: #FF8E0B !important;
+    border: none !important;
+    /* 손으로 빚은 듯 삐뚤한 모양 */
+    border-radius: 60% 40% 50% 50% / 50% 60% 40% 50% !important;
+    
+    color: white !important;
+    font-family: 'Jua', sans-serif !important;
+    font-size: 24px !important;
+    z-index: 1;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* 1. 마우스 올리면 나타날 '귀' (Before/After 활용) */
+.login-button::before, .login-button::after {
+    content: "";
+    position: absolute;
+    top: 10px;
+    width: 30px;
+    height: 30px;
+    background: #FF8E0B;
+    border-radius: 50% 50% 0 0;
+    z-index: -1;
+    transition: all 0.3s ease;
+}
+
+.login-button::before { left: 40px; }
+.login-button::after { right: 40px; }
+
+/* 2. 마우스 올렸을 때 효과: 귀가 쏙! 올라옴 */
+.login-button:hover::before {
+    top: -20px;
+    transform: rotate(-15deg);
+}
+
+.login-button:hover::after {
+    top: -20px;
+    transform: rotate(15deg);
+}
+
+/* 3. 버튼 몸통도 같이 꿀렁! */
+.login-button:hover {
+    transform: scale(1.05);
+    background-color: #ff9d2b !important;
+    /* 신나서 꼬리 흔드는 듯한 미세한 진동 */
+    animation: tail-wag 0.4s infinite;
+}
+
+@keyframes tail-wag {
+    0% { transform: scale(1.05) rotate(0deg); }
+    50% { transform: scale(1.05) rotate(2deg); }
+    100% { transform: scale(1.05) rotate(0deg); }
+}
+
+/* 4. 클릭 시: 동물이 깜짝 놀라 납작해지는 느낌 */
+.login-button:active {
+    transform: scale(0.9) translateY(10px);
+}
+
+/* 마우스를 졸졸 따라다니는 입체 젤리 발바닥 */
+.follow-paw {
+  position: absolute;
+  width: 38px; 
+  height: 38px;
+  
+  /* 1. 입체감이 살아있는 리얼 젤리 발바닥 이모지 스타일 이미지 */
+  background-image: url('https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Paw%20Prints.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+
+  /* 2. 색상 보정: 주황색 톤을 더 선명하게 (블러는 뺐어요!) */
+  filter: sepia(30%) saturate(180%) hue-rotate(-15deg);
+  
+  pointer-events: none;
+  z-index: 10000;
+
+  /* 3. 움직임: 애니메이션 없이 마우스를 즉각적으로 따라옴 */
+  transition: none !important;
+}
