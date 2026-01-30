@@ -50,7 +50,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     // 6️⃣ Security Context에 저장될 OAuth Principal 반환
     return new CustomOAuth2User(
       user.getUserId(),
+      user.getEmail(),
       user.getRole(),
+      user.getStatus(),
       attributes   // 현재 단계에서는 그대로 유지
     );
   }

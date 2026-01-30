@@ -5,6 +5,7 @@ import type { AdminCategory, AdminCategoryId } from "@/types/admin/category";
 import {
   useAdminCategoryCreate,
   useAdminCategoryMoveParent,
+  useAdminCategoryReorder,
   useAdminCategorySoftDelete,
   useAdminCategorySortOrder,
   useAdminCategoryToggleActive,
@@ -79,6 +80,7 @@ export function useAdminCategoriesPage() {
   const toggleMut = useAdminCategoryToggleActive();
   const sortMut = useAdminCategorySortOrder();
   const moveMut = useAdminCategoryMoveParent();
+  const reorderMut = useAdminCategoryReorder();
   const deleteMut = useAdminCategorySoftDelete();
 
   // ✅ treeQuery.data는 이미 AdminCategory[] 입니다 (중첩 .data 금지)
@@ -110,6 +112,7 @@ export function useAdminCategoriesPage() {
     toggleMut,
     sortMut,
     moveMut,
+    reorderMut,
     deleteMut,
   };
 }

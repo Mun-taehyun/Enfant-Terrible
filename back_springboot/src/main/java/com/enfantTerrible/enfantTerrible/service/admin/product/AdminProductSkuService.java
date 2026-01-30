@@ -1,6 +1,9 @@
 package com.enfantTerrible.enfantTerrible.service.admin.product;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -9,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.enfantTerrible.enfantTerrible.common.enums.SkuStatus;
 import com.enfantTerrible.enfantTerrible.common.response.AdminPageResponse;
 import com.enfantTerrible.enfantTerrible.dto.admin.product.AdminSkuListRequest;
+import com.enfantTerrible.enfantTerrible.dto.admin.product.AdminSkuOptionRow;
 import com.enfantTerrible.enfantTerrible.dto.admin.product.AdminSkuResponse;
 import com.enfantTerrible.enfantTerrible.dto.admin.product.AdminSkuRow;
 import com.enfantTerrible.enfantTerrible.dto.admin.product.AdminSkuSaveInternalRequest;
@@ -37,8 +41,22 @@ public class AdminProductSkuService {
     List<AdminSkuRow> rows = skuMapper.findSkus(req, size, offset);
     int totalCount = skuMapper.countSkus(req);
 
+    Map<Long, List<Long>> optionValueIdsBySkuId = new HashMap<>();
+    if (!rows.isEmpty()) {
+      List<Long> skuIds = rows.stream().map(AdminSkuRow::getSkuId).toList();
+      List<AdminSkuOptionRow> skuOptions = skuOptionMapper.findSkuOptionsBySkuIds(skuIds);
+      for (AdminSkuOptionRow so : skuOptions) {
+        if (so.getSkuId() == null || so.getOptionValueId() == null) {
+          continue;
+        }
+        optionValueIdsBySkuId
+            .computeIfAbsent(so.getSkuId(), k -> new ArrayList<>())
+            .add(so.getOptionValueId());
+      }
+    }
+
     List<AdminSkuResponse> list = rows.stream()
-        .map(this::toResponse)
+        .map(r -> toResponse(r, optionValueIdsBySkuId.get(r.getSkuId())))
         .toList();
 
     return new AdminPageResponse<>(page, size, totalCount, list);
@@ -52,7 +70,8 @@ public class AdminProductSkuService {
       throw new BusinessException("SKU가 존재하지 않습니다.");
     }
 
-    return toResponse(row);
+    List<Long> optionValueIds = skuOptionMapper.findOptionValueIdsBySkuId(skuId);
+    return toResponse(row, optionValueIds);
   }
 
   public void create(AdminSkuSaveRequest req) {
@@ -157,7 +176,7 @@ public class AdminProductSkuService {
     }
   }
 
-  private AdminSkuResponse toResponse(AdminSkuRow row) {
+  private AdminSkuResponse toResponse(AdminSkuRow row, List<Long> optionValueIds) {
 
     AdminSkuResponse res = new AdminSkuResponse();
     res.setSkuId(row.getSkuId());
@@ -166,6 +185,8 @@ public class AdminProductSkuService {
     res.setPrice(row.getPrice());
     res.setStock(row.getStock());
     res.setStatus(row.getStatus());
+    res.setOptionValueIds(optionValueIds == null ? java.util.List.of() : optionValueIds);
+    res.setCreatedAt(row.getCreatedAt());
     return res;
   }
 }

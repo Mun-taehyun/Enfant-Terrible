@@ -12,8 +12,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.enfantTerrible.enfantTerrible.service.user.UserService;
-
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -23,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 
   private final JwtTokenProvider jwtTokenProvider;
-  private final UserService userService;
   private final OAuth2SuccessHandler oAuth2SuccessHandler;
   private final CustomOAuth2UserService customOAuth2UserService;
 
@@ -31,7 +28,7 @@ public class SecurityConfig {
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
     JwtAuthenticationFilter jwtFilter =
-      new JwtAuthenticationFilter(jwtTokenProvider, userService);
+      new JwtAuthenticationFilter(jwtTokenProvider);
 
     http
       // CORS 설정

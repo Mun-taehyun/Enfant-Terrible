@@ -7,7 +7,9 @@ import './style.css';
 
 export default function PointHistoryPage() {
     const {searchParams} = useProduct();
-    const {data:pointHistoryData} = pointQueries.useHistory( Number(searchParams.get("page")) , 5);
+    const rawPage = Number(searchParams.get("page"));
+    const page = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1;
+    const {data:pointHistoryData} = pointQueries.useHistory(page , 5);
 
   return (
     <div className="point-history-page">

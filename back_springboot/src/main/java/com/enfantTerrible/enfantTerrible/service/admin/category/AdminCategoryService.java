@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.enfantTerrible.enfantTerrible.dto.admin.category.AdminCategoryCreateRequest;
+import com.enfantTerrible.enfantTerrible.dto.admin.category.AdminCategoryReorderItem;
+import com.enfantTerrible.enfantTerrible.dto.admin.category.AdminCategoryReorderRequest;
 import com.enfantTerrible.enfantTerrible.dto.admin.category.AdminCategoryResponse;
 import com.enfantTerrible.enfantTerrible.dto.admin.category.AdminCategoryRow;
 import com.enfantTerrible.enfantTerrible.dto.admin.category.AdminCategoryUpdateRequest;
@@ -192,6 +194,39 @@ public class AdminCategoryService {
 
     // 서브트리 depth 재계산 (부모가 바뀌면 자식들도 depth가 바뀜)
     recomputeSubtreeDepths(categoryId);
+  }
+
+  public void reorder(AdminCategoryReorderRequest req) {
+    if (req == null || req.getItems() == null || req.getItems().isEmpty()) {
+      return;
+    }
+
+    for (AdminCategoryReorderItem it : req.getItems()) {
+      if (it == null || it.getCategoryId() == null) {
+        continue;
+      }
+
+      AdminCategoryRow cur = mustFind(it.getCategoryId());
+      Long nextParentId = it.getParentId();
+
+      if (nextParentId != null && nextParentId.equals(it.getCategoryId())) {
+        throw new BusinessException("자기 자신을 상위 카테고리로 지정할 수 없습니다.");
+      }
+
+      if (cur.getParentId() == null) {
+        if (nextParentId != null) {
+          moveCategory(it.getCategoryId(), nextParentId);
+        }
+      } else {
+        if (nextParentId == null) {
+          moveCategory(it.getCategoryId(), null);
+        } else if (!cur.getParentId().equals(nextParentId)) {
+          moveCategory(it.getCategoryId(), nextParentId);
+        }
+      }
+
+      updateSortOrder(it.getCategoryId(), it.getSortOrder());
+    }
   }
 
   /**

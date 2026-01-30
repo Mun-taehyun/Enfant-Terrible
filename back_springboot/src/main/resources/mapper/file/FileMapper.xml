@@ -28,6 +28,50 @@
     ORDER BY file_id ASC
   </select>
 
+  <select id="findFirstFilesByRefIds" resultType="com.enfantTerrible.enfantTerrible.dto.file.FileRow">
+    SELECT f.ref_id AS refId,
+           f.file_url AS fileUrl
+    FROM et_file f
+    JOIN (
+      SELECT ref_id, MIN(file_id) AS file_id
+      FROM et_file
+      WHERE ref_type = #{refType}
+        AND file_role = #{fileRole}
+        AND deleted_at IS NULL
+        AND ref_id IN
+        <foreach collection="refIds" item="id" open="(" separator="," close=")">
+          #{id}
+        </foreach>
+      GROUP BY ref_id
+    ) t ON t.file_id = f.file_id
+  </select>
+
+  <select id="findFilesByRefAndRole" resultType="com.enfantTerrible.enfantTerrible.dto.file.FileRow">
+    SELECT file_id AS fileId,
+           ref_id AS refId,
+           file_role AS fileRole,
+           file_url AS fileUrl,
+           original_name AS originalName
+    FROM et_file
+    WHERE ref_type = #{refType}
+      AND ref_id = #{refId}
+      AND file_role = #{fileRole}
+      AND deleted_at IS NULL
+    ORDER BY file_id ASC
+  </select>
+
+  <select id="findById" resultType="com.enfantTerrible.enfantTerrible.dto.file.FileRow">
+    SELECT file_id AS fileId,
+           ref_type AS refType,
+           ref_id AS refId,
+           file_role AS fileRole,
+           file_url AS fileUrl,
+           original_name AS originalName
+    FROM et_file
+    WHERE file_id = #{fileId}
+      AND deleted_at IS NULL
+  </select>
+
   <!-- 파일 등록 -->
   <insert id="insert" useGeneratedKeys="true" keyProperty="fileId">
     INSERT INTO et_file (
@@ -57,6 +101,22 @@
     SET deleted_at = NOW()
     WHERE ref_type = #{refType}
       AND ref_id = #{refId}
+      AND deleted_at IS NULL
+  </update>
+
+  <update id="softDeleteByRefAndRole">
+    UPDATE et_file
+    SET deleted_at = NOW()
+    WHERE ref_type = #{refType}
+      AND ref_id = #{refId}
+      AND file_role = #{fileRole}
+      AND deleted_at IS NULL
+  </update>
+
+  <update id="softDeleteById">
+    UPDATE et_file
+    SET deleted_at = NOW()
+    WHERE file_id = #{fileId}
       AND deleted_at IS NULL
   </update>
 

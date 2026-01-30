@@ -12,7 +12,7 @@ public class AdminOrderListRequest {
   private int page = 1;
   private int size = 20;
 
-  private Long userId;
+  private String userEmail;
   private String orderCode;
   private String status;
 

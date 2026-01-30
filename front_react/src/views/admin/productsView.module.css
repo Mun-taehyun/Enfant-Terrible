@@ -9,6 +9,7 @@
 
 .input { padding: 8px; border: 1px solid #ddd; border-radius: 8px; }
 .select { padding: 8px; border: 1px solid #ddd; border-radius: 8px; }
+.textarea { padding: 8px; border: 1px solid #ddd; border-radius: 8px; min-height: 90px; resize: vertical; }
 
 .secondaryBtn { padding: 8px 10px; border: 1px solid #ddd; background: #fff; border-radius: 8px; cursor: pointer; }
 .smallBtn { padding: 6px 8px; border: 1px solid #ddd; background: #fff; border-radius: 8px; cursor: pointer; }
@@ -31,5 +32,10 @@
 .createGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; align-items: end; }
 @media (max-width: 980px) { .createGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 640px) { .createGrid { grid-template-columns: 1fr; } }
+
+.modalOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 1000; }
+.modal { width: min(980px, 100%); background: #fff; border-radius: 12px; border: 1px solid #eee; padding: 12px; }
+.modalHeader { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.modalTitle { font-size: 16px; font-weight: 700; }
 
 .detailPanel { margin-top: 14px; border: 1px solid #eee; border-radius: 12px; overflow: hidden; }

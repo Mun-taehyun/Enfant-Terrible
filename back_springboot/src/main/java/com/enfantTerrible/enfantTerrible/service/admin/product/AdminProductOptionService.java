@@ -3,8 +3,10 @@ package com.enfantTerrible.enfantTerrible.service.admin.product;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,9 +59,47 @@ public class AdminProductOptionService {
     if (groupMapper.update(groupId, req) == 0) {
       throw new BusinessException("수정할 옵션 그룹이 없습니다.");
     }
+  }
 
-    // 옵션 구조 변경 → SKU 동기화
-    syncSkus(group.getProductId());
+  public void reorderGroups(AdminProductOptionGroupReorderRequest req) {
+    if (req == null || req.getProductId() == null) {
+      throw new BusinessException("productId가 필요합니다.");
+    }
+    if (req.getOrderedGroupIds() == null || req.getOrderedGroupIds().isEmpty()) {
+      return;
+    }
+
+    List<AdminProductOptionGroupRow> groups = groupMapper.findByProductId(req.getProductId());
+    java.util.Map<Long, AdminProductOptionGroupRow> byId = new java.util.HashMap<>();
+    for (AdminProductOptionGroupRow g : groups) {
+      byId.put(g.getOptionGroupId(), g);
+    }
+
+    for (int i = 0; i < req.getOrderedGroupIds().size(); i += 1) {
+      Long groupId = req.getOrderedGroupIds().get(i);
+      if (groupId == null) continue;
+      AdminProductOptionGroupRow g = byId.get(groupId);
+      if (g == null) {
+        throw new BusinessException("옵션 그룹을 찾을 수 없습니다. groupId=" + groupId);
+      }
+      if (!req.getProductId().equals(g.getProductId())) {
+        throw new BusinessException("상품이 일치하지 않습니다. groupId=" + groupId);
+      }
+
+      int nextSortOrder = i + 1;
+      if (g.getSortOrder() != null && g.getSortOrder().intValue() == nextSortOrder) {
+        continue;
+      }
+
+      AdminProductOptionGroupSaveRequest save = new AdminProductOptionGroupSaveRequest();
+      save.setProductId(req.getProductId());
+      save.setName(g.getName());
+      save.setSortOrder(nextSortOrder);
+
+      if (groupMapper.update(groupId, save) == 0) {
+        throw new BusinessException("옵션 그룹 정렬 변경 실패");
+      }
+    }
   }
 
   public void deleteGroup(Long groupId) {
@@ -83,6 +123,13 @@ public class AdminProductOptionService {
   public List<AdminProductOptionValueResponse> getValues(Long groupId) {
 
     return valueMapper.findByGroupId(groupId).stream()
+        .map(this::toValueResponse)
+        .toList();
+  }
+
+  public List<AdminProductOptionValueResponse> getValuesByProductId(Long productId) {
+
+    return valueMapper.findByProductId(productId).stream()
         .map(this::toValueResponse)
         .toList();
   }
@@ -118,6 +165,47 @@ public class AdminProductOptionService {
 
     if (valueMapper.update(valueId, req) == 0) {
       throw new BusinessException("수정할 옵션 값이 없습니다.");
+    }
+  }
+
+  public void reorderValues(AdminProductOptionValueReorderRequest req) {
+    if (req == null || req.getOptionGroupId() == null) {
+      throw new BusinessException("optionGroupId가 필요합니다.");
+    }
+    if (req.getOrderedValueIds() == null || req.getOrderedValueIds().isEmpty()) {
+      return;
+    }
+
+    List<AdminProductOptionValueRow> values = valueMapper.findByGroupId(req.getOptionGroupId());
+    java.util.Map<Long, AdminProductOptionValueRow> byId = new java.util.HashMap<>();
+    for (AdminProductOptionValueRow v : values) {
+      byId.put(v.getOptionValueId(), v);
+    }
+
+    for (int i = 0; i < req.getOrderedValueIds().size(); i += 1) {
+      Long valueId = req.getOrderedValueIds().get(i);
+      if (valueId == null) continue;
+      AdminProductOptionValueRow v = byId.get(valueId);
+      if (v == null) {
+        throw new BusinessException("옵션 값을 찾을 수 없습니다. valueId=" + valueId);
+      }
+      if (!req.getOptionGroupId().equals(v.getOptionGroupId())) {
+        throw new BusinessException("옵션 그룹이 일치하지 않습니다. valueId=" + valueId);
+      }
+
+      int nextSortOrder = i + 1;
+      if (v.getSortOrder() != null && v.getSortOrder().intValue() == nextSortOrder) {
+        continue;
+      }
+
+      AdminProductOptionValueSaveRequest save = new AdminProductOptionValueSaveRequest();
+      save.setOptionGroupId(req.getOptionGroupId());
+      save.setValue(v.getValue());
+      save.setSortOrder(nextSortOrder);
+
+      if (valueMapper.update(valueId, save) == 0) {
+        throw new BusinessException("옵션 값 정렬 변경 실패");
+      }
     }
   }
 
@@ -159,11 +247,18 @@ public class AdminProductOptionService {
 
     // 그룹별 옵션값 수집
     List<List<Long>> groupValues = new ArrayList<>();
+    List<AdminProductOptionValueRow> allValues = valueMapper.findByProductId(productId);
+    Map<Long, List<AdminProductOptionValueRow>> valuesByGroupId = allValues.stream()
+        .filter(v -> v.getOptionGroupId() != null)
+        .collect(Collectors.groupingBy(AdminProductOptionValueRow::getOptionGroupId));
+
     for (AdminProductOptionGroupRow g : groups) {
-      List<Long> ids = valueMapper.findByGroupId(g.getOptionGroupId())
-          .stream()
+      List<AdminProductOptionValueRow> rows = valuesByGroupId.getOrDefault(g.getOptionGroupId(), List.of());
+      List<Long> ids = rows.stream()
           .map(AdminProductOptionValueRow::getOptionValueId)
+          .filter(id -> id != null)
           .toList();
+
       if (ids.isEmpty()) {
         // 어떤 그룹이라도 값이 없으면 조합을 만들 수 없음 → 기본 SKU 1개 보장
         ensureDefaultSku(productId, product.getBasePrice());

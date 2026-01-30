@@ -10,12 +10,9 @@ import {
   useAdminInquiryDelete,
 } from "@/hooks/admin/adminInquiry.hook";
 
-function toIntOrUndef(v: string): number | undefined {
+function toTrimOrUndef(v: string): string | undefined {
   const s = v.trim();
-  if (!s) return undefined;
-  const n = Number(s);
-  if (!Number.isFinite(n)) return undefined;
-  return Math.floor(n);
+  return s ? s : undefined;
 }
 
 function getErrorMessage(err: unknown, fallback = "요청에 실패했습니다."): string {
@@ -29,8 +26,8 @@ function getErrorMessage(err: unknown, fallback = "요청에 실패했습니다.
 }
 
 export default function ProductInquiriesView() {
-  const [productIdText, setProductIdText] = useState("");
-  const [userIdText, setUserIdText] = useState("");
+  const [productNameText, setProductNameText] = useState("");
+  const [userEmailText, setUserEmailText] = useState("");
   const [status, setStatus] = useState<string>("");
 
   const [page, setPage] = useState(1);
@@ -40,16 +37,16 @@ export default function ProductInquiriesView() {
   const [openIds, setOpenIds] = useState<Record<number, boolean>>({});
 
   const params = useMemo(() => {
-    const productId = toIntOrUndef(productIdText);
-    const userId = toIntOrUndef(userIdText);
+    const productName = toTrimOrUndef(productNameText);
+    const userEmail = toTrimOrUndef(userEmailText);
     return {
-      productId,
-      userId,
+      productName,
+      userEmail,
       status: status.trim() ? status.trim() : undefined,
       page,
       size,
     };
-  }, [productIdText, userIdText, status, page, size]);
+  }, [productNameText, userEmailText, status, page, size]);
 
   const { data, isLoading, error, refetch, isFetching } = useAdminInquiries(params);
 
@@ -72,8 +69,8 @@ export default function ProductInquiriesView() {
   };
 
   const onClickReset = () => {
-    setProductIdText("");
-    setUserIdText("");
+    setProductNameText("");
+    setUserEmailText("");
     setStatus("");
     setPage(1);
     setSize(20);
@@ -202,13 +199,13 @@ export default function ProductInquiriesView() {
 
         <div className={styles.filtersGrid}>
           <label className={styles.field}>
-            <span className={styles.fieldLabel}>상품ID</span>
-            <input className={styles.input} value={productIdText} onChange={(e) => setProductIdText(e.target.value)} inputMode="numeric" />
+            <span className={styles.fieldLabel}>상품명</span>
+            <input className={styles.input} value={productNameText} onChange={(e) => setProductNameText(e.target.value)} />
           </label>
 
           <label className={styles.field}>
-            <span className={styles.fieldLabel}>사용자ID</span>
-            <input className={styles.input} value={userIdText} onChange={(e) => setUserIdText(e.target.value)} inputMode="numeric" />
+            <span className={styles.fieldLabel}>사용자 이메일</span>
+            <input className={styles.input} value={userEmailText} onChange={(e) => setUserEmailText(e.target.value)} />
           </label>
 
           <label className={styles.field}>
@@ -224,39 +221,6 @@ export default function ProductInquiriesView() {
               <option value="">전체</option>
               <option value="WAITING">WAITING</option>
               <option value="ANSWERED">ANSWERED</option>
-            </select>
-          </label>
-
-          <label className={styles.field}>
-            <span className={styles.fieldLabel}>페이지</span>
-            <input
-              className={styles.input}
-              value={String(page)}
-              onChange={(e) => {
-                const n = Number(e.target.value);
-                if (Number.isFinite(n)) setPage(Math.max(1, Math.floor(n)));
-              }}
-              inputMode="numeric"
-            />
-          </label>
-
-          <label className={styles.field}>
-            <span className={styles.fieldLabel}>사이즈</span>
-            <select
-              className={styles.select}
-              value={String(size)}
-              onChange={(e) => {
-                const n = Number(e.target.value);
-                if (Number.isFinite(n)) {
-                  setSize(n);
-                  setPage(1);
-                }
-              }}
-            >
-              <option value="10">10</option>
-              <option value="20">20</option>
-              <option value="50">50</option>
-              <option value="100">100</option>
             </select>
           </label>
 

@@ -25,7 +25,7 @@ function unwrapOrThrow<T>(res: ApiResponse<T>): T {
 
 export async function getAdminPointBalance(userId: number): Promise<AdminPointBalanceResponse> {
   const { data } = await mainAxios.get<ApiResponse<AdminPointBalanceResponse>>(
-    `/api/admin/points/users/${userId}/balance`
+    `/admin/points/users/${userId}/balance`
   );
   return unwrapOrThrow(data);
 }
@@ -35,7 +35,7 @@ export async function getAdminPointHistory(
   params: AdminPointHistoryParams
 ): Promise<AdminPageResponse<AdminPointHistoryItem>> {
   const { data } = await mainAxios.get<ApiResponse<AdminPageResponse<AdminPointHistoryItem>>>(
-    `/api/admin/points/users/${userId}/history`,
+    `/admin/points/users/${userId}/history`,
     { params }
   );
   return unwrapOrThrow(data);
@@ -46,7 +46,7 @@ export async function postAdminPointAdjust(
   body: AdminPointAdjustRequest
 ): Promise<null> {
   const { data } = await mainAxios.post<ApiResponse<null>>(
-    `/api/admin/points/users/${userId}/adjust`,
+    `/admin/points/users/${userId}/adjust`,
     body
   );
   return unwrapOrThrow(data);

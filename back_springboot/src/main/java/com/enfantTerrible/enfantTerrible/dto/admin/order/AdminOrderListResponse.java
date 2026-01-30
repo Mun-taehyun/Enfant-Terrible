@@ -11,6 +11,7 @@ public class AdminOrderListResponse {
 
   private Long orderId;
   private Long userId;
+  private String userEmail;
   private String orderCode;
   private String status;
   private Long totalAmount;

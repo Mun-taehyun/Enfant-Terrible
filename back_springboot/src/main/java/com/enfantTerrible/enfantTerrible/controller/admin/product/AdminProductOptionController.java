@@ -43,6 +43,14 @@ public class AdminProductOptionController {
     return ApiResponse.successMessage("옵션 그룹 수정 성공");
   }
 
+  @PutMapping("/groups/reorder")
+  public ApiResponse<Void> reorderGroups(
+      @RequestBody AdminProductOptionGroupReorderRequest req
+  ) {
+    optionService.reorderGroups(req);
+    return ApiResponse.successMessage("옵션 그룹 정렬 변경 성공");
+  }
+
   @DeleteMapping("/groups/{groupId}")
   public ApiResponse<Void> deleteGroup(
       @PathVariable Long groupId
@@ -63,6 +71,14 @@ public class AdminProductOptionController {
     );
   }
 
+  @GetMapping("/values/by-product")
+  public ApiResponse<?> valuesByProduct(@RequestParam Long productId) {
+    return ApiResponse.success(
+        optionService.getValuesByProductId(productId),
+        "옵션 값 조회 성공"
+    );
+  }
+
   @PostMapping("/values")
   public ApiResponse<Void> createValue(
       @RequestBody AdminProductOptionValueSaveRequest req
@@ -78,6 +94,14 @@ public class AdminProductOptionController {
   ) {
     optionService.updateValue(valueId, req);
     return ApiResponse.successMessage("옵션 값 수정 성공");
+  }
+
+  @PutMapping("/values/reorder")
+  public ApiResponse<Void> reorderValues(
+      @RequestBody AdminProductOptionValueReorderRequest req
+  ) {
+    optionService.reorderValues(req);
+    return ApiResponse.successMessage("옵션 값 정렬 변경 성공");
   }
 
   @DeleteMapping("/values/{valueId}")

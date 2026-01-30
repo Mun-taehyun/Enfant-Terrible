@@ -87,7 +87,7 @@ export default function OrdersView() {
   const [page, setPage] = useState<number>(1);
   const [size, setSize] = useState<number>(20);
 
-  const [keywordUserId, setKeywordUserId] = useState<string>("");
+  const [keywordUserEmail, setKeywordUserEmail] = useState<string>("");
   const [keywordOrderCode, setKeywordOrderCode] = useState<string>("");
 
   const [status, setStatus] = useState<AdminOrderStatus | "">("");
@@ -98,13 +98,13 @@ export default function OrdersView() {
     () => ({
       page,
       size,
-      userId: keywordUserId.trim() ? toInt(keywordUserId.trim(), 0) : undefined,
+      userEmail: keywordUserEmail.trim() ? keywordUserEmail.trim() : undefined,
       orderCode: keywordOrderCode.trim() ? keywordOrderCode.trim() : undefined,
       status: status ? status : undefined,
       sortBy,
       direction,
     }),
-    [page, size, keywordUserId, keywordOrderCode, status, sortBy, direction]
+    [page, size, keywordUserEmail, keywordOrderCode, status, sortBy, direction]
   );
 
   // selection
@@ -243,12 +243,12 @@ export default function OrdersView() {
 
           <div className={styles.controls}>
             <div className={styles.controlItem}>
-              <span className={styles.controlLabel}>회원번호</span>
+              <span className={styles.controlLabel}>이메일</span>
               <input
                 className={styles.input}
-                value={keywordUserId}
-                onChange={(e) => setKeywordUserId(e.target.value)}
-                placeholder="예: 1"
+                value={keywordUserEmail}
+                onChange={(e) => setKeywordUserEmail(e.target.value)}
+                placeholder="예: user@example.com"
               />
             </div>
 
@@ -361,7 +361,7 @@ export default function OrdersView() {
                       <span className={styles.orderCode}>{o.orderCode}</span>
                     </div>
                     <div className={styles.listSub}>
-                      <span>회원: {o.userId}</span>
+                      <span>이메일: {o.userEmail}</span>
                       <span>상태: {o.status}</span>
                       <span>금액: {fmtMoney(o.totalAmount)}원</span>
                     </div>
@@ -404,7 +404,7 @@ export default function OrdersView() {
                 <div className={styles.cardTitle}>주문 정보</div>
                 <div className={styles.infoTable}>
                   <InfoRow label="주문번호" value={order.orderId} />
-                  <InfoRow label="회원번호" value={order.userId} />
+                  <InfoRow label="이메일" value={order.userEmail} />
                   <InfoRow label="주문코드" value={order.orderCode} />
                   <InfoRow label="주문상태" value={order.status} />
                   <InfoRow label="결제금액" value={`${fmtMoney(order.totalAmount)}원`} />

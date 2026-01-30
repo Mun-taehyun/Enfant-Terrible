@@ -53,3 +53,13 @@ export type AdminCategoryUpdatePayload = {
   status?: CategoryStatus;
   parentId?: AdminCategoryId | null;
 };
+
+export type AdminCategoryReorderItem = {
+  categoryId: AdminCategoryId;
+  parentId: AdminCategoryId | null;
+  sortOrder: number;
+};
+
+export type AdminCategoryReorderPayload = {
+  items: AdminCategoryReorderItem[];
+};

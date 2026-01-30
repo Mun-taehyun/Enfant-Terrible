@@ -5,6 +5,7 @@ import {
   createAdminCategory,
   getAdminCategoryTree,
   moveAdminCategory,
+  reorderAdminCategories,
   softDeleteAdminCategory,
   updateAdminCategory,
   updateAdminCategoryActive,
@@ -15,6 +16,7 @@ import type {
   AdminCategory,
   CategoryActiveCode, // ✅ AdminCategoryActive -> CategoryActiveCode
   AdminCategoryCreatePayload,
+  AdminCategoryReorderPayload,
   AdminCategoryUpdatePayload,
 } from "@/types/admin/category";
 
@@ -84,6 +86,16 @@ export function useAdminCategorySoftDelete() {
   const qc = useQueryClient();
   return useMutation<void, Error, number>({
     mutationFn: (categoryId) => softDeleteAdminCategory(categoryId),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: QK.tree });
+    },
+  });
+}
+
+export function useAdminCategoryReorder() {
+  const qc = useQueryClient();
+  return useMutation<void, Error, AdminCategoryReorderPayload>({
+    mutationFn: (payload) => reorderAdminCategories(payload),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: QK.tree });
     },

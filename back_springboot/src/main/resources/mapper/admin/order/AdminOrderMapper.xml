@@ -8,8 +8,8 @@
   <sql id="adminOrderWhere">
     WHERE 1=1
 
-    <if test="req.userId != null">
-      AND o.user_id = #{req.userId}
+    <if test="req.userEmail != null and req.userEmail != ''">
+      AND u.email LIKE CONCAT('%', #{req.userEmail}, '%')
     </if>
 
     <if test="req.orderCode != null and req.orderCode != ''">
@@ -49,6 +49,7 @@
     SELECT
       o.order_id,
       o.user_id,
+      u.email AS user_email,
       o.order_code,
       o.order_status AS status,
       o.total_amount,
@@ -58,6 +59,7 @@
       o.shipped_at,
       o.delivered_at
     FROM et_order o
+    INNER JOIN et_user u ON u.user_id = o.user_id
     <include refid="adminOrderWhere" />
     ORDER BY
     <choose>
@@ -84,6 +86,7 @@
   <select id="countOrders" resultType="int">
     SELECT COUNT(*)
     FROM et_order o
+    INNER JOIN et_user u ON u.user_id = o.user_id
     <include refid="adminOrderWhere" />
   </select>
 
@@ -91,6 +94,7 @@
     SELECT
       o.order_id,
       o.user_id,
+      u.email AS user_email,
       o.order_code,
       o.order_status AS status,
       o.total_amount,
@@ -103,6 +107,7 @@
       o.shipped_at,
       o.delivered_at
     FROM et_order o
+    INNER JOIN et_user u ON u.user_id = o.user_id
     WHERE o.order_id = #{orderId}
   </select>
 

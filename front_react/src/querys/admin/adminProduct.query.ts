@@ -18,6 +18,7 @@ import {
   getAdminSkus,
   getAdminOptionGroups,
   getAdminOptionValues,
+  getAdminOptionValuesByProduct,
 } from "@/apis/admin/request/adminProduct.request";
 
 export const adminProductKeys = {
@@ -37,6 +38,9 @@ export const adminProductKeys = {
 
   optionValues: (groupId: number) =>
     [...adminProductKeys.root, "optionValues", groupId] as const,
+
+  optionValuesByProduct: (productId: number) =>
+    [...adminProductKeys.root, "optionValuesByProduct", productId] as const,
 };
 
 export function adminProductsListOptions(
@@ -108,5 +112,15 @@ export function adminOptionValuesOptions(
     queryKey: adminProductKeys.optionValues(groupId) as QueryKey,
     queryFn: () => getAdminOptionValues(groupId) as Promise<AdminOptionValueItem[]>,
     enabled: groupId > 0,
+  };
+}
+
+export function adminOptionValuesByProductOptions(
+  productId: number
+): UseQueryOptions<AdminOptionValueItem[], Error, AdminOptionValueItem[], QueryKey> {
+  return {
+    queryKey: adminProductKeys.optionValuesByProduct(productId) as QueryKey,
+    queryFn: () => getAdminOptionValuesByProduct(productId) as Promise<AdminOptionValueItem[]>,
+    enabled: productId > 0,
   };
 }

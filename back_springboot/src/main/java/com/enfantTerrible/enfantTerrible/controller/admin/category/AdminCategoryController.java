@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.enfantTerrible.enfantTerrible.common.response.ApiResponse;
 import com.enfantTerrible.enfantTerrible.dto.admin.category.AdminCategoryCreateRequest;
+import com.enfantTerrible.enfantTerrible.dto.admin.category.AdminCategoryReorderRequest;
 import com.enfantTerrible.enfantTerrible.dto.admin.category.AdminCategoryResponse;
 import com.enfantTerrible.enfantTerrible.dto.admin.category.AdminCategoryUpdateRequest;
 import com.enfantTerrible.enfantTerrible.service.admin.category.AdminCategoryService;
@@ -87,6 +88,14 @@ public class AdminCategoryController {
   ) {
     adminCategoryService.moveCategory(categoryId, parentId);
     return ApiResponse.successMessage("카테고리 이동 성공");
+  }
+
+  @PutMapping("/reorder")
+  public ApiResponse<Void> reorder(
+      @RequestBody AdminCategoryReorderRequest req
+  ) {
+    adminCategoryService.reorder(req);
+    return ApiResponse.successMessage("카테고리 정렬/레벨 변경 성공");
   }
 
   /**

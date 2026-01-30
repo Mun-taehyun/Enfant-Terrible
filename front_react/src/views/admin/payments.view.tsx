@@ -21,7 +21,7 @@ export default function PaymentsView() {
   const [page, setPage] = useState<number>(1);
   const [size, setSize] = useState<number>(20);
 
-  const [userId, setUserId] = useState<string>("");
+  const [userEmail, setUserEmail] = useState<string>("");
   const [orderId, setOrderId] = useState<string>("");
   const [orderCode, setOrderCode] = useState<string>("");
   const [paymentStatus, setPaymentStatus] = useState<string>("");
@@ -35,12 +35,12 @@ export default function PaymentsView() {
     return {
       page,
       size,
-      userId: toNumberOrUndef(userId),
+      userEmail: userEmail.trim() || undefined,
       orderId: toNumberOrUndef(orderId),
       orderCode: orderCode.trim() || undefined,
       paymentStatus: paymentStatus.trim() || undefined,
     };
-  }, [page, size, userId, orderId, orderCode, paymentStatus]);
+  }, [page, size, userEmail, orderId, orderCode, paymentStatus]);
 
   const listQ = useAdminPayments(params);
   const detailQ = useAdminPaymentDetail(selectedPaymentId);
@@ -55,7 +55,7 @@ export default function PaymentsView() {
   }
 
   function onReset() {
-    setUserId("");
+    setUserEmail("");
     setOrderId("");
     setOrderCode("");
     setPaymentStatus("");
@@ -106,12 +106,12 @@ export default function PaymentsView() {
       <section className={styles.filters}>
         <div className={styles.row}>
           <label className={styles.field}>
-            <span className={styles.label}>회원 ID</span>
+            <span className={styles.label}>회원 이메일</span>
             <input
               className={styles.input}
-              value={userId}
-              onChange={(e) => setUserId(e.target.value)}
-              placeholder="숫자"
+              value={userEmail}
+              onChange={(e) => setUserEmail(e.target.value)}
+              placeholder="user@example.com"
             />
           </label>
 

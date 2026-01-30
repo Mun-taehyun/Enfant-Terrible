@@ -6,6 +6,7 @@ import type {
   CategoryActiveCode, // ✅ "Y" | "N"
   AdminCategoryCreatePayload,
   AdminCategoryUpdatePayload,
+  AdminCategoryReorderPayload,
 } from "@/types/admin/category";
 import type { ApiResponse } from "@/types/admin/api";
 
@@ -70,4 +71,8 @@ export async function moveAdminCategory(categoryId: number, parentId: number | n
 export async function softDeleteAdminCategory(categoryId: number): Promise<void> {
   // ✅ 운영 백: DELETE /{id}
   await mainAxios.delete<ApiResponse<null>>(`${BASE}/${categoryId}`);
+}
+
+export async function reorderAdminCategories(payload: AdminCategoryReorderPayload): Promise<void> {
+  await mainAxios.put<ApiResponse<null>>(`${BASE}/reorder`, payload);
 }

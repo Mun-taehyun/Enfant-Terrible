@@ -3,8 +3,8 @@ export type AdminProductInquiryStatus = string;
 // 예: "WAITING" | "ANSWERED" 등 (백 enum 확정되면 union으로 잠그세요)
 
 export type AdminProductInquiryListParams = {
-  productId?: number | null;
-  userId?: number | null;
+  productName?: string | null;
+  userEmail?: string | null;
   status?: string | null;
   page?: number; // default 1
   size?: number; // default 20

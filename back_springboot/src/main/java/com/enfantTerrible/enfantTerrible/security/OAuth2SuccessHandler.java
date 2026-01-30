@@ -46,11 +46,13 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     // 2️⃣ 사용자 정보 추출
     Long userId = oAuth2User.getUserId();
+    String email = oAuth2User.getEmail();
     UserRole role = oAuth2User.getRole();
+    com.enfantTerrible.enfantTerrible.common.enums.UserStatus status = oAuth2User.getStatus();
 
     // 3️⃣ Access Token 발급 (refresh token 미사용)
     String accessToken =
-      jwtTokenProvider.createAccessToken(userId, role);
+      jwtTokenProvider.createAccessToken(userId, email, role, status);
 
     // 4️⃣ Redirect URL 생성
     // 프론트 예: /oauth/callback?accessToken=xxx

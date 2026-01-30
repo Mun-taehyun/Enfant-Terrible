@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.enfantTerrible.enfantTerrible.common.enums.UserRole;
+import com.enfantTerrible.enfantTerrible.common.enums.UserStatus;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -38,6 +39,20 @@ public class JwtTokenProvider {
     return Jwts.builder()
       .setSubject(String.valueOf(userId))
       .claim("role", role.name())       // USER / ADMIN
+      .claim("typ", "ACCESS")
+      .setIssuedAt(new Date(now))
+      .setExpiration(new Date(now + accessTokenValidityMs))
+      .signWith(key, SignatureAlgorithm.HS256)
+      .compact();
+  }
+
+  public String createAccessToken(Long userId, String email, UserRole role, UserStatus status) {
+    long now = System.currentTimeMillis();
+    return Jwts.builder()
+      .setSubject(String.valueOf(userId))
+      .claim("email", email)
+      .claim("role", role.name())       // USER / ADMIN
+      .claim("status", status.name())   // ACTIVE / SUSPENDED ...
       .claim("typ", "ACCESS")
       .setIssuedAt(new Date(now))
       .setExpiration(new Date(now + accessTokenValidityMs))
@@ -85,6 +100,16 @@ public class JwtTokenProvider {
   public String getRole(String token) {
     Object role = parseClaims(token).get("role");
     return role == null ? null : String.valueOf(role);
+  }
+
+  public String getEmail(String token) {
+    Object email = parseClaims(token).get("email");
+    return email == null ? null : String.valueOf(email);
+  }
+
+  public String getStatus(String token) {
+    Object status = parseClaims(token).get("status");
+    return status == null ? null : String.valueOf(status);
   }
 
   public String getTokenType(String token) {

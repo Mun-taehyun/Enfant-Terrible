@@ -8,8 +8,8 @@
   <sql id="adminPaymentWhere">
     WHERE 1=1
 
-    <if test="req.userId != null">
-      AND o.user_id = #{req.userId}
+    <if test="req.userEmail != null and req.userEmail != ''">
+      AND u.email LIKE CONCAT('%', #{req.userEmail}, '%')
     </if>
 
     <if test="req.orderId != null">
@@ -55,6 +55,7 @@
       p.created_at
     FROM et_payment p
     JOIN et_order o ON o.order_id = p.order_id
+    JOIN et_user u ON u.user_id = o.user_id
     <include refid="adminPaymentWhere" />
     ORDER BY
     <choose>
@@ -74,6 +75,7 @@
     SELECT COUNT(*)
     FROM et_payment p
     JOIN et_order o ON o.order_id = p.order_id
+    JOIN et_user u ON u.user_id = o.user_id
     <include refid="adminPaymentWhere" />
   </select>
 
