@@ -46,7 +46,7 @@ export default function ProductFilterCard () {
                             {
                             (category.children ?? []).map((sub : CategoryChildItem) => (
                                 <div key={sub.categoryId} className="sub-item" onClick={() => SideCategoryEventHandler(sub.categoryId)}>
-                                    {sub.name} ({sub.children.length})
+                                    {sub.name}
                                 </div>
                             ))}
                             </div>

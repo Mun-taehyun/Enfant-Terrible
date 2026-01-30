@@ -2,7 +2,7 @@ import './style.css';
 
 
 interface WidgetHomeProps {
-  onStartChat: () => void;
+  onStartChat: (e: React.MouseEvent) => void;
 }
 
 export default function ChatWait({ onStartChat }: WidgetHomeProps) {

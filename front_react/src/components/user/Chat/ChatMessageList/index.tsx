@@ -5,6 +5,7 @@ import { ChatMessageItem } from '@/apis/user/response/qna/qna-message-response.d
 import { useQueryClient } from '@tanstack/react-query';
 import { qnaKeys } from '@/querys/user/keys/key';
 import { qnaQueries } from '@/querys/user/queryhooks';
+import './style.css';
 
 interface ChatRoomProps {
   roomId: number;
@@ -62,7 +63,7 @@ export default function ChatRoom({ roomId, onBack }: ChatRoomProps) {
     const client = new Client({
       brokerURL: 'ws://localhost:8080/ws',
       connectHeaders: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
       },
       onConnect: () => {
         console.log('STOMP Connected');

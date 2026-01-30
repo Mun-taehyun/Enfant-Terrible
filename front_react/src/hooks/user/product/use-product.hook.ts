@@ -125,6 +125,7 @@ export const useProduct = () => {
     //이벤트핸들러 : 정렬 이벤트 처리 
     const sortChangeEventHandler = (sortValue : string) => {
         setCurrentSort(sortValue); // 이 호출 하나로 useQuery가 다시 실행됨
+        updateSearchFilter({sort: String(sortValue)})
     };
 
 
