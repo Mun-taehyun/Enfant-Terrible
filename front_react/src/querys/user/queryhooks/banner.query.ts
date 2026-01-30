@@ -9,6 +9,7 @@ export const bannerQueries = {
         return useQuery({
             queryKey: bannerKeys.lists(),
             queryFn: getBannerListRequest,
+            select: (data) => ({ bannerList: Array.isArray(data) ? data : [] })
         })
     },
 };

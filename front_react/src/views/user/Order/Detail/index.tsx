@@ -1,17 +1,24 @@
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { orderQueries } from '@/querys/user/queryhooks'; // 쿼리 팩토리 경로
+import './style.css';
+import { USER_PATH } from '@/constant/user/route.index';
 
 export default function OrderDetailView() {
   const { orderId } = useParams<{ orderId: string }>();
 
   // 1. 리액트 쿼리로 데이터 직접 조회
-  const { data: orderData, isLoading, isError } = orderQueries.useGetOrderMyDetail(Number(orderId));
+  const { data: orderData} = orderQueries.useGetOrderMyDetail(Number(orderId));
 
-  if (isLoading) return <div className="loading-state">데이터를 불러오는 중...</div>;
-  if (isError || !orderData) return <div className="error-state">주문 정보를 찾을 수 없습니다.</div>;
+  //함수 : 네비
+  const navigate = useNavigate();
+
 
   const formatDate = (date: string | null) => 
     date ? date.replace('T', ' ').substring(0, 16).replace(/-/g, '.') : '-';
+
+  const onClickUserPage = () => {
+    navigate(USER_PATH());
+  }
 
   return (
     <div className="order-detail-container">
@@ -19,8 +26,8 @@ export default function OrderDetailView() {
       <div className="detail-header">
         <div className="header-title">주문 상세 내역</div>
         <div className="header-meta">
-          <div className="meta-item">주문번호: <strong>{orderData.orderCode}</strong></div>
-          <div className="meta-item">주문일시: {formatDate(orderData.orderedAt)}</div>
+          <div className="meta-item">주문번호: <strong>{orderData?.orderCode}</strong></div>
+          <div className="meta-item">주문일시: {formatDate(orderData ? orderData.orderedAt : "시간을 불러올 수가 없습니다.")}</div>
         </div>
       </div>
 
@@ -28,7 +35,7 @@ export default function OrderDetailView() {
       <div className="detail-section">
         <div className="section-title">주문 상품 정보</div>
         <div className="product-list">
-          {orderData.items.map((item) => (
+          {orderData?.items.map((item) => (
             <div key={item.skuId} className="product-card">
               <div className="product-main">
                 <div className="product-name">{item.productName}</div>
@@ -36,7 +43,7 @@ export default function OrderDetailView() {
               </div>
               <div className="product-price">
                 <div className="current-price">{(item.price * item.quantity).toLocaleString()}원</div>
-                <div className="status-text">{orderData.status}</div>
+                <div className="status-text">{orderData?.status}</div>
               </div>
             </div>
           ))}
@@ -49,21 +56,21 @@ export default function OrderDetailView() {
         <div className="info-grid">
           <div className="info-row">
             <div className="info-label">받는 분</div>
-            <div className="info-value">{orderData.receiverName}</div>
+            <div className="info-value">{orderData?.receiverName}</div>
           </div>
           <div className="info-row">
             <div className="info-label">연락처</div>
-            <div className="info-value">{orderData.receiverPhone}</div>
+            <div className="info-value">{orderData?.receiverPhone}</div>
           </div>
           <div className="info-row">
             <div className="info-label">배송주소</div>
             <div className="info-value">
-              ({orderData.zipCode}) {orderData.addressBase} {orderData.addressDetail}
+              ({orderData?.zipCode}) {orderData?.addressBase} {orderData?.addressDetail}
             </div>
           </div>
           <div className="info-row">
             <div className="info-label">송장번호</div>
-            <div className="info-value">{orderData.trackingNumber || '배송 준비 중'}</div>
+            <div className="info-value">{orderData?.trackingNumber || '배송 준비 중'}</div>
           </div>
         </div>
       </div>
@@ -74,17 +81,17 @@ export default function OrderDetailView() {
         <div className="payment-box">
           <div className="payment-row">
             <div className="payment-label">주문 금액</div>
-            <div className="payment-value">{orderData.totalAmount.toLocaleString()}원</div>
+            <div className="payment-value">{orderData?.totalAmount.toLocaleString()}원</div>
           </div>
           <div className="payment-row total">
             <div className="total-label">총 결제 금액</div>
-            <div className="total-value">{orderData.totalAmount.toLocaleString()}원</div>
+            <div className="total-value">{orderData?.totalAmount.toLocaleString()}원</div>
           </div>
         </div>
       </div>
 
       <div className="bottom-actions">
-        <div className="back-button" onClick={() => window.history.back()}>목록으로 돌아가기</div>
+        <div className="back-button" onClick={() => onClickUserPage()}>목록으로 돌아가기</div>
       </div>
     </div>
   );

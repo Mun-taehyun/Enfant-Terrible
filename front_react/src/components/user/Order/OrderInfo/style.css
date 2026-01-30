@@ -100,3 +100,13 @@
   padding: 2px 8px;
   border-radius: 4px;
 }
+
+
+/* 상품이 없을 때 나오는 메시지 중앙 정렬 */
+.empty-message {
+    grid-column: 1 / -1; /* Grid일 경우 전체 칸을 다 차지하게 함 */
+    text-align: center;
+    padding: 80px 0;
+    color: #999;
+    font-size: 16px;
+}

@@ -2,6 +2,7 @@ import { usePopupControl } from "@/hooks/user/popup/use-popup-controller";
 import type {PopupItem} from "@/types/user/interface";
 // import dayjs, { Dayjs } from "dayjs";
 import { createPortal } from "react-dom";
+import './style.css';
 
 
 interface Prop {
@@ -12,37 +13,47 @@ interface Prop {
 
 export default function Popup( {popupItem} : Prop) {
 
-    //속성 : 인터페이스 "하나의 객체만 생각 => 이미 App.tsx에서 걸러짐"
-    const {title, content, linkUrl, imageUrl} = popupItem;//구 .분 .할
+const { title, content, linkUrl, imageUrl, width, height, position } = popupItem;
+    const { isPopup, popupCloseTime } = usePopupControl();
 
-    //상태 : 팝업창을 닫는 상태변수 (접속 시 10분정도 / 재접속 시 뜸 ) => 사용자 관리
-    const {isPopup, popupCloseTime} = usePopupControl();
-        //팝업on/off 여부,  //팝업닫는시간 여부
-
-
-    //이벤트핸들러 : 광고 팝업 클릭 시 해당 링크로 이동하는 이벤트 처리
     const PopupLinkEventHandler = () => {
-        window.open(linkUrl, "_blank")
-    }//광고 사이트로 새창을 띄운다.. 
-
-
-
-
+        if (linkUrl) window.open(linkUrl, "_blank");
+    };
 
     if (!isPopup) return null;
+
+    // 이미지 경로에 서버 주소가 없다면 `${process.env.REACT_APP_API_URL}${imageUrl}` 형태로 수정 필요
+    const fullImageUrl = imageUrl && imageUrl.startsWith('http') 
+        ? imageUrl 
+        : imageUrl 
+            ? `http://localhost:8080${imageUrl}` 
+            : ""; // 이미지가 아예 없으면 빈 문자열 처리
+
     return createPortal(
-        <div id="popup-container">
-            <div className="popup-title-box">{title}</div>
-            <div className="popup-content-box">{content}</div>
-            <div className="popup-image-box">
-                <img src={imageUrl} style={{cursor: 'pointer'}} onClick={PopupLinkEventHandler}/>
-                <button onClick={() => popupCloseTime(10)}>
-                    10분 동안 닫기
-                </button>
+        <div className={`popup-overlay ${position}`}>
+            <div className="popup-wrapper" style={{ width: `${width}px` }}>
+                {/* 헤더: 제목 */}
+                <div className="popup-header">
+                    <h3>{title}</h3>
+                    <button className="close-x" onClick={() => popupCloseTime(0)}>✕</button>
+                </div>
+
+                {/* 바디: 이미지 & 내용 */}
+                <div className="popup-body" onClick={PopupLinkEventHandler} style={{ cursor: 'pointer' }}>
+                    <img src={fullImageUrl} alt={title} style={{ height: `${height}px` }} />
+                    {content && <div className="popup-text-content">{content}</div>}
+                </div>
+
+                {/* 푸터: 닫기 버튼 */}
+                <div className="popup-footer">
+                    <button className="btn-time-close" onClick={() => popupCloseTime(10)}>
+                        10분 동안 보지 않기
+                    </button>
+                    <button className="btn-close" onClick={() => popupCloseTime(0)}>닫기</button>
+                </div>
             </div>
         </div>,
         document.body
-        //창의 어디에나 들어올 수 있게.. 
     );
 }
 

@@ -43,6 +43,9 @@ export default function ProductDetail() {
     const {data : inquiryData} = inquiryQueries.useGetInquiries(product, Number(searchParams.get("page")), 5); 
 
 
+    // 이미지 경로에 서버 주소가 없다면 `${process.env.REACT_APP_API_URL}${imageUrl}` 형태로 수정 필요
+    const fullImageUrl = productDetail?.thumbnailUrl.startsWith('http') ? productDetail?.thumbnailUrl : `http://localhost:8080${productDetail?.thumbnailUrl}`;
+
     if(!productDetail) return;
     //렌더 : 제품 상세페이지
     return (
@@ -52,7 +55,7 @@ export default function ProductDetail() {
                 {/* 왼쪽: 이미지 영역 */}
                 <div className="product-visual">
                     <div className="main-image-wrapper">
-                        <img src={productDetail.thumbnailUrl} alt={productDetail.name} />
+                        <img src={fullImageUrl} alt={productDetail.name} />
                     </div>
                 </div>
 

@@ -10,7 +10,8 @@ export const productQueries = {
         return useQuery({
             queryKey: productKeys.list(params),
             queryFn: () => getProductListRequest(params),
-            select: (data) => data.productList,
+            // select: (data) => data.productList,
+            select: (data) => ({ productList: Array.isArray(data) ? data : [] })
         });
     },
 
@@ -39,7 +40,8 @@ export const productQueries = {
         return useQuery({
             queryKey: productKeys.recommendation(),
             queryFn: () => getProductRecommendationRequest(),
-            select: (data) => data.productList,
+            // select: (data) => data.productList,
+            select: (data) => ({ productList: Array.isArray(data) ? data : [] })
         });
     },
 };

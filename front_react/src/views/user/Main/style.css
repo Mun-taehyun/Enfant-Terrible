@@ -1,3 +1,69 @@
+/* 섹션 전체를 감싸는 컨테이너 */
+.section-container {
+    padding: 60px 0;
+    border-bottom: 1px solid #f0f0f0; /* 너무 진한 선 대신 연한 선 사용 */
+}
+
+/* 제목: 폰트 두께와 자간 조절만으로도 느낌이 확 삽니다 */
+.section-title {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -1px; /* 자간을 살짝 좁히면 더 고급스러워요 */
+    margin-bottom: 40px;
+    color: #222;
+}
+
+/* 상품이 없을 때 나오는 메시지 중앙 정렬 */
+.empty-message {
+    grid-column: 1 / -1; /* Grid일 경우 전체 칸을 다 차지하게 함 */
+    text-align: center;
+    padding: 80px 0;
+    color: #999;
+    font-size: 16px;
+}
+
+/* 상품 리스트 컨테이너 (2x5 배열) */
+.main-recommend-product-container,
+.main-product-container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); 
+    gap: 30px 20px; /* 위아래 간격을 좌우보다 조금 더 넓게 */
+    max-width: 1200px;
+    margin: 0 auto;
+    min-height: 200px; /* 상품이 없어도 최소 높이를 유지해서 휑함을 방지 */
+}
+
+.section-divider {
+    border-top: 1px solid #e0e0e0; /* 구분선 색상 */
+    margin: 60px auto 20px;        /* 상단 여백을 크게 주어 섹션 분리 */
+    width: 80%;                    /* 선 길이 */
+}
+
+
+/* 페이지네이션 정렬 */
+.pagination-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+    margin-bottom: 100px;
+}
+
+/* 반응형 처리 (선택사항: 화면이 작아지면 5줄은 너무 좁으므로) */
+@media (max-width: 1024px) {
+    .main-recommend-product-container,
+    .main-product-container {
+        grid-template-columns: repeat(3, 1fr); /* 태블릿에선 3열 */
+    }
+}
+
+@media (max-width: 600px) {
+    .main-recommend-product-container,
+    .main-product-container {
+        grid-template-columns: repeat(2, 1fr); /* 모바일에선 2열 */
+    }
+}
+
 .main-page {
   position: relative;
 }

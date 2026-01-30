@@ -1,5 +1,5 @@
 import CategoryItemList from "@/components/user/CategoryItemList";
-import { AUTH_LOGIN_PATH, AUTH_PATH, CART_PATH, MAIN_PATH,USER_PATH } from "@/constant/user/route.index";
+import { AUTH_LOGIN_PATH, AUTH_PATH, CART_PATH, MAIN_PATH,POST_PATH,USER_PATH } from "@/constant/user/route.index";
 import { useEffect, useRef, useState, type ChangeEvent, type KeyboardEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import './style.css';
@@ -59,6 +59,11 @@ export default function Header() {
         navigate(USER_PATH());
     }
 
+    //이벤트핸들러 : 공지사항 버튼 클릭 이벤트 처리
+    const onClickNoticeEventHandler = () => {
+        navigate(POST_PATH());
+    }
+
 //=====================================  검색 내부 컴포넌트 ==============================
     // 컴포넌트 : 검색버튼
     const SearchButton = () => {
@@ -72,10 +77,6 @@ export default function Header() {
 
         //참조 : 검색 버튼 요소
         const searchButtonRef = useRef<HTMLDivElement | null>(null);
-
-        //상태 : 검색버튼
-        const [status, setStatus] = useState<boolean>(false);//useState에는 boolean 자료형만 담김
-            //검색버튼에 따라 검색창이 뜰 지 말 지 결정?
 
         //상태 : 검색어 입력값받기
         const [keyword, setKeyword] = useState<string>('');
@@ -103,11 +104,6 @@ export default function Header() {
 
         //이벤트 핸들러: 검색버튼 클릭 이벤트 처리 함수
         const onSearchButtonClickHandler = () => {
-            if(!status) {
-                setStatus(!status);
-                return;
-            } // status false 라면 => true로 상태를 바꾸고. 
-            //status true에서 누르면 
             updateSearchFilter({
                 keyword,
                 categoryId: "",
@@ -121,20 +117,11 @@ export default function Header() {
         useEffect(() => {
             if(keyword) {
                 setKeyword(keyword);
-                setStatus(true);
             }
         }, [keyword])
         //searchWord가 변할 때마다 실행된다
 
-
-        if (!status)
-        // 렌더링 : 검색 버튼 false 상태
-        return (
-            <button className='search-action-button' onClick={onSearchButtonClickHandler}>
-                <span className='button-label'>검색</span>
-            </button>
-        );
-        // 렌더링 : 검색 버튼 true 상태
+        // 렌더링 : 검색 버튼
         return (
             <div className='header-search-input-box'>
                 <input className='header-search-input' type='text' placeholder='검색어를 입력해주세요' value={keyword} onChange={onSearchWordChangeHandler} onKeyDown={(event) => onSearchKeyDownEventHandler(event)}/>
@@ -154,6 +141,11 @@ export default function Header() {
                     <div className="header-logo-content">{'앙팡테리블'}</div>
                 </div>
                 <SearchButton />
+                <div className="header-main-post-box">
+                    <div className='search-action-button' onClick={onClickNoticeEventHandler}>
+                        <span className="button-label">공지사항</span>
+                    </div>
+                </div>
                 {token !== null ?
                 <div className="header-main-button-box">
                     <div className="header-main-button-cart" onClick={onCartButtonClickEventHandler}>{'장바구니'}</div>

@@ -1,58 +1,68 @@
+/* 전체 배너 컨테이너 */
 .banner-container {
     position: relative;
     width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
+    max-width: 1200px; /* 프로젝트 폭에 맞춰 조절 */
+    margin: 20px auto;
+    border-radius: 16px;
+    overflow: hidden;
+    background-color: #f0f0f0;
 }
 
-/* 실제로 보이는 영역 */
+/* 슬라이더 뷰포트 */
 .banner-wrapper {
     width: 100%;
-    height: 280px;
+    height: 350px; /* 배너 높이 고정 */
     overflow: hidden;
-    border-radius: 8px;
 }
 
-/* 이동하는 트랙 */
+/* 움직이는 트랙 */
 .banner-track {
     display: flex;
     width: 100%;
     height: 100%;
-    transition: transform 0.4s ease;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* 좌우 네비게이션 버튼 공통 */
+/* 내비게이션 버튼 (화살표) */
 .banner-nav {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    z-index: 10;
-
-    width: 40px;
-    height: 40px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
-
-    border: none;
-    background: rgba(0, 0, 0, 0.5);
-    color: #ffffff;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(8px); /* 뒤가 비치는 효과 */
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
     font-size: 24px;
-    line-height: 40px;
-    text-align: center;
-
     cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
 }
 
-/* 왼쪽 버튼 */
-.banner-nav.prev {
-    left: -20px;
-}
 
-/* 오른쪽 버튼 */
-.banner-nav.next {
-    right: -20px;
-}
 
 /* hover 효과 */
 .banner-nav:hover {
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(255, 255, 255, 0.4);
+    scale: 1.1;
+}
+
+.banner-nav.prev { left: 20px; }
+.banner-nav.next { right: 20px; }
+
+
+.banner-trank {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #999;
+    font-size: 14px;
 }

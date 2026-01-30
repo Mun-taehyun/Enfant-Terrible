@@ -2,6 +2,7 @@ import { CartCard } from "@/components/user/CartCard";
 import { useCart } from "@/hooks/user/cart/use-cart.hook";
 import { useMemo } from "react";
 import './stlye.css';
+import { CartItem } from "@/apis/user/response/cart/cart-item-response.dto";
 
 export const Cart = () => {
 
@@ -41,7 +42,7 @@ export const Cart = () => {
             </div>
 
             <div className="cart-list">
-                {items?.map((item) => ( //장바구니 개수가 궁금 => cartItemId를 쓰는게 당연
+                {items?.map((item : CartItem) => ( //장바구니 개수가 궁금 => cartItemId를 쓰는게 당연
                     <CartCard 
                         key={item.cartItemId}
                         item={item}

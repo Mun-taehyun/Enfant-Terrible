@@ -1,84 +1,112 @@
-/* 팝업 전체 컨테이너 (고정 위치 및 스타일) */
-#popup-container {
+
+
+/* 1. 팝업 전체 컨테이너 */
+.popup-overlay {
     position: fixed;
-    bottom: 30px; /* 화면 우측 하단 배치 (원하는 위치로 수정 가능) */
-    right: 30px;
-    width: 320px;
-    background-color: #ffffff;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-    border-radius: 12px;
+    z-index: 9999;
+    pointer-events: none; /* 레이어 간섭 방지 */
+}
+
+/* 위치 클래스 (예시) */
+.popup-overlay.center { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+
+.popup-wrapper {
+    background: #ffffff;
+    border-radius: 20px;
     overflow: hidden;
-    z-index: 9999; /* 최상단 유지 */
-    border: 1px solid #eeeeee;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     display: flex;
     flex-direction: column;
-    animation: popup-slide-up 0.4s ease-out; /* 등장 애니메이션 */
+    pointer-events: auto; /* 내부 요소 클릭 가능 */
+    
+    /* [수정] style로 들어오는 width에 맞게 너비 고정 */
+    max-width: 95vw; /* 화면보다 커지는 것 방지 */
 }
 
-/* 팝업 제목 영역 */
-.popup-title-box {
-    padding: 16px;
-    font-size: 16px;
+/* 2. 상단 헤더 */
+.popup-header {
+    padding: 14px 20px;
+    background: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #f1f3f5;
+}
+
+.popup-header h3 {
+    font-size: 15px;
     font-weight: 700;
     color: #1a1a1a;
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #efefef;
-    text-align: center;
+    margin: 0;
+    /* 제목이 길어지면 말줄임 처리 */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-/* 팝업 내용/텍스트 영역 */
-.popup-content-box {
-    padding: 14px 16px;
-    font-size: 14px;
-    color: #444444;
-    line-height: 1.5;
-    text-align: center;
-    word-break: keep-all;
-}
-
-/* 이미지 및 하단 버튼 영역 */
-.popup-image-box {
-    position: relative;
-    width: 100%;
-}
-
-/* 팝업 이미지 */
-.popup-image-box img {
-    width: 100%;
-    display: block;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-}
-
-.popup-image-box img:hover {
-    transform: scale(1.02); /* 살짝 커지는 효과 */
-}
-
-/* "10분 동안 닫기" 버튼 */
-.popup-image-box button {
-    width: 100%;
-    padding: 12px 0;
-    background-color: #333333;
-    color: #ffffff;
+.close-x {
+    background: none;
     border: none;
-    font-size: 13px;
-    font-weight: 500;
+    font-size: 20px;
+    color: #adb5bd;
     cursor: pointer;
-    transition: background-color 0.2s;
+    line-height: 1;
 }
 
-.popup-image-box button:hover {
-    background-color: #000000;
+/* 3. 이미지 바디 (너비/높이 대응 핵심) */
+.popup-body {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #fff;
 }
 
-/* 등장 애니메이션 정의 */
-@keyframes popup-slide-up {
-    from {
-        transform: translateY(20px);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
+.popup-body img {
+    /* [수정] 인라인 height가 적용되어도 가로 세로 비율 유지 */
+    width: 100%; 
+    max-width: 100%;
+    border-radius: 12px;
+    object-fit: contain; /* [중요] 설정한 height 내에서 이미지가 안 잘리게 함 */
+    display: block;
+    background-color: #f8f9fa; /* 이미지 로딩 전이나 여백 대비 */
+}
+
+.popup-text-content {
+    margin-top: 12px;
+    font-size: 14px;
+    color: #495057;
+    text-align: center;
+    width: 100%;
+    word-break: break-word; /* 긴 텍스트 줄바꿈 */
+}
+
+/* 4. 푸터 버튼 */
+.popup-footer {
+    display: flex;
+    gap: 8px;
+    padding: 8px 16px 16px;
+}
+
+.popup-footer button {
+    height: 44px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+
+.btn-time-close {
+    background: #f1f3f5;
+    color: #495057;
+    flex: 1.4;
+}
+
+.btn-close {
+    background: #222;
+    color: #fff;
+    flex: 1;
 }

@@ -11,6 +11,7 @@ export const popupQueries = {
         return useQuery({
             queryKey: popupKeys.lists(),
             queryFn: getPopupListRequest,
+            select: (data) => ({ popupList: Array.isArray(data) ? data : [] })
         });
     }
 };

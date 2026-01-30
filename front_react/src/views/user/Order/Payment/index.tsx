@@ -27,17 +27,18 @@ export default function OrderPreparePage() {
     //상태: 결제방식 선택 
     const [paymentMethod, setPaymentMethod] = useState<string>('');
 
-    if(!cartData || !directData) return;
+
+    
     return (
         <div className="order-prepare-page">
-            <OrderUser order={cartData || directData} />
-            <OrderInfo items={cartData.items || directData.items} />
+            <OrderUser order={(cartData ? cartData : null) || (directData ? directData : null)} />
+            <OrderInfo items={(cartData ? cartData.items : null) || (directData ? directData.items : null)} />
             <PaymentMethodSelector selected={paymentMethod} onChange={setPaymentMethod}/>
 
             <OrderLast
-                totalAmount={cartData.totalAmount || directData.totalAmount}
+                totalAmount={(cartData ? cartData.totalAmount: null) || (directData ? directData.totalAmount : null)}
                 paymentMethod={paymentMethod}
-                isBuyable={(cartData || directData).items.every(item => item.isBuyable)}
+                isBuyable={(cartData ? cartData.items.every(item => item.isBuyable) : null) || (directData ? directData.items.every(item => item.isBuyable) : null)}
             />
         </div>
     );

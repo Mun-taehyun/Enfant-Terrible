@@ -2,7 +2,7 @@ import { OrderPrepareItem } from "@/apis/user/response/order/order-prepare-respo
 
 
 //컴포넌트 : 상품 주문 리스트 
-export default function OrderInfo({ items }: { items: OrderPrepareItem[] }) {
+export default function OrderInfo({ items }: { items: OrderPrepareItem[] | null }) {
 
     //렌더 : 상품 주문 리스트 
     return (
@@ -10,7 +10,7 @@ export default function OrderInfo({ items }: { items: OrderPrepareItem[] }) {
             <div className="order-list-title">주문 상품</div>
 
             <div className="order-list-items">
-                {items.map(item => ( //상품 리스트 .. 
+                {items ? items.map(item => ( //상품 리스트 .. 
                     <div key={item.skuId}
                         className={`order-item ${!item.isBuyable ? 'disabled' : ''}`}>
                         <div className="order-item-thumbnail"><img src={item.thumbnailUrl} /></div>
@@ -25,7 +25,9 @@ export default function OrderInfo({ items }: { items: OrderPrepareItem[] }) {
                             </div>
                         )}
                     </div>
-                ))}
+                )) :
+                    <div className="empty-message"> 주문하는 상품이 없습니다. </div>
+                }
             </div>
         </div>
     );

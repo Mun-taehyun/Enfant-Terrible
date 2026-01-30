@@ -1,6 +1,12 @@
 import OptionValue from "@/types/user/interface/option-value.interface";
 
 export default interface CartItemResponseDto {
+    cartList : CartItem[];
+}
+
+
+
+export interface CartItem {
     cartItemId : number;        //장바구니 pk
     skuId : number;             //sku pk
     productId : number;         //제품 pk
@@ -15,5 +21,4 @@ export default interface CartItemResponseDto {
 
     isBuyable : boolean;            //결제 가능 여부 
     buyableReason : string;         //구매 불가능 시 이유 (재고부족 등..)
-
 }

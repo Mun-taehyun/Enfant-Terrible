@@ -33,17 +33,16 @@ import QnaRoomsView from './views/admin/QnaRoomsView';
 import QnaMessagesView from './views/admin/QnaMessagesView';
 import RecommendationsView from './views/admin/RecommendationsView';
 import OrdersView from './views/admin/orders.view';
+import { PopupItem } from './types/user/interface';
 
 
 
 function App() {
 
   //쿼리: 사용 활성화된 광고팝업 캐싱 
-  const {data : popupData, isLoading : isPopupLoading } = popupQueries.usePopup();
+  const {data : popupData} = popupQueries.usePopup();
 
   const popupArray = popupData?.popupList ?? [];
-
-  if (isPopupLoading) return <div> 팝업 업로드 중 </div>
 
   
   return (
@@ -72,7 +71,7 @@ function App() {
     //      장바구니페이지 /cart        
 
     <>
-    {popupArray.map((item) => (<Popup key={item.popupId} popupItem={item} />))}
+    {popupArray.map((item : PopupItem) => (<Popup key={item.popupId} popupItem={item} />))}
 
     <Routes>
       <Route element={<UserContainer/>}>
@@ -86,15 +85,14 @@ function App() {
         
         <Route path={USER_PATH()} element={<UserPage />}/>
         <Route path={USER_PATH() + USER_UPDATE_PATH(':userId')} element={<UserUpdate />} />
-        <Route path={PRODUCT_PATH()} element={<ProductFilter />} >
-          <Route path={PRODUCT_PATH() + PRODUCT_DETAIL_PATH(":productId")} element={<ProductDetail />} />
-        </Route>
+        <Route path={PRODUCT_PATH()} element={<ProductFilter />} />
+        <Route path={PRODUCT_PATH() + PRODUCT_DETAIL_PATH(":productId")} element={<ProductDetail />} />
         <Route path={POST_PATH()} element={<PostList />}> 
           <Route path={POST_PATH() + "/" +POST_DETAIL_PATH(':postId')} element={<PostDetailPage/>} />
         </Route>
         <Route path={ORDER_PATH()} >
-          <Route path={ORDER_PATH() + "/" + ORDER_DETAIL_PATH(':orderId')} element={<OrderDetailView/>} />
-          <Route path={ORDER_PATH() + "/" + ORDER_PAYLOAD_PATH()} element={<OrderPreparePage/>} />                          
+          <Route path={ORDER_PATH() + "/" + ORDER_PAYLOAD_PATH()} element={<OrderPreparePage/>} />
+          <Route path={ORDER_PATH() + "/" + ORDER_DETAIL_PATH(':orderId')} element={<OrderDetailView/>} />                          
         </Route>
         <Route path={CART_PATH()} element={<Cart/>}/>
         <Route path={POINT_PATH()} element={<PointHistoryPage/>}/>

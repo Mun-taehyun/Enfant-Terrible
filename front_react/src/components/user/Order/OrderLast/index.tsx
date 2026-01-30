@@ -37,9 +37,9 @@ declare global {
 }
 
 interface OrderLastProps {
-  totalAmount : number,
+  totalAmount : number | null,
   paymentMethod: string,
-  isBuyable: boolean
+  isBuyable: boolean | null,
 }
 
 
@@ -155,7 +155,7 @@ export default function OrderLast({
     <div className="order-submit-bar">
       <div className="total-amount-container">
         <span className="total-label">총 결제 금액</span>
-        <span className="total-value">{totalAmount.toLocaleString()}원</span>
+        <span className="total-value">{totalAmount ? totalAmount.toLocaleString() : 0 }원</span>
       </div>
 
       <button

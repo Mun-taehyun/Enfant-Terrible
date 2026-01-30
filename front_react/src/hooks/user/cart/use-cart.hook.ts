@@ -29,7 +29,7 @@ export const useCart = () => {
     //서버상태 : 장바구니 주문
     const orderMutation = orderQueries.usePostOrderFromCart();
 
-    const items = Array.isArray(cartData) ? cartData : [];
+    const items = Array.isArray(cartData?.cartList) ? cartData.cartList : [];
 
     //서버상태 : 포인트 조회
     const {data: pointData} = pointQueries.useBalance();

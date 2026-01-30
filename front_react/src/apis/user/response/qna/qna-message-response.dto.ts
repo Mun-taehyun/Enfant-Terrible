@@ -1,4 +1,11 @@
 export default interface QnaMessageResponseDto {
+    messageList: ChatMessageItem[];
+}
+//채팅 메세지 
+
+
+export interface ChatMessageItem {
+
     messageId : number; //메세지 pk
     roomId : number;    //채팅방 pk
     sender : string;    //보낸사람 
@@ -7,4 +14,3 @@ export default interface QnaMessageResponseDto {
 
     imageUrls : string[];   //이미지 배열
 }
-//채팅 메세지 

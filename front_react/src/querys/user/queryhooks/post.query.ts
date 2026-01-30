@@ -13,6 +13,7 @@ export const postQueries = {
             queryFn: () => getPostRequest(params),
             placeholderData: (previousData) => previousData, 
             // 페이징 시 리스트 깜빡임 방지(UX 개선)
+            select: (data) => ({ postList: Array.isArray(data) ? data : [] })
         });
     },
 

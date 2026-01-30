@@ -8,7 +8,7 @@ import PostComponent from '@/components/user/PostItem';
 export default function PostList() {
   // 1. 요청 DTO 상태 (params.postType은 'NOTICE' 고정)
   const [params, setParams] = useState({
-    page: 0,
+    page: 1,
     size: 10,
     postType: 'NOTICE'
   });
@@ -19,7 +19,7 @@ export default function PostList() {
 
 
   // 2. 리액트 쿼리 호출
-  const { data : postData , isLoading } = postQueries.useGetPosts(params);
+  const { data : postData } = postQueries.useGetPosts(params);
 
 
 
@@ -29,14 +29,12 @@ export default function PostList() {
         navigate(`/post/${postId}`);
     };  
 
-    if (isLoading) return <div className="pet-loading">🐾 소식 불러오는 중...</div>;
-
   return (
     <div className="pet-page-container">
       {/* 타이틀 영역 (div 위주) */}
       <div className="pet-page-header">
         <div className="header-title">공지사항</div>
-        <div className="header-desc">포근포근 펫쇼핑몰의 새로운 소식을 확인하세요.</div>
+        <div className="header-desc">앙팡테리블 펫 쇼핑몰의 새로운 소식을 확인하세요.</div>
       </div>
 
       {/* 반복 아이템이 돌아갈 리스트 영역 */}

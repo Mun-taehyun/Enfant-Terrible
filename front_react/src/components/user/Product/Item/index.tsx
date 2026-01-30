@@ -6,23 +6,26 @@ import './style.css';
 // 현재 discountType 은 변동사항이 존재함 명시 .
 interface Props {
     product : Product;
+    onClick : (id : number) => void;
 }
 
 //컴포넌트 : 제품
-export default function ProductCard({ product }: Props) {
+export default function ProductCard({ product , onClick }: Props) {
 
     //속성 : 제품
     const { categoryName, name, description, price, thumbnailUrl,
-            discountType, discountValue, discountedPrice, averageRating, reviewCount
+            discountType, discountValue, discountedPrice, averageRating, reviewCount,productId
     } = product;
+
+    const fullImageUrl = thumbnailUrl.startsWith('http') ? thumbnailUrl : `http://localhost:8080${thumbnailUrl}`;
 
 
     //렌더 : 제품
     return (
-        <div className="product-card">
+        <div className="product-card" onClick={() =>onClick( productId )}>
             {/* 상단: 이미지 및 배지 영역 */}
             <div className="product-image-container">
-                <img src={thumbnailUrl} alt={name} className="product-image" />
+                <img src={fullImageUrl} alt={name} className="product-image" />
                 {discountValue > 0 && (//할인이 퍼센트인지 그냥 값인지에 따른 할인 반영
                     <div className="product-badge">
                         {discountType === 'PERCENT' ? `${discountValue}%` : 'SALE'}

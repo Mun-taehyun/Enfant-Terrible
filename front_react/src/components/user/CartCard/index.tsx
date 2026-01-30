@@ -1,7 +1,7 @@
-import CartItemResponseDto from "@/apis/user/response/cart/cart-item-response.dto";
+import { CartItem } from "@/apis/user/response/cart/cart-item-response.dto";
 
 interface Props {
-    item: CartItemResponseDto; // 장바구니 리스트에 있을 1개의 요소 
+    item: CartItem; // 장바구니 리스트에 있을 1개의 요소 
     isSelected: boolean; //선택 여부
     onToggle: (id: number) => void; //선택여부 on,off 상태
     onQuantityChange: (id: number, currentQty: number, delta: number) => void;

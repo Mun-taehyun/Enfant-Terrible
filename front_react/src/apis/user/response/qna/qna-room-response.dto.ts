@@ -1,4 +1,9 @@
 export default interface QnaRoomResponseDto {
+    chatList: ChatRoomItem[];
+}
+
+
+export interface ChatRoomItem {
     roomId : number;                //채팅방 pk
     userId : number;                //유저 pk
     status : string;                //채팅방 상태 

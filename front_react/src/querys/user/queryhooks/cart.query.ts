@@ -11,6 +11,7 @@ export const cartQueries = {
         return useQuery({
             queryKey: cartKeys.lists(),
             queryFn: getCartItemRequest,
+            select: (data) => ({ cartList: Array.isArray(data) ? data : [] }),
             enabled: !!token
         });
     },
