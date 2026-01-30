@@ -16,6 +16,18 @@
     p.created_at
   </sql>
 
+  <sql id="selectDetailColumns">
+    p.product_id,
+    p.product_code,
+    p.name,
+    p.description,
+    p.base_price,
+    p.status,
+    p.category_id,
+    c.name AS category_name,
+    p.created_at
+  </sql>
+
   <sql id="where">
     WHERE p.deleted_at IS NULL
 
@@ -93,17 +105,27 @@
       AND p.deleted_at IS NULL
   </select>
 
+  <select id="findDetailById" resultType="com.enfantTerrible.enfantTerrible.dto.admin.product.AdminProductDetailResponse">
+    SELECT <include refid="selectDetailColumns" />
+    FROM et_product p
+    JOIN et_category c ON c.category_id = p.category_id
+    WHERE p.product_id = #{productId}
+      AND p.deleted_at IS NULL
+  </select>
+
   <insert id="insert" useGeneratedKeys="true" keyProperty="productId">
     INSERT INTO et_product (
       product_code,
       category_id,
       name,
+      description,
       base_price,
       status
     ) VALUES (
       #{productCode},
       #{categoryId},
       #{name},
+      #{description},
       #{basePrice},
       #{status}
     )
@@ -115,6 +137,7 @@
       product_code = #{req.productCode},
       category_id = #{req.categoryId},
       name = #{req.name},
+      description = #{req.description},
       base_price = #{req.basePrice},
       status = #{req.status}
     WHERE product_id = #{productId}

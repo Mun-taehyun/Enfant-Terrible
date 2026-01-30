@@ -1,6 +1,8 @@
 package com.enfantTerrible.enfantTerrible.service.admin.product;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -28,6 +30,7 @@ public class AdminProductService {
 
   private static final String REF_PRODUCT = "product";
   private static final String ROLE_THUMBNAIL = "THUMBNAIL";
+  private static final String ROLE_CONTENT = "CONTENT";
 
   private final AdminProductMapper productMapper;
   private final AdminProductSkuMapper skuMapper;
@@ -44,8 +47,27 @@ public class AdminProductService {
         productMapper.findProducts(req, size, offset);
     int totalCount = productMapper.countProducts(req);
 
+    final Map<Long, String> thumbnailUrlByProductId;
+    if (rows.isEmpty()) {
+      thumbnailUrlByProductId = Map.of();
+    } else {
+      List<Long> productIds = rows.stream()
+          .map(AdminProductRow::getProductId)
+          .toList();
+
+      thumbnailUrlByProductId = fileQueryService
+          .findFirstFilesByRefIds(REF_PRODUCT, ROLE_THUMBNAIL, productIds)
+          .stream()
+          .filter(f -> f.getRefId() != null)
+          .collect(Collectors.toMap(
+              FileRow::getRefId,
+              FileRow::getFileUrl,
+              (a, b) -> a
+          ));
+    }
+
     List<AdminProductResponse> list = rows.stream()
-        .map(this::toResponse)
+        .map(row -> toResponse(row, thumbnailUrlByProductId.get(row.getProductId())))
         .toList();
 
     return new AdminPageResponse<>(page, size, totalCount, list);
@@ -59,6 +81,23 @@ public class AdminProductService {
     }
 
     return toResponse(row);
+  }
+
+  @Transactional(readOnly = true)
+  public AdminProductDetailResponse getProductDetail(Long productId) {
+    AdminProductDetailResponse res = productMapper.findDetailById(productId);
+    if (res == null) {
+      throw new BusinessException("상품이 존재하지 않습니다.");
+    }
+
+    List<ProductImageResponse> images = fileQueryService
+        .findFilesByRefAndRole(REF_PRODUCT, productId, ROLE_CONTENT)
+        .stream()
+        .map(this::toProductImageResponse)
+        .toList();
+
+    res.setImages(images);
+    return res;
   }
 
   public void create(AdminProductSaveRequest req) {
@@ -97,7 +136,7 @@ public class AdminProductService {
     productMapper.update(productId, req);
 
     if (req.getThumbnailFileId() != null) {
-      fileCommandService.deleteByRef(REF_PRODUCT, productId);
+      fileCommandService.deleteByRefAndRole(REF_PRODUCT, productId, ROLE_THUMBNAIL);
       // 실제로는 file_id 기준 update로 연결하는 게 더 좋음 (다음 단계)
     }
   }
@@ -132,8 +171,69 @@ public class AdminProductService {
     fileCommandService.save(file);
   }
 
-  private AdminProductResponse toResponse(AdminProductRow row) {
+  public void addContentImages(Long productId, List<String> imageUrls) {
+    if (productId == null) {
+      throw new BusinessException("상품 ID가 비어있습니다.");
+    }
 
+    if (imageUrls == null || imageUrls.isEmpty()) {
+      return;
+    }
+
+    for (String imageUrl : imageUrls) {
+      if (imageUrl == null || imageUrl.isBlank()) {
+        continue;
+      }
+
+      FileRow file = new FileRow();
+      file.setRefType(FileRefType.PRODUCT);
+      file.setRefId(productId);
+      file.setFileRole(FileRole.CONTENT);
+
+      file.setFileUrl(imageUrl);
+      file.setOriginalName(imageUrl);
+      file.setStoredName(imageUrl);
+      file.setFileType("URL");
+      file.setFilePath("");
+
+      fileCommandService.save(file);
+    }
+  }
+
+  public void deleteContentImage(Long productId, Long fileId) {
+    if (productId == null) {
+      throw new BusinessException("상품 ID가 비어있습니다.");
+    }
+    if (fileId == null) {
+      throw new BusinessException("fileId가 비어있습니다.");
+    }
+
+    FileRow file = fileQueryService.findById(fileId);
+    if (file == null) {
+      throw new BusinessException("삭제 대상 파일이 없습니다.");
+    }
+
+    if (file.getRefType() != FileRefType.PRODUCT) {
+      throw new BusinessException("상품 본문 이미지가 아닙니다.");
+    }
+    if (file.getRefId() == null || !file.getRefId().equals(productId)) {
+      throw new BusinessException("상품 ID가 일치하지 않습니다.");
+    }
+    if (file.getFileRole() != FileRole.CONTENT) {
+      throw new BusinessException("상품 본문 이미지가 아닙니다.");
+    }
+
+    fileCommandService.deleteById(fileId);
+  }
+
+  private AdminProductResponse toResponse(AdminProductRow row) {
+    return toResponse(
+        row,
+        fileQueryService.findFirstFileUrl(REF_PRODUCT, row.getProductId(), ROLE_THUMBNAIL)
+    );
+  }
+
+  private AdminProductResponse toResponse(AdminProductRow row, String thumbnailUrl) {
     AdminProductResponse res = new AdminProductResponse();
     res.setProductId(row.getProductId());
     res.setProductCode(row.getProductCode());
@@ -142,15 +242,16 @@ public class AdminProductService {
     res.setName(row.getName());
     res.setBasePrice(row.getBasePrice());
     res.setStatus(row.getStatus());
+    res.setThumbnailUrl(thumbnailUrl);
+    return res;
+  }
 
-    res.setThumbnailUrl(
-        fileQueryService.findFirstFileUrl(
-            REF_PRODUCT,
-            row.getProductId(),
-            ROLE_THUMBNAIL
-        )
-    );
-
+  private ProductImageResponse toProductImageResponse(FileRow row) {
+    ProductImageResponse res = new ProductImageResponse();
+    res.setFileId(row.getFileId());
+    res.setFileUrl(row.getFileUrl());
+    res.setOriginalName(row.getOriginalName());
+    res.setSortOrder(null);
     return res;
   }
 }

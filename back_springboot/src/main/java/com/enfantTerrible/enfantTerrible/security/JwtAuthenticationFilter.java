@@ -7,8 +7,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.enfantTerrible.enfantTerrible.dto.user.UserRow;
-import com.enfantTerrible.enfantTerrible.service.user.UserService;
+import com.enfantTerrible.enfantTerrible.common.enums.UserRole;
+import com.enfantTerrible.enfantTerrible.common.enums.UserStatus;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -18,14 +18,11 @@ import jakarta.servlet.http.HttpServletResponse;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private final JwtTokenProvider jwtTokenProvider;
-  private final UserService userService;
 
   public JwtAuthenticationFilter(
-    JwtTokenProvider jwtTokenProvider,
-    UserService userService
+    JwtTokenProvider jwtTokenProvider
   ) {
     this.jwtTokenProvider = jwtTokenProvider;
-    this.userService = userService;
   }
 
   @Override
@@ -51,23 +48,35 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 2️⃣ 토큰에서 userId 추출
         Long userId = jwtTokenProvider.getUserId(token);
 
-        // 3️⃣ DB 조회 (보안 판단용 전체 정보)
-        UserRow user = userService.getUserForSecurity(userId);
+        String roleStr = jwtTokenProvider.getRole(token);
+        String email = jwtTokenProvider.getEmail(token);
+        String statusStr = jwtTokenProvider.getStatus(token);
+
+        UserRole role = roleStr == null ? null : UserRole.valueOf(roleStr);
+        UserStatus status = statusStr == null ? UserStatus.ACTIVE : UserStatus.valueOf(statusStr);
+
+        if (role == null) {
+          throw new IllegalStateException("Missing role claim");
+        }
+
+        if (email == null || email.isBlank()) {
+          email = String.valueOf(userId);
+        }
 
         // 4️⃣ CustomUserDetails (정식 생성자)
         CustomUserDetails details =
           new CustomUserDetails(
-            user.getUserId(),
-            user.getEmail(),
-            user.getRole(),          // USER / ADMIN
-            user.getStatus()        // ACTIVE / SUSPENDED
+            userId,
+            email,
+            role,          // USER / ADMIN
+            status        // ACTIVE / SUSPENDED
           );
 
         // 5️⃣ Principal (최소 정보)
         CustomUserPrincipal principal =
           new CustomUserPrincipal(
-            user.getUserId(),
-            user.getRole()
+            userId,
+            role
           );
 
         // 6️⃣ Authentication 생성

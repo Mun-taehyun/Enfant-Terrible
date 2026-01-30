@@ -8,12 +8,12 @@
   <sql id="adminInquiryWhere">
     WHERE i.deleted_at IS NULL
 
-    <if test="req.productId != null">
-      AND i.product_id = #{req.productId}
+    <if test="req.productName != null and req.productName != ''">
+      AND p.name LIKE CONCAT('%', #{req.productName}, '%')
     </if>
 
-    <if test="req.userId != null">
-      AND i.user_id = #{req.userId}
+    <if test="req.userEmail != null and req.userEmail != ''">
+      AND u.email LIKE CONCAT('%', #{req.userEmail}, '%')
     </if>
 
     <if test="req.status != null and req.status != ''">
@@ -36,6 +36,7 @@
       i.created_at
     FROM et_product_inquiry i
     INNER JOIN et_user u ON u.user_id = i.user_id
+    INNER JOIN et_product p ON p.product_id = i.product_id
     <include refid="adminInquiryWhere" />
     ORDER BY i.inquiry_id DESC
     LIMIT #{req.size} OFFSET #{req.offset}
@@ -44,6 +45,8 @@
   <select id="countInquiries" resultType="int">
     SELECT COUNT(*)
     FROM et_product_inquiry i
+    INNER JOIN et_user u ON u.user_id = i.user_id
+    INNER JOIN et_product p ON p.product_id = i.product_id
     <include refid="adminInquiryWhere" />
   </select>
 

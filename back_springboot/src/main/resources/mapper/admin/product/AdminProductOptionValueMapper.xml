@@ -17,6 +17,21 @@
     ORDER BY sort_order ASC, option_value_id ASC
   </select>
 
+  <select id="findByProductId" resultType="AdminProductOptionValueRow">
+    SELECT
+      v.option_value_id,
+      v.option_group_id,
+      v.value,
+      v.sort_order
+    FROM et_product_option_value v
+    JOIN et_product_option_group g
+      ON g.option_group_id = v.option_group_id
+    WHERE g.product_id = #{productId}
+      AND g.deleted_at IS NULL
+      AND v.deleted_at IS NULL
+    ORDER BY g.sort_order ASC, g.option_group_id ASC, v.sort_order ASC, v.option_value_id ASC
+  </select>
+
   <select id="findById" resultType="AdminProductOptionValueRow">
     SELECT
       option_value_id,

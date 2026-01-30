@@ -29,4 +29,12 @@ public class FileCommandService {
   public void deleteByRef(String refType, Long refId) {
     fileMapper.softDeleteByRef(refType, refId);
   }
+
+  public void deleteByRefAndRole(String refType, Long refId, String fileRole) {
+    fileMapper.softDeleteByRefAndRole(refType, refId, fileRole);
+  }
+
+  public void deleteById(Long fileId) {
+    fileMapper.softDeleteById(fileId);
+  }
 }

@@ -8,12 +8,13 @@ export type AdminPostListRequest = {
   page?: number;     // default 1
   size?: number;     // default 20
   postType?: string; // nullable
-  userId?: number;   // nullable
+  userEmail?: string;   // nullable
 };
 
 export type AdminPostListItem = {
   postId: AdminPostId;
   userId: number;
+  userEmail: string;
   postType: AdminPostType;
   title: string;
   createdAt: string | null;
@@ -23,6 +24,7 @@ export type AdminPostListItem = {
 export type AdminPostDetail = {
   postId: AdminPostId;
   userId: number;
+  userEmail: string;
 
   postType: AdminPostType;
   refType: string | null;

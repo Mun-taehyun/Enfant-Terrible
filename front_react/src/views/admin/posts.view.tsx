@@ -1,5 +1,5 @@
 // src/views/admin/posts.view.tsx
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import styles from "./posts.view.module.css";
 
 import {
@@ -18,7 +18,7 @@ type AdminPostListParams = {
   page: number;
   size: number;
   postType?: string;
-  userId?: number;
+  userEmail?: string;
 };
 
 const POST_TYPE_OPTIONS = [
@@ -34,15 +34,14 @@ function toNumOrNull(v: string): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
-function normalizeOrNull(v: string): string | null {
-  const s = v.trim();
-  return s ? s : null;
+function toStr(v: unknown): string {
+  return typeof v === "string" ? v : "";
 }
 
 export default function PostsView() {
   // filters
   const [filterPostType, setFilterPostType] = useState("");
-  const [filterUserId, setFilterUserId] = useState("");
+  const [filterUserEmail, setFilterUserEmail] = useState("");
 
   // list
   const {
@@ -65,6 +64,8 @@ export default function PostsView() {
 
   const mode: "create" | "update" = selectedPostId == null ? "create" : "update";
 
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+
   const mutations = useAdminPostMutations(() => {
     refetch();
     detail.refetch();
@@ -83,57 +84,67 @@ export default function PostsView() {
     return Math.max(1, Math.ceil(totalCount / size));
   }, [totalCount, size]);
 
-  // editor refs (비제어)
-  const postTypeRef = useRef<HTMLSelectElement>(null);
-  const refTypeRef = useRef<HTMLInputElement>(null);
-  const refIdRef = useRef<HTMLInputElement>(null);
-  const titleRef = useRef<HTMLInputElement>(null);
-  const contentRef = useRef<HTMLTextAreaElement>(null);
+  // update form (controlled)
+  const [editPostType, setEditPostType] = useState<string>("");
+  const [editRefId, setEditRefId] = useState<string>("");
+  const [editTitle, setEditTitle] = useState<string>("");
+  const [editContent, setEditContent] = useState<string>("");
+  const [editFiles, setEditFiles] = useState<File[]>([]);
 
-  // ✅ 렌더 중 ref 접근 금지, effect setState 금지: 선택 타입은 이벤트로만 갱신
-  const [editorPostType, setEditorPostType] = useState<string>("");
+  // create form (controlled)
+  const [createPostType, setCreatePostType] = useState<string>("");
+  const [createRefId, setCreateRefId] = useState<string>("");
+  const [createTitle, setCreateTitle] = useState<string>("");
+  const [createContent, setCreateContent] = useState<string>("");
+  const [createFiles, setCreateFiles] = useState<File[]>([]);
 
   const handleApplyFilters = () => {
-    const userIdNum = toNumOrNull(filterUserId);
     setParams((prev) => ({
       ...prev,
       page: 1,
       postType: filterPostType.trim() ? filterPostType.trim() : undefined,
-      userId: userIdNum == null ? undefined : userIdNum,
+      userEmail: filterUserEmail.trim() ? filterUserEmail.trim() : undefined,
     }));
   };
 
   const handleClearFilters = () => {
     setFilterPostType("");
-    setFilterUserId("");
+    setFilterUserEmail("");
     setParams((prev) => ({
       ...prev,
       page: 1,
       postType: undefined,
-      userId: undefined,
+      userEmail: undefined,
     }));
   };
 
   const handleSelect = (pid: AdminPostId, postType: string) => {
     setSelectedPostId(pid);
-    setEditorPostType(postType ?? "");
+    setEditPostType(postType ?? "");
+    setEditFiles([]);
   };
 
   const handleNewMode = () => {
-    setSelectedPostId(null);
-    setEditorPostType("");
-    setSelectedFiles([]);
+    setCreatePostType("");
+    setCreateRefId("");
+    setCreateTitle("");
+    setCreateContent("");
+    setCreateFiles([]);
+
+    setIsCreateOpen(true);
   };
 
-  const buildSaveBodyFromRefs = (): AdminPostSaveRequest | null => {
-    // select의 value는 백엔드 enum 문자열(NOTICE/EVENT/PRODUCT_DETAIL)
-    const postType = (postTypeRef.current?.value ?? "").trim();
-    const title = titleRef.current?.value.trim() ?? "";
-    const content = contentRef.current?.value.trim() ?? "";
+  function buildSaveBodyFromState(v: {
+    postType: string;
+    refId: string;
+    title: string;
+    content: string;
+  }): AdminPostSaveRequest | null {
+    const postType = v.postType.trim();
+    const title = v.title.trim();
+    const content = v.content.trim();
 
-    const refTypeRaw = refTypeRef.current?.value ?? "";
-    const refIdText = refIdRef.current?.value ?? "";
-    const refId = toNumOrNull(refIdText);
+    const refId = toNumOrNull(v.refId);
 
     if (!postType) {
       alert("게시판 종류는 필수입니다.");
@@ -141,7 +152,7 @@ export default function PostsView() {
     }
 
     if (postType === "PRODUCT_DETAIL" && refId == null) {
-      alert("상품상세 게시글은 연결 ID가 필수입니다.");
+      alert("상품상세 게시글은 상품 ID가 필수입니다.");
       return null;
     }
 
@@ -154,39 +165,44 @@ export default function PostsView() {
       return null;
     }
 
+    const normalizedRefType = postType === "PRODUCT_DETAIL" ? "PRODUCT" : null;
+    const normalizedRefId = postType === "PRODUCT_DETAIL" ? refId : null;
+
     return {
       postType,
       title,
       content,
-      refType: normalizeOrNull(refTypeRaw),
-      refId,
+      refType: normalizedRefType,
+      refId: normalizedRefId,
     };
-  };
+  }
 
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-
-  function buildFormData(body: AdminPostSaveRequest): FormData {
+  function buildFormData(body: AdminPostSaveRequest, files: File[]): FormData {
     const fd = new FormData();
     fd.append("req", new Blob([JSON.stringify(body)], { type: "application/json" }));
-    selectedFiles.forEach((f) => {
+    files.forEach((f) => {
       fd.append("files", f);
     });
     return fd;
   }
 
-  const handleSubmit = async () => {
-    const body = buildSaveBodyFromRefs();
+  const handleCreateSubmit = async () => {
+    const body = buildSaveBodyFromState({
+      postType: createPostType,
+      refId: createRefId,
+      title: createTitle,
+      content: createContent,
+    });
     if (!body) return;
 
-    const formData = buildFormData(body);
+    const formData = buildFormData(body, createFiles);
+    await mutations.create(formData);
+    alert("게시글 생성 성공");
+    setIsCreateOpen(false);
+    refetch();
+  };
 
-    if (mode === "create") {
-      await mutations.create(formData);
-      alert("게시글 생성 성공");
-      handleNewMode();
-      return;
-    }
-
+  const handleUpdateSubmit = async () => {
     if (selectedPostId == null) {
       alert("수정할 게시글을 선택하세요.");
       return;
@@ -200,10 +216,20 @@ export default function PostsView() {
       return;
     }
 
+    const body = buildSaveBodyFromState({
+      postType: editPostType,
+      refId: editRefId,
+      title: editTitle,
+      content: editContent,
+    });
+    if (!body) return;
+
+    const formData = buildFormData(body, editFiles);
     await mutations.update(selectedPostId, formData);
     alert("게시글 수정 성공");
     refetch();
     detail.refetch();
+    setEditFiles([]);
   };
 
   const handleDelete = async () => {
@@ -214,7 +240,11 @@ export default function PostsView() {
     if (detail.notFound) {
       alert("해당 게시글은 이미 삭제되었거나 존재하지 않습니다.");
       setSelectedPostId(null);
-      setEditorPostType("");
+      setEditPostType("");
+      setEditRefId("");
+      setEditTitle("");
+      setEditContent("");
+      setEditFiles([]);
       return;
     }
 
@@ -223,39 +253,42 @@ export default function PostsView() {
 
     await mutations.remove(selectedPostId);
     alert("게시글 삭제 성공");
-    handleNewMode();
+    setSelectedPostId(null);
+    setEditPostType("");
+    setEditRefId("");
+    setEditTitle("");
+    setEditContent("");
+    setEditFiles([]);
     refetch();
   };
 
-  const editorKey = useMemo(() => {
-    if (selectedPostId == null) return "create";
-
-    const d = detail.data;
-    if (!d) return `loading-${selectedPostId}`;
-
-    return `update-${d.postId}-${d.updatedAt ?? "na"}`;
-  }, [selectedPostId, detail.data]);
-
   const canSubmit =
     mutations.loading === false &&
-    (mode === "create" ||
-      (mode === "update" &&
-        selectedPostId != null &&
-        detail.data != null &&
-        detail.notFound === false));
+    mode === "update" &&
+    selectedPostId != null &&
+    detail.data != null &&
+    detail.notFound === false;
 
-  const initialPostType =
-    mode === "update" ? (detail.data?.postType ?? "") : "";
-  const initialRefType = mode === "update" ? (detail.data?.refType ?? "") : "";
-  const initialRefId =
-    mode === "update"
-      ? detail.data?.refId == null
-        ? ""
-        : String(detail.data.refId)
-      : "";
+  const isUpdateProductDetailSelected = editPostType === "PRODUCT_DETAIL";
+  const isCreateProductDetailSelected = createPostType === "PRODUCT_DETAIL";
 
-  const isProductDetailSelected =
-    (editorPostType || initialPostType) === "PRODUCT_DETAIL";
+  useEffect(() => {
+    if (selectedPostId == null) {
+      setEditPostType("");
+      setEditRefId("");
+      setEditTitle("");
+      setEditContent("");
+      setEditFiles([]);
+      return;
+    }
+
+    if (detail.data) {
+      setEditPostType(toStr(detail.data.postType));
+      setEditRefId(detail.data.refId == null ? "" : String(detail.data.refId));
+      setEditTitle(toStr(detail.data.title));
+      setEditContent(toStr(detail.data.content));
+    }
+  }, [selectedPostId, detail.data]);
 
   return (
     <div className={styles.wrap}>
@@ -322,21 +355,28 @@ export default function PostsView() {
             <div className={styles.filterRow}>
               <label className={styles.fLabel}>
                 게시판 종류
-                <input
-                  className={styles.input}
+                <select
+                  className={styles.select}
                   value={filterPostType}
                   onChange={(e) => setFilterPostType(e.target.value)}
-                  placeholder="예: NOTICE"
-                />
+                  disabled={loading}
+                >
+                  <option value="">전체</option>
+                  {POST_TYPE_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
               </label>
 
               <label className={styles.fLabel}>
-                작성자 ID
+                작성자 이메일
                 <input
                   className={styles.input}
-                  value={filterUserId}
-                  onChange={(e) => setFilterUserId(e.target.value)}
-                  placeholder="예: 1"
+                  value={filterUserEmail}
+                  onChange={(e) => setFilterUserEmail(e.target.value)}
+                  placeholder="user@example.com"
                 />
               </label>
 
@@ -381,7 +421,7 @@ export default function PostsView() {
                   <div className={styles.rowTop}>
                     <span className={styles.badge}>게시글 ID: {pid}</span>
                     <span className={styles.badge}>
-                      작성자 ID: {item.userId}
+                      작성자 이메일: {item.userEmail}
                     </span>
                     <span className={styles.badge}>
                       게시판 종류: {item.postType}
@@ -408,7 +448,7 @@ export default function PostsView() {
         <section className={styles.panel}>
           <div className={styles.panelHeader}>
             <div className={styles.panelTitle}>
-              상세 / {mode === "create" ? "생성" : "수정"}
+              상세 / 수정
             </div>
 
             <div className={styles.rightActions}>
@@ -430,55 +470,144 @@ export default function PostsView() {
             </div>
           </div>
 
-          <div className={styles.detailBox}>
-            {selectedPostId == null ? (
+          {selectedPostId == null ? (
+            <div className={styles.detailBox}>
               <div className={styles.hint}>
-                선택된 게시글이 없습니다. 아래 폼으로 신규 작성할 수 있습니다.
+                수정할 게시글을 선택해 주세요.
               </div>
-            ) : detail.notFound ? (
+            </div>
+          ) : detail.notFound ? (
+            <div className={styles.detailBox}>
               <div className={styles.hint}>
                 해당 게시글은 존재하지 않습니다(삭제되었거나 접근 불가).
                 <div style={{ marginTop: 8 }}>
                   <button
                     type="button"
                     className={styles.btn}
-                    onClick={handleNewMode}
+                    onClick={() => setSelectedPostId(null)}
                   >
                     선택 해제
                   </button>
                 </div>
               </div>
-            ) : (
-              <>
-                <div className={styles.detailTitle}>
-                  선택 게시글 ID: {selectedPostId}
-                </div>
-                {detail.errorMsg && (
-                  <div className={styles.error}>상세 오류: {detail.errorMsg}</div>
-                )}
-                {detail.loading && (
-                  <div className={styles.loading}>상세 불러오는 중...</div>
-                )}
-                {detail.data && (
-                  <pre className={styles.detailPre}>
-                    {JSON.stringify(detail.data, null, 2)}
-                  </pre>
-                )}
-              </>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className={styles.editor}>
+              {detail.errorMsg && (
+                <div className={styles.error}>상세 오류: {detail.errorMsg}</div>
+              )}
+              {detail.loading && (
+                <div className={styles.loading}>상세 불러오는 중...</div>
+              )}
 
-          {/* editor: key 리마운트로 defaultValue 반영 */}
-          <div className={styles.editor} key={editorKey}>
+              <div className={styles.formGrid}>
+                <label className={styles.fLabel}>
+                  게시판 종류 (필수)
+                  <select
+                    className={styles.select}
+                    required
+                    value={editPostType}
+                    onChange={(e) => setEditPostType(e.target.value)}
+                    disabled={detail.notFound || detail.loading}
+                  >
+                    <option value="" disabled>
+                      선택하세요
+                    </option>
+                    {POST_TYPE_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                {isUpdateProductDetailSelected ? (
+                  <label className={styles.fLabel}>
+                    상품 ID
+                    <input
+                      className={styles.input}
+                      value={editRefId}
+                      onChange={(e) => setEditRefId(e.target.value)}
+                      placeholder="예: 123"
+                      disabled={detail.notFound || detail.loading}
+                    />
+                  </label>
+                ) : null}
+
+                <label className={styles.fLabelWide}>
+                  제목 (필수)
+                  <input
+                    className={styles.input}
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                    placeholder="제목을 입력하세요"
+                    disabled={detail.notFound || detail.loading}
+                  />
+                </label>
+
+                <label className={styles.fLabelWide}>
+                  내용 (필수)
+                  <textarea
+                    className={styles.textarea}
+                    value={editContent}
+                    onChange={(e) => setEditContent(e.target.value)}
+                    placeholder="내용을 입력하세요"
+                    disabled={detail.notFound || detail.loading}
+                  />
+                </label>
+
+                <label className={styles.fLabelWide}>
+                  첨부파일 (선택)
+                  <input
+                    className={styles.input}
+                    type="file"
+                    multiple
+                    onChange={(e) => {
+                      const files = e.target.files ? Array.from(e.target.files) : [];
+                      setEditFiles(files);
+                    }}
+                    disabled={detail.notFound || detail.loading}
+                  />
+                </label>
+              </div>
+
+              {mutations.errorMsg && (
+                <div className={styles.error}>저장 오류: {mutations.errorMsg}</div>
+              )}
+
+              <div className={styles.editorActions}>
+                <button
+                  type="button"
+                  className={styles.btnPrimary}
+                  onClick={handleUpdateSubmit}
+                  disabled={!canSubmit}
+                >
+                  저장(수정)
+                </button>
+              </div>
+            </div>
+          )}
+        </section>
+      </div>
+
+      {isCreateOpen && (
+        <div className={styles.modalBackdrop} onClick={() => setIsCreateOpen(false)}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHead}>
+              <h3 className={styles.modalTitle}>게시글 신규 작성</h3>
+              <button type="button" className={styles.btn} onClick={() => setIsCreateOpen(false)}>
+                닫기
+              </button>
+            </div>
+
             <div className={styles.formGrid}>
               <label className={styles.fLabel}>
                 게시판 종류 (필수)
                 <select
                   className={styles.select}
-                  ref={postTypeRef}
-                  defaultValue={initialPostType}
                   required
-                  onChange={(e) => setEditorPostType(e.target.value)}
+                  value={createPostType}
+                  onChange={(e) => setCreatePostType(e.target.value)}
                 >
                   <option value="" disabled>
                     선택하세요
@@ -491,32 +620,24 @@ export default function PostsView() {
                 </select>
               </label>
 
-              <label className={styles.fLabel}>
-                연관 타입
-                <input
-                  className={styles.input}
-                  ref={refTypeRef}
-                  defaultValue={initialRefType}
-                />
-              </label>
-
-              <label className={styles.fLabel}>
-                연결 ID
-                <input
-                  className={styles.input}
-                  ref={refIdRef}
-                  defaultValue={initialRefId}
-                />
-                {/* 상품상세일 때만 필수라는 사실만 남기고, 설명 박스/안내 문구는 제거 */}
-                {isProductDetailSelected ? null : null}
-              </label>
+              {isCreateProductDetailSelected ? (
+                <label className={styles.fLabel}>
+                  상품 ID
+                  <input
+                    className={styles.input}
+                    value={createRefId}
+                    onChange={(e) => setCreateRefId(e.target.value)}
+                    placeholder="예: 123"
+                  />
+                </label>
+              ) : null}
 
               <label className={styles.fLabelWide}>
                 제목 (필수)
                 <input
                   className={styles.input}
-                  ref={titleRef}
-                  defaultValue={mode === "update" ? detail.data?.title ?? "" : ""}
+                  value={createTitle}
+                  onChange={(e) => setCreateTitle(e.target.value)}
                   placeholder="제목을 입력하세요"
                 />
               </label>
@@ -525,10 +646,8 @@ export default function PostsView() {
                 내용 (필수)
                 <textarea
                   className={styles.textarea}
-                  ref={contentRef}
-                  defaultValue={
-                    mode === "update" ? detail.data?.content ?? "" : ""
-                  }
+                  value={createContent}
+                  onChange={(e) => setCreateContent(e.target.value)}
                   placeholder="내용을 입력하세요"
                 />
               </label>
@@ -541,7 +660,7 @@ export default function PostsView() {
                   multiple
                   onChange={(e) => {
                     const files = e.target.files ? Array.from(e.target.files) : [];
-                    setSelectedFiles(files);
+                    setCreateFiles(files);
                   }}
                 />
               </label>
@@ -555,15 +674,15 @@ export default function PostsView() {
               <button
                 type="button"
                 className={styles.btnPrimary}
-                onClick={handleSubmit}
-                disabled={!canSubmit}
+                onClick={handleCreateSubmit}
+                disabled={mutations.loading}
               >
-                {mode === "create" ? "저장(생성)" : "저장(수정)"}
+                저장(생성)
               </button>
             </div>
           </div>
-        </section>
-      </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -22,6 +22,8 @@ public class AdminProductSaveRequest {
   @ProductName
   private String name;
 
+  private String description;
+
   @PositivePrice
   private Long basePrice;
 

@@ -241,7 +241,7 @@ export const postPaymentsCancelRequest = async(requestBody : PaymentCancelReques
 //================================ 포인트 ============================
 const GET_POINTS_ME_URL = () => `/points/me`;
 //포인트 조회하기 
-const GET_POINTS_ME_HISTORY_URL = (page : number|null , size : number|null) => `/points/me/history?page=${page}&size=${size}`;
+const GET_POINTS_ME_HISTORY_URL = () => `/points/me/history`;
 //포인트 히스토리 조회하기  
 const POST_POINTS_ME_EARN_URL = () => `/points/me/earn`;
 //포인트 적립 하기 
@@ -251,8 +251,13 @@ const POST_POINTS_ME_USE_URL = () => `/points/me/use`;
 export const getPointsMeRequest = () : Promise<PointBalanceResponseDto> => {
     return apiClient.get(GET_POINTS_ME_URL());}
     
-export const getPointsMeHistoryRequest = (page: number|null , size : number | null) : Promise<PointHistoryResponseDto[]> => {
-    return apiClient.get(GET_POINTS_ME_HISTORY_URL(page,size));}
+export const getPointsMeHistoryRequest = (page?: number | null, size?: number | null) : Promise<PointHistoryResponseDto[]> => {
+    return apiClient.get(GET_POINTS_ME_HISTORY_URL(), {
+        params: {
+            ...(page == null || !Number.isFinite(page) ? {} : { page }),
+            ...(size == null || !Number.isFinite(size) ? {} : { size }),
+        }
+    });}
 
 export const postPointsMeEarnRequest = (requestBody : PointChangeRequestDto) => {
     return apiClient.post(POST_POINTS_ME_EARN_URL(), requestBody);}

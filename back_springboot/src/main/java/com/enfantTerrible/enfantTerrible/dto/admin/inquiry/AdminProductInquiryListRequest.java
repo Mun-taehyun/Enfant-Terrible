@@ -7,8 +7,8 @@ import lombok.Setter;
 @Setter
 public class AdminProductInquiryListRequest {
 
-  private Long productId;
-  private Long userId;
+  private String productName;
+  private String userEmail;
   private String status;
 
   private Integer page = 1;

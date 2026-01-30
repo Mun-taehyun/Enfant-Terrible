@@ -48,7 +48,9 @@ public class AuthService {
 
     String accessToken = jwtTokenProvider.createAccessToken(
         user.getUserId(),
-        user.getRole()
+        user.getEmail(),
+        user.getRole(),
+        user.getStatus()
     );
     String refreshToken = jwtTokenProvider.createRefreshToken(user.getUserId());
 
@@ -128,7 +130,12 @@ public class AuthService {
       throw new BusinessException("사용할 수 없는 계정입니다.");
     }
 
-    String newAccessToken = jwtTokenProvider.createAccessToken(userId, user.getRole());
+    String newAccessToken = jwtTokenProvider.createAccessToken(
+        userId,
+        user.getEmail(),
+        user.getRole(),
+        user.getStatus()
+    );
     String newRefreshToken = jwtTokenProvider.createRefreshToken(userId);
 
     return new LoginResponse(newAccessToken, newRefreshToken);

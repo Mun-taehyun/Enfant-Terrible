@@ -21,7 +21,7 @@ export type AdminOrderListParams = {
   page: number;
   size: number;
 
-  userId?: number;
+  userEmail?: string;
   orderCode?: string;
   status?: AdminOrderStatus;
 
@@ -40,6 +40,7 @@ export type AdminOrderListParams = {
 export type AdminOrderListItem = {
   orderId: number;
   userId: number;
+  userEmail: string;
   orderCode: string;
   status: AdminOrderStatus;
   totalAmount: number;
@@ -68,6 +69,7 @@ export type AdminOrderItem = {
 export type AdminOrderDetail = {
   orderId: number;
   userId: number;
+  userEmail: string;
   orderCode: string;
   status: AdminOrderStatus;
   totalAmount: number;

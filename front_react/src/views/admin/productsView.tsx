@@ -37,17 +37,20 @@ export default function ProductsView() {
     productCode: string;
     categoryId: string;
     name: string;
+    description: string;
     basePrice: string;
     status: string;
   }>({
     productCode: "",
     categoryId: "",
     name: "",
+    description: "",
     basePrice: "",
     status: "",
   });
 
   const [createThumbnailFile, setCreateThumbnailFile] = useState<File | null>(null);
+  const [createContentImages, setCreateContentImages] = useState<File[]>([]);
 
   const categoryTreeQ = useAdminCategoryTree();
 
@@ -117,6 +120,7 @@ export default function ProductsView() {
         productCode: createForm.productCode.trim(),
         categoryId: toNumberOrThrow(createForm.categoryId, "카테고리"),
         name: createForm.name.trim(),
+        description: createForm.description,
         basePrice: toNumberOrThrow(createForm.basePrice, "기본가"),
         status: createForm.status.trim(),
       };
@@ -131,6 +135,10 @@ export default function ProductsView() {
         formData.append("image", createThumbnailFile);
       }
 
+      for (const f of createContentImages) {
+        formData.append("contentImages", f);
+      }
+
       await createMut.mutateAsync(formData);
 
       setShowCreate(false);
@@ -138,10 +146,12 @@ export default function ProductsView() {
         productCode: "",
         categoryId: "",
         name: "",
+        description: "",
         basePrice: "",
         status: "",
       });
       setCreateThumbnailFile(null);
+      setCreateContentImages([]);
     } catch (e) {
       setCreateError(e instanceof Error ? e.message : "상품 등록에 실패했습니다.");
     }
@@ -154,7 +164,7 @@ export default function ProductsView() {
         <button
           className={styles.secondaryBtn}
           onClick={() => {
-            setShowCreate((v: boolean) => !v);
+            setShowCreate(true);
             setCreateError("");
             setSelectedProductId(null);
           }}
@@ -164,10 +174,30 @@ export default function ProductsView() {
       </div>
 
       {showCreate ? (
-        <div className={styles.createPanel}>
-          {createError ? <div className={styles.errorBox}>{createError}</div> : null}
+        <div
+          className={styles.modalOverlay}
+          onClick={() => {
+            setShowCreate(false);
+            setCreateError("");
+          }}
+        >
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <div className={styles.modalTitle}>상품 등록</div>
+              <button
+                className={styles.smallBtn}
+                onClick={() => {
+                  setShowCreate(false);
+                  setCreateError("");
+                }}
+              >
+                닫기
+              </button>
+            </div>
 
-          <div className={styles.createGrid}>
+            {createError ? <div className={styles.errorBox}>{createError}</div> : null}
+
+            <div className={styles.createGrid}>
             <label className={styles.label}>
               상품코드
               <input
@@ -215,6 +245,17 @@ export default function ProductsView() {
             </label>
 
             <label className={styles.label}>
+              상품설명
+              <textarea
+                className={styles.textarea}
+                value={createForm.description}
+                onChange={(e) =>
+                  setCreateForm((p) => ({ ...p, description: e.target.value }))
+                }
+              />
+            </label>
+
+            <label className={styles.label}>
               기본가
               <input
                 className={styles.input}
@@ -253,6 +294,20 @@ export default function ProductsView() {
                 }}
               />
             </label>
+
+            <label className={styles.label}>
+              본문 이미지 (여러장)
+              <input
+                className={styles.input}
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={(e) => {
+                  const files = e.target.files ? Array.from(e.target.files) : [];
+                  setCreateContentImages(files);
+                }}
+              />
+            </label>
           </div>
 
           <div className={styles.actions}>
@@ -273,6 +328,7 @@ export default function ProductsView() {
             >
               등록
             </button>
+          </div>
           </div>
         </div>
       ) : null}

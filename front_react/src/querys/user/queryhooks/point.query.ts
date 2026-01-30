@@ -19,9 +19,11 @@ export const pointQueries = {
 
     //쿼리 : 포인트 기록 조회
     useHistory: (page: number | null, size: number | null) => {
+        const safePage = page == null || !Number.isFinite(page) || page < 1 ? 1 : page;
+        const safeSize = size == null || !Number.isFinite(size) || size < 1 ? 20 : size;
         return useQuery({
-            queryKey: pointKeys.history(page, size),
-            queryFn: () => getPointsMeHistoryRequest(page, size),
+            queryKey: pointKeys.history(safePage, safeSize),
+            queryFn: () => getPointsMeHistoryRequest(safePage, safeSize),
             placeholderData: (previousData) => previousData,
             //이전데이터를 미리 노출 => UX 개선사항
         });

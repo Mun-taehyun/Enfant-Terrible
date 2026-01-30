@@ -6,7 +6,7 @@ export type AdminPaymentStatus = string; // 백엔드 enum 확정되면 union으
 export type AdminPaymentListParams = {
   page?: number; // default 1
   size?: number; // default 20
-  userId?: number;
+  userEmail?: string;
   orderId?: number;
   orderCode?: string;
   paymentStatus?: string;

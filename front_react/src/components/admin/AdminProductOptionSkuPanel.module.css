@@ -1,0 +1,43 @@
+.wrap { padding: 10px 0; }
+
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.card { border: 1px solid #eee; border-radius: 12px; overflow: hidden; background: #fff; }
+.cardHeader { display: flex; align-items: baseline; justify-content: space-between; padding: 10px; background: #fafafa; border-bottom: 1px solid #eee; }
+.cardTitle { font-weight: 700; font-size: 13px; }
+.cardHint { font-size: 12px; color: #666; }
+
+.formRow { display: flex; gap: 8px; padding: 10px; border-bottom: 1px solid #eee; flex-wrap: wrap; align-items: end; }
+
+.list { padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+.item { display: flex; gap: 10px; justify-content: space-between; border: 1px solid #eee; border-radius: 10px; padding: 10px; }
+.activeItem { border-color: #111; }
+.itemMain { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.itemTitle { font-weight: 700; font-size: 13px; }
+.itemSub { font-size: 12px; color: #666; }
+.itemActions { display: flex; gap: 6px; align-items: center; white-space: nowrap; }
+
+.row { display: flex; gap: 10px; align-items: end; flex-wrap: wrap; margin: 10px 0; }
+
+.tableWrap { border: 1px solid #eee; border-radius: 10px; overflow: hidden; }
+.table { width: 100%; border-collapse: collapse; }
+.table th, .table td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; font-size: 13px; vertical-align: top; }
+.table th { background: #fafafa; font-weight: 700; }
+.actionsTd { white-space: nowrap; }
+
+.input { padding: 8px; border: 1px solid #ddd; border-radius: 8px; }
+.inputSmall { padding: 8px; border: 1px solid #ddd; border-radius: 8px; width: 110px; }
+.select { padding: 8px; border: 1px solid #ddd; border-radius: 8px; }
+
+.primaryBtn { padding: 8px 10px; border: 1px solid #111; background: #111; color: #fff; border-radius: 8px; cursor: pointer; }
+.secondaryBtn { padding: 8px 10px; border: 1px solid #ddd; background: #fff; border-radius: 8px; cursor: pointer; }
+.smallBtn { padding: 6px 8px; border: 1px solid #ddd; background: #fff; border-radius: 8px; cursor: pointer; }
+.dangerBtn { padding: 8px 10px; border: 1px solid #f2c2c2; background: #fff3f3; color: #9a1b1b; border-radius: 8px; cursor: pointer; }
+
+.empty { padding: 14px; color: #666; }
+.errorBox { margin: 8px 0; padding: 10px; border: 1px solid #f2c2c2; background: #fff3f3; border-radius: 10px; color: #9a1b1b; }
+.loading { padding: 14px; }
+
+.sectionTitle { font-size: 13px; font-weight: 700; margin: 10px 0; }
+.pager { display: flex; align-items: center; gap: 10px; justify-content: center; margin-top: 12px; }
+.pageText { font-size: 13px; color: #333; }

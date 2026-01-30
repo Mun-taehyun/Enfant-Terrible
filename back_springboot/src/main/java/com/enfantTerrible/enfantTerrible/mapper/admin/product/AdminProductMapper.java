@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.enfantTerrible.enfantTerrible.dto.admin.product.AdminProductRow;
+import com.enfantTerrible.enfantTerrible.dto.admin.product.AdminProductDetailResponse;
 import com.enfantTerrible.enfantTerrible.dto.admin.product.AdminProductSaveRequest;
 import com.enfantTerrible.enfantTerrible.dto.admin.product.AdminProductListRequest;
 
@@ -21,6 +22,8 @@ public interface AdminProductMapper {
   int countProducts(@Param("req") AdminProductListRequest req);
 
   AdminProductRow findById(@Param("productId") Long productId);
+
+  AdminProductDetailResponse findDetailById(@Param("productId") Long productId);
 
   int insert(AdminProductSaveRequest req);
 

@@ -13,6 +13,8 @@ public interface AdminProductOptionValueMapper {
 
   List<AdminProductOptionValueRow> findByGroupId(@Param("optionGroupId") Long optionGroupId);
 
+  List<AdminProductOptionValueRow> findByProductId(@Param("productId") Long productId);
+
   AdminProductOptionValueRow findById(@Param("optionValueId") Long optionValueId);
 
   int insert(AdminProductOptionValueSaveRequest req);

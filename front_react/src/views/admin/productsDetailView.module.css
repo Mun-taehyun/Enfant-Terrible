@@ -13,6 +13,7 @@
 .formGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .label { display: flex; flex-direction: column; gap: 6px; font-size: 12px; }
 .input { padding: 8px; border: 1px solid #ddd; border-radius: 8px; }
+.textarea { padding: 8px; border: 1px solid #ddd; border-radius: 8px; min-height: 90px; resize: vertical; }
 .select { padding: 8px; border: 1px solid #ddd; border-radius: 8px; }
 .inputSmall { padding: 8px; border: 1px solid #ddd; border-radius: 8px; width: 110px; }
 
@@ -37,6 +38,10 @@
 .errorBox { margin: 8px 0; padding: 10px; border: 1px solid #f2c2c2; background: #fff3f3; border-radius: 10px; color: #9a1b1b; }
 .loading { padding: 14px; }
 .empty { padding: 14px; color: #666; }
+
+.subTitle { font-size: 13px; font-weight: 700; margin-bottom: 8px; }
+.imageList { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.imageItem { display: flex; gap: 10px; align-items: center; justify-content: space-between; border: 1px solid #eee; border-radius: 10px; padding: 10px; }
 
 .optionGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .card { border: 1px solid #eee; border-radius: 12px; overflow: hidden; }

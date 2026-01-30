@@ -11,6 +11,7 @@ public class AdminPostListResponse {
 
   private Long postId;
   private Long userId;
+  private String userEmail;
   private String postType;
 
   private String title;

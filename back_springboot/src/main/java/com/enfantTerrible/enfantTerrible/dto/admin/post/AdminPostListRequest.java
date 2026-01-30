@@ -13,7 +13,7 @@ public class AdminPostListRequest {
   private int size = 20;
 
   private String postType;
-  private Long userId;
+  private String userEmail;
 
   private String keyword;
   private LocalDateTime createdFrom;
