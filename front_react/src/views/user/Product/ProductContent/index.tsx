@@ -9,6 +9,13 @@ export default function ProductContent() {
     const {productDetail, isDescOpen,toggleDesc} = useProduct();
 
 
+        // 이미지 경로에 서버 주소가 없다면 `${process.env.REACT_APP_API_URL}${imageUrl}` 형태로 수정 필요
+        const fullImageUrl = productDetail?.thumbnailUrl && productDetail?.thumbnailUrl.startsWith('http') 
+            ? productDetail?.thumbnailUrl
+            : productDetail?.thumbnailUrl
+                ? `http://localhost:8080${productDetail?.thumbnailUrl}` 
+                : ""; 
+
     if(!productDetail) return;
     return (
         <>
@@ -17,8 +24,8 @@ export default function ProductContent() {
                 <div className="section-divider"><span>상세 정보</span></div>
                 
                 <div className="image-content-list">
-                    {productDetail.contentImageUrls.map((url, index) => (
-                        <img key={index} src={url} alt={`상세 이미지 ${index + 1}`} />
+                    {productDetail.contentImageUrls.map((_ , index) => (
+                        <img key={index} src={fullImageUrl} alt={`상세 이미지 ${index + 1}`} />
                     ))}
                     {/* 더보기 버튼 오버레이 (CSS에서 그라데이션 처리) */}
                     {!isDescOpen && <div className="fade-overlay" />}

@@ -18,8 +18,11 @@ export default function ChatQna() {
     const {data : roomData} = qnaQueries.useGetQnaRoom();
 
     // 1. 신규 방 생성 후 입장 (ChatWait에서 호출)
-    const handleCreateAndEnterRoom = () => {
+    const handleCreateAndEnterRoom = (e: React.MouseEvent) => {
         if(!roomData) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
         const lastId = roomData?.chatList?.length > 0 
             ? Math.max(...roomData.chatList.map(r => r.roomId)) 
             : 0;
@@ -37,24 +40,29 @@ export default function ChatQna() {
     };
 
     return (
-        <div className="chat-overlay-wrapper">
+        <div className="chat-overlay-wrapper" onMouseDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
             {/* 위젯 상단에 항상 'X' 버튼이나 공통 헤더를 둘 수 있음 */}
             
             <div className="content-area">
-                {view === 'home' && (
-                <ChatWait onStartChat={() => handleCreateAndEnterRoom()} />
-                )}
+                    {/* 조건부 렌더링( && ) 대신 스타일로 제어 */}
+                    <div style={{ display: view === 'home' ? 'block' : 'none' }}>
+                        <ChatWait onStartChat={handleCreateAndEnterRoom} />
+                    </div>
 
-                {view === 'list' && (
-                <ChatRoomList onSelectRoom={handleSelectRoom} />
-                )}
+                    <div style={{ display: view === 'list' ? 'block' : 'none' }}>
+                        <ChatRoomList onSelectRoom={handleSelectRoom} />
+                    </div>
 
-                {view === 'chat' && selectedRoomId && (
-                <ChatRoom
-                    roomId={selectedRoomId} 
-                    onBack={() => setView('list')} // 채팅방에서 뒤로가면 목록으로 이동
-                />
-                )}
+                    {/* 채팅창은 실제 ID가 있을 때만 렌더링하되, 입장 시 로딩 상태를 보여줘야 함 */}
+                    <div style={{ display: view === 'chat' ? 'block' : 'none' }}>
+                        {selectedRoomId ? (
+                            <div style={{ display: view === 'chat' ? 'block' : 'none' }}>
+                                <ChatRoom roomId={selectedRoomId} onBack={() => setView('list')} />
+                            </div>
+                        ) : (
+                            <div className="no-room"> 참여 중인 대화가 없습니다. </div>
+                        )}
+                    </div>
             </div>
 
             {/* 하단 내비게이션: 홈과 목록 이동용 */}

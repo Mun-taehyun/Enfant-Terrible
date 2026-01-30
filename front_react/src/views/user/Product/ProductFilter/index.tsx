@@ -47,7 +47,7 @@ export default function ProductFilter() {
                         <div className="total-unit">개 상품</div>
                     </div>    
                     <div className="sort-group">
-                        {SORT_OPTIONS.map((option) => (
+                        {SORT_OPTIONS.map((option) => (//정렬옵션 
                             <div
                             key={option.value}
                             className={`sort-item ${params.sort === option.value ? "is-active" : ""}`}

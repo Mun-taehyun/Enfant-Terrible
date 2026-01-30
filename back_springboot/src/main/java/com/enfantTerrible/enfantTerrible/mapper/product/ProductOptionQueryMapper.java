@@ -14,4 +14,8 @@ public interface ProductOptionQueryMapper {
   List<ProductOptionGroupRow> findOptionGroupsByProductId(@Param("productId") Long productId);
 
   List<ProductOptionValueRow> findOptionValuesByGroupId(@Param("optionGroupId") Long optionGroupId);
+
+  List<ProductOptionValueRow> findOptionValuesByGroupIds(
+      @Param("optionGroupIds") List<Long> optionGroupIds
+  );
 }

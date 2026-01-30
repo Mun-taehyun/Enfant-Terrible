@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.enfantTerrible.enfantTerrible.common.enums.ProductSortType;
+import com.enfantTerrible.enfantTerrible.dto.file.FileRow;
 import com.enfantTerrible.enfantTerrible.dto.product.ProductDiscountRow;
 import com.enfantTerrible.enfantTerrible.dto.product.ProductDetailResponse;
 import com.enfantTerrible.enfantTerrible.dto.product.ProductOptionGroupResponse;
@@ -88,11 +89,23 @@ public class ProductQueryService {
     );
 
     Map<Long, ProductDiscountRow> discountMap = new HashMap<>();
+    Map<Long, String> thumbnailUrlMap = new HashMap<>();
     if (!rows.isEmpty()) {
       List<Long> productIds = rows.stream().map(ProductRow::getProductId).toList();
       List<ProductDiscountRow> discounts = productDiscountMapper.findActiveByProductIds(productIds);
       for (ProductDiscountRow d : discounts) {
         discountMap.put(d.getProductId(), d);
+      }
+
+      List<FileRow> thumbnails = fileQueryService.findFirstFilesByRefIds(
+          REF_TYPE_PRODUCT,
+          FILE_ROLE_THUMBNAIL,
+          productIds
+      );
+      for (FileRow f : thumbnails) {
+        if (f != null && f.getRefId() != null) {
+          thumbnailUrlMap.put(f.getRefId(), f.getFileUrl());
+        }
       }
     }
 
@@ -125,13 +138,7 @@ public class ProductQueryService {
       res.setAverageRating(row.getAverageRating());
       res.setReviewCount(row.getReviewCount());
 
-      res.setThumbnailUrl(
-          fileQueryService.findFirstFileUrl(
-              REF_TYPE_PRODUCT,
-              row.getProductId(),
-              FILE_ROLE_THUMBNAIL
-          )
-      );
+      res.setThumbnailUrl(thumbnailUrlMap.get(row.getProductId()));
       return res;
     }).toList();
   }
@@ -185,6 +192,20 @@ public class ProductQueryService {
     List<ProductOptionGroupRow> groupRows =
         productOptionQueryMapper.findOptionGroupsByProductId(productId);
 
+    Map<Long, List<ProductOptionValueRow>> valueRowsByGroupId = new HashMap<>();
+    if (!groupRows.isEmpty()) {
+      List<Long> groupIds = groupRows.stream().map(ProductOptionGroupRow::getOptionGroupId).toList();
+      List<ProductOptionValueRow> allValueRows =
+          productOptionQueryMapper.findOptionValuesByGroupIds(groupIds);
+
+      for (ProductOptionValueRow v : allValueRows) {
+        if (v == null || v.getOptionGroupId() == null) continue;
+        valueRowsByGroupId
+            .computeIfAbsent(v.getOptionGroupId(), k -> new java.util.ArrayList<>())
+            .add(v);
+      }
+    }
+
     res.setOptionGroups(
         groupRows.stream().map(g -> {
           ProductOptionGroupResponse og = new ProductOptionGroupResponse();
@@ -192,7 +213,7 @@ public class ProductQueryService {
           og.setName(g.getName());
 
           List<ProductOptionValueRow> valueRows =
-              productOptionQueryMapper.findOptionValuesByGroupId(g.getOptionGroupId());
+              valueRowsByGroupId.getOrDefault(g.getOptionGroupId(), java.util.Collections.emptyList());
 
           og.setValues(
               valueRows.stream().map(v -> {

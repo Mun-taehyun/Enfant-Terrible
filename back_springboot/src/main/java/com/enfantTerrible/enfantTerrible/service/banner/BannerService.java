@@ -1,10 +1,14 @@
 package com.enfantTerrible.enfantTerrible.service.banner;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Collections;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.enfantTerrible.enfantTerrible.dto.file.FileRow;
 import com.enfantTerrible.enfantTerrible.dto.banner.BannerResponse;
 import com.enfantTerrible.enfantTerrible.dto.banner.BannerRow;
 import com.enfantTerrible.enfantTerrible.mapper.banner.BannerMapper;
@@ -24,24 +28,37 @@ public class BannerService {
   private final FileQueryService fileQueryService;
 
   public List<BannerResponse> getActiveBanners() {
-    return bannerMapper.findActiveBanners().stream()
-        .map(this::toResponse)
+    List<BannerRow> rows = bannerMapper.findActiveBanners();
+
+    if (rows == null || rows.isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    Map<Long, String> imageUrlMap = new HashMap<>();
+    List<Long> bannerIds = rows.stream().map(BannerRow::getBannerId).toList();
+    List<FileRow> thumbnails = fileQueryService.findFirstFilesByRefIds(
+        REF_TYPE_BANNER,
+        FILE_ROLE_THUMBNAIL,
+        bannerIds
+    );
+    for (FileRow f : thumbnails) {
+      if (f != null && f.getRefId() != null) {
+        imageUrlMap.put(f.getRefId(), f.getFileUrl());
+      }
+    }
+
+    return rows.stream()
+        .map(r -> toResponse(r, imageUrlMap.get(r.getBannerId())))
         .toList();
   }
 
-  private BannerResponse toResponse(BannerRow row) {
+  private BannerResponse toResponse(BannerRow row, String imageUrl) {
     BannerResponse res = new BannerResponse();
     res.setBannerId(row.getBannerId());
     res.setTitle(row.getTitle());
     res.setLinkUrl(row.getLinkUrl());
     res.setSortOrder(row.getSortOrder());
-    res.setImageUrl(
-        fileQueryService.findFirstFileUrl(
-            REF_TYPE_BANNER,
-            row.getBannerId(),
-            FILE_ROLE_THUMBNAIL
-        )
-    );
+    res.setImageUrl(imageUrl);
     return res;
   }
 }

@@ -1,6 +1,8 @@
 package com.enfantTerrible.enfantTerrible.service.product;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -18,6 +20,7 @@ import com.enfantTerrible.enfantTerrible.dto.product.ProductResponse;
 import com.enfantTerrible.enfantTerrible.dto.product.ProductRow;
 import com.enfantTerrible.enfantTerrible.dto.product.ProductSkuOptionRow;
 import com.enfantTerrible.enfantTerrible.dto.product.ProductSkuResponse;
+import com.enfantTerrible.enfantTerrible.dto.file.FileRow;
 import com.enfantTerrible.enfantTerrible.event.ProductViewedEvent;
 import com.enfantTerrible.enfantTerrible.exception.BusinessException;
 import com.enfantTerrible.enfantTerrible.mapper.admin.product.AdminProductOptionGroupMapper;
@@ -65,6 +68,21 @@ public class ProductService {
         offset
     );
 
+    Map<Long, String> thumbnailUrlMap = new HashMap<>();
+    if (!rows.isEmpty()) {
+      List<Long> productIds = rows.stream().map(ProductRow::getProductId).toList();
+      List<FileRow> thumbnails = fileQueryService.findFirstFilesByRefIds(
+          REF_TYPE_PRODUCT,
+          FILE_ROLE_THUMBNAIL,
+          productIds
+      );
+      for (FileRow f : thumbnails) {
+        if (f != null && f.getRefId() != null) {
+          thumbnailUrlMap.put(f.getRefId(), f.getFileUrl());
+        }
+      }
+    }
+
     return rows.stream().map(row -> {
       ProductResponse res = new ProductResponse();
       res.setProductId(row.getProductId());
@@ -73,13 +91,7 @@ public class ProductService {
       res.setName(row.getName());
       res.setDescription(row.getDescription());
       res.setPrice(row.getMinSkuPrice());
-      res.setThumbnailUrl(
-          fileQueryService.findFirstFileUrl(
-              REF_TYPE_PRODUCT,
-              row.getProductId(),
-              FILE_ROLE_THUMBNAIL
-          )
-      );
+      res.setThumbnailUrl(thumbnailUrlMap.get(row.getProductId()));
       return res;
     }).toList();
   }
