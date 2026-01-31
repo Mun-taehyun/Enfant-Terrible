@@ -1,4 +1,5 @@
 import { PAYMENT_METHOD_OPTIONS } from "@/constant/user/payment.index";
+import './style.css';
 
 
 

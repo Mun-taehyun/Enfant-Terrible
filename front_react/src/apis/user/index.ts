@@ -187,19 +187,19 @@ export const getProductRecommendationRequest = async () : Promise<GetProductList
     return apiClient.get(GET_PRODUCT_RECOMMENDATION_URL());}
 
 // ================================ 주문 ============================
-const POST_ORDER_FROM_CART_URL = () => `/order/from-cart`;
+const POST_ORDER_FROM_CART_URL = () => `/orders/from-cart`;
 //장바구니에서 주문하기 시.. 
-const POST_ORDER_DIRECT_URL = () => `/order/direct`;
+const POST_ORDER_DIRECT_URL = () => `/orders/direct`;
 //즉시 구매 주문하기 시..
-const GET_ORDER_MY_URL = (page : number , size : number) => `/order/my?page=${page}&size=${size}`;
+const GET_ORDER_MY_URL = (page : number , size : number) => `/orders/my?page=${page}&size=${size}`;
 //내 주문목록 조회
-const GET_ORDER_MY_DETAIL_URL = (orderId : number) => `order/my/${orderId}`;
+const GET_ORDER_MY_DETAIL_URL = (orderId : number) => `orders/my/${orderId}`;
 //내 주문 상세 조회
-const POST_ORDER_MY_CANCEL_URL = (orderId : number) => `order/my/${orderId}/cancel`;
+const POST_ORDER_MY_CANCEL_URL = (orderId : number) => `orders/my/${orderId}/cancel`;
 //내 주문 취소 
-const GET_ORDER_PREPARE_FROM_CART_URL = () => `/order/prepare/from-cart`;
+const GET_ORDER_PREPARE_FROM_CART_URL = () => `/orders/prepare/from-cart`;
 //장바구니 주문 사전조회
-const GET_ORDER_PREPARE_DIRECT = () => `/order/prepare/direct`;
+const GET_ORDER_PREPARE_DIRECT = () => `/orders/prepare/direct`;
 //즉시 주문 사전조회
 
 
@@ -222,8 +222,14 @@ export const getOrderPrepareFromCartRequest =async() : Promise<OrderPrepareRespo
     return apiClient.get(GET_ORDER_PREPARE_FROM_CART_URL());}
 
 export const getOrderPrepareDirectRequest = async(params : GetOrderParamRequestDto) : Promise<OrderPrepareResponseDto> => {
-    return apiClient.get(GET_ORDER_PREPARE_DIRECT(), {params});}
-    
+    const queryParams: any = {
+        productId: params.productId,
+        quantity: params.quantity,
+    };
+    if (Array.isArray(params.optionValueIds) && params.optionValueIds.length > 0) {
+        queryParams.optionValueIds = params.optionValueIds;
+    }
+    return apiClient.get(GET_ORDER_PREPARE_DIRECT(), { params: queryParams });}
 
 //================================= 결제 ============================
 const POST_PAYMENTS_CONFIRM_URL = () => `/payments/confirm`;

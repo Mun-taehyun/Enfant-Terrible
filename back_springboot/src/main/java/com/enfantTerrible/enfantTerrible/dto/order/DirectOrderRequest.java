@@ -14,6 +14,9 @@ import lombok.Setter;
 @Setter
 public class DirectOrderRequest {
 
+  // 결제에서 사용한 merchant_uid(주문코드)를 주문 생성 시 그대로 사용하고 싶을 때 전달
+  private String orderCode;
+
   @NotNull
   private Long productId;
 

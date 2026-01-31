@@ -14,6 +14,11 @@ interface Props {
 //컴포넌트 : 장바구니 
 export const CartCard = ({item, isSelected, onToggle, onQuantityChange, onDelete}: Props) => {
 
+    const optionValues = Array.isArray(item.optionValueList) ? item.optionValueList : [];
+    const safePrice = typeof item.price === 'number' ? item.price : Number(item.price) || 0;
+    const safeProductName = item.productName ?? '';
+    const safeThumbnailUrl = item.thumbnailUrl ?? '';
+
     //렌더 : 장바구니 
     return (
         <div className={`cart-card-item ${!item.isBuyable ? 'disabled' : ''}`}>
@@ -29,21 +34,21 @@ export const CartCard = ({item, isSelected, onToggle, onQuantityChange, onDelete
 
             {/* 이미지 */}
             <div className="image-area">
-                <img src={item.thumbnailUrl} alt={item.productName} />
+                <img src={safeThumbnailUrl} alt={safeProductName} />
                 {item.skuStatus === '품절' && <div className="overlay">품절</div>}
             </div>
 
             {/* 상품 상세 및 옵션 */}
             <div className="info-area">
-                <p className="product-name">{item.productName}</p>
+                <p className="product-name">{safeProductName}</p>
                 <div className="option-tags">
-                    {item.optionValueList.map(option => (
-                        <span key={option.optionValueId} className="option-tag">
-                            {option.value}: {option.value}
+                    {optionValues.map((option, idx) => (
+                        <span key={option.optionValueId ?? idx} className="option-tag">
+                            {option.value}
                         </span>
                     ))}
                 </div>
-                <p className="price-text">{item.price.toLocaleString()}원</p>
+                <p className="price-text">{safePrice.toLocaleString()}원</p>
                 {!item.isBuyable && <p className="reason-text">{item.buyableReason}</p>}
             </div>
 
@@ -54,7 +59,7 @@ export const CartCard = ({item, isSelected, onToggle, onQuantityChange, onDelete
                     <span>{item.quantity}</span>
                     <button onClick={() => onQuantityChange(item.cartItemId, item.quantity, 1)}>+</button>
                 </div>
-                <p className="subtotal-price">{(item.price * item.quantity).toLocaleString()}원</p>
+                <p className="subtotal-price">{(safePrice * item.quantity).toLocaleString()}원</p>
                 <button className="delete-btn" onClick={() => onDelete(item.cartItemId)}>삭제</button>
             </div>
         </div>

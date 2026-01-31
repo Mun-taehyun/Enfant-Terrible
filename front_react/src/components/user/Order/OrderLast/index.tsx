@@ -1,45 +1,25 @@
 import { useAuth } from "@/hooks/user/auth/use-sign.hook";
-import { useProduct } from "@/hooks/user/product/use-product.hook";
 import { orderQueries, paymentQueries, pointQueries } from "@/querys/user/queryhooks";
-
-// 1. 상세 타입 정의 (any 대신 사용)
-interface IamportResponse {
-  success: boolean;
-  error_msg?: string;
-  imp_uid?: string;
-  merchant_uid?: string;
-  paid_amount?: number;
-}
-
-interface IamportRequest {
-  channelKey?: string;
-  merchant_uid: string;
-  name: string;
-  amount: number;
-  buyer_email?: string;
-  buyer_name?: string;
-  buyer_tel?: string;
-}
-
-interface Iamport {
-  init: (merchantId: string) => void;
-  request_pay: (
-    data: IamportRequest,
-    callback: (rsp: IamportResponse) => void
-  ) => void;
-}
-
-// 2. Window 객체 확장
-declare global {
-  interface Window {
-    IMP: Iamport;
-  }
-}
+import * as PortOne from "@portone/browser-sdk/v2";
+import './style.css';
 
 interface OrderLastProps {
   totalAmount : number | null,
   paymentMethod: string,
   isBuyable: boolean | null,
+  mode: 'cart' | 'direct',
+  shipping: {
+    receiverName: string;
+    receiverPhone: string;
+    zipCode: string;
+    addressBase: string;
+    addressDetail: string | null;
+  },
+  directParams?: {
+    productId: number;
+    optionValueIds: number[];
+    quantity: number;
+  } | null,
 }
 
 
@@ -48,13 +28,14 @@ interface OrderLastProps {
 export default function OrderLast({
   totalAmount,
   paymentMethod,
-  isBuyable
+  isBuyable,
+  mode,
+  shipping,
+  directParams
 }: OrderLastProps) {
   
   //커스텀 훅 : 유저 
   const { myInfo } = useAuth();
-  //커스텀 훅 : 상품
-  const { searchParams } = useProduct();
 
   //서버상태 : 포인트조회
   const {data: pointData} = pointQueries.useBalance();
@@ -62,93 +43,184 @@ export default function OrderLast({
   //서버상태 : 결제
   const { mutate : paymentMutate, isPending } = paymentQueries.usePostPaymentConfirm();
 
-  const params = {
-    productId: Number(searchParams.get("productId")),  
-    optionValueIds: searchParams.getAll("optionValueIds").map(Number),
-    quantity: Number(searchParams.get("quantity")) || 1 
-  }
-
-  //서버상태 : 즉시 주문 준비
-  const {data : directInfo} = orderQueries.useGetOrderPrepareDirect(params);
-  const item = directInfo?.items?.[0];
-
 
   //서버상태 : 장바구니 주문생성 
-  const { mutate : cartData } = orderQueries.usePostOrderFromCart();
+  const { mutate: createOrderFromCart } = orderQueries.usePostOrderFromCart();
   //서버상태 : 즉시 주문생성 
-  const { mutate : directData } = orderQueries.usePostOrderDirect();
+  const { mutate: createOrderDirect } = orderQueries.usePostOrderDirect();
+
+  const envAny = import.meta.env as any;
+  const storeId = (envAny.VITE_PORTONE_STORE_ID ?? '') as string;
+  const channelKey = (envAny.VITE_PORTONE_CHANNEL_KEY ?? '') as string;
+  const enableMockPayment = String(envAny.VITE_ENABLE_MOCK_PAYMENT ?? '').toLowerCase() === 'true';
+
+  const uuid = () => {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') return crypto.randomUUID();
+    return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  };
+
+  const shortId = (length: number) => {
+    const alphabet = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const bytes = new Uint8Array(Math.max(1, length));
+    if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
+      crypto.getRandomValues(bytes);
+    } else {
+      for (let i = 0; i < bytes.length; i += 1) bytes[i] = Math.floor(Math.random() * 256);
+    }
+    let out = '';
+    for (let i = 0; i < length; i += 1) out += alphabet[bytes[i] % alphabet.length];
+    return out;
+  };
+
+  const toPortOnePayRequestExtras = (method: string): { payMethod: any; union?: Record<string, any> } => {
+    const m = (method ?? '').toUpperCase();
+
+    switch (m) {
+      case 'NAVERPAY':
+        return {
+          payMethod: (PortOne as any).PaymentPayMethod.EASY_PAY,
+          union: { easyPay: { easyPayProvider: (PortOne as any).EasyPayProvider.NAVERPAY } },
+        };
+      case 'KAKAOPAY':
+        return {
+          payMethod: (PortOne as any).PaymentPayMethod.EASY_PAY,
+          union: { easyPay: { easyPayProvider: (PortOne as any).EasyPayProvider.KAKAOPAY } },
+        };
+      case 'TOSSPAY':
+        return {
+          payMethod: (PortOne as any).PaymentPayMethod.EASY_PAY,
+          union: { easyPay: { easyPayProvider: (PortOne as any).EasyPayProvider.TOSSPAY } },
+        };
+
+      case 'TRANSFER':
+        return { payMethod: (PortOne as any).PaymentPayMethod.TRANSFER };
+      case 'VIRTUAL_ACCOUNT':
+        return { payMethod: (PortOne as any).PaymentPayMethod.VIRTUAL_ACCOUNT };
+      case 'MOBILE':
+        return { payMethod: (PortOne as any).PaymentPayMethod.MOBILE };
+
+      case 'CARD':
+      default:
+        return { payMethod: (PortOne as any).PaymentPayMethod.CARD };
+    }
+  };
 
 
 
   const handlePayment = () => {
     if (!paymentMethod) return alert('결제 수단을 선택하세요');
     if (!isBuyable) return alert('구매 불가 상품이 포함되어 있습니다');
-    if (isPending || !myInfo || !pointData || !item) return;
+    if (isPending || !myInfo) return;
+    if (totalAmount == null || !Number.isFinite(totalAmount) || totalAmount <= 0) {
+      return alert('결제 금액이 올바르지 않습니다');
+    }
 
+    if (!shipping.receiverName || !shipping.receiverPhone || !shipping.zipCode || !shipping.addressBase) {
+      return alert('배송 정보가 올바르지 않습니다');
+    }
 
-    if (cartData) {
-      cartData(  
+    // 결제 실패 시 주문이 생성되지 않도록, 결제(성공) -> 주문생성 -> 결제승인 순서로 진행
+    const orderCode = `ORD-${shortId(20)}`;
+    const paymentId = `pay_${shortId(24)}`;
+
+    const onPaid = (paidPaymentId: string) => {
+      const basePayload = {
+        orderCode,
+        receiverName: shipping.receiverName,
+        receiverPhone: shipping.receiverPhone,
+        zipCode: shipping.zipCode,
+        addressBase: shipping.addressBase,
+        addressDetail: shipping.addressDetail ?? null,
+        usedPoint: pointData?.balance ?? 0,
+      };
+
+      const confirmPayment = () => {
+        paymentMutate({
+          paymentId: paidPaymentId,
+          orderId: orderCode,
+          amount: totalAmount,
+        });
+      };
+
+      if (mode === 'cart') {
+        createOrderFromCart(basePayload as any, {
+          onSuccess: () => {
+            confirmPayment();
+          },
+          onError: () => alert('주문 생성에 실패했습니다.'),
+        });
+        return;
+      }
+
+      if (!directParams || !directParams.productId) {
+        alert('즉시구매 정보가 올바르지 않습니다');
+        return;
+      }
+
+      createOrderDirect(
         {
-          receiverName : myInfo?.name,
-          receiverPhone : myInfo?.tel,
-          zipCode: myInfo?.zipCode,
-          addressBase: myInfo?.addressBase,
-          addressDetail: myInfo?.addressDetail,
-          usedPoint: pointData?.balance
+          ...(basePayload as any),
+          productId: directParams.productId,
+          optionValueIds:
+            Array.isArray(directParams.optionValueIds) && directParams.optionValueIds.length > 0
+              ? directParams.optionValueIds.map((id: number) => ({ optionValueId: id, value: "" }))
+              : null,
+          quantity: directParams.quantity,
         },
         {
-        onSuccess: ({ orderCode, totalAmount }) => {
-          paymentEventHandler(orderCode, totalAmount);
-        },
+          onSuccess: () => {
+            confirmPayment();
+          },
+          onError: () => alert('주문 생성에 실패했습니다.'),
         }
       );
-    } else {
-      directData(
-        {
-          productId : item.productId,
-          optionValueIds : item.optionValueIds.map((id:number) => ({optionValueId: id , value: ""})) ,
-          quantity : item.quantity,
-          receiverName : myInfo?.name,
-          receiverPhone : myInfo?.tel,
-          zipCode: myInfo?.zipCode,
-          addressBase: myInfo?.addressBase,
-          addressDetail: myInfo?.addressDetail,
-          usedPoint: pointData?.balance
-        }, 
-        {
-        onSuccess: ({ orderCode, totalAmount }) => {
-          paymentEventHandler(orderCode, totalAmount);
-        },
-      });
-    }
-  };
-  
-  const paymentEventHandler = (orderCode: string, totalAmount:number) => {
-    const { IMP } = window;
-    if (!IMP) return alert("결제 모듈 로드 실패");
-
-    IMP.init("imp12345678"); // 가맹점 식별코드
-
-    const paymentData: IamportRequest = {
-      channelKey: "channel-key-f14164d3-e4ed-4429-a50c-459dca5ad0dc",
-      merchant_uid: orderCode, 
-      name: "테스트 상품",
-      amount: totalAmount,
-      buyer_name: "홍길동",
-      buyer_email: "test@test.com",
     };
 
-    IMP.request_pay(paymentData, (response) => {
-      if (response.success && response.imp_uid && response.merchant_uid && response.paid_amount) {
-        paymentMutate({
-          paymentId: response.imp_uid,
-          orderCode: response.merchant_uid,
-          amount: response.paid_amount,
-        });
-      } else {
-        alert(`결제 실패: ${response.error_msg}`);
+    if (enableMockPayment) {
+      onPaid(`payment-mock-${uuid()}`);
+      return;
+    }
+
+    if (!storeId || !channelKey) {
+      alert('PortOne 결제 설정(storeId/channelKey)이 없습니다. (환경변수 확인 필요)');
+      return;
+    }
+
+    (async () => {
+      try {
+        const { payMethod, union } = toPortOnePayRequestExtras(paymentMethod);
+
+        const response = await PortOne.requestPayment({
+          storeId,
+          channelKey,
+          paymentId,
+          orderName: "주문 결제",
+          totalAmount,
+          currency: "KRW" as any,
+          payMethod,
+          customer: {
+            fullName: shipping.receiverName,
+            phoneNumber: shipping.receiverPhone,
+            email: "test@test.com",
+          },
+          ...(union ?? {}),
+        } as any);
+
+        if (!response) {
+          alert('결제가 취소되었습니다.');
+          return;
+        }
+
+        if ((response as any)?.code !== undefined) {
+          alert(`결제 실패: ${(response as any)?.message ?? '결제에 실패했습니다.'}`);
+          return;
+        }
+
+        onPaid(paymentId);
+      } catch (e: any) {
+        alert(`결제 실패: ${e?.message ?? '결제에 실패했습니다.'}`);
       }
-    });
+    })();
   };
 
   return (

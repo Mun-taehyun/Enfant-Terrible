@@ -23,8 +23,11 @@ export const Cart = () => {
 
 
     const totalAmount = useMemo(() => {//총값 값 계산
-        const total = items.map( sum =>sum.price);
-        return total;
+        return items.reduce((sum, item) => {
+            const price = typeof item.price === 'number' ? item.price : Number(item.price) || 0;
+            const qty = typeof item.quantity === 'number' ? item.quantity : Number(item.quantity) || 0;
+            return sum + (price * qty);
+        }, 0);
     }, [items])
 
     return(
@@ -68,7 +71,7 @@ export const Cart = () => {
 
                 <div className="price-display">
                     <div className="price-label">총 주문금액</div>
-                    <div className="price-value">{totalAmount}원</div>
+                    <div className="price-value">{totalAmount.toLocaleString()}원</div>
                 </div>
 
                 <div className="order-submit-btn" onClick={handleOrderSubmit}>

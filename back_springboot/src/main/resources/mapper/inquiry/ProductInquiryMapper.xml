@@ -27,39 +27,39 @@
 
   <select id="findById" resultType="com.enfantTerrible.enfantTerrible.dto.inquiry.ProductInquiryRow">
     SELECT
-      inquiry_id,
-      product_id,
-      user_id,
+      i.inquiry_id,
+      i.product_id,
+      i.user_id,
       u.email AS user_email,
-      content,
-      is_private,
-      status,
-      answer_content,
-      answered_by_user_id,
-      answered_at,
-      created_at,
-      updated_at,
-      deleted_at
+      i.content,
+      i.is_private,
+      i.status,
+      i.answer_content,
+      i.answered_by_user_id,
+      i.answered_at,
+      i.created_at,
+      i.updated_at,
+      i.deleted_at
     FROM et_product_inquiry i
     INNER JOIN et_user u ON u.user_id = i.user_id
-    WHERE inquiry_id = #{inquiryId}
+    WHERE i.inquiry_id = #{inquiryId}
   </select>
 
   <select id="findByProductId" resultType="com.enfantTerrible.enfantTerrible.dto.inquiry.ProductInquiryRow">
     SELECT
-      inquiry_id,
-      product_id,
-      user_id,
+      i.inquiry_id,
+      i.product_id,
+      i.user_id,
       u.email AS user_email,
-      content,
-      is_private,
-      status,
-      answer_content,
-      answered_by_user_id,
-      answered_at,
-      created_at,
-      updated_at,
-      deleted_at
+      i.content,
+      i.is_private,
+      i.status,
+      i.answer_content,
+      i.answered_by_user_id,
+      i.answered_at,
+      i.created_at,
+      i.updated_at,
+      i.deleted_at
     FROM et_product_inquiry i
     INNER JOIN et_user u ON u.user_id = i.user_id
     WHERE i.product_id = #{productId}

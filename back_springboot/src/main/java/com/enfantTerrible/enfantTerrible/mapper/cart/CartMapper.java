@@ -34,6 +34,17 @@ public interface CartMapper {
       @Param("quantity") int quantity
   );
 
+  CartItemRow findCartItemByCartIdAndCartItemId(
+      @Param("cartId") Long cartId,
+      @Param("cartItemId") Long cartItemId
+  );
+
+  int updateCartItemQuantityByCartIdAndCartItemId(
+      @Param("cartId") Long cartId,
+      @Param("cartItemId") Long cartItemId,
+      @Param("quantity") int quantity
+  );
+
   int increaseCartItemQuantity(
       @Param("cartItemId") Long cartItemId,
       @Param("delta") int delta

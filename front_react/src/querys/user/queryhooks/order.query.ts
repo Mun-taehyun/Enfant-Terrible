@@ -19,7 +19,7 @@ export const orderQueries = {
         return useQuery({
             queryKey: orderKeys.prepare('direct', params),
             queryFn: () => getOrderPrepareDirectRequest(params),
-            enabled: !!params.productId,
+            enabled: Number.isFinite(params.productId) && params.productId > 0,
         });
     },
 

@@ -61,7 +61,10 @@ public class OrderService {
 
     long totalAmount = originalAmount - usedPoint;
 
-    String orderCode = "ORD-" + UUID.randomUUID();
+    String orderCode = cmd.getOrderCode();
+    if (orderCode == null || orderCode.isBlank()) {
+      orderCode = "ORD-" + UUID.randomUUID();
+    }
 
     orderMapper.insertOrder(
         cmd.getUserId(),

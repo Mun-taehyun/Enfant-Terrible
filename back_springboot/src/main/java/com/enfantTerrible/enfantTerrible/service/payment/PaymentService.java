@@ -3,6 +3,7 @@ package com.enfantTerrible.enfantTerrible.service.payment;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,10 +21,7 @@ import com.enfantTerrible.enfantTerrible.mapper.order.OrderMapper;
 import com.enfantTerrible.enfantTerrible.mapper.payment.PaymentMapper;
 import com.enfantTerrible.enfantTerrible.service.point.PointService;
 
-import lombok.RequiredArgsConstructor;
-
 @Service
-@RequiredArgsConstructor
 @Transactional
 public class PaymentService {
 
@@ -31,6 +29,22 @@ public class PaymentService {
   private final OrderMapper orderMapper;
   private final PortOneClient portOneClient;
   private final PointService pointService;
+
+  private final String portOneApiSecret;
+
+  public PaymentService(
+      PaymentMapper paymentMapper,
+      OrderMapper orderMapper,
+      PortOneClient portOneClient,
+      PointService pointService,
+      @Value("${portone.api-secret:}") String portOneApiSecret
+  ) {
+    this.paymentMapper = paymentMapper;
+    this.orderMapper = orderMapper;
+    this.portOneClient = portOneClient;
+    this.pointService = pointService;
+    this.portOneApiSecret = portOneApiSecret;
+  }
 
   public PaymentConfirmResponse confirm(Long userId, PaymentConfirmRequest req) {
 
@@ -73,6 +87,34 @@ public class PaymentService {
     payment.setPaidAt(null);
 
     paymentMapper.insert(payment);
+
+    // 개발/로컬 환경: PortOne API Secret이 없으면 외부 결제 조회를 생략하고 성공 처리
+    if (portOneApiSecret == null || portOneApiSecret.isBlank() || "dummy".equalsIgnoreCase(portOneApiSecret.trim())) {
+      LocalDateTime paidAt = LocalDateTime.now();
+      payment.setPaymentMethod(PaymentMethod.TOSSPAY);
+      payment.setPaymentStatus(PaymentStatus.SUCCESS);
+      payment.setPaidAt(paidAt);
+
+      paymentMapper.updateStatus(
+          payment.getPaymentId(),
+          payment.getPaymentStatus().name(),
+          payment.getPgTid(),
+          payment.getPaidAt()
+      );
+
+      orderMapper.updateOrderStatus(order.getOrderId(), OrderStatus.PAID.name());
+      pointService.earnForOrderIfAbsent(order.getUserId(), order.getOrderId(), order.getTotalAmount());
+
+      PaymentConfirmResponse res = new PaymentConfirmResponse();
+      res.setPaymentId(payment.getPaymentId());
+      res.setOrderId(order.getOrderId());
+      res.setPaymentStatus(payment.getPaymentStatus());
+      res.setPaymentMethod(payment.getPaymentMethod());
+      res.setPaymentAmount(payment.getPaymentAmount());
+      res.setPgTid(payment.getPgTid());
+      res.setPaidAt(paidAt.toString());
+      return res;
+    }
 
     try {
       PortOnePaymentResponse portonePayment = portOneClient.getPayment(req.getPaymentId());

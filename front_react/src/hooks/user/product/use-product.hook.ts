@@ -5,9 +5,7 @@ import { categoryQueries, productQueries } from "@/querys/user/queryhooks";
 import { useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useCart } from "../cart/use-cart.hook";
-
-
-
+import { ORDER_PATH, ORDER_PAYLOAD_PATH } from "@/constant/user/route.index";
 
 
 
@@ -30,6 +28,8 @@ export const useProduct = () => {
 
     //상태 : 옵션 선택상태 기록장 
     const [selectedOptions, setSelectedOptions] = useState<Record<number, number>>({});
+
+    const [quantity, setQuantity] = useState<number>(1);
 
     //상태 : 더 보기 클릭 이벤트 처리 
     const [isDescOpen, setIsDescOpen] = useState(false);
@@ -70,6 +70,15 @@ export const useProduct = () => {
         //마지막 인자로 인해 sku옵션이 완전히 결정이 되었을 경우 요청
     );
 
+    const hasOptions = optionGroups.length > 0;
+    const fallbackSku = Array.isArray(productDetail?.skus) && productDetail!.skus.length > 0 ? productDetail!.skus[0] : null;
+    const effectiveSku = hasOptions ? (resolvedSku ?? null) : (fallbackSku ? {
+        skuId: fallbackSku.skuId,
+        price: fallbackSku.discountedPrice ?? fallbackSku.price,
+        stock: fallbackSku.stock,
+        status: fallbackSku.status,
+    } : null);
+
     //이벤트핸들러: 옵션 클릭 이벤트 처리
     const optionClickEventhandle = (groupId: number, valueId: number) => {
         setSelectedOptions(prev => ({ ...prev, [groupId]: valueId }));
@@ -104,12 +113,10 @@ export const useProduct = () => {
         })
     }
 
-
     //이벤트핸들러 : 결과 내 카테고리 이동 (기본 필터 유지 카테고리만 누적변경)
     const SideCategoryEventHandler = (categoryId: number | string) => {
         updateSearchFilter({ categoryId: String(categoryId) });
     };
-
 
     //이벤트핸들러 : 페이지이동 시 Url 변경 , navigate 이동
     const onPageClickHandler = (page: number) => {
@@ -128,22 +135,43 @@ export const useProduct = () => {
         updateSearchFilter({sort: String(sortValue)})
     };
 
+    const handleBuyNow = () => {
+        if (hasOptions && !isAllSelected) {
+            alert("모든 옵션을 선택해야 구매할 수 있습니다.");
+            return;
+        }
+
+        if (!effectiveSku || !effectiveSku.skuId) return;
+        if (String(effectiveSku.status).toUpperCase() === 'SOLD_OUT' || (effectiveSku.stock ?? 0) <= 0) {
+            alert('품절된 상품입니다.');
+            return;
+        }
+
+        const nextParams = new URLSearchParams();
+        nextParams.set('productId', String(product));
+        nextParams.set('quantity', String(Number.isFinite(quantity) && quantity > 0 ? quantity : 1));
+        if (hasOptions) {
+            optionValueIds.forEach((id) => nextParams.append('optionValueIds', String(id)));
+        }
+        navigate(ORDER_PATH() + '/' + ORDER_PAYLOAD_PATH() + `?${nextParams.toString()}`);
+    };
 
     const handleAddToCart = () => {
-        // 1. 모든 옵션이 선택되었는지 먼저 확인
-        if (!isAllSelected) {
+        if (hasOptions && !isAllSelected) {
             alert("모든 옵션을 선택해야 장바구니에 담을 수 있습니다.");
             return;
         }
 
-        //resolvedSku가 확정되었을 때
-        if (!resolvedSku || !resolvedSku.skuId) return;
-        
+        if (!effectiveSku || !effectiveSku.skuId) return;
+        if (String(effectiveSku.status).toUpperCase() === 'SOLD_OUT' || (effectiveSku.stock ?? 0) <= 0) {
+            alert('품절된 상품입니다.');
+            return;
+        }
 
         // requestBody에 skuId , quantity 기입 
         const requestBody: CartItemRequestDto = {
-            skuId: resolvedSku.skuId, // Resolved된 SKU의 PK
-            quantity: 1        // 현재 컴포넌트의 수량 State
+            skuId: effectiveSku.skuId,
+            quantity: Number.isFinite(quantity) && quantity > 0 ? quantity : 1
         };
 
         // 장바구니 추가 요청 
@@ -156,7 +184,6 @@ export const useProduct = () => {
         });
     };
   
-    
     return { 
         params,                 searchParams,              currentSort,
         //초기화 변수           / 쿼리스트링 key=value 형식  /정렬 방식 
@@ -164,7 +191,8 @@ export const useProduct = () => {
         categoryTree,
         //카테고리 변수를 활용.. 
 
-        productDetail,        resolvedSku, isResolving, isDescOpen, selectedOptions,
+        productDetail,        resolvedSku: effectiveSku, isResolving, isDescOpen, selectedOptions,
+
         //상세보기데이터 , sku 설정 , 설정여부 대기 , 더보기 , 옵션상태 기록
 
         product,
@@ -187,7 +215,10 @@ export const useProduct = () => {
         toggleDesc,                 optionClickEventhandle,           
         //더보기 토글 이벤트 처리 /옵션 이벤트 처리
 
-        handleAddToCart
+        handleAddToCart,
+        handleBuyNow,
+        quantity,
+        setQuantity
         //장바구니 추가 이벤트 처리 
 
     };

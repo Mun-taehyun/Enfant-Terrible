@@ -123,6 +123,7 @@ public class OrderController {
 
     var cmd = cartOrderAssembler.fromCart(
         principal.getUserId(),
+        req.getOrderCode(),
         cartItems,
         req.getReceiverName(),
         req.getReceiverPhone(),

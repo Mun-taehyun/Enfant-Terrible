@@ -12,4 +12,16 @@
     ORDER BY option_value_id ASC
   </select>
 
+  <select id="findSkuOptionsBySkuIds" resultType="com.enfantTerrible.enfantTerrible.dto.product.ProductSkuOptionRow">
+    SELECT
+      sku_id AS skuId,
+      option_value_id AS optionValueId
+    FROM et_product_sku_option
+    WHERE sku_id IN
+    <foreach collection="skuIds" item="id" open="(" close=")" separator=",">
+      #{id}
+    </foreach>
+    ORDER BY sku_id ASC, option_value_id ASC
+  </select>
+
 </mapper>

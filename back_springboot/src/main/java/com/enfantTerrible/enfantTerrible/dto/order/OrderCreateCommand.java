@@ -9,6 +9,7 @@ import lombok.Setter;
 public class OrderCreateCommand {
 
   private Long userId;
+  private String orderCode;
   private List<OrderItemCommand> items;
 
   private Integer usedPoint;

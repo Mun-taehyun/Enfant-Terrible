@@ -1,6 +1,9 @@
 package com.enfantTerrible.enfantTerrible.service.cart;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +17,7 @@ import com.enfantTerrible.enfantTerrible.dto.cart.CartItemResponse;
 import com.enfantTerrible.enfantTerrible.dto.cart.CartItemRow;
 import com.enfantTerrible.enfantTerrible.dto.cart.CartItemUpdateRequest;
 import com.enfantTerrible.enfantTerrible.dto.cart.CartSkuRow;
+import com.enfantTerrible.enfantTerrible.dto.file.FileRow;
 import com.enfantTerrible.enfantTerrible.exception.BusinessException;
 import com.enfantTerrible.enfantTerrible.mapper.cart.CartMapper;
 import com.enfantTerrible.enfantTerrible.mapper.product.ProductSkuOptionValueQueryMapper;
@@ -88,6 +92,49 @@ public class CartService {
 
     List<CartItemRow> rows = cartMapper.findCartItems(cartId);
 
+    if (rows == null || rows.isEmpty()) {
+      return java.util.List.of();
+    }
+
+    List<Long> productIds = rows.stream()
+        .map(CartItemRow::getProductId)
+        .filter(id -> id != null)
+        .distinct()
+        .toList();
+
+    List<Long> skuIds = rows.stream()
+        .map(CartItemRow::getSkuId)
+        .filter(id -> id != null)
+        .distinct()
+        .toList();
+
+    Map<Long, String> thumbnailUrlByProductId = new HashMap<>();
+    if (!productIds.isEmpty()) {
+      List<FileRow> thumbnails = fileQueryService.findFirstFilesByRefIds(
+          FileRefType.PRODUCT.getCode(),
+          FileRole.THUMBNAIL.getCode(),
+          productIds
+      );
+      for (FileRow f : thumbnails) {
+        if (f != null && f.getRefId() != null) {
+          thumbnailUrlByProductId.put(f.getRefId(), f.getFileUrl());
+        }
+      }
+    }
+
+    Map<Long, List<Long>> optionValueIdsBySkuId = new HashMap<>();
+    if (!skuIds.isEmpty()) {
+      var skuOptions = skuOptionValueQueryMapper.findSkuOptionsBySkuIds(skuIds);
+      for (var so : skuOptions) {
+        if (so == null || so.getSkuId() == null || so.getOptionValueId() == null) {
+          continue;
+        }
+        optionValueIdsBySkuId
+            .computeIfAbsent(so.getSkuId(), k -> new ArrayList<>())
+            .add(so.getOptionValueId());
+      }
+    }
+
     return rows.stream().map(row -> {
 
       CartItemResponse res = new CartItemResponse();
@@ -101,17 +148,9 @@ public class CartService {
       res.setSkuStatus(row.getSkuStatus());
       res.setQuantity(row.getQuantity());
 
-      res.setThumbnailUrl(
-          fileQueryService.findFirstFileUrl(
-              FileRefType.PRODUCT.getCode(),
-              row.getProductId(),
-              FileRole.THUMBNAIL.getCode()
-          )
-      );
+      res.setThumbnailUrl(thumbnailUrlByProductId.get(row.getProductId()));
 
-      res.setOptionValueIds(
-          skuOptionValueQueryMapper.findOptionValueIdsBySkuId(row.getSkuId())
-      );
+      res.setOptionValueIds(optionValueIdsBySkuId.getOrDefault(row.getSkuId(), java.util.List.of()));
 
       // 구매 가능 여부 판단
       applyBuyableState(res);
@@ -133,12 +172,8 @@ public class CartService {
       throw new BusinessException("장바구니가 비어 있습니다.");
     }
 
-    // 소유자 검증을 cartId + cartItemId로 처리
-    List<CartItemRow> items = cartMapper.findCartItems(cartId);
-    CartItemRow target = items.stream()
-        .filter(i -> i.getCartItemId().equals(cartItemId))
-        .findFirst()
-        .orElse(null);
+    // 소유자 검증 + SKU 조회를 단건으로 처리 (전체 목록 조회 제거)
+    CartItemRow target = cartMapper.findCartItemByCartIdAndCartItemId(cartId, cartItemId);
 
     if (target == null) {
       throw new BusinessException("수정할 장바구니 항목이 없습니다.");
@@ -153,7 +188,7 @@ public class CartService {
       throw new BusinessException("재고가 부족합니다.");
     }
 
-    if (cartMapper.updateCartItemQuantity(cartItemId, quantity) == 0) {
+    if (cartMapper.updateCartItemQuantityByCartIdAndCartItemId(cartId, cartItemId, quantity) == 0) {
       throw new BusinessException("수량 변경에 실패했습니다.");
     }
   }

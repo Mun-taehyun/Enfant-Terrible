@@ -60,6 +60,7 @@ public class DirectOrderController {
 
     OrderCreateCommand cmd = new OrderCreateCommand();
     cmd.setUserId(principal.getUserId());
+    cmd.setOrderCode(req.getOrderCode());
     cmd.setItems(java.util.List.of(item));
     cmd.setReceiverName(req.getReceiverName());
     cmd.setReceiverPhone(req.getReceiverPhone());

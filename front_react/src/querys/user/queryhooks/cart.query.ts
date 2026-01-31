@@ -11,7 +11,17 @@ export const cartQueries = {
         return useQuery({
             queryKey: cartKeys.lists(),
             queryFn: getCartItemRequest,
-            select: (data) => ({ cartList: Array.isArray(data) ? data : [] }),
+            select: (data) => {
+                if (data && typeof data === 'object' && Array.isArray((data as any).cartList)) {
+                    return { cartList: (data as any).cartList };
+                }
+
+                if (Array.isArray(data)) {
+                    return { cartList: data };
+                }
+
+                return { cartList: [] };
+            },
             enabled: !!token
         });
     },
@@ -31,8 +41,25 @@ export const cartQueries = {
     useUpdateItem: () => {
         return useMutation({
             mutationFn: putCartItemRequest,
-            onSuccess: () => {
-                queryClient.invalidateQueries({ queryKey: cartKeys.all });
+            onMutate: async ({ cartItemId, requestBody }) => {
+                await queryClient.cancelQueries({ queryKey: cartKeys.lists() });
+
+                const prev = queryClient.getQueryData<any>(cartKeys.lists());
+
+                queryClient.setQueryData(cartKeys.lists(), (old: any) => {
+                    const prevList = Array.isArray(old?.cartList) ? old.cartList : [];
+                    const nextList = prevList.map((it: any) =>
+                        it?.cartItemId === cartItemId ? { ...it, quantity: requestBody.quantity } : it
+                    );
+                    return { ...(old ?? {}), cartList: nextList };
+                });
+
+                return { prev };
+            },
+            onError: (_err, _vars, ctx) => {
+                if (ctx?.prev) {
+                    queryClient.setQueryData(cartKeys.lists(), ctx.prev);
+                }
             },
         });
     },

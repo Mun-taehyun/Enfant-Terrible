@@ -13,6 +13,7 @@ public class CartOrderAssembler {
 
   public OrderCreateCommand fromCart(
       Long userId,
+      String orderCode,
       List<CartItemResponse> cartItems,
       String receiverName,
       String receiverPhone,
@@ -24,6 +25,7 @@ public class CartOrderAssembler {
 
     OrderCreateCommand cmd = new OrderCreateCommand();
     cmd.setUserId(userId);
+    cmd.setOrderCode(orderCode);
     cmd.setReceiverName(receiverName);
     cmd.setReceiverPhone(receiverPhone);
     cmd.setZipCode(zipCode);

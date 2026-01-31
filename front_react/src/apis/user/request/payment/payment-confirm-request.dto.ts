@@ -1,6 +1,6 @@
 export default interface PaymentConfirmRequestDto {
     paymentId: string | number;
-    orderCode: string;
+    orderId: string;
     amount: number;
 }
 //

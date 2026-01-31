@@ -55,6 +55,23 @@
     WHERE cart_item_id = #{cartItemId}
   </update>
 
+  <select id="findCartItemByCartIdAndCartItemId" resultType="CartItemRow">
+    SELECT
+      cart_item_id,
+      sku_id,
+      quantity
+    FROM et_cart_item
+    WHERE cart_id = #{cartId}
+      AND cart_item_id = #{cartItemId}
+  </select>
+
+  <update id="updateCartItemQuantityByCartIdAndCartItemId">
+    UPDATE et_cart_item
+    SET quantity = #{quantity}
+    WHERE cart_id = #{cartId}
+      AND cart_item_id = #{cartItemId}
+  </update>
+
   <update id="increaseCartItemQuantity">
     UPDATE et_cart_item
     SET quantity = quantity + #{delta}

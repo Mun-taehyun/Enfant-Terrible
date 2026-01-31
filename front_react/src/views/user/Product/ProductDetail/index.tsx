@@ -10,11 +10,6 @@ import { inquiryQueries } from "@/querys/user/queryhooks/inquiry.query";
 import './style.css';
 
 
-
-
-
-
-
 //컴포넌트 : 제품 상세페이지 
 export default function ProductDetail() {
 
@@ -28,6 +23,9 @@ export default function ProductDetail() {
             selectedOptions,  
             optionClickEventhandle, 
             handleAddToCart, //장바구니 추가
+            quantity,
+            setQuantity,
+            handleBuyNow,
         } = useProduct();
 
 
@@ -105,6 +103,27 @@ export default function ProductDetail() {
                         ))}
                     </div>
 
+                    <div className="quantity-selection-area">
+                        <div className="group-label">수량</div>
+                        <div className="value-grid">
+                            <div
+                                className={`value-card ${(quantity ?? 1) <= 1 ? 'disabled' : ''}`}
+                                onClick={() => setQuantity((quantity ?? 1) - 1)}
+                            >
+                                -
+                            </div>
+                            <div className="value-card active">
+                                {Number.isFinite(quantity) ? quantity : 1}
+                            </div>
+                            <div
+                                className="value-card"
+                                onClick={() => setQuantity((Number.isFinite(quantity) ? quantity : 1) + 1)}
+                            >
+                                +
+                            </div>
+                        </div>
+                    </div>
+
                     {/* 선택 완료 시 나타나는 SKU 상태바 */}
                     {resolvedSku && (//선택이 되었을 경우 sku 요청 
                         <div className={`sku-status-bar ${resolvedSku.status}`}>
@@ -116,7 +135,13 @@ export default function ProductDetail() {
 
                     <div className="sticky-action-buttons">
                         <div className="cart-action" onClick={handleAddToCart}>장바구니</div>
-                        <div className={`buy-now-action ${(!resolvedSku || resolvedSku.status === 'SOLD_OUT') ? 'disabled' : ''}`}>
+                        <div
+                            className={`buy-now-action ${(!resolvedSku || resolvedSku.status === 'SOLD_OUT') ? 'disabled' : ''}`}
+                            onClick={() => {
+                                if (!resolvedSku || resolvedSku.status === 'SOLD_OUT') return;
+                                handleBuyNow();
+                            }}
+                        >
                             {resolvedSku?.status === 'SOLD_OUT' ? '구매 불가' : '바로 구매하기'}
                         </div>
                     </div>

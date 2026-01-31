@@ -86,9 +86,119 @@ public class AdminOrderService {
       throw new BusinessException("주문을 찾을 수 없습니다.");
     }
 
+    if (s == OrderStatus.CANCELLED) {
+      cancelOrderFully(orderId, "관리자 주문 취소");
+      return;
+    }
+
     int updated = adminOrderMapper.updateOrderStatus(orderId, s.name());
     if (updated != 1) {
       throw new BusinessException("주문 상태 변경에 실패했습니다.");
+    }
+  }
+
+  private void cancelOrderFully(Long orderId, String reason) {
+
+    OrderRow order = orderMapper.findByIdForPayment(orderId);
+    if (order == null) {
+      throw new BusinessException("주문을 찾을 수 없습니다.");
+    }
+
+    if (order.getOrderStatus() == null) {
+      throw new BusinessException("주문 상태 값이 올바르지 않습니다.");
+    }
+
+    // 배송중/배송완료 상태에서는 취소 불가
+    if (order.getOrderStatus() == OrderStatus.SHIPPING || order.getOrderStatus() == OrderStatus.DELIVERED) {
+      throw new BusinessException("배송중 또는 배송완료된 주문은 취소할 수 없습니다.");
+    }
+
+    if (order.getOrderStatus() == OrderStatus.CANCELLED) {
+      throw new BusinessException("이미 취소된 주문입니다.");
+    }
+
+    List<OrderItemRow> items = orderItemMapper.findByOrderId(orderId);
+    if (items == null || items.isEmpty()) {
+      throw new BusinessException("주문 상품이 없습니다.");
+    }
+
+    long refundAmount = 0L;
+    for (OrderItemRow it : items) {
+      int qty = it.getQuantity() == null ? 0 : it.getQuantity();
+      int cancelled = it.getCancelledQuantity() == null ? 0 : it.getCancelledQuantity();
+      int remaining = qty - cancelled;
+      if (remaining <= 0) {
+        continue;
+      }
+      long price = it.getPrice() == null ? 0L : it.getPrice();
+      refundAmount += price * remaining;
+    }
+
+    if (refundAmount <= 0) {
+      throw new BusinessException("환불 금액이 0입니다.");
+    }
+
+    long originalAmount = order.getOriginalAmount() == null ? 0L : order.getOriginalAmount();
+    int usedPoint = order.getUsedPoint() == null ? 0 : order.getUsedPoint();
+    int alreadyRefundedPoint = order.getUsedPointRefunded() == null ? 0 : order.getUsedPointRefunded();
+    int maxRefundablePoint = Math.max(0, usedPoint - alreadyRefundedPoint);
+
+    int refundPoint = 0;
+    if (originalAmount > 0 && maxRefundablePoint > 0) {
+      long shouldRefundTotal = (refundAmount * usedPoint) / originalAmount;
+      if (shouldRefundTotal > Integer.MAX_VALUE) {
+        shouldRefundTotal = Integer.MAX_VALUE;
+      }
+      refundPoint = (int) Math.min(maxRefundablePoint, Math.max(0L, shouldRefundTotal));
+    }
+
+    long refundCashAmount = refundAmount - refundPoint;
+    if (refundCashAmount < 0) {
+      refundCashAmount = 0;
+    }
+
+    PaymentRow paid = paymentMapper.findLatestSuccessByOrderId(orderId);
+    if (paid != null && paid.getPgTid() != null && !paid.getPgTid().isBlank()) {
+      portOneClient.cancelPayment(paid.getPgTid(), refundCashAmount, reason);
+
+      PaymentRow refundRow = new PaymentRow();
+      refundRow.setOrderId(orderId);
+      refundRow.setPaymentMethod(paid.getPaymentMethod());
+      refundRow.setPaymentAmount(refundCashAmount);
+      refundRow.setPaymentStatus(PaymentStatus.REFUND);
+      refundRow.setPgTid(paid.getPgTid());
+      refundRow.setPaidAt(paid.getPaidAt());
+      paymentMapper.insert(refundRow);
+    }
+
+    for (OrderItemRow it : items) {
+      int qty = it.getQuantity() == null ? 0 : it.getQuantity();
+      int cancelled = it.getCancelledQuantity() == null ? 0 : it.getCancelledQuantity();
+      int remaining = qty - cancelled;
+      if (remaining <= 0) {
+        continue;
+      }
+
+      int updated = orderItemMapper.increaseCancelledQuantity(orderId, it.getSkuId(), remaining);
+      if (updated != 1) {
+        throw new BusinessException("주문 취소 처리에 실패했습니다.");
+      }
+
+      stockMapper.increaseStock(it.getSkuId(), remaining);
+    }
+
+    int newRefundedPoint = alreadyRefundedPoint + refundPoint;
+    int orderUpdated = orderMapper.updateStatusTotalAndUsedPointRefunded(orderId, OrderStatus.CANCELLED.name(), 0L, newRefundedPoint);
+    if (orderUpdated != 1) {
+      throw new BusinessException("주문 상태 갱신에 실패했습니다.");
+    }
+
+    if (refundPoint > 0 && order.getUserId() != null) {
+      pointService.refundUsedForOrder(order.getUserId(), orderId, refundPoint, "주문 취소 포인트 반환");
+    }
+
+    if (order.getUserId() != null) {
+      pointService.revokeEarnForOrderIfExists(order.getUserId(), orderId, refundCashAmount);
     }
   }
 

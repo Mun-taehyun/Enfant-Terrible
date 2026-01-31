@@ -117,18 +117,18 @@
 
   <select id="findMyOrders" resultType="com.enfantTerrible.enfantTerrible.dto.order.MyOrderListItemResponse">
     SELECT
-      order_id AS orderId,
-      order_code AS orderCode,
-      order_status AS status,
-      total_amount AS totalAmount,
+      et_order.order_id AS orderId,
+      et_order.order_code AS orderCode,
+      et_order.order_status AS status,
+      et_order.total_amount AS totalAmount,
 
       rep.product_name AS representativeProductName,
       rep.thumbnail_url AS representativeThumbnailUrl,
 
-      tracking_number AS trackingNumber,
-      ordered_at AS orderedAt,
-      shipped_at AS shippedAt,
-      delivered_at AS deliveredAt
+      et_order.tracking_number AS trackingNumber,
+      et_order.ordered_at AS orderedAt,
+      et_order.shipped_at AS shippedAt,
+      et_order.delivered_at AS deliveredAt
     FROM et_order
     LEFT JOIN (
       SELECT
@@ -155,8 +155,8 @@
       ) tf ON tf.ref_id = ps.product_id
       LEFT JOIN et_file f ON f.file_id = tf.min_file_id
     ) rep ON rep.order_id = et_order.order_id
-    WHERE user_id = #{userId}
-    ORDER BY order_id DESC
+    WHERE et_order.user_id = #{userId}
+    ORDER BY et_order.order_id DESC
     LIMIT #{size} OFFSET #{offset}
   </select>
 

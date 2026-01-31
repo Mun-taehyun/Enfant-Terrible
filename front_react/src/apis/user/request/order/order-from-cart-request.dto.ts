@@ -1,4 +1,5 @@
 export default interface OrderFromCartRequestDto {
+    orderCode?: string;
     receiverName : string;
     receiverPhone : string;
     zipCode: string;
