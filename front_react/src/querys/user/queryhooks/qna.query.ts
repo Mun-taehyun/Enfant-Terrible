@@ -11,9 +11,7 @@ export const qnaQueries = {
             queryKey: qnaKeys.rooms(),
             queryFn: getQnaRoomRequest,
             refetchOnWindowFocus: true,
-            //메시지 동기화가 자주 일어나면 사용되는 옵션
-            //사용자가 브라우저를 바라보면 데이터 고칠 지 여부
-            select: (data) => data || null
+            // 유저는 방이 1개(없으면 생성)라서 서버 응답을 그대로 사용
         });
     },
 

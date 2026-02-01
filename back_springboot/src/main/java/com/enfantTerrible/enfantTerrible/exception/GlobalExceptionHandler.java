@@ -27,6 +27,7 @@ public class GlobalExceptionHandler {
         || uri.startsWith("/css/")
         || uri.startsWith("/js/")
         || uri.startsWith("/images/")
+        || uri.startsWith("/uploads/")
         || uri.startsWith("/webjars/")
         || uri.startsWith("/.well-known/");
   }

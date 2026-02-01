@@ -7,6 +7,7 @@ import { useReview } from "@/hooks/user/review/use-review.hook";
 import Pagination from "@/components/user/Pagination";
 import InquiryBox from "@/components/user/Inquiry";
 import { inquiryQueries } from "@/querys/user/queryhooks/inquiry.query";
+import InquiryWriteForm from "@/views/user/Inquiry";
 import './style.css';
 
 
@@ -31,12 +32,19 @@ export default function ProductDetail() {
 
 
     //상태 : 탭에 따른 뷰 변화
-    const [activeTab, setActiveTab] = useState<'detail' | 'review' | 'inquiry' | 'delivery'>('detail');
-    //상태 : 별점 값 저장 
-    const [rating, setRating] = useState("5");
+    const [activeTab, setActiveTab] = useState<'detail' | 'review' | 'qna' | 'delivery'>('detail');
 
     //커스텀 훅 : 리뷰 데이터 호출
-    const {reviewData } = useReview();
+    const {
+        reviewData,
+        rating,
+        setRating,
+        reviewText,
+        setReviewText,
+        handleFileChange,
+        resetForm,
+        reviewInsertUpdateEventHandler,
+    } = useReview();
     //서버상태 : 문의 
     const {data : inquiryData} = inquiryQueries.useGetInquiries(product, Number(searchParams.get("page")), 5); 
 
@@ -153,7 +161,7 @@ export default function ProductDetail() {
                     <div
                         key={tab.key}
                         className={`product-tab-item ${activeTab === tab.key ? 'active' : ''}`}
-                        onClick={() => setActiveTab(tab.key as 'detail' | 'review' | 'inquiry' | 'delivery')}
+                        onClick={() => setActiveTab(tab.key as 'detail' | 'review' | 'qna' | 'delivery')}
                     >
                         {tab.label}
                     </div>
@@ -162,40 +170,72 @@ export default function ProductDetail() {
             <div className="product-tab-content">
                 {activeTab === 'detail' && <ProductContent />}
                 {activeTab === 'review' && (
-                    <div id="review-container">
-                        {/* 별점 영역: input 태그는 반드시 /> 로 닫아야 함 */}
-                        <div className="rating-group">
-                            {[5, 4, 3, 2, 1].map((num) => (//값에 따른 변수 변동 => 작성 , 수정 시 사용
-                                <label key={num} htmlFor={`s${num}`}>
-                                <input type="radio" name="rating" value={num} id={`s${num}`} checked={rating === String(num)}
-                                    onChange={(e) => setRating(e.target.value)}
-                                />★</label>
-                            ))}
-                        </div>
-                        <div className="content-group">
-                            <textarea id="reviewText" placeholder="내용을 입력하세요"></textarea>
-                        </div>
+                    <div className="tab-section">
+                        <div id="review-container">
 
-                        <div className="button-group">
-                            <button type="button" id="btn-save">등록하기</button>
-                            {/* style 속성은 객체 형태로 전달 */}
-                            <button type="button" id="btn-update" style={{ display: 'none' }}>수정완료</button>
-                            <button type="button" id="btn-cancel" style={{ display: 'none' }}>취소</button>
-                        </div>
+                            <div className="write-header">상품 후기 작성</div>
 
-                        
-                        {reviewData ? reviewData?.reviewList.map((item) => (//리뷰 목록 렌더링
-                            <ReviewCard key={item.reviewId} props={item} />
-                        )) : "리뷰가 존재하지 않습니다"
-                        }
-                        <div className="pagination-review">
-                            <Pagination totalCount={reviewData?.reviewList.length} size={5}/>
+                            {/* 별점 영역: input 태그는 반드시 /> 로 닫아야 함 */}
+                            <div className="rating-group">
+                                {Array.from({ length: 5 }, (_, idx) => idx + 1).map((num) => (
+                                    <button
+                                        key={num}
+                                        type="button"
+                                        className={`rating-star ${num <= Number(rating) ? 'active' : ''}`}
+                                        onClick={() => setRating(String(num))}
+                                        aria-label={`별점 ${num}점 선택`}
+                                    >
+                                        ★
+                                    </button>
+                                ))}
+                                <span className="rating-value">{Number(rating)}/5</span>
+                            </div>
+                            <div className="content-group">
+                                <textarea
+                                    id="reviewText"
+                                    placeholder="내용을 입력하세요"
+                                    value={reviewText}
+                                    onChange={(e) => setReviewText(e.target.value)}
+                                ></textarea>
+                            </div>
+
+                            <div className="write-image-section">
+                                <label className="image-upload-label">
+                                    <input
+                                        type="file"
+                                        multiple
+                                        accept="image/*"
+                                        onChange={handleFileChange}
+                                        hidden
+                                    />
+                                    <div className="plus-icon">+</div>
+                                    <div className="count-text">첨부</div>
+                                </label>
+                            </div>
+
+                            <div className="write-actions">
+                                <div className="btn-cancel" onClick={resetForm}>취소</div>
+                                <div className="btn-submit" onClick={reviewInsertUpdateEventHandler}>등록하기</div>
+                            </div>
+
+                            {reviewData ? reviewData?.reviewList.map((item) => (//리뷰 목록 렌더링
+                                <ReviewCard key={item.reviewId} props={item} />
+                            )) : "리뷰가 존재하지 않습니다"}
+                            <div className="pagination-review">
+                                <Pagination totalCount={reviewData?.reviewList.length} size={5}/>
+                            </div>
                         </div>
                     </div>
                 )}
-                {activeTab === 'inquiry' && ( //문의데이터가 있을 경우에 ... 
-                    inquiryData ? inquiryData.inquiryList.map( (item) => (<InquiryBox item={item} />)):
-                    <div> 문의 내역이 존재하지 않습니다. </div>
+                {activeTab === 'qna' && ( //문의데이터가 있을 경우에 ... 
+                    <div className="tab-section">
+                        <InquiryWriteForm />
+                        {inquiryData && inquiryData.inquiryList.length > 0 ? (
+                            inquiryData.inquiryList.map((item) => (<InquiryBox key={item.inquiryId} item={item} />))
+                        ) : (
+                            <div> 문의 내역이 존재하지 않습니다. </div>
+                        )}
+                    </div>
                 )}
             </div>
         </div>

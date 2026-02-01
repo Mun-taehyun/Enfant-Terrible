@@ -230,6 +230,83 @@
     padding-top: 20px;
 }
 
+.tab-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.tab-section .write-header {
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 6px;
+    color: #222;
+}
+
+.tab-section .write-image-section {
+    display: flex;
+    gap: 15px;
+}
+
+.tab-section .image-upload-label {
+    width: 100px;
+    height: 100px;
+    border: 2px dashed #ddd;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tab-section .image-upload-label:hover {
+    border-color: #ff8e0b;
+}
+
+.tab-section .plus-icon {
+    font-size: 24px;
+    color: #aaa;
+    margin-bottom: 5px;
+}
+
+.tab-section .count-text {
+    font-size: 12px;
+    color: #999;
+}
+
+.tab-section .write-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.tab-section .write-actions div {
+    flex: 1;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.tab-section .btn-cancel {
+    background-color: #f5f5f5;
+    color: #888;
+}
+
+.tab-section .btn-submit {
+    background-color: #ff8e0b;
+    color: #fff;
+}
+
 /* =========================
    리뷰 영역
 ========================= */
@@ -239,13 +316,31 @@
     gap: 20px;
 }
 
-.rating-group label {
-    font-size: 24px;
-    cursor: pointer;
+.rating-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
-.rating-group input {
-    display: none;
+.rating-star {
+    font-size: 26px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: #cfcfcf;
+    line-height: 1;
+}
+
+.rating-star.active {
+    color: #f5c518;
+}
+
+.rating-value {
+    margin-left: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #555;
 }
 
 .content-group textarea {
@@ -273,4 +368,45 @@
 #btn-save {
     background-color: #ff8e0b;
     color: #fff;
+}
+
+/* inquiry tab: scoped alignment to review tab */
+.tab-section .inquiry-write-container {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+}
+
+.tab-section .write-header {
+    margin-bottom: 16px;
+}
+
+.tab-section .write-textarea {
+    height: 120px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+}
+
+.tab-section .write-actions {
+    margin-top: 16px;
+}
+
+.tab-section .btn-submit {
+    background-color: #ff8e0b;
+    color: #fff;
+}
+
+.tab-section .inquiry-item-container {
+    border: 1px solid #eee;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.tab-section .inquiry-header {
+    padding: 16px;
+}
+
+.tab-section .inquiry-body-content {
+    padding: 16px;
 }

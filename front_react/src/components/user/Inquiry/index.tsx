@@ -1,6 +1,7 @@
 import { useLoginUserStore } from "@/stores/user";
 import { InquiryItem } from "@/types/user/interface";
 import { useState } from "react";
+import './style.css';
 
 
 interface Props {

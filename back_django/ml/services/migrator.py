@@ -6,6 +6,7 @@ import numpy as np
 from sqlalchemy import create_engine, text
 from datetime import datetime
 from pathlib import Path
+from urllib.parse import quote_plus
 
 # --- Django 환경 초기화 ---
 current_path = Path(__file__).resolve()
@@ -22,15 +23,16 @@ def migrate_to_et_tables_latest():
     PROD_CSV = LOGS_PATH / "product_master_erd.csv"
     CAT_CSV = LOGS_PATH / "category_master.csv" # 카테고리 파일 추가
 
-    # [중요] 사용자 ID 'enfant' 반영 및 DB 설정
-    DB_USER = "kosmo"  # 사용자님의 User ID 반영
-    DB_PASS = "1234"    # 실제 비밀번호로 확인 필요
-    DB_HOST = "localhost"
-    DB_PORT = "3306"
-    DB_NAME = "kosmo"
+    db_conf = settings.DATABASES['default']
+    u = db_conf.get('USER')
+    p = db_conf.get('PASSWORD') or ""
+    h = db_conf.get('HOST')
+    port = db_conf.get('PORT')
+    db_name = db_conf.get('NAME')
 
-    DB_URL = f"mysql+pymysql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-    engine = create_engine(DB_URL, pool_pre_ping=True)
+    safe_pw = quote_plus(str(p))
+    db_url = f"mysql+pymysql://{u}:{safe_pw}@{h}:{port}/{db_name}?charset=utf8mb4"
+    engine = create_engine(db_url, pool_pre_ping=True)
 
     try:
         # 파일 존재 확인

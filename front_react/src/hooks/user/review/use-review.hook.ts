@@ -2,7 +2,7 @@ import { reviewQueries } from '@/querys/user/queryhooks/review.query';
 import { useState } from 'react';
 import { useParams} from 'react-router-dom';
 import { useProduct } from '../product/use-product.hook';
-import { fileQueries, orderQueries } from '@/querys/user/queryhooks';
+import { orderQueries } from '@/querys/user/queryhooks';
 import ReviewItem from '@/types/user/interface/review.interface';
 
 export function useReview() {
@@ -13,7 +13,6 @@ export function useReview() {
     //커스텀 훅 : page 
     const {searchParams} = useProduct();
     const page = Number(searchParams.get("page")); //임시 page 변수 
-    
 
     //서버상태: 서버에서 가져온 리뷰 목록 상태 (실제 환경에선 API로 관리)
     const {data : reviewData} = reviewQueries.useGetReviews(product,page,5);
@@ -33,6 +32,10 @@ export function useReview() {
     const [editingId, setEditingId] = useState<number | null>(null);
     //상태: 이미지 배열 상태여부
     const [imageUrlList , setImageUrlList] = useState<string[]>([]);
+    //상태: 업로드할 이미지 파일들
+    const [imageFiles, setImageFiles] = useState<File[]>([]);
+    //상태: 미리보기 URL
+    const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
 
     //이벤트핸들러 : 생성 , 수정 리뷰 이벤트핸들러
     const reviewInsertUpdateEventHandler = () => {
@@ -46,7 +49,8 @@ export function useReview() {
         if (editingId) {//수정 시 
             updateMutation.mutate({
                 reviewId: editingId,
-                body: requestBody
+                body: requestBody,
+                images: imageFiles
             }, {
                 onSuccess: () => resetForm()
             });
@@ -55,32 +59,48 @@ export function useReview() {
             if(!orderData?.items[0].orderId) return;
             createMutation.mutate(
                 {
-                    orderId: orderData?.items[0].orderId,
-                    ...requestBody
-                }, 
+                    body: {
+                        orderId: orderData?.items[0].orderId,
+                        ...requestBody
+                    },
+                    images: imageFiles
+                },
                 {onSuccess: () => resetForm()}
             );
         }
     };
-
-    //서버상태: 파일쿼리 호출
-    const uploadMutation = fileQueries.useUploadFile();
 
     // 파일 선택 시 실행되는 핸들러
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
         if (!files || files.length === 0) return;
 
-        const formData = new FormData();
-        Array.from(files).forEach((file) => {
-            formData.append('file', file); // 백엔드 필드명에 맞게 수정 ('images' 등)
+        const incoming = Array.from(files);
+        setImageFiles((prev) => {
+            const merged = [...prev, ...incoming].slice(0, 5);
+            return merged;
         });
 
-        //데이터 , 성공 시 => setImageUrlList를 받아온다. "이미지.."
-        uploadMutation.mutate(formData, {
-            onSuccess: (response) => {
-                setImageUrlList(prev => [...prev, ...response.data]);
+        const incomingPreviews = incoming.map((f) => URL.createObjectURL(f));
+        setImagePreviewUrls((prev) => {
+            const merged = [...prev, ...incomingPreviews].slice(0, 5);
+            // 초과된 preview는 revoke
+            if (merged.length < prev.length + incomingPreviews.length) {
+                const overflow = [...prev, ...incomingPreviews].slice(5);
+                overflow.forEach((u) => URL.revokeObjectURL(u));
             }
+            return merged;
+        });
+
+        e.target.value = '';
+    };
+
+    const removeImageAt = (index: number) => {
+        setImageFiles((prev) => prev.filter((_, i) => i !== index));
+        setImagePreviewUrls((prev) => {
+            const target = prev[index];
+            if (target) URL.revokeObjectURL(target);
+            return prev.filter((_, i) => i !== index);
         });
     };
 
@@ -100,18 +120,23 @@ export function useReview() {
         }
     };
 
-
     const resetForm = () => {
         setEditingId(null);
         setReviewText("");
         setRating("5");
         setImageUrlList([]); // 이미지 목록도 초기화
+        setImageFiles([]);
+
+        setImagePreviewUrls((prev) => {
+            prev.forEach((u) => URL.revokeObjectURL(u));
+            return [];
+        });
     };
 
     return {
         reviewData, rating, reviewText, editingId,
         setRating, setReviewText, resetForm,
         editModeEventHandler, deleteReviewEventHandler, handleFileChange,
-        reviewInsertUpdateEventHandler
+        reviewInsertUpdateEventHandler, imagePreviewUrls, removeImageAt
     };
 }

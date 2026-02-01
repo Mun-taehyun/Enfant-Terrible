@@ -15,6 +15,8 @@ export const inquiryQueries = {
             // 이미 정의하신 함수를 그대로 꽂아넣기!
             queryFn: () => getProductInquiriesRequest(productId, page, size),
             enabled: !!productId,
+            placeholderData: (previousData) => previousData,
+            select: (data) => ({ inquiryList: Array.isArray(data) ? data : [] }),
         });
     },
 

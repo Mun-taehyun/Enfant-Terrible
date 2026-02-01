@@ -48,6 +48,20 @@ public class ProductReviewService {
         .toList();
   }
 
+  @Transactional(readOnly = true)
+  public List<ProductReviewResponse> getMyReviews(Long userId, Integer pageParam, Integer sizeParam) {
+
+    int page = (pageParam == null || pageParam < 1) ? 1 : pageParam;
+    int size = (sizeParam == null || sizeParam < 1) ? 20 : sizeParam;
+    if (size > 100) size = 100;
+    int offset = (page - 1) * size;
+
+    return productReviewMapper.findByUserId(userId, size, offset)
+        .stream()
+        .map(this::toResponse)
+        .toList();
+  }
+
   public ProductReviewResponse create(Long userId, Long productId, ProductReviewCreateRequest req) {
 
     int purchased = productReviewMapper.existsPurchase(userId, req.getOrderId(), productId);

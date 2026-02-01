@@ -42,7 +42,12 @@
       AND p.status IN ('ON_SALE', 'SOLD_OUT')
 
     <if test="categoryId != null">
-      AND p.category_id = #{categoryId}
+      AND p.category_id IN (
+        SELECT c2.category_id
+        FROM et_category c2
+        WHERE c2.category_id = #{categoryId}
+           OR c2.parent_id = #{categoryId}
+      )
     </if>
 
     <if test="keyword != null and keyword != ''">
@@ -85,6 +90,50 @@
     </choose>
 
     LIMIT #{size} OFFSET #{offset}
+  </select>
+
+  <select id="countProducts" resultType="int">
+    SELECT
+      COUNT(*)
+    FROM et_product p
+    JOIN et_category c ON c.category_id = p.category_id
+    WHERE p.deleted_at IS NULL
+      AND p.status IN ('ON_SALE', 'SOLD_OUT')
+
+    <if test="categoryId != null">
+      AND p.category_id IN (
+        SELECT c2.category_id
+        FROM et_category c2
+        WHERE c2.category_id = #{categoryId}
+           OR c2.parent_id = #{categoryId}
+      )
+    </if>
+
+    <if test="keyword != null and keyword != ''">
+      AND p.name LIKE CONCAT('%', #{keyword}, '%')
+    </if>
+
+    <if test="minPrice != null">
+      AND p.base_price &gt;= #{minPrice}
+    </if>
+
+    <if test="maxPrice != null">
+      AND p.base_price &lt;= #{maxPrice}
+    </if>
+
+    <if test="minRating != null">
+      AND p.average_rating &gt;= #{minRating}
+    </if>
+
+    <if test="hasDiscount != null and hasDiscount">
+      AND EXISTS (
+        SELECT 1
+        FROM et_product_discount d
+        WHERE d.product_id = p.product_id
+          AND (d.start_at IS NULL OR d.start_at &lt;= NOW())
+          AND (d.end_at IS NULL OR d.end_at &gt;= NOW())
+      )
+    </if>
   </select>
 
   <!-- ===========================

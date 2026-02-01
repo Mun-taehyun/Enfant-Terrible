@@ -40,15 +40,16 @@ export default function UserPage() {
     //서버상태 : 주문내역 불러오기 
     const {data: orderData} = orderQueries.useGetOrderMy(Number(searchParams.get("page")), 5);
     //서버상태 : 내가 쓴 리뷰 불러오기 
-    const {data: reviewData} = reviewQueries.useGetReviews(product, Number(searchParams.get("page")) , 5);
+    const {data: reviewData} = reviewQueries.useGetMyReviews(Number(searchParams.get("page")), 5);
+
     //서버상태 : 내가 쓴 문의 불러오기 
     const {data: inquiryData} = inquiryQueries.useGetInquiries(product, Number(searchParams.get("page")) , 5)
     //서버상태 : 내가 쓴 문의 삭제하기 
     const { mutate: deleteInquiry } = inquiryQueries.useDeleteInquiry(product);
     //서버상태 : 내가 쓴 리뷰 삭제하기 
-    const { mutate: deleteReview } = reviewQueries.useDeleteReview(product);
+    const { mutate: deleteReview } = reviewQueries.useDeleteMyReview();
+
     //서버상태 : 주문상세내역에서 정보 가져오기 
-    const { data: detailOrder} = orderQueries.useGetOrderMyDetail(product);
     //서버상태 : 내가 산 주문내역에서 취소하기 
     const { mutate: cancelOrder , isPending } = orderQueries.usePostOrderMyCancel();
 
@@ -100,13 +101,13 @@ export default function UserPage() {
             });
         }        
     }
-    const [step, setStep] = useState<'IDLE' | 'FORM'>('IDLE');
+    const [activeCancelOrderId, setActiveCancelOrderId] = useState<number | null>(null);
     const [reason, setReason] = useState<string>('');
-    const isCancelable = detailOrder?.status === 'PAID' || detailOrder?.status === 'PREPARING';
 
     //이벤트핸들러 : 주문 취소하기
-    const handleCancelRequest = (orderId : number) => {
+    const handleCancelRequest = (orderId : number, status?: string) => {
         if(orderId === 0) return;
+        const isCancelable = status === 'PAID' || status === 'PREPARING';
         if (!isCancelable) {
             alert("배송이 시작된 상품은 취소가 불가능합니다. 고객센터로 문의해주세요.");
             return;
@@ -119,6 +120,8 @@ export default function UserPage() {
         cancelOrder({ orderId, requestBody }, {
             onSuccess: () => {
             alert("주문 취소가 완료되었습니다.");
+            setActiveCancelOrderId(null);
+            setReason('');
             }
         });
         }
@@ -166,32 +169,33 @@ export default function UserPage() {
                     {orderData ? orderData.items.map((item) => (
                         <>
                         <OrderList key={item.orderId} item={item} />
-                        {step === 'IDLE' ? (
-                            // [1단계] 단순 취소 버튼
-                            <button className="btn-open-form" onClick={() => setStep('FORM')}>
-                                주문 취소하기
-                            </button>
-                             ) : (
-                            // [2단계] 사유 입력 폼 (상태값 변화에 의해 나타남)
-                            <div className="cancel-form-box">
-                                <div className="form-title">취소 사유를 알려주세요 🐾</div>
-                                <textarea 
-                                    className="cancel-textarea"
-                                    placeholder="단순 변심, 사이즈 착오 등 사유를 적어주세요."
-                                    value={reason}
-                                    onChange={(e) => setReason(e.target.value)}
-                                />
-                                <div className="form-btns">
-                                    <button className="btn-back" onClick={() => setStep('IDLE')}>이전</button>
-                                    <button 
-                                        className="btn-confirm" 
-                                        onClick={() =>handleCancelRequest(detailOrder ? detailOrder.orderId : 0)}
-                                        disabled={isPending}
-                                        >
-                                        {isPending ? "처리중..." : "확인"}
-                                    </button>
+
+                        {(item.status === 'PAID' || item.status === 'PREPARING') && (
+                            activeCancelOrderId !== item.orderId ? (
+                                <button className="btn-open-form" onClick={() => setActiveCancelOrderId(item.orderId)}>
+                                    주문 취소하기
+                                </button>
+                            ) : (
+                                <div className="cancel-form-box">
+                                    <div className="form-title">취소 사유를 알려주세요 🐾</div>
+                                    <textarea 
+                                        className="cancel-textarea"
+                                        placeholder="단순 변심, 사이즈 착오 등 사유를 적어주세요."
+                                        value={reason}
+                                        onChange={(e) => setReason(e.target.value)}
+                                    />
+                                    <div className="form-btns">
+                                        <button className="btn-back" onClick={() => { setActiveCancelOrderId(null); setReason(''); }}>이전</button>
+                                        <button 
+                                            className="btn-confirm" 
+                                            onClick={() => handleCancelRequest(item.orderId, item.status)}
+                                            disabled={isPending}
+                                            >
+                                            {isPending ? "처리중..." : "확인"}
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
+                            )
                         )}
                         </>
                     )) : //주문내역 리스트.. 

@@ -106,6 +106,9 @@ export const reviewKeys = {
     lists: (productId: number) => [...reviewKeys.all, 'list', productId] as const,
     list: (productId: number, page: number, size: number) => 
         [...reviewKeys.lists(productId), { page, size }] as const,
+
+    myLists: () => [...reviewKeys.all, 'my-list'] as const,
+    myList: (page: number, size: number) => [...reviewKeys.myLists(), { page, size }] as const,
 };
 
 //key 관리 : inquiry(상품 문의)

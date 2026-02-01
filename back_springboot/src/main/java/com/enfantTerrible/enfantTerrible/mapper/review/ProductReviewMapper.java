@@ -28,6 +28,12 @@ public interface ProductReviewMapper {
       @Param("offset") int offset
   );
 
+  List<ProductReviewRow> findByUserId(
+      @Param("userId") Long userId,
+      @Param("size") int size,
+      @Param("offset") int offset
+  );
+
   int update(
       @Param("reviewId") Long reviewId,
       @Param("rating") Integer rating,

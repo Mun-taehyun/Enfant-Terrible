@@ -26,6 +26,7 @@ import ProductSkuResolveResponse from "./response/product/product-sku-resolve-re
 import { QnaMessageResponseDto, QnaRoomResponseDto } from "./response/qna";
 import ProductReviewResponseDto from "./response/review/product-review-response.dto";
 import { ProductReviewCreateRequestDto, ProductReviewUpdateRequestDto } from "./request/review";
+import type { ProductReviewItem } from "./request/review/product-review-create-request.dto";
 import OrderCreateResponseDto from "./response/order/order-create-response.dto";
 import OrderFromCartRequestDto from "./request/order/order-from-cart-request.dto";
 import { MyOrderCancelResponseDto, MyOrderDetailResponseDto, MyOrderListItemResponseDto, OrderPrepareResponseDto } from "./response/order";
@@ -317,6 +318,8 @@ export const getPostDetailRequest = (postId : number) : Promise<PostResponseDto>
 // ================================ 리뷰 =======================================
 const GET_PRODUCTS_REVIEWS_URL = (productId : number , page : number , size : number) => `/products/${productId}/reviews?page=${page}&size=${size}`
 //상품 리뷰 조회 
+const GET_MY_REVIEWS_URL = (page : number , size : number) => `/reviews/my?page=${page}&size=${size}`;
+//내 리뷰 조회
 const POST_PRODUCTS_REVIEWS_URL = (productId : number) => `/products/${productId}/reviews`;
 //상품 리뷰 생성 
 const PUT_PRODUCTS_REVIEWS_URL = (reviewId : number) => `/reviews/${reviewId}`;
@@ -328,11 +331,52 @@ const DELETE_PRODUCTS_REVIEWS_URL = (reviewId : number) => `/reviews/${reviewId}
 export const getProductReviewRequest = (productId : number , page : number , size : number) : Promise<ProductReviewResponseDto> => {
     return apiClient.get(GET_PRODUCTS_REVIEWS_URL(productId,page,size));}
 
-export const postProductReviewRequest = (productId : number, requestBody : ProductReviewCreateRequestDto) : Promise<ProductReviewResponseDto> => {
-    return apiClient.post(POST_PRODUCTS_REVIEWS_URL(productId), requestBody);}
+export const getMyReviewRequest = (page : number , size : number) : Promise<ProductReviewResponseDto> => {
+    return apiClient.get(GET_MY_REVIEWS_URL(page,size));}
 
-export const putProductReviewRequest = (reviewId : number, requestBody : ProductReviewUpdateRequestDto ) : Promise<ProductReviewResponseDto> => {
-    return apiClient.put(PUT_PRODUCTS_REVIEWS_URL(reviewId), requestBody);}
+function normalizeCreateReviewPayload(requestBody: ProductReviewCreateRequestDto | ProductReviewItem): ProductReviewItem {
+    const bodyAny = requestBody as any;
+    if (bodyAny && Array.isArray(bodyAny.reviewList) && bodyAny.reviewList.length > 0) {
+        return bodyAny.reviewList[0] as ProductReviewItem;
+    }
+    return requestBody as ProductReviewItem;
+}
+
+function buildReviewReqFormData(req: object, images?: File[] | null): FormData {
+    const formData = new FormData();
+    formData.append(
+        'req',
+        new Blob([JSON.stringify(req)], { type: 'application/json' })
+    );
+    if (images && images.length > 0) {
+        images.forEach((file) => {
+            formData.append('images', file);
+        });
+    }
+    return formData;
+}
+
+export const postProductReviewRequest = (
+    productId : number,
+    requestBody : ProductReviewCreateRequestDto | ProductReviewItem,
+    images?: File[] | null
+) : Promise<ProductReviewResponseDto> => {
+    const payload = normalizeCreateReviewPayload(requestBody);
+    const formData = buildReviewReqFormData({
+        orderId: payload.orderId,
+        rating: payload.rating,
+        content: payload.content,
+        imageUrls: payload.imageUrls,
+    }, images);
+    return apiClient.post(POST_PRODUCTS_REVIEWS_URL(productId), formData);}
+
+export const putProductReviewRequest = (reviewId : number, requestBody : ProductReviewUpdateRequestDto, images?: File[] | null ) : Promise<ProductReviewResponseDto> => {
+    const formData = buildReviewReqFormData({
+        rating: requestBody.rating,
+        content: requestBody.content,
+        imageUrls: requestBody.imageUrls,
+    }, images);
+    return apiClient.put(PUT_PRODUCTS_REVIEWS_URL(reviewId), formData);}
 
 export const deleteProductReviewRequest = (reviewId : number) => {
     return apiClient.delete(DELETE_PRODUCTS_REVIEWS_URL(reviewId));}
@@ -350,7 +394,12 @@ export const getProductInquiriesRequest = (productId:number, page:number, size:n
     return apiClient.get(GET_PRODUCT_INQUIRIES_URL(productId,page,size));}
 
 export const postProductInquiriesRequest = (productId:number , requestBody : ProductInquiryRequestDto) : Promise<ProductInquiryResponseDto> => {
-    return apiClient.post(POST_PRODUCT_INQUIRIES_URL(productId), requestBody)}
+    const formData = new FormData();
+    formData.append(
+        'req',
+        new Blob([JSON.stringify(requestBody)], { type: 'application/json' })
+    );
+    return apiClient.post(POST_PRODUCT_INQUIRIES_URL(productId), formData)}
 
 export const deleteProductInquiriesRequest = (inquiryId:number) => {
     return apiClient.delete(DELETE_PRODUCT_INQUIRIES_URL(inquiryId));}
