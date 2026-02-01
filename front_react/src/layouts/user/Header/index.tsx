@@ -42,6 +42,7 @@ export default function Header() {
         const accessToken = localStorage.getItem("accessToken"); 
         if( !accessToken) {
             localStorage.removeItem("accessToken");
+            navigate(AUTH_PATH() + AUTH_LOGIN_PATH(), { state: { from: CART_PATH() } });
             return;
         }
         //검증 완료 (로그인 상태)
@@ -53,6 +54,7 @@ export default function Header() {
         const accessToken = localStorage.getItem("accessToken");
         if( !accessToken) {
             localStorage.removeItem("accessToken");
+            navigate(AUTH_PATH() + AUTH_LOGIN_PATH(), { state: { from: USER_PATH() } });
             return;
         }
         //검증 완료 (로그인상태)

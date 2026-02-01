@@ -79,7 +79,7 @@ def main() -> int:
     if not product_ids:
         raise SystemExit("No products in et_product")
 
-    log_dir = Path(settings.BASE_DIR).parent / "logs"
+    log_dir = Path(settings.LOG_DIR)
     log_dir.mkdir(parents=True, exist_ok=True)
 
     header = ["timestamp", "productId", "userId", "sessionId", "clientIp", "userAgent"]

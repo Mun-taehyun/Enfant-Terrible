@@ -72,7 +72,7 @@ import ProductInquiryRequestDto from "./request/inquiry/product-inquiry-request.
 //실패 시 error.response 반환 (NOT 2xx 상태코드) response랑 거의 유사.. 
 // error.response = {response와 거의 일치}
 // ============================== 사용자 ================================
-export const SNS_SIGN_IN_URL = (type: 'naver'| 'google') => `http://localhost:8080/oauth2/authorization/${type}`; //소셜로그인 시 로그인 창 접속
+export const SNS_SIGN_IN_URL = (type: 'naver'| 'google') => `/oauth2/authorization/${type}`; //소셜로그인 시 로그인 창 접속
 const SIGN_UP_URL = () => `/users/signup` //회원가입
 const USER_SELECT_URL = () => `/users/me` //내 정보 조회
 const USER_UPDATE_URL = USER_SELECT_URL; //내 정보 수정

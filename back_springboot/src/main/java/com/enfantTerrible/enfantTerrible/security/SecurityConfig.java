@@ -92,6 +92,7 @@ public class SecurityConfig {
       .oauth2Login(oauth -> oauth
         .userInfoEndpoint(u -> u.userService(customOAuth2UserService))
         .successHandler(oAuth2SuccessHandler)
+        .failureUrl("/auth/login?error")
       )
 
       // 유효하지 않거나 만료된 토큰으로 접근시 exception

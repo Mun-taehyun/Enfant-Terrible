@@ -1,7 +1,9 @@
 package com.enfantTerrible.enfantTerrible.service.auth;
 
 import java.util.Map;
+import java.util.UUID;
 
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -86,11 +88,32 @@ public class AuthService {
       throw new BusinessException("이메일 제공에 동의해야 합니다.");
     }
 
+    // 동일 이메일 계정이 이미 존재하면 신규 생성하지 않고 소셜 계정만 연결
+    if (userMapper.countByEmail(email) > 0) {
+      UserRow existing = userMapper.findByEmail(email);
+      if (existing == null) {
+        throw new BusinessException("사용할 수 없는 계정입니다.");
+      }
+
+      try {
+        userMapper.insertSocialAccount(
+            existing.getUserId(),
+            provider,
+            providerUserId
+        );
+      } catch (DuplicateKeyException ignore) {
+        // 이미 연결된 소셜 계정이면 그대로 로그인 처리
+      }
+      userMapper.updateLastLogin(existing.getUserId());
+      return existing;
+    }
+
     String name = extractName(provider, attributes);
     String tel  = extractTel(provider, attributes);
 
     UserRow user = new UserRow();
     user.setEmail(email);
+    user.setPassword(passwordEncoder.encode("OAUTH-" + provider.toUpperCase() + "-" + UUID.randomUUID()));
     user.setName(name);
     user.setTel(tel);
     user.setRole(UserRole.USER);
@@ -98,13 +121,32 @@ public class AuthService {
     user.setStatus(UserStatus.ACTIVE);
     user.setEmailVerified(com.enfantTerrible.enfantTerrible.common.enums.EmailVerifiedStatus.Y);
 
-    userMapper.insertOAuthUser(user);
+    try {
+      userMapper.insertOAuthUser(user);
+    } catch (DuplicateKeyException e) {
+      // 동시성/중복 가입 방어: 이미 이메일이 생성된 경우 소셜 계정만 연결
+      UserRow existing = userMapper.findByEmail(email);
+      if (existing == null) {
+        throw e;
+      }
+      userMapper.insertSocialAccount(
+          existing.getUserId(),
+          provider,
+          providerUserId
+      );
+      userMapper.updateLastLogin(existing.getUserId());
+      return existing;
+    }
 
-    userMapper.insertSocialAccount(
-        user.getUserId(),
-        provider,
-        providerUserId
-    );
+    try {
+      userMapper.insertSocialAccount(
+          user.getUserId(),
+          provider,
+          providerUserId
+      );
+    } catch (DuplicateKeyException ignore) {
+      // 이미 연결된 소셜 계정이면 그대로 로그인 처리
+    }
 
     userMapper.updateLastLogin(user.getUserId());
 

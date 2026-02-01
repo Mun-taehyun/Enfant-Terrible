@@ -47,6 +47,7 @@ export const CART_PATH = () => `/cart`;
 export const ORDER_PATH = () => `/order`;
 export const ORDER_DETAIL_PATH = (orderId : number | string) => `/${orderId}`;
 export const ORDER_PAYLOAD_PATH = () => `/payload`;
+export const ORDER_COMPLETE_PATH = () => `/complete`;
 //주문 페이지 /order
     //      주문 상세페이지 /order/:orderId     
     //      결제 준비페이지 /order/payload 

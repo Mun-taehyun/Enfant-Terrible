@@ -3,8 +3,9 @@ import OrderLast from "@/components/user/Order/OrderLast";
 import OrderUser from "@/components/user/Order/OrderUser";
 import PaymentMethodSelector from "@/components/user/PaymentSelector";
 import { useProduct } from "@/hooks/user/product/use-product.hook";
-import { cartQueries, orderQueries } from "@/querys/user/queryhooks";
+import { cartQueries, orderQueries, pointQueries } from "@/querys/user/queryhooks";
 import { useEffect, useMemo, useState } from "react";
+import "@/components/user/Order/OrderLast/style.css";
 
 
 //컴포넌트 : 결제페이지 
@@ -33,6 +34,31 @@ export default function OrderPreparePage() {
 
     //상태: 결제방식 선택 
     const [paymentMethod, setPaymentMethod] = useState<string>('');
+
+    //서버상태 : 포인트조회
+    const { data: pointData } = pointQueries.useBalance();
+
+    const pointBalance = useMemo(() => {
+        const v = (pointData as any)?.balance;
+        return typeof v === 'number' && Number.isFinite(v) && v > 0 ? Math.floor(v) : 0;
+    }, [pointData]);
+
+    const orderTotal = useMemo(() => {
+        const v = isDirect ? (directData ? directData.totalAmount : null) : (cartData ? cartData.totalAmount : null);
+        return v != null && Number.isFinite(v) ? Math.floor(v) : 0;
+    }, [isDirect, directData, cartData]);
+
+    const maxUsablePoint = useMemo(() => {
+        return Math.max(0, Math.min(pointBalance, orderTotal));
+    }, [pointBalance, orderTotal]);
+
+    const [usedPointInput, setUsedPointInput] = useState<string>('0');
+
+    const usedPoint = useMemo(() => {
+        const n = Number(usedPointInput);
+        if (!Number.isFinite(n)) return 0;
+        return Math.max(0, Math.min(Math.floor(n), maxUsablePoint));
+    }, [usedPointInput, maxUsablePoint]);
 
     const order = isDirect ? (directData ? directData : null) : (cartData ? cartData : null);
     const items = isDirect ? (directData?.items ?? null) : (cartData?.items ?? null);
@@ -106,6 +132,47 @@ export default function OrderPreparePage() {
                         }
                 }
             />
+
+            <div className="point-use-container">
+                <div className="point-use-header">
+                    <span className="point-use-label">보유 포인트</span>
+                    <span className="point-use-balance">{pointBalance.toLocaleString()}P</span>
+                </div>
+
+                <div className="point-use-controls">
+                    <input
+                        className="point-use-input"
+                        inputMode="numeric"
+                        placeholder="0"
+                        value={usedPointInput}
+                        onChange={(e) => {
+                            const next = e.target.value;
+                            if (next === '') {
+                                setUsedPointInput('');
+                                return;
+                            }
+                            if (!/^\d+$/.test(next)) return;
+                            setUsedPointInput(next);
+                        }}
+                        onBlur={() => {
+                            setUsedPointInput(String(usedPoint));
+                        }}
+                    />
+                    <button
+                        type="button"
+                        className="point-use-all"
+                        onClick={() => setUsedPointInput(String(maxUsablePoint))}
+                        disabled={maxUsablePoint <= 0}
+                    >
+                        전체사용
+                    </button>
+                </div>
+
+                <div className="point-use-summary">
+                    <span className="point-use-summary-label">사용 포인트</span>
+                    <span className="point-use-summary-value">-{usedPoint.toLocaleString()}원</span>
+                </div>
+            </div>
             <PaymentMethodSelector selected={paymentMethod} onChange={setPaymentMethod}/>
 
             <OrderLast
@@ -113,6 +180,7 @@ export default function OrderPreparePage() {
                 paymentMethod={paymentMethod}
                 isBuyable={isBuyableAll}
                 mode={isDirect ? 'direct' : 'cart'}
+                usedPoint={usedPoint}
                 shipping={
                     {
                         receiverName,

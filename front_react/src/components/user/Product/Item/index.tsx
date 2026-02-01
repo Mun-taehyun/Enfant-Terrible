@@ -20,7 +20,7 @@ export default function ProductCard({ product , onClick }: Props) {
     const fullImageUrl = thumbnailUrl && thumbnailUrl.startsWith('http') 
         ? thumbnailUrl 
         : thumbnailUrl 
-            ? `http://localhost:8080${thumbnailUrl}` 
+            ? new URL(thumbnailUrl, window.location.origin).toString() 
             : ""; 
 
     //렌더 : 제품

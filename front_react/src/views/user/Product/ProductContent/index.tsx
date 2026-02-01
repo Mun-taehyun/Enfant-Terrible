@@ -10,7 +10,7 @@ export default function ProductContent() {
 
     const toFullImageUrl = (url: string) => {
         if (!url) return "";
-        return url.startsWith('http') ? url : `http://localhost:8080${url}`;
+        return url.startsWith('http') ? url : new URL(url, window.location.origin).toString();
     };
 
 

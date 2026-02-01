@@ -1,6 +1,9 @@
 import { useAuth } from "@/hooks/user/auth/use-sign.hook";
-import { orderQueries, paymentQueries, pointQueries } from "@/querys/user/queryhooks";
+import { orderQueries, paymentQueries } from "@/querys/user/queryhooks";
+import { ORDER_COMPLETE_PATH, ORDER_PATH } from "@/constant/user/route.index";
 import * as PortOne from "@portone/browser-sdk/v2";
+import { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import './style.css';
 
 interface OrderLastProps {
@@ -8,6 +11,7 @@ interface OrderLastProps {
   paymentMethod: string,
   isBuyable: boolean | null,
   mode: 'cart' | 'direct',
+  usedPoint: number,
   shipping: {
     receiverName: string;
     receiverPhone: string;
@@ -30,6 +34,7 @@ export default function OrderLast({
   paymentMethod,
   isBuyable,
   mode,
+  usedPoint,
   shipping,
   directParams
 }: OrderLastProps) {
@@ -37,8 +42,21 @@ export default function OrderLast({
   //커스텀 훅 : 유저 
   const { myInfo } = useAuth();
 
-  //서버상태 : 포인트조회
-  const {data: pointData} = pointQueries.useBalance();
+  const navigate = useNavigate();
+
+  const orderTotal = useMemo(() => {
+    return totalAmount != null && Number.isFinite(totalAmount) ? Math.floor(totalAmount) : 0;
+  }, [totalAmount]);
+
+  const safeUsedPoint = useMemo(() => {
+    const n = Number(usedPoint);
+    if (!Number.isFinite(n)) return 0;
+    return Math.max(0, Math.min(Math.floor(n), orderTotal));
+  }, [usedPoint, orderTotal]);
+
+  const payableAmount = useMemo(() => {
+    return Math.max(0, orderTotal - safeUsedPoint);
+  }, [orderTotal, safeUsedPoint]);
 
   //서버상태 : 결제
   const { mutate : paymentMutate, isPending } = paymentQueries.usePostPaymentConfirm();
@@ -131,21 +149,34 @@ export default function OrderLast({
         zipCode: shipping.zipCode,
         addressBase: shipping.addressBase,
         addressDetail: shipping.addressDetail ?? null,
-        usedPoint: pointData?.balance ?? 0,
+        usedPoint: safeUsedPoint,
       };
 
-      const confirmPayment = () => {
-        paymentMutate({
-          paymentId: paidPaymentId,
-          orderId: orderCode,
-          amount: totalAmount,
-        });
+      const confirmPayment = (confirmedOrderCode?: string, confirmedAmount?: number) => {
+        paymentMutate(
+          {
+            paymentId: paidPaymentId,
+            orderId: confirmedOrderCode ?? orderCode,
+            amount: confirmedAmount ?? payableAmount,
+          },
+          {
+            onSuccess: () => {
+              navigate(ORDER_PATH() + ORDER_COMPLETE_PATH(), {
+                replace: true,
+                state: { orderId: confirmedOrderCode ?? orderCode },
+              });
+            },
+            onError: (e: any) => {
+              alert(e?.message ?? '결제 승인에 실패했습니다.');
+            },
+          }
+        );
       };
 
       if (mode === 'cart') {
         createOrderFromCart(basePayload as any, {
-          onSuccess: () => {
-            confirmPayment();
+          onSuccess: (res: any) => {
+            confirmPayment(res?.orderCode ?? orderCode, res?.totalAmount ?? payableAmount);
           },
           onError: () => alert('주문 생성에 실패했습니다.'),
         });
@@ -163,13 +194,13 @@ export default function OrderLast({
           productId: directParams.productId,
           optionValueIds:
             Array.isArray(directParams.optionValueIds) && directParams.optionValueIds.length > 0
-              ? directParams.optionValueIds.map((id: number) => ({ optionValueId: id, value: "" }))
+              ? directParams.optionValueIds
               : null,
           quantity: directParams.quantity,
         },
         {
-          onSuccess: () => {
-            confirmPayment();
+          onSuccess: (res: any) => {
+            confirmPayment(res?.orderCode ?? orderCode, res?.totalAmount ?? payableAmount);
           },
           onError: () => alert('주문 생성에 실패했습니다.'),
         }
@@ -178,6 +209,11 @@ export default function OrderLast({
 
     if (enableMockPayment) {
       onPaid(`payment-mock-${uuid()}`);
+      return;
+    }
+
+    if (payableAmount <= 0) {
+      onPaid(`payment-point-${uuid()}`);
       return;
     }
 
@@ -195,7 +231,7 @@ export default function OrderLast({
           channelKey,
           paymentId,
           orderName: "주문 결제",
-          totalAmount,
+          totalAmount: payableAmount,
           currency: "KRW" as any,
           payMethod,
           customer: {
@@ -227,7 +263,7 @@ export default function OrderLast({
     <div className="order-submit-bar">
       <div className="total-amount-container">
         <span className="total-label">총 결제 금액</span>
-        <span className="total-value">{totalAmount ? totalAmount.toLocaleString() : 0 }원</span>
+        <span className="total-value">{payableAmount ? payableAmount.toLocaleString() : 0 }원</span>
       </div>
 
       <button

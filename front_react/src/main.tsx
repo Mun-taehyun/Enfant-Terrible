@@ -13,6 +13,12 @@ const root = ReactDOM.createRoot(
 );
 
 const queryClient = new QueryClient();
+
+function getRouterBasename(): string {
+    const base = String(import.meta.env.BASE_URL ?? '/');
+    const normalized = base.endsWith('/') ? base.slice(0, -1) : base;
+    return normalized || '/';
+}
 //쿼리 캐시 : quesyKey 데이터 매핑
 //구독자 관리 : 특정 컴포넌트가 어떤 서버데이터를 구독 중인지.. (클라이언트 <> 서버)
 //요청 중복 제거 : 네트워크 낭비 X => 최적화 
@@ -23,7 +29,7 @@ const queryClient = new QueryClient();
 root.render( //Link , Route 를 하려면 BrowserRouter로 감싸져 있어야한다.. 
     <React.StrictMode>
         <QueryClientProvider client={queryClient}>
-            <BrowserRouter>
+            <BrowserRouter basename={getRouterBasename()}>
                 {/* <CategoryItemList /> */}
                 <App />
             </BrowserRouter>

@@ -60,7 +60,9 @@ export function useAdminQnaSocket(opts: UseAdminQnaSocketOptions) {
   // VITE_WS_URL을 쓰고 있으면 그대로 사용, 없으면 기본값
   const wsUrl = useMemo(() => {
     const fromEnv = import.meta.env.VITE_WS_URL?.trim();
-    return fromEnv && fromEnv.length > 0 ? fromEnv : "ws://localhost:8080/ws";
+    if (fromEnv && fromEnv.length > 0) return fromEnv;
+    const proto = window.location.protocol === "https:" ? "wss" : "ws";
+    return `${proto}://${window.location.host}/ws`;
   }, []);
 
   const [connected, setConnected] = useState<boolean>(false);

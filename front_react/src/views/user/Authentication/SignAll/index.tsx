@@ -3,10 +3,13 @@ import './style.css';
 import InputBox from '@/components/user/CustomComponent/InputBox';
 import { useAuth } from '@/hooks/user/auth/use-sign.hook';
 import { SNS_SIGN_IN_URL } from '@/apis/user';
+import { useLocation } from 'react-router-dom';
 
 // 컴포넌트 : 인증화면 
 export default function Authentication() {
 
+    const location = useLocation();
+    const redirectTo = (location.state as any)?.from;
 
     // 상태 : 화면 (로그인 화면 or 회원가입 화면 외엔 안 받음)
     const [view, setView] = useState<'sign-in' | 'sign-up' |'password-search'>('sign-in');
@@ -24,7 +27,6 @@ export default function Authentication() {
             onKeyDown, onSignInButtonClickHandler,
             //키다운이벤트처리 /로그인 이벤트처리 
         } = useAuth();
-
 
         //이벤트핸들러 : 회원가입 링크 클릭 이벤트 처리
         const onSignUpLinkClickHandler = () => {
@@ -63,10 +65,10 @@ export default function Authentication() {
                                   error={false} name='password' value={formData.password} onChange={onInputChange} 
                                   icon={formChange.passwordIcon} onButtonClick={() => togglePasswordType('pw')}
                                   buttonName='보기'  
-                                  onkeyDown={(event) => onKeyDown(event, undefined , onSignInButtonClickHandler )}/>
+                                  onkeyDown={(event) => onKeyDown(event, undefined , () => onSignInButtonClickHandler(redirectTo) )}/>
                     </div>
                     <div className='auth-card-bottom'>
-                        <div className='black-large-full-button' onClick={onSignInButtonClickHandler}>{'로그인'}</div>
+                        <div className='black-large-full-button' onClick={() => onSignInButtonClickHandler(redirectTo)}>{'로그인'}</div>
                         <div className='auth-description-box'>
                             <div className='auth-description'>{'신규 사용자이신가요?'}<span className='auth-description-link' onClick={onSignUpLinkClickHandler}>{'회원가입'}</span></div>
                             <div className='auth-description'>{'비밀번호를 잊으셨나요?'}<span className='auth-description-link' onClick={onPasswordSearchLinkClickHandler}>{'비밀번호 찾기'}</span></div>
@@ -166,7 +168,7 @@ export default function Authentication() {
                         <InputBox ref={refForms.zipCode} label='우편 번호*' type='text' placeholder='우편 번호를 입력해주세요.' 
                                   name='zipCode' value={formData.zipCode} onChange={onInputChange} 
                                   error={errors.zipCode.state} message={errors.zipCode.message}
-                                  onButtonClick={onAddressButtonClickHandler} buttonName='주소버튼'
+                                  onButtonClick={onAddressButtonClickHandler} buttonName='주소검색'
                                   onkeyDown={(event) => onKeyDown(event, 'addressDetail', onAddressButtonClickHandler)}
                                    />
                         <InputBox ref={refForms.addressBase} label='주소*' type='text' placeholder='우편번호 찾기' 

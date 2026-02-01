@@ -74,5 +74,7 @@ export async function softDeleteAdminCategory(categoryId: number): Promise<void>
 }
 
 export async function reorderAdminCategories(payload: AdminCategoryReorderPayload): Promise<void> {
-  await mainAxios.put<ApiResponse<null>>(`${BASE}/reorder`, payload);
+  await mainAxios.put<ApiResponse<null>>(`${BASE}/reorder`, payload, {
+    headers: { 'X-Skip-Success-Alert': 'true' },
+  });
 }

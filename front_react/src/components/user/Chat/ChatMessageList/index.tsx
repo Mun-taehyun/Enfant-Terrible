@@ -20,6 +20,13 @@ export default function ChatRoom({ roomId, onBack, showBack = true }: ChatRoomPr
   const stompClient = useRef<Client | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  const wsUrl = useMemo(() => {
+    const fromEnv = import.meta.env.VITE_WS_URL?.trim();
+    if (fromEnv && fromEnv.length > 0) return fromEnv;
+    const proto = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    return `${proto}://${window.location.host}/ws`;
+  }, []);
+
   // 1. React Query 데이터 로드 (select를 통해 messageList 추출됨)
   const { data: chatData, isLoading } = qnaQueries.useGetQnaMessages(roomId, limit);
   const messages = useMemo(() => chatData?.messageList || [], [chatData]);
@@ -62,7 +69,7 @@ export default function ChatRoom({ roomId, onBack, showBack = true }: ChatRoomPr
   // 4. STOMP 연결 및 구독
   useEffect(() => {
     const client = new Client({
-      brokerURL: 'ws://localhost:8080/ws',
+      brokerURL: wsUrl,
       connectHeaders: {
         Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
       },
@@ -81,7 +88,7 @@ export default function ChatRoom({ roomId, onBack, showBack = true }: ChatRoomPr
     return () => {
       client.deactivate();
     };
-  }, [roomId, handleIncomingMessage]);
+  }, [roomId, handleIncomingMessage, wsUrl]);
 
   // 5. 메시지 전송 (텍스트 + 이미지 대응)
   const handleSend = useCallback((text: string, urls: string[] = []) => {

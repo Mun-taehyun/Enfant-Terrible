@@ -6,7 +6,13 @@ import axios from "axios";
 
 function normalizeApiBaseUrl(raw: string | undefined): string {
   const base = (raw ?? "").trim();
-  if (!base) return "/api";
+  if (!base) {
+    try {
+      return new URL("api", document.baseURI).toString();
+    } catch {
+      return "/api";
+    }
+  }
   return base.endsWith("/") ? `${base}api` : `${base}/api`;
 }
 

@@ -127,7 +127,8 @@ export async function updateAdminOptionGroup(groupId: number, payload: AdminOpti
 export async function reorderAdminOptionGroups(payload: AdminOptionGroupReorderPayload) {
   const { data } = await mainAxios.put<ApiResponse<null>>(
     "/admin/products/options/groups/reorder",
-    payload
+    payload,
+    { headers: { 'X-Skip-Success-Alert': 'true' } }
   );
   unwrapOrThrow(data);
 }
@@ -177,7 +178,8 @@ export async function updateAdminOptionValue(
 export async function reorderAdminOptionValues(payload: AdminOptionValueReorderPayload) {
   const { data } = await mainAxios.put<ApiResponse<null>>(
     "/admin/products/options/values/reorder",
-    payload
+    payload,
+    { headers: { 'X-Skip-Success-Alert': 'true' } }
   );
   unwrapOrThrow(data);
 }

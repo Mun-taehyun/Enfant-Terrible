@@ -30,7 +30,7 @@ const { title, content, linkUrl, imageUrl, width, height, position } = popupItem
     const fullImageUrl = imageUrl && imageUrl.startsWith('http') 
         ? imageUrl 
         : imageUrl 
-            ? `http://localhost:8080${imageUrl}` 
+            ? new URL(imageUrl, window.location.origin).toString() 
             : ""; // 이미지가 아예 없으면 빈 문자열 처리
 
     return createPortal(

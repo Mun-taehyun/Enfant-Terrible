@@ -14,6 +14,12 @@ AI_ANALYSIS_DIR = BASE_DIR.parent / "ai_analysis"
 PROCESSED_DIR = AI_ANALYSIS_DIR / "data" / "processed"
 SERVICE_READY_CSV = PROCESSED_DIR / "service_ready_data.csv"
 
+_et_log_dir = os.getenv("ET_LOG_DIR", "").strip()
+if _et_log_dir:
+    LOG_DIR = Path(_et_log_dir).expanduser().resolve()
+else:
+    LOG_DIR = BASE_DIR.parent / "logs"
+
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-fallback-key')
 DEBUG = True
 ALLOWED_HOSTS = ['*']
@@ -43,6 +49,8 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
     'http://127.0.0.1:5173',
+    'http://localhost:8080',
+    'http://127.0.0.1:8080',
 ]
 
 CORS_ALLOW_CREDENTIALS = True

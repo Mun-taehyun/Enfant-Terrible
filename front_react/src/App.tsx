@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import './App.css'
 import Popup from '@/components/user/Popup';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import UserContainer from './layouts/user/UserContainer';
-import {AUTH_ADD_INFOMATION_PATH, AUTH_LOGIN_PATH, AUTH_OAUTH_PATH, AUTH_PATH, CART_PATH, MAIN_PATH, OAUTH_PATH, ORDER_DETAIL_PATH, ORDER_PATH, ORDER_PAYLOAD_PATH, POINT_PATH, POST_DETAIL_PATH, POST_PATH, PRODUCT_DETAIL_PATH, PRODUCT_PATH, USER_PATH, USER_UPDATE_PATH} from './constant/user/route.index';
+import {AUTH_ADD_INFOMATION_PATH, AUTH_LOGIN_PATH, AUTH_OAUTH_PATH, AUTH_PATH, CART_PATH, MAIN_PATH, OAUTH_PATH, ORDER_COMPLETE_PATH, ORDER_DETAIL_PATH, ORDER_PATH, ORDER_PAYLOAD_PATH, POINT_PATH, POST_DETAIL_PATH, POST_PATH, PRODUCT_DETAIL_PATH, PRODUCT_PATH, USER_PATH, USER_UPDATE_PATH} from './constant/user/route.index';
+
 import Main from './views/user/Main';
 import { popupQueries} from './querys/user/queryhooks';
 import Authentication from './views/user/Authentication/SignAll';
@@ -18,8 +19,10 @@ import PostList from './views/user/Post/List';
 import PostDetailPage from './views/user/Post/Detail';
 import OrderDetailView from './views/user/Order/Detail';
 import OrderPreparePage from './views/user/Order/Payment';
+import OrderCompletePage from './views/user/Order/Complete';
 import { Cart } from './views/user/Cart';
 import PointHistoryPage from './views/user/Point';
+
 import AdminLayout from './layouts/admin/AdminLayout';
 import SalesView from './views/admin/sales.view';
 import UsersView from './views/admin/users.view';
@@ -34,7 +37,9 @@ import QnaRoomsView from './views/admin/QnaRoomsView';
 import QnaMessagesView from './views/admin/QnaMessagesView';
 import RecommendationsView from './views/admin/RecommendationsView';
 import OrdersView from './views/admin/orders.view';
+import LoginView from './views/admin/login.view';
 import { PopupItem } from './types/user/interface';
+import RequireAuth from './components/user/RequireAuth';
 
 function App() {
 
@@ -45,7 +50,7 @@ function App() {
 
   const {pathname} = useLocation();
 
-  // 🐾 마우스 포인터를 졸졸 따라다니는 단 하나의 발바닥
+  // 마우스 포인터를 졸졸 따라다니는 단 하나의 발바닥
   useEffect(() => {
     // 1. 발바닥 요소 하나만 미리 생성
     const paw = document.createElement('div');
@@ -75,26 +80,33 @@ function App() {
     <Routes>
       <Route element={<UserContainer/>}>
         <Route path={MAIN_PATH()} element={<Main />}/>
+
         <Route path={AUTH_PATH()} >
-          <Route path={AUTH_PATH() + "/" + AUTH_LOGIN_PATH()} element={<Authentication />}/>
-          <Route path={AUTH_PATH() + "/" + AUTH_OAUTH_PATH()} element={<OAuthAddPage />}/>
-          <Route path={AUTH_PATH() + "/" + AUTH_ADD_INFOMATION_PATH()} element={<PetInfomation />}/>
+          <Route path={AUTH_PATH() + AUTH_LOGIN_PATH()} element={<Authentication />}/>
+          <Route path={AUTH_PATH() + AUTH_OAUTH_PATH()} element={<OAuthAddPage />}/>
+          <Route path={AUTH_PATH() + AUTH_ADD_INFOMATION_PATH()} element={<PetInfomation />}/>
         </Route>
         <Route path={OAUTH_PATH()} element={<OAuthCallBack />} />
         
-        <Route path={USER_PATH()} element={<UserPage />}/>
-        <Route path={USER_PATH() + USER_UPDATE_PATH(':userId')} element={<UserUpdate />} />
+        <Route element={<RequireAuth />}>
+          <Route path={USER_PATH()} element={<UserPage />}/>
+          <Route path={USER_PATH() + USER_UPDATE_PATH(':userId')} element={<UserUpdate />} />
+          <Route path={CART_PATH()} element={<Cart/>}/>
+          <Route path={POINT_PATH()} element={<PointHistoryPage/>}/>
+        </Route>
         <Route path={PRODUCT_PATH()} element={<ProductFilter />} />
         <Route path={PRODUCT_PATH() + PRODUCT_DETAIL_PATH(":productId")} element={<ProductDetail />} />
         <Route path={POST_PATH()} element={<PostList />} /> 
         <Route path={POST_PATH() + POST_DETAIL_PATH(':postId')} element={<PostDetailPage/>} />
         <Route path={ORDER_PATH()} >
-          <Route path={ORDER_PATH() + "/" + ORDER_PAYLOAD_PATH()} element={<OrderPreparePage/>} />
-          <Route path={ORDER_PATH() + "/" + ORDER_DETAIL_PATH(':orderId')} element={<OrderDetailView/>} />                                          
+          <Route element={<RequireAuth />}>
+            <Route path={ORDER_PATH() + ORDER_PAYLOAD_PATH()} element={<OrderPreparePage/>} />
+          </Route>
+          <Route path={ORDER_PATH() + ORDER_COMPLETE_PATH()} element={<OrderCompletePage/>} />
+          <Route path={ORDER_PATH() + ORDER_DETAIL_PATH(':orderId')} element={<OrderDetailView/>} />                                          
         </Route>
-        <Route path={CART_PATH()} element={<Cart/>}/>
-        <Route path={POINT_PATH()} element={<PointHistoryPage/>}/>
       </Route>
+      <Route path="/admin/login" element={<LoginView />} />
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<SalesView />} />
         <Route path="sales" element={<SalesView />} />

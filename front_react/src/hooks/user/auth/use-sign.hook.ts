@@ -7,30 +7,21 @@ import { ChangeEvent, KeyboardEvent, useRef, useState } from "react";
 import { Address, useDaumPostcodePopup} from "react-daum-postcode";
 import { useNavigate } from "react-router-dom";
 
-//초기화 객체: 입력값 
-const input ={email: '', verification: '', password: '', passwordCheck: '', newPassword: '',
-              name: '', tel: '', zipCode: '', addressBase: '', addressDetail: ''} //=> 이동 시 다 비워야 좋다. 
-
-
-
 export const useAuth = () => {
+    //초기화 객체: 입력값 
+    const input ={email: '', verification: '', password: '', passwordCheck: '', newPassword: '',
+                  name: '', tel: '', zipCode: '', addressBase: '', addressDetail: ''} //=> 이동 시 다 비워야 좋다. 
 
-    //함수: Daum 우편번호 , 주소 
-    const openDaum = useDaumPostcodePopup();
-
-    //이벤트핸들러 : 우편번호/주소 버튼 클릭 이벤트 처리
-    const onAddressButtonClickHandler = () => {
-        openDaum({onComplete: onAddressComplete});
-    }//npm i react-daum-postcode 를 하게되면 =>  인베디드 형태 , 팝업 형태를 고를 수 있음 ..
-
-    //이벤트핸들러: 우편번호, 주소 검색
-    const onAddressComplete = (data: Address) => {
-        setFormData(prev => ({ ...prev, zipCode: data.zonecode, addressBase: data.address }));
-        //FormData 순회 => zipCode , address data선택.. 
-        setErrors(prev => ({ ...prev, zipCode: { state: false, message: '' }, addressBase: { state: false, message: '' } }));
-        if(!refForms.addressDetail.current) return;
-        refForms.addressDetail.current.focus();
-        //null일 수 있으므로 필터.. 
+    const initialErrors: Record<string, { state: boolean; message: string }> = {
+        email: { state: false, message: '' },
+        verification: { state: false, message: '' },
+        password: { state: false, message: '' },
+        passwordCheck: { state: false, message: '' },
+        newPassword: { state: false, message: '' },
+        name: { state: false, message: '' },
+        tel: { state: false, message: '' },
+        zipCode: { state: false, message: '' },
+        addressBase: { state: false, message: '' },
     };
 
     //보관상태: 유저정보 저장
@@ -78,7 +69,6 @@ export const useAuth = () => {
     //상태: 입력 데이터 
     const [formData, setFormData] = useState(input);
 
-
     //상태: 폼 상태의 변화 (비밀번호 감추기 , 아이콘 변경 , 메일발송 , 인증번호 검증.)
     const [formChange, setFormChange] = useState({
         passwordType: 'password' as 'text' | 'password',
@@ -92,19 +82,7 @@ export const useAuth = () => {
         //메일 인증 , 인증번호 검증 여부 => 기본값 false.. 
     });
 
-    const [errors, setErrors] = useState<Record<string, { state: boolean; message: string }>>({
-        email: { state: false, message: '' },
-        verification: { state: false, message: '' },
-        password: { state: false, message: '' },
-        passwordCheck: { state: false, message: '' },
-        newPassword: {state:false,message: ''},
-        name: { state: false, message: '' },
-        tel: { state: false, message: '' },
-        zipCode: { state: false, message: '' },
-        addressBase: { state: false, message: '' },
-        //Record<key , value>으로  key - value 짝 데이터를 관리하기 용이 한 객체다. 
-        //상태 , 메세지로 => error , message 에 각각 오류 여부 , 남긴다.. 
-    });
+    const [errors, setErrors] = useState<Record<string, { state: boolean; message: string }>>(initialErrors);
 
     //참조 : 입력 폼 접근
     const refForms = {
@@ -120,21 +98,37 @@ export const useAuth = () => {
         addressDetail: useRef<HTMLInputElement>(null),
     };
 
+    //함수: Daum 우편번호 , 주소 
+    const openDaum = useDaumPostcodePopup();
 
-    
-    //함수 : 상태 초기화 "각각 가입방식에 따라 공유되지 않기위해"
-    const resetForm = () => {
-        setFormData(input); //전체 값 초기화 ... 
-        setErrors({}); // 에러 상태 초기화 ... 
-        setFormChange(prev => ({ ...prev, verificationActive: false, codeVerify: false }));
-        //FormChange에 있는 여러 매개변수 중 뒤에있는 메일발송 , 인증코드 검증 상태 초기화 
-    
-        // Object.values(refForms).forEach(ref => {
-        //     if (ref.current) ref.current.value = "";})
+    //이벤트핸들러: 우편번호, 주소 검색
+    const onAddressComplete = (data: Address) => {
+        setFormData(prev => ({ ...prev, zipCode: data.zonecode, addressBase: data.address }));
+        //FormData 순회 => zipCode , address data선택.. 
+        setErrors(prev => ({ ...prev, zipCode: { state: false, message: '' }, addressBase: { state: false, message: '' } }));
+        if(!refForms.addressDetail.current) return;
+        refForms.addressDetail.current.focus();
+        //null일 수 있으므로 필터.. 
     };
+
+    //이벤트핸들러 : 우편번호/주소 버튼 클릭 이벤트 처리
+    const onAddressButtonClickHandler = () => {
+        openDaum({onComplete: onAddressComplete});
+    }//npm i react-daum-postcode 를 하게되면 =>  인베디드 형태 , 팝업 형태를 고를 수 있음 ..
 
     //함수: 네비게이트 
     const navigate = useNavigate();
+
+    //함수 : 상태 초기화 "각각 가입방식에 따라 공유되지 않기위해"
+    const resetForm = () => {
+        setFormData(input); //전체 값 초기화 ... 
+        setErrors(initialErrors); // 에러 상태 초기화 ... 
+        setFormChange(prev => ({ ...prev, verificationActive: false, codeVerify: false }));
+        //FormChange에 있는 여러 매개변수 중 뒤에있는 메일발송 , 인증코드 검증 상태 초기화 
+
+        // Object.values(refForms).forEach(ref => {
+        //     if (ref.current) ref.current.value = "";})
+    };
 
     //이벤트핸들러 : 모든 InputBox 데이터 바뀜 이벤트 처리 
     const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -270,7 +264,7 @@ export const useAuth = () => {
     
 
     // 이벤트핸들러 : 로그인 버튼 클릭 이벤트 처리
-    const onSignInButtonClickHandler = async () => {
+    const onSignInButtonClickHandler = async (redirectTo?: string) => {
         // 1. 입력 검증 (불필요한 네트워크 요청 방지)
         const { email, password } = formData;
         if (!email || !password) {
@@ -284,8 +278,12 @@ export const useAuth = () => {
                 onSuccess: async (data) => {
                     localStorage.setItem('accessToken', data.accessToken);
                     const { data : latestInfo } = await refetch();
-                    if(latestInfo?.role === 'USER') navigate(MAIN_PATH());
-                    else if (latestInfo?.role === 'ADMIN') navigate("/admin");
+                    if(latestInfo?.role === 'USER') {
+                        navigate(redirectTo ? String(redirectTo) : MAIN_PATH(), { replace: true });
+                    }
+                    else if (latestInfo?.role === 'ADMIN') {
+                        navigate("/admin", { replace: true });
+                    }
                     resetForm();
                     return;
                 },

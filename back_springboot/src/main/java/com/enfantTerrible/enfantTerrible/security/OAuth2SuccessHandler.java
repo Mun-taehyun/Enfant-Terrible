@@ -56,8 +56,24 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     // 4️⃣ Redirect URL 생성
     // 프론트 예: /oauth/callback?accessToken=xxx
+    String baseRedirectUri = redirectUri;
+    if (baseRedirectUri != null && baseRedirectUri.startsWith("/")) {
+      String scheme = request.getScheme();
+      String serverName = request.getServerName();
+      int serverPort = request.getServerPort();
+      String contextPath = request.getContextPath();
+
+      boolean isDefaultPort = ("http".equalsIgnoreCase(scheme) && serverPort == 80)
+          || ("https".equalsIgnoreCase(scheme) && serverPort == 443);
+
+      String portPart = isDefaultPort ? "" : ":" + serverPort;
+      String ctx = (contextPath == null) ? "" : contextPath;
+
+      baseRedirectUri = scheme + "://" + serverName + portPart + ctx + baseRedirectUri;
+    }
+
     String redirectUrl =
-      redirectUri +
+      baseRedirectUri +
       "?accessToken=" +
       URLEncoder.encode(accessToken, StandardCharsets.UTF_8);
 

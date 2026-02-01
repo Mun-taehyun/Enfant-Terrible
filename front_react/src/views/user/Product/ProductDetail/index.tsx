@@ -53,7 +53,7 @@ export default function ProductDetail() {
     const fullImageUrl = productDetail?.thumbnailUrl && productDetail?.thumbnailUrl.startsWith('http') 
         ? productDetail?.thumbnailUrl
         : productDetail?.thumbnailUrl
-            ? `http://localhost:8080${productDetail?.thumbnailUrl}` 
+            ? new URL(productDetail?.thumbnailUrl, window.location.origin).toString() 
             : ""; 
 
 

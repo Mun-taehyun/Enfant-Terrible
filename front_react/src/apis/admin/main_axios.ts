@@ -8,7 +8,13 @@ function getAccessToken(): string | null {
 export const mainAxios = axios.create({
   baseURL: (() => {
     const base = String(import.meta.env.VITE_API_BASE_URL ?? '').trim();
-    if (!base) return '/api';
+    if (!base) {
+      try {
+        return new URL('api', document.baseURI).toString();
+      } catch {
+        return '/api';
+      }
+    }
     return base.endsWith('/') ? `${base}api` : `${base}/api`;
   })(),
   timeout: 15000,
@@ -73,7 +79,25 @@ mainAxios.interceptors.request.use(config => {
 });
 
 mainAxios.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    const method = String(response.config?.method ?? '').toLowerCase();
+    const url = String(response.config?.url ?? '');
+    const skip = String((response.config?.headers as any)?.['X-Skip-Success-Alert'] ?? '').toLowerCase() === 'true';
+
+    const isMutation = method === 'post' || method === 'put' || method === 'patch' || method === 'delete';
+    const isAuthEndpoint = url.includes('/auth/login') || url.includes('/auth/refresh');
+
+    if (!skip && isMutation && !isAuthEndpoint) {
+      const body = response.data as any;
+      const success = body?.success;
+      const message = typeof body?.message === 'string' ? body.message : '';
+      if (success === true) {
+        window.alert(message || '완료되었습니다.');
+      }
+    }
+
+    return response;
+  },
   async (error) => {
     const status = error.response?.status;
     const originalRequest = error.config as (typeof error.config & { _retry?: boolean }) | undefined;

@@ -55,10 +55,7 @@ def admin_recommendation_update(request):
     RATING_WEIGHT = 2.0  # 리뷰 평점 가중치
     VIEW_WEIGHT = 0.1    # 조회 로그 가중치
     
-    # settings.py의 경로 설정 활용
-    project_root = Path(settings.BASE_DIR).parent
-    # logs 폴더 또는 ai_analysis 경로 확인
-    log_dir = project_root / "logs"
+    log_dir = Path(settings.LOG_DIR)
     csv_path = log_dir / "service_ready_data.csv"
 
     try:

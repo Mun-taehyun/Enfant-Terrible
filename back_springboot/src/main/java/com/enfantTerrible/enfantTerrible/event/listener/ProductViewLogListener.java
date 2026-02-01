@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -26,6 +27,9 @@ public class ProductViewLogListener {
       DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
   private static final DateTimeFormatter DATE_FORMAT =
       DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+  @Value("${et.log.dir:}")
+  private String configuredLogDir;
 
   @Async
   @EventListener
@@ -59,6 +63,9 @@ public class ProductViewLogListener {
   }
 
   private Path getLogDirPath() {
+    if (configuredLogDir != null && !configuredLogDir.isBlank()) {
+      return Path.of(configuredLogDir).toAbsolutePath();
+    }
     Path userDir = Path.of(System.getProperty("user.dir")).toAbsolutePath();
     Path parent = userDir.getParent();
     if (parent == null) {
