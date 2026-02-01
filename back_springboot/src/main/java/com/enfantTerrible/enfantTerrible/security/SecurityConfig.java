@@ -1,5 +1,9 @@
 package com.enfantTerrible.enfantTerrible.security;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -23,6 +27,9 @@ public class SecurityConfig {
   private final JwtTokenProvider jwtTokenProvider;
   private final OAuth2SuccessHandler oAuth2SuccessHandler;
   private final CustomOAuth2UserService customOAuth2UserService;
+
+  @Value("${app.cors.allowed-origins:https://web.filmal.dev}")
+  private String allowedOrigins;
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -135,7 +142,12 @@ public class SecurityConfig {
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
     configuration.setAllowCredentials(true);
-    configuration.addAllowedOriginPattern("*");
+
+    List<String> origins = Arrays.stream(allowedOrigins.split(","))
+        .map(String::trim)
+        .filter(s -> !s.isBlank())
+        .toList();
+    configuration.setAllowedOrigins(origins);
     configuration.addAllowedHeader("*");
     configuration.addAllowedMethod("*");
     

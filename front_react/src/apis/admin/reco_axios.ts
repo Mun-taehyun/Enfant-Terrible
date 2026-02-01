@@ -9,8 +9,20 @@ function getAccessToken(): string | null {
   return localStorage.getItem("accessToken");
 }
 
+function normalizeRecoBaseUrl(raw: string | undefined): string {
+  const base = (raw ?? "").trim();
+  if (!base) {
+    try {
+      return new URL("py", document.baseURI).toString().replace(/\/$/, "");
+    } catch {
+      return "/py";
+    }
+  }
+  return base.replace(/\/$/, "");
+}
+
 export const recoAxios = axios.create({
-  baseURL: import.meta.env.VITE_RECO_API_BASE_URL,
+  baseURL: normalizeRecoBaseUrl(import.meta.env.VITE_RECO_API_BASE_URL),
   timeout: 15000,
   headers: {
     "Content-Type": "application/json",

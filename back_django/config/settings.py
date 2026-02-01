@@ -21,8 +21,12 @@ else:
     LOG_DIR = BASE_DIR.parent / "logs"
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-fallback-key')
-DEBUG = True
-ALLOWED_HOSTS = ['*']
+DEBUG = os.getenv('DJANGO_DEBUG', 'false').strip().lower() in ('1', 'true', 'yes', 'y', 'on')
+ALLOWED_HOSTS = [
+    'web.filmal.dev',
+    'localhost',
+    '127.0.0.1',
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -51,6 +55,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:5173',
     'http://localhost:8080',
     'http://127.0.0.1:8080',
+    'https://web.filmal.dev',
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -99,11 +104,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # 데이터베이스 설정
 _db_url = os.getenv('DB_URL', '')
 _db_username = os.getenv('DB_USERNAME', '')
-_db_user = os.getenv('DB_USER', 'kosmo')
-_db_password = os.getenv('DB_PASSWORD', '1234')
-_db_host = os.getenv('DB_HOST', '127.0.0.1')
-_db_port = os.getenv('DB_PORT', '3306')
-_db_name = os.getenv('DB_NAME', 'kosmo')
+_db_user = os.getenv('DB_USER', 'enfant')
+_db_password = os.getenv('DB_PASSWORD', 'enfant')
+_db_host = os.getenv('DB_HOST', 'mysql.filmal.dev')
+_db_port = os.getenv('DB_PORT', '3307')
+_db_name = os.getenv('DB_NAME', 'enfant')
 
 if _db_url:
     try:
@@ -132,6 +137,7 @@ DATABASES = {
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
             'charset': 'utf8mb4',
+            'connect_timeout': 30,
         },
     }
 }
@@ -149,7 +155,8 @@ TIME_ZONE = 'Asia/Seoul'
 USE_I18N = True
 USE_TZ = True
 STATIC_URL = 'static/'
+STATIC_ROOT = '/app/static'
 
 # 미디어 파일 설정 (이미지 업로드 등 대비)
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = '/app/uploads'
