@@ -9,20 +9,12 @@ import {
 } from "@/hooks/admin/adminPayment.hook";
 import type { AdminPaymentListParams } from "@/types/admin/payment";
 
-function toNumberOrUndef(v: string): number | undefined {
-  const s = v.trim();
-  if (!s) return undefined;
-  const n = Number(s);
-  return Number.isFinite(n) ? n : undefined;
-}
-
 export default function PaymentsView() {
   // 목록 조건
   const [page, setPage] = useState<number>(1);
   const [size, setSize] = useState<number>(20);
 
   const [userEmail, setUserEmail] = useState<string>("");
-  const [orderId, setOrderId] = useState<string>("");
   const [orderCode, setOrderCode] = useState<string>("");
   const [paymentStatus, setPaymentStatus] = useState<string>("");
 
@@ -36,11 +28,10 @@ export default function PaymentsView() {
       page,
       size,
       userEmail: userEmail.trim() || undefined,
-      orderId: toNumberOrUndef(orderId),
       orderCode: orderCode.trim() || undefined,
       paymentStatus: paymentStatus.trim() || undefined,
     };
-  }, [page, size, userEmail, orderId, orderCode, paymentStatus]);
+  }, [page, size, userEmail, orderCode, paymentStatus]);
 
   const listQ = useAdminPayments(params);
   const detailQ = useAdminPaymentDetail(selectedPaymentId);
@@ -56,7 +47,6 @@ export default function PaymentsView() {
 
   function onReset() {
     setUserEmail("");
-    setOrderId("");
     setOrderCode("");
     setPaymentStatus("");
     setPage(1);
@@ -116,16 +106,6 @@ export default function PaymentsView() {
           </label>
 
           <label className={styles.field}>
-            <span className={styles.label}>주문 ID</span>
-            <input
-              className={styles.input}
-              value={orderId}
-              onChange={(e) => setOrderId(e.target.value)}
-              placeholder="숫자"
-            />
-          </label>
-
-          <label className={styles.fieldWide}>
             <span className={styles.label}>주문 코드</span>
             <input
               className={styles.input}
@@ -193,10 +173,8 @@ export default function PaymentsView() {
             <table className={styles.table}>
               <thead>
                 <tr>
-                  <th>결제 ID</th>
-                  <th>주문 ID</th>
-                  <th>회원 ID</th>
                   <th>주문 코드</th>
+                  <th>회원 이메일</th>
                   <th>결제 수단</th>
                   <th>결제 금액</th>
                   <th>결제 상태</th>
@@ -208,17 +186,15 @@ export default function PaymentsView() {
               <tbody>
                 {list.length === 0 ? (
                   <tr>
-                    <td colSpan={10} className={styles.empty}>
+                    <td colSpan={8} className={styles.empty}>
                       데이터가 없습니다.
                     </td>
                   </tr>
                 ) : (
                   list.map((p) => (
                     <tr key={p.paymentId}>
-                      <td>{p.paymentId}</td>
-                      <td>{p.orderId}</td>
-                      <td>{p.userId}</td>
                       <td className={styles.mono}>{p.orderCode}</td>
+                      <td>{p.userEmail}</td>
                       <td>{p.paymentMethod}</td>
                       <td>{p.paymentAmount.toLocaleString()}</td>
                       <td>{p.paymentStatus}</td>
@@ -282,17 +258,11 @@ export default function PaymentsView() {
                 return (
                   <>
                     <div className={styles.detailGrid}>
-                      <div>
-                        <b>결제 ID</b> {d.paymentId}
-                      </div>
-                      <div>
-                        <b>주문 ID</b> {d.orderId}
-                      </div>
-                      <div>
-                        <b>회원 ID</b> {d.userId}
-                      </div>
                       <div className={styles.mono}>
                         <b>주문 코드</b> {d.orderCode}
+                      </div>
+                      <div>
+                        <b>회원 이메일</b> {d.userEmail}
                       </div>
                       <div>
                         <b>결제 수단</b> {d.paymentMethod}

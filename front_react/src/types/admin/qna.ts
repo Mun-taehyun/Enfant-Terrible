@@ -5,6 +5,7 @@ import type { ApiResponse, AdminPageResponse } from "@/types/admin/api";
 export type AdminQnaRoomListItem = {
   roomId: number;
   userId: number;
+  userEmail: string;
   status: string;
   lastMessageAt: string; // LocalDateTime -> JSON string
   unread: number;

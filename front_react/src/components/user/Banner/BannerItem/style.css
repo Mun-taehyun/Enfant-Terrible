@@ -1,12 +1,17 @@
 /* 단일 배너 컨테이너 */
 .banner-item {
-    flex: 0 0 100%; /* 트랙 안에서 한 칸씩 차지 */
+    width: 100%;
     height: 100%;
     display: block;
     text-decoration: none;
-    background-size: cover;    /* [핵심] 이미지를 영역에 꽉 채움 */
-    background-position: center; /* [핵심] 이미지의 중심을 맞춤 */
     position: relative;
+}
+
+.banner-img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: fill;
 }
 
 /* 하단 그라데이션 오버레이 */

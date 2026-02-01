@@ -152,7 +152,7 @@ export default function PostsView() {
     }
 
     if (postType === "PRODUCT_DETAIL" && refId == null) {
-      alert("상품상세 게시글은 상품 ID가 필수입니다.");
+      alert("상품상세 게시글은 상품이 필요합니다.");
       return null;
     }
 
@@ -248,7 +248,7 @@ export default function PostsView() {
       return;
     }
 
-    const ok = window.confirm(`게시글(ID=${selectedPostId})을 삭제하시겠습니까?`);
+    const ok = window.confirm(`게시글을 삭제하시겠습니까?`);
     if (!ok) return;
 
     await mutations.remove(selectedPostId);
@@ -419,7 +419,6 @@ export default function PostsView() {
                   onClick={() => handleSelect(pid, item.postType)}
                 >
                   <div className={styles.rowTop}>
-                    <span className={styles.badge}>게시글 ID: {pid}</span>
                     <span className={styles.badge}>
                       작성자 이메일: {item.userEmail}
                     </span>
@@ -523,7 +522,7 @@ export default function PostsView() {
 
                 {isUpdateProductDetailSelected ? (
                   <label className={styles.fLabel}>
-                    상품 ID
+                    상품
                     <input
                       className={styles.input}
                       value={editRefId}
@@ -622,7 +621,7 @@ export default function PostsView() {
 
               {isCreateProductDetailSelected ? (
                 <label className={styles.fLabel}>
-                  상품 ID
+                  상품
                   <input
                     className={styles.input}
                     value={createRefId}

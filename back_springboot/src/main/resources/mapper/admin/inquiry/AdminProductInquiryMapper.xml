@@ -25,6 +25,7 @@
     SELECT
       i.inquiry_id,
       i.product_id,
+      p.name AS product_name,
       i.user_id,
       u.email AS user_email,
       i.content,

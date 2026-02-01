@@ -46,6 +46,20 @@
     ) t ON t.file_id = f.file_id
   </select>
 
+  <select id="findFileUrlsByRefIds" resultType="com.enfantTerrible.enfantTerrible.dto.file.FileRow">
+    SELECT ref_id AS refId,
+           file_url AS fileUrl
+    FROM et_file
+    WHERE ref_type = #{refType}
+      AND file_role = #{fileRole}
+      AND deleted_at IS NULL
+      AND ref_id IN
+      <foreach collection="refIds" item="id" open="(" separator="," close=")">
+        #{id}
+      </foreach>
+    ORDER BY ref_id ASC, file_id ASC
+  </select>
+
   <select id="findFilesByRefAndRole" resultType="com.enfantTerrible.enfantTerrible.dto.file.FileRow">
     SELECT file_id AS fileId,
            ref_id AS refId,

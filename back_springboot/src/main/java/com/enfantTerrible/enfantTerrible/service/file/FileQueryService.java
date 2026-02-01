@@ -1,8 +1,7 @@
 package com.enfantTerrible.enfantTerrible.service.file;
 
-import java.util.Collections;
 import java.util.List;
-
+import java.util.Collections;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,6 +46,15 @@ public class FileQueryService {
   ) {
     if (refIds == null || refIds.isEmpty()) return Collections.emptyList();
     return fileMapper.findFirstFilesByRefIds(refType, role, refIds);
+  }
+
+  public List<FileRow> findFileUrlsByRefIds(
+      String refType,
+      String role,
+      List<Long> refIds
+  ) {
+    if (refIds == null || refIds.isEmpty()) return Collections.emptyList();
+    return fileMapper.findFileUrlsByRefIds(refType, role, refIds);
   }
 
   public List<FileRow> findFilesByRefAndRole(

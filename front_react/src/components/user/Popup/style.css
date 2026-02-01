@@ -9,6 +9,10 @@
 
 /* 위치 클래스 (예시) */
 .popup-overlay.center { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+.popup-overlay.top-left { top: 20px; left: 20px; }
+.popup-overlay.top-right { top: 20px; right: 20px; }
+.popup-overlay.bottom-left { bottom: 20px; left: 20px; }
+.popup-overlay.bottom-right { bottom: 20px; right: 20px; }
 
 .popup-wrapper {
     background: #ffffff;

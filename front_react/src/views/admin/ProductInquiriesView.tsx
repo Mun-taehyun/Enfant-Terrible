@@ -251,9 +251,9 @@ export default function ProductInquiriesView() {
               <thead>
                 {/* ✅ 헤더도 동일한 5칸 그리드로 “균형” 고정 */}
                 <tr className={styles.gridRow}>
-                  <th className={styles.thCell}>문의ID</th>
-                  <th className={styles.thCell}>상품ID</th>
-                  <th className={styles.thCell}>사용자</th>
+                  <th className={styles.thCell}>상품</th>
+                  <th className={styles.thCell}>사용자 이메일</th>
+                  <th className={styles.thCell}>문의</th>
                   <th className={`${styles.thCell} ${styles.thCenter}`}>상태</th>
                   <th className={`${styles.thCell} ${styles.thRight}`}>작업</th>
                 </tr>
@@ -278,18 +278,15 @@ export default function ProductInquiriesView() {
                       {/* ✅ 요약행: 5칸 균형 그리드 (데이터 길이에 영향 안 받음) */}
                       <tr key={`sum-${row.inquiryId}`} className={`${styles.gridRow} ${styles.summaryRow}`}>
                         <td className={styles.tdCell}>
-                          <span className={styles.idValue}>{row.inquiryId}</span>
+                          <span className={styles.idValue}>{row.productName}</span>
                         </td>
 
                         <td className={styles.tdCell}>
-                          <span className={styles.idValue}>{row.productId}</span>
+                          <span className={styles.userEmail}>{row.userEmail}</span>
                         </td>
 
                         <td className={styles.tdCell}>
-                          <div className={styles.userCell}>
-                            <span className={styles.userIdValue}>{row.userId}</span>
-                            <span className={styles.userEmail}>{row.userEmail}</span>
-                          </div>
+                          <span className={styles.idValue}>{row.content}</span>
                         </td>
 
                         <td className={`${styles.tdCell} ${styles.centerCell}`}>
@@ -363,7 +360,7 @@ export default function ProductInquiriesView() {
 
                                 <div className={styles.metaText}>
                                   {row.answeredAt
-                                    ? `답변일: ${row.answeredAt} (by ${row.answeredByUserId ?? "-"})`
+                                    ? `답변일: ${row.answeredAt}`
                                     : "답변 이력 없음"}
                                 </div>
                               </div>

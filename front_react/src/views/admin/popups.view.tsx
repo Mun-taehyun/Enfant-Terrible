@@ -19,6 +19,26 @@ import type {
 
 type ActiveFilter = "ALL" | "ACTIVE" | "INACTIVE";
 
+type PopupPositionOption = {
+  value: string;
+  label: string;
+};
+
+const POPUP_POSITION_OPTIONS: PopupPositionOption[] = [
+  { value: "CENTER", label: "가운데" },
+  { value: "TOP_LEFT", label: "좌측 상단" },
+  { value: "TOP_RIGHT", label: "우측 상단" },
+  { value: "BOTTOM_LEFT", label: "좌측 하단" },
+  { value: "BOTTOM_RIGHT", label: "우측 하단" },
+];
+
+function positionLabel(position?: string | null): string {
+  const v = (position ?? "").trim();
+  if (!v) return "-";
+  const found = POPUP_POSITION_OPTIONS.find((o) => o.value === v);
+  return found ? found.label : v;
+}
+
 function toBoolFilter(v: ActiveFilter): boolean | undefined {
   if (v === "ACTIVE") return true;
   if (v === "INACTIVE") return false;
@@ -264,7 +284,6 @@ export default function PopupsView() {
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>팝업ID</th>
               <th>제목</th>
               <th>링크</th>
               <th>포지션</th>
@@ -278,10 +297,9 @@ export default function PopupsView() {
           <tbody>
             {rows.map((r) => (
               <tr key={r.popupId}>
-                <td>{r.popupId}</td>
                 <td className={styles.tdTitle}>{r.title}</td>
                 <td className={styles.tdLink}>{r.linkUrl || "-"}</td>
-                <td>{r.position || "-"}</td>
+                <td>{positionLabel(r.position)}</td>
                 <td>{r.isActive ? "Y" : "N"}</td>
                 <td className={styles.tdPeriod}>
                   {r.startAt || "-"} ~ {r.endAt || "-"}
@@ -303,7 +321,7 @@ export default function PopupsView() {
 
             {rows.length === 0 && (
               <tr>
-                <td colSpan={8} className={styles.empty}>
+                <td colSpan={7} className={styles.empty}>
                   데이터가 없습니다.
                 </td>
               </tr>
@@ -339,7 +357,7 @@ export default function PopupsView() {
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <div className={styles.modalTitle}>
-                {mode === "CREATE" ? "팝업 생성" : `팝업 수정 (ID: ${editingId})`}
+                {mode === "CREATE" ? "팝업 생성" : `팝업 수정`}
               </div>
               <button className={styles.grayBtn} onClick={closeModal}>
                 닫기
@@ -369,12 +387,18 @@ export default function PopupsView() {
 
               <div className={styles.formItem}>
                 <label className={styles.label}>포지션</label>
-                <input
-                  className={styles.input}
+                <select
+                  className={styles.select}
                   value={form.position || ""}
                   onChange={(e) => onChange("position", e.target.value)}
-                  placeholder="예: TOP_LEFT"
-                />
+                >
+                  <option value="">선택</option>
+                  {POPUP_POSITION_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className={styles.formItem}>

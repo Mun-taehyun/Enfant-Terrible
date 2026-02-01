@@ -39,7 +39,6 @@ export default function QnaRoomsView() {
 
   const [pageInput, setPageInput] = useState<string>("1");
   const [sizeInput, setSizeInput] = useState<string>("20");
-  const [userIdInput, setUserIdInput] = useState<string>("");
 
   const page = useMemo<number>(() => {
     const n = toNumberOrUndef(pageInput);
@@ -51,12 +50,9 @@ export default function QnaRoomsView() {
     return n && n > 0 ? n : 20;
   }, [sizeInput]);
 
-  const userId = useMemo<number | undefined>(() => toNumberOrUndef(userIdInput), [userIdInput]);
-
   const { data, isLoading, isError, error, refetch } = useAdminQnaRooms({
     page,
     size,
-    userId,
   });
 
   const list = useMemo<AdminQnaRoomListItem[]>(() => data?.list ?? [], [data?.list]);
@@ -96,17 +92,6 @@ export default function QnaRoomsView() {
       </div>
 
       <div className={styles.ctrlBar}>
-        <div className={styles.ctrlItem}>
-          <span className={styles.ctrlLabel}>사용자 ID</span>
-          <input
-            className={styles.ctrlInput}
-            value={userIdInput}
-            onChange={(e) => setUserIdInput(e.target.value)}
-            placeholder="선택"
-            inputMode="numeric"
-          />
-        </div>
-
         <div className={styles.ctrlItem}>
           <span className={styles.ctrlLabel}>페이지</span>
           <input
@@ -162,8 +147,7 @@ export default function QnaRoomsView() {
               <thead>
                 <tr>
                   <th style={{ width: 120 }}>채팅방</th>
-                  <th>채팅방 ID</th>
-                  <th>사용자 ID</th>
+                  <th>사용자</th>
                   <th>상태</th>
                   <th>마지막 채팅 시간</th>
                   <th>안 읽음</th>
@@ -180,8 +164,7 @@ export default function QnaRoomsView() {
                         입장
                       </button>
                     </td>
-                    <td>{it.roomId}</td>
-                    <td>{it.userId}</td>
+                    <td>{it.userEmail}</td>
                     <td>{it.status}</td>
                     <td>{it.lastMessageAt}</td>
                     <td>{unreadMap[it.roomId] ?? it.unread}</td>

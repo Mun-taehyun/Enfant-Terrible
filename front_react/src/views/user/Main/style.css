@@ -122,6 +122,12 @@ main {
     width: 100%;
 }
 
+.main-banner-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
 /* 채팅 컨테이너 */
 .main-chat-container {
   position: fixed;

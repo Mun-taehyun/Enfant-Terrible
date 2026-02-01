@@ -7,5 +7,17 @@ export default defineConfig({
   plugins: [
     react(),
     tsconfigPaths()
-  ]
+  ],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
+      '/uploads': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
+    },
+  },
 })

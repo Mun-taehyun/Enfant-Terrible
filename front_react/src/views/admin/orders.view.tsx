@@ -362,7 +362,6 @@ export default function OrdersView() {
                 >
                   <div className={styles.listMain}>
                     <div className={styles.listTop}>
-                      <span className={styles.badge}>#{o.orderId}</span>
                       <span className={styles.orderCode}>{o.orderCode}</span>
                     </div>
                     <div className={styles.listSub}>
@@ -409,7 +408,6 @@ export default function OrdersView() {
               <div className={styles.detailCard}>
                 <div className={styles.cardTitle}>주문 정보</div>
                 <div className={styles.infoTable}>
-                  <InfoRow label="주문번호" value={order.orderId} />
                   <InfoRow label="이메일" value={order.userEmail} />
                   <InfoRow label="주문코드" value={order.orderCode} />
                   <InfoRow label="주문상태" value={order.status} />
@@ -507,7 +505,7 @@ export default function OrdersView() {
                     return (
                       <div key={it.skuId} className={styles.cancelField}>
                         <div className={styles.cancelLabel}>
-                          {it.productName} (SKU {it.skuId}, 잔여 {remaining})
+                          {it.productName} (잔여 {remaining})
                         </div>
                         <input
                           className={styles.input}
@@ -560,7 +558,6 @@ export default function OrdersView() {
                   <table className={styles.table}>
                     <thead>
                       <tr>
-                        <th>SKU</th>
                         <th>상품명</th>
                         <th>단가</th>
                         <th>수량</th>
@@ -571,7 +568,6 @@ export default function OrdersView() {
                     <tbody>
                       {(order.items ?? []).map((it) => (
                         <tr key={it.skuId}>
-                          <td>{it.skuId}</td>
                           <td>{it.productName}</td>
                           <td>{fmtMoney(it.price)}원</td>
                           <td>{it.quantity}</td>
@@ -582,7 +578,7 @@ export default function OrdersView() {
 
                       {(order.items?.length ?? 0) === 0 ? (
                         <tr>
-                          <td colSpan={6} className={styles.emptyCell}>
+                          <td colSpan={5} className={styles.emptyCell}>
                             데이터가 없습니다.
                           </td>
                         </tr>

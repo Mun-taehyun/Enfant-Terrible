@@ -219,7 +219,7 @@ export default function ProductsView() {
                 <option value="">선택</option>
                 {leafCategories.map((c) => (
                   <option key={c.categoryId} value={String(c.categoryId)}>
-                    {c.name} (ID: {c.categoryId})
+                    {c.name}
                   </option>
                 ))}
               </select>
@@ -407,7 +407,6 @@ export default function ProductsView() {
           <table className={styles.table}>
             <thead>
               <tr>
-                <th>상품 ID</th>
                 <th>상품코드</th>
                 <th>상품명</th>
                 <th>기본가</th>
@@ -427,13 +426,12 @@ export default function ProductsView() {
               ) : (
                 rows.map((p) => (
                   <tr key={p.productId}>
-                    <td>{p.productId}</td>
                     <td>{p.productCode}</td>
                     <td>{p.name}</td>
                     <td>{p.basePrice}</td>
                     <td>{p.status}</td>
                     <td>
-                      {p.categoryName} (ID: {p.categoryId})
+                      {p.categoryName}
                     </td>
                     <td>{p.createdAt}</td>
                     <td className={styles.actions}>

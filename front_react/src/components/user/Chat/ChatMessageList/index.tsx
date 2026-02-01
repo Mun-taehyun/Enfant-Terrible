@@ -9,10 +9,11 @@ import './style.css';
 
 interface ChatRoomProps {
   roomId: number;
-  onBack: () => void;
+  onBack?: () => void;
+  showBack?: boolean;
 }
 
-export default function ChatRoom({ roomId, onBack }: ChatRoomProps) {
+export default function ChatRoom({ roomId, onBack, showBack = true }: ChatRoomProps) {
   const queryClient = useQueryClient();
   const limit = 50; // useQuery와 일치시켜야 함
   const [input, setInput] = useState('');
@@ -113,7 +114,9 @@ export default function ChatRoom({ roomId, onBack }: ChatRoomProps) {
     <div className="chat-room-container">
       {/* 헤더 */}
       <div className="chat-header">
-        <div className="back-btn" onClick={onBack}>←</div>
+        {showBack && onBack && (
+          <div className="back-btn" onClick={onBack}>←</div>
+        )}
         <div className="header-info">
           <div className="header-title">앙팡테리블 상담톡</div>
           <div className="header-status">보통 10분 내 답변</div>

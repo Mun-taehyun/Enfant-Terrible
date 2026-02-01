@@ -1,6 +1,8 @@
 package com.enfantTerrible.enfantTerrible.service.review;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,9 +44,26 @@ public class ProductReviewService {
     if (size > 100) size = 100;
     int offset = (page - 1) * size;
 
-    return productReviewMapper.findByProductId(productId, size, offset)
-        .stream()
-        .map(this::toResponse)
+    List<ProductReviewRow> rows = productReviewMapper.findByProductId(productId, size, offset);
+    if (rows == null || rows.isEmpty()) {
+      return List.of();
+    }
+
+    List<Long> reviewIds = rows.stream()
+        .map(ProductReviewRow::getReviewId)
+        .filter(id -> id != null)
+        .toList();
+
+    Map<Long, List<String>> imageUrlMap = new HashMap<>();
+    fileQueryService.findFileUrlsByRefIds(REF_TYPE_REVIEW, FILE_ROLE_CONTENT, reviewIds)
+        .forEach(f -> {
+          if (f != null && f.getRefId() != null && f.getFileUrl() != null) {
+            imageUrlMap.computeIfAbsent(f.getRefId(), k -> new java.util.ArrayList<>()).add(f.getFileUrl());
+          }
+        });
+
+    return rows.stream()
+        .map(r -> toResponse(r, imageUrlMap.get(r.getReviewId())))
         .toList();
   }
 
@@ -56,9 +75,26 @@ public class ProductReviewService {
     if (size > 100) size = 100;
     int offset = (page - 1) * size;
 
-    return productReviewMapper.findByUserId(userId, size, offset)
-        .stream()
-        .map(this::toResponse)
+    List<ProductReviewRow> rows = productReviewMapper.findByUserId(userId, size, offset);
+    if (rows == null || rows.isEmpty()) {
+      return List.of();
+    }
+
+    List<Long> reviewIds = rows.stream()
+        .map(ProductReviewRow::getReviewId)
+        .filter(id -> id != null)
+        .toList();
+
+    Map<Long, List<String>> imageUrlMap = new HashMap<>();
+    fileQueryService.findFileUrlsByRefIds(REF_TYPE_REVIEW, FILE_ROLE_CONTENT, reviewIds)
+        .forEach(f -> {
+          if (f != null && f.getRefId() != null && f.getFileUrl() != null) {
+            imageUrlMap.computeIfAbsent(f.getRefId(), k -> new java.util.ArrayList<>()).add(f.getFileUrl());
+          }
+        });
+
+    return rows.stream()
+        .map(r -> toResponse(r, imageUrlMap.get(r.getReviewId())))
         .toList();
   }
 
@@ -139,6 +175,10 @@ public class ProductReviewService {
   }
 
   private ProductReviewResponse toResponse(ProductReviewRow row) {
+    return toResponse(row, null);
+  }
+
+  private ProductReviewResponse toResponse(ProductReviewRow row, List<String> imageUrls) {
     if (row == null) {
       return null;
     }
@@ -150,7 +190,7 @@ public class ProductReviewService {
     res.setOrderId(row.getOrderId());
     res.setRating(row.getRating());
     res.setContent(row.getContent());
-    res.setImageUrls(fileQueryService.findFileUrls(REF_TYPE_REVIEW, row.getReviewId(), FILE_ROLE_CONTENT));
+    res.setImageUrls(imageUrls);
     res.setCreatedAt(row.getCreatedAt());
     res.setUpdatedAt(row.getUpdatedAt());
     return res;

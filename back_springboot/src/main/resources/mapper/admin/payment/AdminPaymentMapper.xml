@@ -46,6 +46,7 @@
       p.payment_id,
       p.order_id,
       o.user_id,
+      u.email AS user_email,
       o.order_code,
       p.payment_method,
       p.payment_amount,
@@ -84,6 +85,7 @@
       p.payment_id,
       p.order_id,
       o.user_id,
+      u.email AS user_email,
       o.order_code,
       p.payment_method,
       p.payment_amount,
@@ -94,6 +96,7 @@
       p.updated_at
     FROM et_payment p
     JOIN et_order o ON o.order_id = p.order_id
+    JOIN et_user u ON u.user_id = o.user_id
     WHERE p.payment_id = #{paymentId}
   </select>
 

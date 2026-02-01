@@ -67,11 +67,6 @@ export default function QnaMessagesView() {
 
       <div className={styles.ctrlBar}>
         <div className={styles.ctrlItem}>
-          <span className={styles.ctrlLabel}>채팅방 ID</span>
-          <span className={styles.ctrlValue}>{roomId}</span>
-        </div>
-
-        <div className={styles.ctrlItem}>
           <span className={styles.ctrlLabel}>최근 메시지</span>
           <input
             className={styles.ctrlInput}
@@ -92,7 +87,7 @@ export default function QnaMessagesView() {
         </button>
       </div>
 
-      {roomId <= 0 && <div className={styles.error}>잘못된 채팅방 ID 입니다.</div>}
+      {roomId <= 0 && <div className={styles.error}>잘못된 요청입니다.</div>}
 
       {isLoading && <div className={styles.muted}>로딩 중...</div>}
       {isError && <div className={styles.error}>{errorText(error)}</div>}

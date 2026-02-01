@@ -1,6 +1,8 @@
 package com.enfantTerrible.enfantTerrible.service.inquiry;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,10 +49,35 @@ public class ProductInquiryService {
     if (size > 100) size = 100;
     int offset = (page - 1) * size;
 
-    return productInquiryMapper.findByProductId(productId, size, offset)
-        .stream()
+    List<ProductInquiryRow> rows = productInquiryMapper.findByProductId(productId, size, offset);
+    if (rows == null || rows.isEmpty()) {
+      return List.of();
+    }
+
+    boolean isAdmin = viewerRole == UserRole.ADMIN;
+    List<ProductInquiryRow> filtered = rows.stream()
         .filter(r -> r != null && r.getDeletedAt() == null)
-        .map(r -> toResponse(r, viewerUserId, viewerRole))
+        .toList();
+
+    List<Long> viewableInquiryIds = filtered.stream()
+        .filter(r -> {
+          boolean isOwner = viewerUserId != null && r.getUserId() != null && r.getUserId().equals(viewerUserId);
+          boolean canViewContent = Boolean.FALSE.equals(r.getIsPrivate()) || isOwner || isAdmin;
+          return canViewContent && r.getInquiryId() != null;
+        })
+        .map(ProductInquiryRow::getInquiryId)
+        .toList();
+
+    Map<Long, List<String>> attachmentMap = new HashMap<>();
+    fileQueryService.findFileUrlsByRefIds(REF_TYPE_INQUIRY, FILE_ROLE_ATTACHMENT, viewableInquiryIds)
+        .forEach(f -> {
+          if (f != null && f.getRefId() != null && f.getFileUrl() != null) {
+            attachmentMap.computeIfAbsent(f.getRefId(), k -> new java.util.ArrayList<>()).add(f.getFileUrl());
+          }
+        });
+
+    return filtered.stream()
+        .map(r -> toResponse(r, viewerUserId, viewerRole, attachmentMap.get(r.getInquiryId())))
         .toList();
   }
 
@@ -118,6 +145,15 @@ public class ProductInquiryService {
   }
 
   private ProductInquiryResponse toResponse(ProductInquiryRow row, Long viewerUserId, UserRole viewerRole) {
+    return toResponse(row, viewerUserId, viewerRole, null);
+  }
+
+  private ProductInquiryResponse toResponse(
+      ProductInquiryRow row,
+      Long viewerUserId,
+      UserRole viewerRole,
+      List<String> attachmentUrls
+  ) {
     if (row == null) {
       return null;
     }
@@ -142,7 +178,7 @@ public class ProductInquiryService {
     if (canViewContent) {
       res.setContent(row.getContent());
       res.setAnswerContent(row.getAnswerContent());
-      res.setImageUrls(fileQueryService.findFileUrls(REF_TYPE_INQUIRY, row.getInquiryId(), FILE_ROLE_ATTACHMENT));
+      res.setImageUrls(attachmentUrls);
     } else {
       res.setContent(MASKED_CONTENT);
       res.setAnswerContent(null);

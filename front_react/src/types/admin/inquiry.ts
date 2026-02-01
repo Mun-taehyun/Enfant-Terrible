@@ -13,6 +13,7 @@ export type AdminProductInquiryListParams = {
 export type AdminProductInquiryListItem = {
   inquiryId: number;
   productId: number;
+  productName: string;
   userId: number;
   userEmail: string;
 

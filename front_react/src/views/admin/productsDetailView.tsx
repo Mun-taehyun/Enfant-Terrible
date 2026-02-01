@@ -198,7 +198,7 @@ export default function ProductDetailView({ productId, onClose }: Props) {
   async function onDeleteContentImage(fileId: number) {
     setUiError("");
     try {
-      const ok = window.confirm(`본문 이미지를 삭제하시겠습니까?\nfileId=${fileId}`);
+      const ok = window.confirm(`본문 이미지를 삭제하시겠습니까?`);
       if (!ok) return;
       await contentImageDeleteMut.mutateAsync(fileId);
     } catch (e) {
@@ -210,7 +210,7 @@ export default function ProductDetailView({ productId, onClose }: Props) {
     setUiError("");
     try {
       const ok = window.confirm(
-        `상품을 삭제(soft delete)하시겠습니까?\n상품 ID=${productId}`
+        `상품을 삭제(soft delete)하시겠습니까?`
       );
       if (!ok) return;
       await deleteMut.mutateAsync(productId);
@@ -307,7 +307,7 @@ export default function ProductDetailView({ productId, onClose }: Props) {
   async function onDeleteDiscount(discountId: number) {
     setUiError("");
     try {
-      const ok = window.confirm(`상품 할인을 삭제하시겠습니까?\n할인 ID=${discountId}`);
+      const ok = window.confirm(`상품 할인을 삭제하시겠습니까?`);
       if (!ok) return;
       await discountDelete.mutateAsync(discountId);
     } catch (e) {
@@ -324,7 +324,7 @@ export default function ProductDetailView({ productId, onClose }: Props) {
   return (
     <div className={styles.wrap}>
       <div className={styles.topBar}>
-        <div className={styles.topTitle}>상품 상세 패널 (상품 ID: {productId})</div>
+        <div className={styles.topTitle}>상품 상세 패널</div>
         <button className={styles.closeBtn} onClick={onClose}>
           닫기
         </button>
@@ -388,7 +388,7 @@ export default function ProductDetailView({ productId, onClose }: Props) {
                     <option value="">선택</option>
                     {leafCategories.map((c) => (
                       <option key={c.categoryId} value={String(c.categoryId)}>
-                        {c.name} (ID: {c.categoryId})
+                        {c.name}
                       </option>
                     ))}
                   </select>
@@ -612,8 +612,6 @@ export default function ProductDetailView({ productId, onClose }: Props) {
                 <table className={styles.table}>
                   <thead>
                     <tr>
-                      <th>할인 ID</th>
-                      <th>상품 ID</th>
                       <th>할인 값</th>
                       <th>할인 유형</th>
                       <th>시작 일시</th>
@@ -625,15 +623,13 @@ export default function ProductDetailView({ productId, onClose }: Props) {
                   <tbody>
                     {discounts.length === 0 ? (
                       <tr>
-                        <td colSpan={8} className={styles.empty}>
+                        <td colSpan={6} className={styles.empty}>
                           할인이 없습니다.
                         </td>
                       </tr>
                     ) : (
                       discounts.map((d) => (
                         <tr key={d.discountId}>
-                          <td>{d.discountId}</td>
-                          <td>{d.productId}</td>
                           <td>{d.discountValue}</td>
                           <td>{d.discountType}</td>
                           <td>{d.startAt ?? "-"}</td>

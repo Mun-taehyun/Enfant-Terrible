@@ -249,7 +249,6 @@ export default function BannersView() {
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>배너ID</th>
               <th>제목</th>
               <th>링크</th>
               <th>정렬</th>
@@ -263,7 +262,6 @@ export default function BannersView() {
           <tbody>
             {rows.map((r) => (
               <tr key={r.bannerId}>
-                <td>{r.bannerId}</td>
                 <td className={styles.tdTitle}>{r.title}</td>
                 <td className={styles.tdLink}>{r.linkUrl || "-"}</td>
                 <td>{r.sortOrder ?? "-"}</td>
@@ -285,7 +283,7 @@ export default function BannersView() {
 
             {rows.length === 0 && (
               <tr>
-                <td colSpan={8} className={styles.empty}>
+                <td colSpan={7} className={styles.empty}>
                   데이터가 없습니다.
                 </td>
               </tr>
@@ -321,7 +319,7 @@ export default function BannersView() {
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <div className={styles.modalTitle}>
-                {mode === "CREATE" ? "배너 생성" : `배너 수정 (ID: ${editingId})`}
+                {mode === "CREATE" ? "배너 생성" : `배너 수정`}
               </div>
               <button className={styles.grayBtn} onClick={closeModal}>
                 닫기

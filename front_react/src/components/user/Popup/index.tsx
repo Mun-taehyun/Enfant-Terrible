@@ -16,6 +16,10 @@ export default function Popup( {popupItem} : Prop) {
 const { title, content, linkUrl, imageUrl, width, height, position } = popupItem;
     const { isPopup, popupCloseTime } = usePopupControl();
 
+    const positionClass = (position ? String(position) : "center")
+        .toLowerCase()
+        .replaceAll("_", "-");
+
     const PopupLinkEventHandler = () => {
         if (linkUrl) window.open(linkUrl, "_blank");
     };
@@ -30,7 +34,7 @@ const { title, content, linkUrl, imageUrl, width, height, position } = popupItem
             : ""; // 이미지가 아예 없으면 빈 문자열 처리
 
     return createPortal(
-        <div className={`popup-overlay ${position}`}>
+        <div className={`popup-overlay ${positionClass}`}>
             <div className="popup-wrapper" style={{ width: `${width}px` }}>
                 {/* 헤더: 제목 */}
                 <div className="popup-header">
@@ -46,8 +50,8 @@ const { title, content, linkUrl, imageUrl, width, height, position } = popupItem
 
                 {/* 푸터: 닫기 버튼 */}
                 <div className="popup-footer">
-                    <button className="btn-time-close" onClick={() => popupCloseTime(10)}>
-                        10분 동안 보지 않기
+                    <button className="btn-time-close" onClick={() => popupCloseTime(1440)}>
+                        하루 동안 보지 않기
                     </button>
                     <button className="btn-close" onClick={() => popupCloseTime(0)}>닫기</button>
                 </div>

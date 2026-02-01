@@ -26,7 +26,7 @@ export default function ChatRoomListItem({chatItem, onClick} : Props) {
 
             <div className="item-info">
                 <div className="info-top">
-                <div className="room-name">반려동물용품점 앙팡테리블 (ID: {chatItem.roomId})</div>
+                <div className="room-name">반려동물용품점 앙팡테리블</div>
                 <div className="room-time">{displayTime}</div>
                 </div>
                 <div className="info-bottom">

@@ -28,6 +28,12 @@ public interface FileMapper {
       @Param("refIds") List<Long> refIds
   );
 
+  List<FileRow> findFileUrlsByRefIds(
+      @Param("refType") String refType,
+      @Param("fileRole") String fileRole,
+      @Param("refIds") List<Long> refIds
+  );
+
   List<FileRow> findFilesByRefAndRole(
       @Param("refType") String refType,
       @Param("refId") Long refId,

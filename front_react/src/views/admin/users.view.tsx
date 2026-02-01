@@ -175,8 +175,6 @@ export default function UsersView() {
                     setOptimisticStatus(null);
                   }}
                 >
-                  <span className={styles.idNo}>{u.userId}</span>
-
                   <div className={styles.userMainInfo}>
                     <span className={styles.nameText}>{u.name ?? "-"}</span>
                     <span className={styles.emailText}>{u.email}</span>
@@ -219,7 +217,6 @@ export default function UsersView() {
             <div className={styles.detailWrapper}>
               <div className={styles.detailBodyBox}>
                 <div className={styles.infoTable}>
-                  <InfoRow label="회원번호" value={String(user.userId)} />
                   <InfoRow label="이메일" value={user.email} />
                   <InfoRow label="이름" value={user.name} />
                   <InfoRow label="전화번호" value={user.tel} />

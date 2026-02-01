@@ -136,12 +136,12 @@ export default function PointsPanel({ userId }: Props) {
               </div>
 
               <div className={styles.formRow}>
-                <label className={styles.label}>참조 ID</label>
+                <label className={styles.label}>참조값</label>
                 <input
                   className={styles.input}
                   value={refId}
                   onChange={(e) => setRefId(e.target.value)}
-                  placeholder="예: 1001"
+                  placeholder=""
                 />
               </div>
             </div>
@@ -238,33 +238,29 @@ export default function PointsPanel({ userId }: Props) {
                   <table className={styles.table}>
                     <thead>
                       <tr>
-                        <th>ID</th>
                         <th>포인트</th>
                         <th>구분</th>
                         <th>사유</th>
                         <th>참조 유형</th>
-                        <th>참조 ID</th>
                         <th>발생일시</th>
                       </tr>
                     </thead>
                     <tbody>
                       {(hist.data?.list ?? []).map((r) => (
                         <tr key={r.pointHistoryId}>
-                          <td>{r.pointHistoryId}</td>
                           <td className={r.pointAmount < 0 ? styles.negative : styles.positive}>
                             {r.pointAmount}
                           </td>
                           <td>{r.pointType}</td>
                           <td>{r.reason ?? ""}</td>
                           <td>{r.refType ?? ""}</td>
-                          <td>{r.refId ?? ""}</td>
                           <td>{r.createdAt}</td>
                         </tr>
                       ))}
 
                       {(hist.data?.list?.length ?? 0) === 0 ? (
                         <tr>
-                          <td colSpan={7} className={styles.empty}>
+                          <td colSpan={5} className={styles.empty}>
                             데이터가 없습니다.
                           </td>
                         </tr>

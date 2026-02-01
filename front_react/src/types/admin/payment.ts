@@ -16,6 +16,7 @@ export type AdminPaymentListItem = {
   paymentId: AdminPaymentId;
   orderId: number;
   userId: number;
+  userEmail: string;
   orderCode: string;
 
   paymentMethod: string;
@@ -31,6 +32,7 @@ export type AdminPaymentDetail = {
   paymentId: AdminPaymentId;
   orderId: number;
   userId: number;
+  userEmail: string;
   orderCode: string;
 
   paymentMethod: string;

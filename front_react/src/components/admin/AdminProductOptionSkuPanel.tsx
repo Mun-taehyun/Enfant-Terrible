@@ -108,11 +108,14 @@ export default function AdminProductOptionSkuPanel({ productId }: Props) {
 
   const optionValueIdsToComboLabel = (ids?: number[]) => {
     if (!ids || ids.length === 0) return "(옵션 없음)";
-    return ids
+    const label = ids
       .slice()
       .sort((a, b) => a - b)
-      .map((id) => optionValueIdToLabel.get(id) ?? `#${id}`)
+      .map((id) => optionValueIdToLabel.get(id) ?? "")
+      .filter((s) => String(s).trim().length > 0)
       .join(" / ");
+
+    return label.trim().length > 0 ? label : "(옵션 없음)";
   };
 
   const [skuPage, setSkuPage] = useState<number>(1);
@@ -222,7 +225,7 @@ export default function AdminProductOptionSkuPanel({ productId }: Props) {
   async function onDeleteGroup(groupId: number) {
     setUiError("");
     try {
-      const ok = window.confirm(`옵션 그룹을 삭제하시겠습니까?\n그룹 ID=${groupId}`);
+      const ok = window.confirm(`옵션 그룹을 삭제하시겠습니까?`);
       if (!ok) return;
       await groupDelete.mutateAsync(groupId);
       if (selectedGroupId === groupId) setSelectedGroupId(0);
@@ -284,7 +287,7 @@ export default function AdminProductOptionSkuPanel({ productId }: Props) {
   async function onDeleteValue(valueId: number) {
     setUiError("");
     try {
-      const ok = window.confirm(`옵션 값을 삭제하시겠습니까?\n옵션 값 ID=${valueId}`);
+      const ok = window.confirm(`옵션 값을 삭제하시겠습니까?`);
       if (!ok) return;
       await valueDelete.mutateAsync(valueId);
     } catch (e) {
@@ -351,7 +354,7 @@ export default function AdminProductOptionSkuPanel({ productId }: Props) {
                   }}
                 >
                   <div className={styles.itemMain} onClick={() => setSelectedGroupId(g.optionGroupId)}>
-                    <div className={styles.itemTitle}>#{g.optionGroupId} {g.name}</div>
+                    <div className={styles.itemTitle}>{g.name}</div>
                     <div className={styles.itemSub}>정렬순서: {g.sortOrder}</div>
                   </div>
 
@@ -380,7 +383,7 @@ export default function AdminProductOptionSkuPanel({ productId }: Props) {
         <div className={styles.card}>
           <div className={styles.cardHeader}>
             <div className={styles.cardTitle}>옵션 값</div>
-            <div className={styles.cardHint}>그룹 ID: {selectedGroupId || "-"}</div>
+            <div className={styles.cardHint}>{selectedGroupId > 0 ? "선택됨" : "그룹을 선택해 주세요"}</div>
           </div>
 
           <div className={styles.formRow}>
@@ -438,7 +441,7 @@ export default function AdminProductOptionSkuPanel({ productId }: Props) {
                   }}
                 >
                   <div className={styles.itemMain}>
-                    <div className={styles.itemTitle}>#{v.optionValueId} {v.value}</div>
+                    <div className={styles.itemTitle}>{v.value}</div>
                     <div className={styles.itemSub}>정렬순서: {v.sortOrder}</div>
                   </div>
 

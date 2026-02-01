@@ -12,6 +12,7 @@ public class AdminPaymentListResponse {
   private Long paymentId;
   private Long orderId;
   private Long userId;
+  private String userEmail;
   private String orderCode;
 
   private String paymentMethod;

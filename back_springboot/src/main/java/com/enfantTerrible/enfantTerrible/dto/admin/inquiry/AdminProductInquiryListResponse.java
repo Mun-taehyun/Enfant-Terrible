@@ -11,6 +11,7 @@ public class AdminProductInquiryListResponse {
 
   private Long inquiryId;
   private Long productId;
+  private String productName;
   private Long userId;
   private String userEmail;
 
