@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.enfantTerrible.enfantTerrible.common.response.ApiResponse;
+import com.enfantTerrible.enfantTerrible.common.response.PageResponse;
 import com.enfantTerrible.enfantTerrible.dto.product.ProductDetailResponse;
 import com.enfantTerrible.enfantTerrible.dto.product.ProductResponse;
 import com.enfantTerrible.enfantTerrible.security.CustomUserPrincipal;
@@ -37,7 +38,7 @@ public class ProductController {
    * - sort
    */
   @GetMapping
-  public ApiResponse<List<ProductResponse>> getProducts(
+  public ApiResponse<PageResponse<ProductResponse>> getProducts(
       @RequestParam(required = false) Integer page,
       @RequestParam(required = false) Integer size,
       @RequestParam(required = false) Long categoryId,
@@ -49,7 +50,7 @@ public class ProductController {
       @RequestParam(required = false) String sort
   ) {
 
-    List<ProductResponse> products =
+    PageResponse<ProductResponse> products =
         productQueryService.getProducts(
             page,
             size,

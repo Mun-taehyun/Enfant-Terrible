@@ -54,6 +54,9 @@ export type AdminOrderListItem = {
   /** 배송 전/완료 전에는 null일 수 있음 */
   shippedAt: string | null;
   deliveredAt: string | null;
+
+  firstProductName?: string | null;
+  itemCount?: number | null;
 };
 
 export type AdminOrderItem = {

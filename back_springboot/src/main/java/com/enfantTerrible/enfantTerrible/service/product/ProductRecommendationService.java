@@ -36,6 +36,13 @@ public class ProductRecommendationService {
   private final ProductDiscountService productDiscountService;
   private final FileQueryService fileQueryService;
 
+  private Float roundRating1(Float rating) {
+    if (rating == null) {
+      return null;
+    }
+    return Math.round(rating * 10.0f) / 10.0f;
+  }
+
   public List<ProductResponse> getRecommendations(Long userId) {
     int limit = DEFAULT_LIMIT;
 
@@ -104,7 +111,7 @@ public class ProductRecommendationService {
             res.setDiscountedPrice(r.getMinSkuPrice());
           }
 
-          res.setAverageRating(r.getAverageRating());
+          res.setAverageRating(roundRating1(r.getAverageRating()));
           res.setReviewCount(r.getReviewCount());
 
           res.setThumbnailUrl(thumbnailUrlMap.get(r.getProductId()));

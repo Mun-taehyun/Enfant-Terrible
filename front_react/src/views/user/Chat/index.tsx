@@ -23,13 +23,8 @@ export default function ChatQna() {
         
         e.preventDefault();
         e.stopPropagation();
-        const lastId = roomData?.chatList?.length > 0 
-            ? Math.max(...roomData.chatList.map(r => r.roomId)) 
-            : 0;
 
-        const nextId = lastId + 1;        
-
-        setSelectedRoomId(nextId);
+        setSelectedRoomId(roomData.roomId);
         setView('chat');
     };
 

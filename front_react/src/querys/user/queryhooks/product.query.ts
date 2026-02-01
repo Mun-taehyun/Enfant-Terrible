@@ -10,8 +10,12 @@ export const productQueries = {
         return useQuery({
             queryKey: productKeys.list(params),
             queryFn: () => getProductListRequest(params),
-            // select: (data) => data.productList,
-            select: (data) => ({ productList: Array.isArray(data) ? data : [] })
+            select: (data) => ({
+                productList: Array.isArray((data as any)?.items) ? (data as any).items : [],
+                totalCount: typeof (data as any)?.totalCount === 'number' ? (data as any).totalCount : 0,
+                page: typeof (data as any)?.page === 'number' ? (data as any).page : Number(params.page ?? 1),
+                size: typeof (data as any)?.size === 'number' ? (data as any).size : Number(params.size ?? 20),
+            })
         });
     },
 

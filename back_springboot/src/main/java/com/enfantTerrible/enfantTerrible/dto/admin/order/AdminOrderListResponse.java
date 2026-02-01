@@ -19,6 +19,9 @@ public class AdminOrderListResponse {
   private String receiverName;
   private String receiverPhone;
 
+  private String firstProductName;
+  private Integer itemCount;
+
   private String trackingNumber;
   private LocalDateTime shippedAt;
   private LocalDateTime deliveredAt;

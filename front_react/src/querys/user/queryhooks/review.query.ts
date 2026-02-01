@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { productKeys, reviewKeys } from "../keys/key";
-import { deleteProductReviewRequest, getProductReviewRequest, postProductReviewRequest, putProductReviewRequest } from "@/apis/user";
+import { deleteProductReviewRequest, getMyReviewRequest, getProductReviewRequest, postProductReviewRequest, putProductReviewRequest } from "@/apis/user";
 import { ProductReviewUpdateRequestDto } from "@/apis/user/request/review";
 import { ProductReviewItem } from "@/apis/user/request/review/product-review-create-request.dto";
 
@@ -19,23 +19,26 @@ export const reviewQueries = {
         });
     },
 
+    //쿼리: 내 리뷰 목록 조회
+    useGetMyReviews(page: number, size: number) {
+        return useQuery({
+            queryKey: reviewKeys.myList(page, size),
+            queryFn: () => getMyReviewRequest(page, size),
+            placeholderData: (previousData) => previousData,
+            select: (data) => ({ reviewList: Array.isArray(data) ? data : [] })
+        });
+    },
+
     //쿼리: 리뷰 생성
     usePostReview(productId: number) {
         const queryClient = useQueryClient();
 
-
         return useMutation({
-            mutationFn: (body: ProductReviewItem) => 
-                postProductReviewRequest(productId, {reviewList: [body]}),
-                //감쌈으로써 사용이 편리해짐.
+            mutationFn: ({ body, images }: { body: ProductReviewItem; images?: File[] | null }) => 
+                postProductReviewRequest(productId, {reviewList: [body]}, images),
             onSuccess: () => {
-                // 정해진 상품의 리뷰 변화 
                 queryClient.invalidateQueries({ queryKey: reviewKeys.lists(productId) });
-                // 상품의 변동도 요구 (평점 변화)
                 queryClient.invalidateQueries({ queryKey: productKeys.detail(productId) });
-
-
-                //사진여부 ? ? ?
             },
         });
     },
@@ -44,8 +47,8 @@ export const reviewQueries = {
     usePutReview(productId: number) {
         const queryClient = useQueryClient();
         return useMutation({
-            mutationFn: ({ reviewId, body }: { reviewId: number; body: ProductReviewUpdateRequestDto }) => 
-                putProductReviewRequest(reviewId, body),
+            mutationFn: ({ reviewId, body, images }: { reviewId: number; body: ProductReviewUpdateRequestDto; images?: File[] | null }) => 
+                putProductReviewRequest(reviewId, body, images),
             onSuccess: () => {
                 queryClient.invalidateQueries({ queryKey: reviewKeys.lists(productId) });
             },
@@ -60,6 +63,17 @@ export const reviewQueries = {
             onSuccess: () => {
                 queryClient.invalidateQueries({ queryKey: reviewKeys.lists(productId) });
                 queryClient.invalidateQueries({ queryKey: productKeys.detail(productId) });
+            },
+        });
+    },
+
+    //쿼리: 내 리뷰 삭제
+    useDeleteMyReview() {
+        const queryClient = useQueryClient();
+        return useMutation({
+            mutationFn: (reviewId: number) => deleteProductReviewRequest(reviewId),
+            onSuccess: () => {
+                queryClient.invalidateQueries({ queryKey: reviewKeys.myLists() });
             },
         });
     },

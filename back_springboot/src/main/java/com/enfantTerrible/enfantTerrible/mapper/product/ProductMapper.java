@@ -23,6 +23,15 @@ public interface ProductMapper {
       @Param("offset") int offset
   );
 
+  int countProducts(
+      @Param("categoryId") Long categoryId,
+      @Param("keyword") String keyword,
+      @Param("minPrice") Long minPrice,
+      @Param("maxPrice") Long maxPrice,
+      @Param("minRating") Float minRating,
+      @Param("hasDiscount") Boolean hasDiscount
+  );
+
   List<ProductRow> findProductsByIds(
       @Param("productIds") List<Long> productIds
   );

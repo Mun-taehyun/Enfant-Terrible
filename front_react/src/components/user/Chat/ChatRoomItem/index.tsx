@@ -1,8 +1,8 @@
-import { ChatRoomItem } from "@/apis/user/response/qna/qna-room-response.dto";
+import type QnaRoomResponseDto from "@/apis/user/response/qna/qna-room-response.dto";
 import './style.css';
 
 interface Props {
-    chatItem : ChatRoomItem;
+    chatItem : QnaRoomResponseDto;
     onClick : (id : number) => void;
 }
 

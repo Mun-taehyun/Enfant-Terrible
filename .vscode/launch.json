@@ -13,7 +13,7 @@
                 "JWT_SECRET": "thisIsMySecretKeyForTestingEnfantTerribleProject2026",
                 "MAIL_USERNAME": "test@gmail.com",
                 "MAIL_PASSWORD": "test_password",
-                "FILE_UPLOAD_DIR": "C:/temp",
+                "FILE_UPLOAD_DIR": "C:/enfant-terrible/uploads",
                 "RECAPTCHA_SECRET_KEY": "dummy",
                 "GOOGLE_CLIENT_ID": "dummy",
                 "GOOGLE_CLIENT_SECRET": "dummy",

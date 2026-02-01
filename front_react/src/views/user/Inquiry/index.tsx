@@ -2,6 +2,7 @@ import { useState, ChangeEvent } from 'react';
 import { fileQueries } from '@/querys/user/queryhooks' 
 import { inquiryQueries } from '@/querys/user/queryhooks/inquiry.query';
 import { useProduct } from '@/hooks/user/product/use-product.hook';
+import './style.css';
 
 export default function InquiryWriteForm() {
   const [content, setContent] = useState<string>('');

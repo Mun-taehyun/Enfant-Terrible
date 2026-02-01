@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 from datetime import datetime
 from pathlib import Path
+from urllib.parse import quote_plus
 
 # --- Django 환경 초기화 ---
 current_path = Path(__file__).resolve()
@@ -24,13 +25,14 @@ np.random.seed(1)
 
 def get_db_engine():
     db_conf = settings.DATABASES['default']
-    u = 'kosmo' 
-    p = db_conf['PASSWORD']
-    h = db_conf['HOST']
-    port = db_conf['PORT']
-    db_name = 'kosmo'  
-    
-    db_url = f"mysql+pymysql://{u}:{p}@{h}:{port}/{db_name}?charset=utf8mb4"
+    u = db_conf.get('USER')
+    p = db_conf.get('PASSWORD') or ""
+    h = db_conf.get('HOST')
+    port = db_conf.get('PORT')
+    db_name = db_conf.get('NAME')
+
+    safe_pw = quote_plus(str(p))
+    db_url = f"mysql+pymysql://{u}:{safe_pw}@{h}:{port}/{db_name}?charset=utf8mb4"
     return create_engine(db_url, pool_pre_ping=True)
 
 def seed_recommendations(engine):

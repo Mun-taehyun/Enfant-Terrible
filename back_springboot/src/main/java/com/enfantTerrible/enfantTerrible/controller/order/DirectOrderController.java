@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
 import com.enfantTerrible.enfantTerrible.common.response.ApiResponse;
 import com.enfantTerrible.enfantTerrible.dto.order.*;
 import com.enfantTerrible.enfantTerrible.dto.product.ProductSkuRow;
@@ -12,6 +11,8 @@ import com.enfantTerrible.enfantTerrible.exception.BusinessException;
 import com.enfantTerrible.enfantTerrible.security.CustomUserPrincipal;
 import com.enfantTerrible.enfantTerrible.service.order.OrderService;
 import com.enfantTerrible.enfantTerrible.mapper.product.ProductSkuQueryMapper;
+import com.enfantTerrible.enfantTerrible.mapper.product.ProductMapper;
+import com.enfantTerrible.enfantTerrible.dto.product.ProductRow;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -21,6 +22,7 @@ public class DirectOrderController {
 
   private final OrderService orderService;
   private final ProductSkuQueryMapper skuQueryMapper;
+  private final ProductMapper productMapper;
 
   @PostMapping("/direct")
   public ApiResponse<OrderCreateResponse> direct(
@@ -54,9 +56,11 @@ public class DirectOrderController {
     item.setSkuId(skuRow.getSkuId());
     item.setPrice(skuRow.getPrice());
     item.setQuantity(req.getQuantity());
-    // product_name 스냅샷을 위해서는 상품명 조회가 필요함
-    // (너 현재 ProductRow/조회 구조로 넣을 수 있음)
-    item.setProductName("상품명 스냅샷 필요"); // TODO: product query로 채워
+    ProductRow productRow = productMapper.findByIdForUser(req.getProductId());
+    if (productRow == null) {
+      throw new BusinessException("상품을 찾을 수 없습니다.");
+    }
+    item.setProductName(productRow.getName());
 
     OrderCreateCommand cmd = new OrderCreateCommand();
     cmd.setUserId(principal.getUserId());

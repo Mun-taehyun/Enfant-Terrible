@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.enfantTerrible.enfantTerrible.common.enums.ProductSortType;
+import com.enfantTerrible.enfantTerrible.common.response.PageResponse;
 import com.enfantTerrible.enfantTerrible.dto.file.FileRow;
 import com.enfantTerrible.enfantTerrible.dto.product.ProductDiscountRow;
 import com.enfantTerrible.enfantTerrible.dto.product.ProductDetailResponse;
@@ -49,11 +50,18 @@ public class ProductQueryService {
   private final ApplicationEventPublisher eventPublisher;
   private final ObjectProvider<HttpServletRequest> requestProvider;
 
+  private Float roundRating1(Float rating) {
+    if (rating == null) {
+      return null;
+    }
+    return Math.round(rating * 10.0f) / 10.0f;
+  }
+
   /* =========================
      목록 (Product 중심)
      - price = product.base_price (최저 SKU 가격 캐시)
      ========================= */
-  public List<ProductResponse> getProducts(
+  public PageResponse<ProductResponse> getProducts(
       Integer pageParam,
       Integer sizeParam,
       Long categoryId,
@@ -70,6 +78,15 @@ public class ProductQueryService {
     if (size > 100) size = 100;
 
     int offset = (page - 1) * size;
+
+    int totalCount = productMapper.countProducts(
+        categoryId,
+        keyword,
+        minPrice,
+        maxPrice,
+        minRating,
+        hasDiscount
+    );
 
     ProductSortType sortType = ProductSortType.from(sort);
     if (sortType == null) {
@@ -109,7 +126,7 @@ public class ProductQueryService {
       }
     }
 
-    return rows.stream().map(row -> {
+    List<ProductResponse> items = rows.stream().map(row -> {
       ProductResponse res = new ProductResponse();
       res.setProductId(row.getProductId());
       res.setCategoryId(row.getCategoryId());
@@ -135,12 +152,14 @@ public class ProductQueryService {
         res.setDiscountedPrice(row.getMinSkuPrice());
       }
 
-      res.setAverageRating(row.getAverageRating());
+      res.setAverageRating(roundRating1(row.getAverageRating()));
       res.setReviewCount(row.getReviewCount());
 
       res.setThumbnailUrl(thumbnailUrlMap.get(row.getProductId()));
       return res;
     }).toList();
+
+    return new PageResponse<>(page, size, totalCount, items);
   }
 
   /* =========================
@@ -169,7 +188,7 @@ public class ProductQueryService {
       res.setDiscountValue(discount.getDiscountValue());
     }
 
-    res.setAverageRating(row.getAverageRating());
+    res.setAverageRating(roundRating1(row.getAverageRating()));
     res.setReviewCount(row.getReviewCount());
 
     res.setThumbnailUrl(

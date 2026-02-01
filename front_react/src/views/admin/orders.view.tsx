@@ -36,6 +36,13 @@ function fmtDateTime(v: string | null | undefined): string {
   return v && v.trim() ? v : "-";
 }
 
+function fmtOrderItemSummary(firstProductName?: string | null, itemCount?: number | null | undefined): string {
+  const name = firstProductName && firstProductName.trim() ? firstProductName.trim() : "-";
+  const cnt = typeof itemCount === "number" ? itemCount : 0;
+  if (cnt <= 1) return name;
+  return `${name} 외 ${cnt - 1}개`;
+}
+
 /* =========================
  * UI constants
  * ========================= */
@@ -118,9 +125,8 @@ export default function OrdersView() {
   const [trackingNumber, setTrackingNumber] = useState<string>("");
 
   // cancel
-  const [cancelSkuId, setCancelSkuId] = useState<string>("");
-  const [cancelQty, setCancelQty] = useState<string>("1");
   const [cancelReason, setCancelReason] = useState<string>("");
+  const [cancelQuantities, setCancelQuantities] = useState<Record<number, string>>({});
 
   // queries
   const listQuery = useAdminOrders(params);
@@ -148,9 +154,8 @@ export default function OrdersView() {
     setStatusDirty(false);
     setNextStatus("");
     setTrackingNumber("");
-    setCancelSkuId("");
-    setCancelQty("1");
     setCancelReason("");
+    setCancelQuantities({});
   };
 
   const statusValue: AdminOrderStatus | "" = statusDirty ? nextStatus : order?.status ?? "";
@@ -201,20 +206,21 @@ export default function OrdersView() {
   const onSubmitCancel = async () => {
     if (!order) return;
 
-    const skuId = toInt(cancelSkuId.trim(), 0);
-    const qty = toInt(cancelQty.trim(), 0);
+    const items = (order.items ?? [])
+      .map((it) => {
+        const raw = cancelQuantities[it.skuId];
+        const qty = toInt(String(raw ?? "").trim(), 0);
+        return { skuId: it.skuId, quantity: qty };
+      })
+      .filter((x) => x.quantity && x.quantity > 0);
 
-    if (!skuId) {
-      alert("취소할 SKU ID를 입력해 주세요.");
-      return;
-    }
-    if (!qty || qty < 1) {
-      alert("취소 수량은 1 이상이어야 합니다.");
+    if (items.length === 0) {
+      alert("취소할 상품과 수량을 입력해 주세요.");
       return;
     }
 
     const payload: AdminOrderCancelPayload = {
-      items: [{ skuId, quantity: qty }],
+      items,
       reason: cancelReason.trim() ? cancelReason.trim() : undefined,
     };
 
@@ -223,9 +229,8 @@ export default function OrdersView() {
       body: payload,
     });
 
-    setCancelSkuId("");
-    setCancelQty("1");
     setCancelReason("");
+    setCancelQuantities({});
 
     await detailQuery.refetch();
     await listQuery.refetch();
@@ -362,6 +367,7 @@ export default function OrdersView() {
                     </div>
                     <div className={styles.listSub}>
                       <span>이메일: {o.userEmail}</span>
+                      <span>주문상품: {fmtOrderItemSummary(o.firstProductName, o.itemCount)}</span>
                       <span>상태: {o.status}</span>
                       <span>금액: {fmtMoney(o.totalAmount)}원</span>
                     </div>
@@ -494,25 +500,29 @@ export default function OrdersView() {
                 <div className={styles.cardTitle}>부분취소</div>
 
                 <div className={styles.cancelGrid}>
-                  <div className={styles.cancelField}>
-                    <div className={styles.cancelLabel}>SKU ID</div>
-                    <input
-                      className={styles.input}
-                      value={cancelSkuId}
-                      onChange={(e) => setCancelSkuId(e.target.value)}
-                      placeholder="예: 101"
-                    />
-                  </div>
-
-                  <div className={styles.cancelField}>
-                    <div className={styles.cancelLabel}>취소 수량</div>
-                    <input
-                      className={styles.input}
-                      value={cancelQty}
-                      onChange={(e) => setCancelQty(e.target.value)}
-                      placeholder="예: 1"
-                    />
-                  </div>
+                  {(order.items ?? []).map((it) => {
+                    const remaining = it.remainingQuantity ?? it.quantity;
+                    const key = it.skuId;
+                    const value = cancelQuantities[key] ?? "";
+                    return (
+                      <div key={it.skuId} className={styles.cancelField}>
+                        <div className={styles.cancelLabel}>
+                          {it.productName} (SKU {it.skuId}, 잔여 {remaining})
+                        </div>
+                        <input
+                          className={styles.input}
+                          value={value}
+                          onChange={(e) =>
+                            setCancelQuantities((prev) => ({
+                              ...prev,
+                              [key]: e.target.value,
+                            }))
+                          }
+                          placeholder="취소 수량(0이면 미취소)"
+                        />
+                      </div>
+                    );
+                  })}
 
                   <div className={styles.cancelReasonRow}>
                     <div className={styles.cancelReasonLeft}>

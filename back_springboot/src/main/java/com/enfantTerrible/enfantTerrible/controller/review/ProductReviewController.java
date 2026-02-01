@@ -45,6 +45,22 @@ public class ProductReviewController {
     );
   }
 
+  @GetMapping("/reviews/my")
+  public ApiResponse<List<ProductReviewResponse>> getMyReviews(
+      @AuthenticationPrincipal CustomUserPrincipal principal,
+      @RequestParam(required = false) Integer page,
+      @RequestParam(required = false) Integer size
+  ) {
+    if (principal == null) {
+      throw new BusinessException("로그인이 필요합니다.");
+    }
+
+    return ApiResponse.success(
+        productReviewService.getMyReviews(principal.getUserId(), page, size),
+        "내 리뷰 목록 조회 성공"
+    );
+  }
+
   @PostMapping(value = "/products/{productId}/reviews", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ApiResponse<ProductReviewResponse> create(
       @AuthenticationPrincipal CustomUserPrincipal principal,

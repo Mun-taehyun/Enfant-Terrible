@@ -1,4 +1,7 @@
 import { MyOrderListItem } from "@/apis/user/response/order/my-order-list-item-response.dto";
+import './style.css';
+import { useNavigate } from "react-router-dom";
+import { ORDER_DETAIL_PATH, ORDER_PATH } from "@/constant/user/route.index";
 
 interface Props {
     item : MyOrderListItem;
@@ -6,6 +9,8 @@ interface Props {
 
 
 export const OrderList = ({ item } : Props) => {
+  const navigate = useNavigate();
+
   // 날짜 변환 (YYYY.MM.DD)
   const formatDate = (date :string) => date ? date.split('T')[0].replace(/-/g, '.') : null;
 
@@ -48,7 +53,12 @@ export const OrderList = ({ item } : Props) => {
 
                 {/* 버튼 액션 영역 */}
                 <div className="action-button-area">
-                    <div className="btn-item secondary">주문 상세</div>
+                    <div
+                      className="btn-item secondary"
+                      onClick={() => navigate(ORDER_PATH() + ORDER_DETAIL_PATH(item.orderId))}
+                    >
+                      주문 상세
+                    </div>
                     {item.trackingNumber && <div className="btn-item primary">배송 조회</div>}
                 </div>
             </div>

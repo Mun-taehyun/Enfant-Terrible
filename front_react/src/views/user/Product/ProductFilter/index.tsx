@@ -43,7 +43,7 @@ export default function ProductFilter() {
                 <div className="content-header">
                     <div className="total-info">
                         <div className="total-label">총</div>
-                        <div className="total-count">{productData?.productList.length || 0}</div>
+                        <div className="total-count">{productData?.totalCount ?? 0}</div>
                         <div className="total-unit">개 상품</div>
                     </div>    
                     <div className="sort-group">
@@ -67,7 +67,7 @@ export default function ProductFilter() {
                     )}
                 </div> 
                 <div className="pagination-wrapper">
-                    <Pagination totalCount={productData?.productList.length || 0} size={20} />
+                    <Pagination totalCount={productData?.totalCount ?? 0} size={Number(params.size) || 20} />
                 </div>
             </div>
         </div>

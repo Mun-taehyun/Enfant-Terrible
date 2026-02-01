@@ -2,6 +2,7 @@ from pathlib import Path
 import os
 import base64
 import binascii
+from urllib.parse import urlparse
 from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,14 +40,41 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
 ROOT_URLCONF = 'config.urls'
 
-# --- [수정 포인트] TEMPLATES 설정 추가 (admin.E403 에러 해결) ---
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'], # 프로젝트 수준의 템플릿 폴더
-        'APP_DIRS': True,                # 각 앱(ml 등) 폴더 내 templates 검색 허용
+        'DIRS': [BASE_DIR / 'templates'], 
+        'APP_DIRS': True,                
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -61,14 +89,38 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 # 데이터베이스 설정
+_db_url = os.getenv('DB_URL', '')
+_db_username = os.getenv('DB_USERNAME', '')
+_db_user = os.getenv('DB_USER', 'kosmo')
+_db_password = os.getenv('DB_PASSWORD', '1234')
+_db_host = os.getenv('DB_HOST', '127.0.0.1')
+_db_port = os.getenv('DB_PORT', '3306')
+_db_name = os.getenv('DB_NAME', 'kosmo')
+
+if _db_url:
+    try:
+        _normalized = _db_url.strip()
+        _normalized = _normalized.replace('jdbc:mysql://jdbc:mysql://', 'jdbc:mysql://')
+        if _normalized.startswith('jdbc:'):
+            _normalized = _normalized[len('jdbc:'):]
+        parsed = urlparse(_normalized)
+        if parsed.hostname:
+            _db_host = parsed.hostname
+        if parsed.port:
+            _db_port = str(parsed.port)
+        if parsed.path and parsed.path != '/':
+            _db_name = parsed.path.lstrip('/')
+    except Exception:
+        pass
+
 DATABASES = {
     'default': {
         'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.mysql'),
-        'NAME': os.getenv('DB_NAME', 'kosmo'),
-        'USER': os.getenv('DB_USER', 'kosmo'),
-        'PASSWORD': os.getenv('DB_PASSWORD', '1234'),
-        'HOST': os.getenv('DB_HOST', '127.0.0.1'),
-        'PORT': os.getenv('DB_PORT', '3306'),
+        'NAME': _db_name,
+        'USER': (_db_username or _db_user),
+        'PASSWORD': _db_password,
+        'HOST': _db_host,
+        'PORT': _db_port,
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
             'charset': 'utf8mb4',

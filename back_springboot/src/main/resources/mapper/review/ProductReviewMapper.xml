@@ -58,6 +58,24 @@
     LIMIT #{size} OFFSET #{offset}
   </select>
 
+  <select id="findByUserId" resultType="com.enfantTerrible.enfantTerrible.dto.review.ProductReviewRow">
+    SELECT
+      review_id,
+      user_id,
+      product_id,
+      order_id,
+      rating,
+      content,
+      created_at,
+      updated_at,
+      deleted_at
+    FROM et_product_review
+    WHERE user_id = #{userId}
+      AND deleted_at IS NULL
+    ORDER BY review_id DESC
+    LIMIT #{size} OFFSET #{offset}
+  </select>
+
   <update id="update">
     UPDATE et_product_review
     SET rating = #{rating},
@@ -81,7 +99,7 @@
       JOIN et_product_sku ps ON ps.sku_id = oi.sku_id
       WHERE o.order_id = #{orderId}
         AND o.user_id = #{userId}
-        AND o.order_status = 'PAID'
+        AND o.order_status = 'DELIVERED'
         AND ps.product_id = #{productId}
     )
   </select>
