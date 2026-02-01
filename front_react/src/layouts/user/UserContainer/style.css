@@ -1,4 +1,14 @@
 
+/* 전체 레이아웃 루트: 헤더 공간 확보 */
+.main-layout-root {
+    width: 100vw;
+    /* 헤더 높이(약 150px)만큼 정확히 아래로 밀어줌 */
+    padding-top: 150px; 
+    background-color: #fcfcfc;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
 /* 2. 문제의 컨테이너: 382px 고정을 풀고 1440px로 확장 */
 .main-layout-container {
     /* 기존의 좁은 width 설정을 덮어씌웁니다 */

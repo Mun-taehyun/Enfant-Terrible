@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import BannerItemView from '../BannerItem';
 import { BannerItem } from '@/types/user/interface';
 import './style.css';
@@ -18,6 +18,17 @@ export default function BannerMain({ banners }: BannerSliderProps) {
     const handleNext = () => {
         setCurrentIndex(prev => (prev === total - 1 ? 0 : prev + 1));
     };
+
+    // --- 추가: 3초 자동 슬라이드 로직 ---
+    useEffect(() => {
+        if (total === 0) return;
+
+        const timer = setInterval(() => {
+            handleNext();
+        }, 3000); // 3000ms = 3초
+
+        return () => clearInterval(timer); // 컴포넌트 언마운트나 인덱스 변경 시 정리
+    }, [currentIndex, total]); // 인덱스가 바뀔 때마다 타이머를 새로 설정해 꼬임 방지
 
     return (
         <div className="banner-container">

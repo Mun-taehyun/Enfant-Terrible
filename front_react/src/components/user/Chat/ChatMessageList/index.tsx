@@ -109,6 +109,9 @@ export default function ChatRoom({ roomId, onBack }: ChatRoomProps) {
 
   if (isLoading) return <div className="loading">채팅을 불러오는 중...</div>;
 
+
+
+
   return (
     <div className="chat-room-container">
       {/* 헤더 */}
@@ -116,7 +119,7 @@ export default function ChatRoom({ roomId, onBack }: ChatRoomProps) {
         <div className="back-btn" onClick={onBack}>←</div>
         <div className="header-info">
           <div className="header-title">앙팡테리블 상담톡</div>
-          <div className="header-status">보통 10분 내 답변</div>
+          <div className="header-status">앙팡테리블 마켓 채팅에 오신 것을 환영합니다.</div>
         </div>
       </div>
 

@@ -1,19 +1,4 @@
-main {
-    /* 1. 로그인창의 auth-wrapper와 똑같은 메커니즘 */
-    width: 100vw;
-    min-height: 100vh;
-    
-    display: flex;
-    flex-direction: column;   /* 위에서 아래로 쌓이게 */
-    align-items: center;      /* 🚨 가로축 중앙 정렬 (이게 핵심) */
-    justify-content: flex-start; /* 위에서부터 차곡차곡 */
-    
-    /* 2. 배경 및 여백 */
-    background-color: #fcfcfc;
-    padding-top: 160px;       /* 헤더 높이만큼 띄우기 */
-    box-sizing: border-box;
-    overflow-x: hidden;       /* 가로 스크롤 절대 방지 */
-}
+
 
 /* --- 추천상품 --- 타이틀도 늘어난 너비에 맞춤 */
 .section-title {
@@ -38,7 +23,7 @@ main {
     width: 100%;
     max-width: 1440px; 
     margin: 0 auto;         /* 좌우 여백 똑같이 나눠갖기 */
-    padding: 60px 40px;
+    padding: 20px 40px;
     box-sizing: border-box;
 }
 
@@ -49,6 +34,20 @@ main {
     height: 1px;
     background: #e0e0e0; /* 연한 회색 선 */
     margin: 0 20px;     /* 글자와 선 사이 간격 */
+}
+
+/* 2. 배너 컨테이너를 가로 100%로 꽉 채우기 */
+
+.main-banner-container {
+    width: 100vw;
+    height: 450px;
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
+    overflow: hidden;
+    position: relative;
+    /* 1. 배경색을 흰색이나 투명으로 변경 */
+    background-color: transparent; 
+
 }
 
 /* 상품이 없을 때 나오는 메시지 중앙 정렬 */
@@ -77,7 +76,7 @@ main {
     margin: 0 auto; 
     justify-content: center; 
     
-    padding: 20px 0;
+    padding: 0;
 }
 
 .section-divider {
@@ -112,8 +111,6 @@ main {
 
 .main-page {
     position: relative;
-    /* 1. 헤더 높이만큼 위쪽 여백 확보 (중요!) */
-    padding-top: 160px; 
     
     /* 2. 전체를 중앙으로 모음 */
     display: flex;
@@ -122,28 +119,76 @@ main {
     width: 100%;
 }
 
-/* 채팅 컨테이너 */
 .main-chat-container {
-  position: fixed;
-  right: 24px;
-  bottom: 24px;
-  z-index: 999;
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 10000;
+    /* 부모는 크기를 가지지 않게 하여 자식들이 밖으로 뻗어나가게 함 */
+    display: flex;
+    justify-content: flex-end; 
+    align-items: flex-end;
 }
 
-/* 동그라미 버튼 */
+/* 채팅창과 X버튼을 담는 통 */
+.chat-wrapper {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+    /* 애니메이션 도중 잘림 방지 */
+    overflow: visible; 
+}
+
+/* [핵심] X버튼: 레이아웃 흐름에서 빼버리고 채팅창 왼쪽 옆에 박아버립니다 */
+.chat-floating-button.close {
+    position: absolute;
+    /* 채팅창 너비(380px) + 간격(15px)만큼 왼쪽으로 강제 이동 */
+    left: -190px; 
+    bottom: 0;
+    background-color: #333;
+    z-index: 10001; /* 보드보다 위에 출력 */
+}
+
+/* 채팅 보드: 왼쪽에서 오른쪽으로 커지는게 아니라, 
+   오른쪽 끝에 붙은 상태에서 나타나야 함 */
+.chat-main-board {
+    width: 380px;
+    height: 600px;
+    max-height: 80vh;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+
+    /* 핵심: 오른쪽 끝을 기준으로 고정하고 왼쪽으로 확장되는 느낌 주지 않기 */
+    transform-origin: right bottom;
+    animation: chatPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes chatPop {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateX(0);
+    }
+}
+
+/* 공통 버튼 */
 .chat-floating-button {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background-color: #111;
-  color: #fff;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-size: 22px;
-  cursor: pointer;
-
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    width: 56px;
+    height: 56px;
+    min-width: 56px;
+    border-radius: 50%;
+    background-color: #111;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }

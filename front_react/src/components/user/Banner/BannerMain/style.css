@@ -2,6 +2,7 @@
 .banner-container {
     position: relative;
     width: 100%;
+    height: 100%;
     max-width: 1200px; /* 프로젝트 폭에 맞춰 조절 */
     margin: 20px auto;
     border-radius: 16px;
@@ -11,8 +12,9 @@
 
 /* 슬라이더 뷰포트 */
 .banner-wrapper {
+    position: relative;
     width: 100%;
-    height: 350px; /* 배너 높이 고정 */
+    height: 100%; /* 배너 높이 고정 */
     overflow: hidden;
 }
 
@@ -58,7 +60,7 @@
 .banner-nav.next { right: 20px; }
 
 
-.banner-trank {
+.banner-trank > div{
     display: flex;
     align-items: center;
     justify-content: center;

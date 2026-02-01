@@ -41,14 +41,20 @@ export default function Main() {
     //함수:네비
     const navigate = useNavigate();
 
+    //이벤트핸들러 : 상품 상세보기 클릭 
     const onClickProductDetailEventHandler = (product : number) => {
         console.log("상세보기테스트");
         navigate(PRODUCT_PATH() + "/" + PRODUCT_DETAIL_PATH(product))
     }
 
+    //이벤트핸들러 : 채팅버튼 클릭 
     const onClickChatButtonClickToggle = () => {
         setChatButton(!chatButton);
     }
+
+
+
+
 
 
     return (
@@ -83,16 +89,27 @@ export default function Main() {
             <div className="pagination-wrapper">
                 <Pagination totalCount={productListData?.productList.length || 0} size={10}/>
             </div>
-            <div className="main-chat-container" onClick={onClickChatButtonClickToggle}>
-                {chatButton ?//채팅방 활성화 비활성화 여부 .. 
-                    <>
-                        <div className="chat-floating-button"> x </div>
-                        <ChatQna />
-                    </>
-                :
-                    <div className="chat-floating-button">💬</div>
-                }
+
+<div className={`main-chat-container ${chatButton ? 'active' : ''}`}>
+    {chatButton ? (
+        <div className="chat-wrapper">
+            {/* 버튼을 채팅보드 왼쪽 외곽으로 보냄 */}
+            <div className="chat-floating-button close" onClick={() => {
+                onClickChatButtonClickToggle();
+                document.body.style.overflow = 'unset';
+            }}>✕</div>
+            
+            <div className="chat-main-board">
+                <ChatQna />
             </div>
+        </div>
+    ) : (
+        <div className="chat-floating-button" onClick={() => {
+            onClickChatButtonClickToggle();
+            document.body.style.overflow = 'hidden';
+        }}>💬</div>
+    )}
+</div>
         </div>
     );
 }

@@ -9,6 +9,7 @@
     SELECT cart_id
     FROM et_cart
     WHERE user_id = #{userId}
+    limit 1
   </select>
 
   <insert id="insertCart">

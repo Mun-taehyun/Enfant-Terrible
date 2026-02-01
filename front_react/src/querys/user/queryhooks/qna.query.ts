@@ -7,14 +7,13 @@ export const qnaQueries = {
 
     //쿼리 : 채팅방 목록 조회
     useGetQnaRoom() {
-        
         return useQuery({
             queryKey: qnaKeys.rooms(),
             queryFn: getQnaRoomRequest,
             refetchOnWindowFocus: true,
             //메시지 동기화가 자주 일어나면 사용되는 옵션
             //사용자가 브라우저를 바라보면 데이터 고칠 지 여부
-            select: (data) => ({ chatList: Array.isArray(data) ? data : [] })
+            select: (data) => data || null
         });
     },
 

@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { cartKeys } from "../keys/key";
 import { deleteCartItemRequest, deleteClearCartItemRequest, getCartItemRequest, postCartItemRequest, putCartItemRequest } from "@/apis/user";
 import { queryClient } from "../queryClient";
@@ -39,12 +39,14 @@ export const cartQueries = {
 
     //쿼리 : 장바구니 수량 수정 
     useUpdateItem: () => {
+        const queryClient = useQueryClient();
         return useMutation({
             mutationFn: putCartItemRequest,
             onMutate: async ({ cartItemId, requestBody }) => {
                 await queryClient.cancelQueries({ queryKey: cartKeys.lists() });
 
                 const prev = queryClient.getQueryData<any>(cartKeys.lists());
+                queryClient.invalidateQueries({ queryKey: cartKeys.all });
 
                 queryClient.setQueryData(cartKeys.lists(), (old: any) => {
                     const prevList = Array.isArray(old?.cartList) ? old.cartList : [];
@@ -66,6 +68,7 @@ export const cartQueries = {
 
     //쿼리 : 장바구니 특정 아이템 삭제
     useDeleteItem: () => {
+        const queryClient = useQueryClient();
         return useMutation({
             mutationFn: deleteCartItemRequest,
             onSuccess: () => {
@@ -76,6 +79,7 @@ export const cartQueries = {
 
     //쿼리 : 장바구니 전체 비우기
     useClearCart: () => {
+        const queryClient = useQueryClient();
         return useMutation({
             mutationFn: deleteClearCartItemRequest,
             onSuccess: () => {
