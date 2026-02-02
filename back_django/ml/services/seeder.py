@@ -28,7 +28,6 @@ def seed_recommendations(conn, log_dir):
         return
 
     df = pd.read_csv(csv_path)
-    # 컬럼명 통일 및 랭킹 계산
     if 'final_preference' in df.columns:
         df = df.rename(columns={'final_preference': 'score'})
     
@@ -49,6 +48,7 @@ def seed_kosmo_operational(truncate_all: bool = False):
     engine = get_db_engine()
     log_dir = Path(settings.BASE_DIR).parent / "logs"
     GITHUB_IMG_BASE = "https://raw.githubusercontent.com/Mun-taehyun/Enfant-Terrible/main/back_django/media/product-images/"
+    now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     with engine.connect() as conn:
         if truncate_all:
@@ -104,16 +104,62 @@ def seed_kosmo_operational(truncate_all: bool = False):
             except: continue
         print(f"🔧 SKU {len(p_rows)}건 생성 완료")
 
-        # 4) 유저 생성
+        # 4) 사용자 생성 (관리자 원본 정보 반영)
+        print("👥 유저 데이터 생성 중...")
+        
+        # (1) 이미지(image_9ed437.png)의 관리자 계정 정보 복구
+        admin_data = {
+            "user_id": 3,
+            "email": "kasd178515@gmail.com",
+            "password": "$2a$10$WUAkbUT6uZl6v/p9lu.1vO0dQ8XWUV...", # 이미지의 해시값
+            "name": "박종원",
+            "tel": "010-2222-1111",
+            "zip_code": "06035",
+            "address_base": "서울 강남구 가로수길 5",
+            "address_detail": "ㅇㅇ",
+            "email_verified": "Y",
+            "provider": "local",
+            "status": "ACTIVE",
+            "role": "ADMIN",
+            "last_login_at": "2026-01-29 19:42:31",
+            "created_at": "2026-01-29 19:41:40",
+            "updated_at": "2026-01-29 19:52:42"
+        }
+        
+        try:
+            conn.execute(text("""
+                INSERT INTO et_user (
+                    user_id, email, password, name, tel, zip_code, address_base, 
+                    address_detail, email_verified, provider, status, role, 
+                    last_login_at, created_at, updated_at
+                ) VALUES (
+                    :user_id, :email, :password, :name, :tel, :zip_code, :address_base, 
+                    :address_detail, :email_verified, :provider, :status, :role, 
+                    :last_login_at, :created_at, :updated_at
+                )
+            """), admin_data)
+            conn.commit()
+            print(f"👑 관리자 계정({admin_data['name']}) 원본 정보로 생성 완료")
+        except: pass
+
+        # (2) 나머지 테스트 유저 생성
         for i in range(1, 101):
+            if i == 3: continue # 관리자 ID와 중복 방지
             try:
                 conn.execute(text("""
-                    INSERT INTO et_user (email, password, name, role, status) 
-                    VALUES (:email, '1234', :name, 'USER', 'ACTIVE')
-                """), {"email": f"user{i}@test.com", "name": f"코스모유저{i}"})
+                    INSERT INTO et_user (
+                        email, password, name, role, status, email_verified, provider, created_at
+                    ) VALUES (
+                        :email, '1234', :name, 'USER', 'ACTIVE', 'Y', 'local', :now
+                    )
+                """), {
+                    "email": f"user{i}@test.com", 
+                    "name": f"코스모유저{i}", 
+                    "now": now_str
+                })
                 conn.commit()
             except: continue
-        print("👥 테스트 유저 100명 생성 완료")
+        print("👥 테스트용 일반 유저 생성 완료")
 
         # 5) AI 추천 데이터 연동
         seed_recommendations(conn, log_dir)
